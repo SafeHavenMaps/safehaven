@@ -1,5 +1,5 @@
 # Build frontend
-FROM node:18-alpine3.14 as frontend
+FROM node:20-alpine as frontend
 WORKDIR /app
 COPY ./frontend /app
 RUN yarn install
@@ -18,4 +18,4 @@ COPY --from=frontend /app/dist /usr/share/safehaven/static
 COPY --from=backend /usr/local/cargo/bin/safehaven /bin/safehaven
 ENV SAFEHAVEN_serve_public_path=/usr/share/safehaven/static
 EXPOSE 28669
-CMD ["/usr/local/bin/safehaven"]
+CMD ["/bin/safehaven"]

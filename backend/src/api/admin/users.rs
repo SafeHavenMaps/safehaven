@@ -22,7 +22,7 @@ pub async fn list(
     DbConn(mut conn): DbConn,
 ) -> Result<AppJson<Vec<User>>, AppError> {
     if !token.is_admin {
-        return Err(AppError::UnauthorizedError);
+        return Err(AppError::Unauthorized);
     }
 
     Ok(AppJson(User::list(&mut conn).await?))
@@ -44,7 +44,7 @@ pub async fn new(
     Json(new_user): Json<NewUser>,
 ) -> Result<AppJson<User>, AppError> {
     if !token.is_admin {
-        return Err(AppError::UnauthorizedError);
+        return Err(AppError::Unauthorized);
     }
 
     Ok(AppJson(User::new(new_user, &mut conn).await?))
@@ -69,7 +69,7 @@ pub async fn get(
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<User>, AppError> {
     if !token.is_admin {
-        return Err(AppError::UnauthorizedError);
+        return Err(AppError::Unauthorized);
     }
 
     Ok(AppJson(User::get(id, &mut conn).await?))
@@ -122,7 +122,7 @@ pub async fn change_password(
     Json(change_password): Json<ChangePassword>,
 ) -> Result<AppJson<()>, AppError> {
     if !token.is_admin {
-        return Err(AppError::UnauthorizedError);
+        return Err(AppError::Unauthorized);
     }
 
     Ok(AppJson(
@@ -149,7 +149,7 @@ pub async fn delete(
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
     if !token.is_admin {
-        return Err(AppError::UnauthorizedError);
+        return Err(AppError::Unauthorized);
     }
 
     User::delete(id, &mut conn).await?;

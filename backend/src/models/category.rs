@@ -45,7 +45,7 @@ impl Category {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn get(given_id: Uuid, conn: &mut PgConnection) -> Result<Category, AppError> {
@@ -60,7 +60,7 @@ impl Category {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn update(
@@ -86,7 +86,7 @@ impl Category {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn delete(given_id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
@@ -99,7 +99,7 @@ impl Category {
         )
         .execute(conn)
         .await
-        .map_err(AppError::DatabaseError)?;
+        .map_err(AppError::Database)?;
 
         Ok(())
     }
@@ -114,7 +114,7 @@ impl Category {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn list_restricted(
@@ -132,6 +132,6 @@ impl Category {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 }

@@ -51,13 +51,11 @@ pub struct NewOrUpdateFamily {
 impl Form {
     pub fn validate(&self) -> Result<(), AppError> {
         if self.title.is_empty() {
-            return Err(AppError::ValidationError(
-                "Title cannot be empty".to_string(),
-            ));
+            return Err(AppError::Validation("Title cannot be empty".to_string()));
         }
 
         if self.fields.is_empty() {
-            return Err(AppError::ValidationError(
+            return Err(AppError::Validation(
                 "Form must have at least one field".to_string(),
             ));
         }
@@ -65,7 +63,7 @@ impl Form {
         let mut keys = Vec::new();
         for field in self.fields.iter() {
             if keys.contains(&field.key) {
-                return Err(AppError::ValidationError(format!(
+                return Err(AppError::Validation(format!(
                     "Duplicate key: {}",
                     field.key
                 )));
@@ -81,7 +79,7 @@ impl Form {
         for field in self.fields.iter() {
             if field.mandatory {
                 data.get(&field.key).ok_or_else(|| {
-                    AppError::ValidationError(format!("Mandatory field {} is missing", field.key))
+                    AppError::Validation(format!("Mandatory field {} is missing", field.key))
                 })?;
             }
         }
@@ -92,11 +90,11 @@ impl Form {
 impl Field {
     pub fn validate(&self) -> Result<(), AppError> {
         if self.key.is_empty() {
-            return Err(AppError::ValidationError("Key cannot be empty".to_string()));
+            return Err(AppError::Validation("Key cannot be empty".to_string()));
         }
 
         if self.display_name.is_empty() {
-            return Err(AppError::ValidationError(
+            return Err(AppError::Validation(
                 "Display name cannot be empty".to_string(),
             ));
         }
@@ -133,7 +131,7 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn update(
@@ -166,7 +164,7 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn delete(given_id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
@@ -179,7 +177,7 @@ impl Family {
         )
         .execute(conn)
         .await
-        .map_err(AppError::DatabaseError)?;
+        .map_err(AppError::Database)?;
 
         Ok(())
     }
@@ -198,7 +196,7 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn list(conn: &mut PgConnection) -> Result<Vec<Family>, AppError> {
@@ -213,7 +211,7 @@ impl Family {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn list_restricted(
@@ -233,7 +231,7 @@ impl Family {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn get_from_category(
@@ -254,7 +252,7 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn get_from_entity(
@@ -276,6 +274,6 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 }

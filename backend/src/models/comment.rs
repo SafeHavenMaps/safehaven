@@ -75,7 +75,7 @@ impl Comment {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn update(
@@ -104,7 +104,7 @@ impl Comment {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn get(given_id: Uuid, conn: &mut PgConnection) -> Result<Comment, AppError> {
@@ -119,7 +119,7 @@ impl Comment {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn delete(given_id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
@@ -132,7 +132,7 @@ impl Comment {
         )
         .execute(conn)
         .await
-        .map_err(AppError::DatabaseError)?;
+        .map_err(AppError::Database)?;
 
         Ok(())
     }
@@ -154,7 +154,7 @@ impl Comment {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn list_for_entity(
@@ -174,7 +174,7 @@ impl Comment {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn pending(conn: &mut PgConnection) -> Result<Vec<ListedComment>, AppError> {
@@ -190,6 +190,6 @@ impl Comment {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 }

@@ -42,11 +42,30 @@
           "rust-analyzer"
         ];
       };
+
+      prepareBuild = pkgs.writeShellScriptBin "prepare" ''
+        set -e
+
+        cd ./backend
+        sqlx database create
+        sqlx migrate run
+        cargo sqlx prepare
+      '';
+      testAndLint = pkgs.writeShellScriptBin "test_and_lint" ''
+        set -e
+
+        cd ./backend
+        cargo fmt -- --check
+        cargo clippy
+      '';
     in
       with pkgs; {
         devShells.default = mkShell {
           nativeBuildInputs = [rustChan];
           buildInputs = [
+            # Prepare scripts
+            prepareBuild
+            testAndLint
             # Backend
             sqlx-cli
             openssl

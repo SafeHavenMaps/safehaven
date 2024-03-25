@@ -21,8 +21,8 @@ pub struct HealthCheckResponse {
 }
 
 #[utoipa::path(
-    get, 
-    path = "/api/health", 
+    get,
+    path = "/api/health",
     responses(
         (status = 200, description = "Health check", body = HealthCheckResponse)
     )
@@ -40,7 +40,7 @@ pub struct BootstrapResponse {
 }
 
 #[utoipa::path(
-    get, 
+    get,
     path = "/api/bootstrap/{token}",
     params(
         ("token" = String, Path, description = "Access token")

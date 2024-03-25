@@ -76,23 +76,19 @@ where
 
     async fn from_request_parts(_parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let app_state = AppState::from_ref(state);
-        let conn = app_state
-            .pool
-            .acquire()
-            .await
-            .map_err(|_| AppError::PoolError)?;
+        let conn = app_state.pool.acquire().await.map_err(|_| AppError::Pool)?;
 
         Ok(Self(conn))
     }
 }
 
 pub enum AppError {
-    PoolError,
-    TokenValidationError,
-    BadUsernameOrPasswordError,
-    UnauthorizedError,
-    ValidationError(String),
-    DatabaseError(sqlx::Error),
+    Pool,
+    TokenValidation,
+    BadUsernameOrPassword,
+    Unauthorized,
+    Validation(String),
+    Database(sqlx::Error),
 }
 
 #[derive(FromRequest)]
@@ -117,19 +113,15 @@ pub struct ErrorResponse {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, error_code, details) = match self {
-            AppError::PoolError => (StatusCode::INTERNAL_SERVER_ERROR, "pool_error", None),
-            AppError::BadUsernameOrPasswordError => (StatusCode::NOT_FOUND, "user_not_found", None),
-            AppError::TokenValidationError => {
-                (StatusCode::UNAUTHORIZED, "token_validation_error", None)
-            }
-            AppError::ValidationError(ve) => {
-                (StatusCode::BAD_REQUEST, "validation_error", Some(ve))
-            }
-            AppError::DatabaseError(de) => match de {
+            AppError::Pool => (StatusCode::INTERNAL_SERVER_ERROR, "pool_error", None),
+            AppError::BadUsernameOrPassword => (StatusCode::NOT_FOUND, "user_not_found", None),
+            AppError::TokenValidation => (StatusCode::UNAUTHORIZED, "token_validation_error", None),
+            AppError::Validation(ve) => (StatusCode::BAD_REQUEST, "validation_error", Some(ve)),
+            AppError::Database(de) => match de {
                 sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "not_found", None),
                 _ => (StatusCode::INTERNAL_SERVER_ERROR, "database_error", None),
             },
-            AppError::UnauthorizedError => (StatusCode::UNAUTHORIZED, "unauthorized", None),
+            AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized", None),
         };
 
         let resp = (
@@ -168,14 +160,14 @@ where
         let TypedHeader(Authorization(bearer)) = parts
             .extract::<TypedHeader<Authorization<Bearer>>>()
             .await
-            .map_err(|_| AppError::TokenValidationError)?;
+            .map_err(|_| AppError::TokenValidation)?;
 
         let token_data = jsonwebtoken::decode::<MapUserTokenClaims>(
             bearer.token(),
             &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
             &jsonwebtoken::Validation::default(),
         )
-        .map_err(|_| AppError::TokenValidationError)?;
+        .map_err(|_| AppError::TokenValidation)?;
 
         Ok(Self(token_data.claims))
     }
@@ -207,14 +199,14 @@ where
         let TypedHeader(Authorization(bearer)) = parts
             .extract::<TypedHeader<Authorization<Bearer>>>()
             .await
-            .map_err(|_| AppError::TokenValidationError)?;
+            .map_err(|_| AppError::TokenValidation)?;
 
         let token_data = jsonwebtoken::decode::<AdminUserTokenClaims>(
             bearer.token(),
             &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
             &jsonwebtoken::Validation::default(),
         )
-        .map_err(|_| AppError::TokenValidationError)?;
+        .map_err(|_| AppError::TokenValidation)?;
 
         Ok(Self(token_data.claims))
     }

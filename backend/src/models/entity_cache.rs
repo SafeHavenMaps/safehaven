@@ -75,7 +75,7 @@ impl CachedEntity {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn search_entities(
@@ -107,6 +107,6 @@ impl CachedEntity {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 }

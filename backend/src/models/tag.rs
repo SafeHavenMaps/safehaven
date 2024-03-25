@@ -34,7 +34,7 @@ impl Tag {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn update(
@@ -57,7 +57,7 @@ impl Tag {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn delete(given_id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
@@ -70,7 +70,7 @@ impl Tag {
         )
         .execute(conn)
         .await
-        .map_err(AppError::DatabaseError)?;
+        .map_err(AppError::Database)?;
 
         Ok(())
     }
@@ -87,7 +87,7 @@ impl Tag {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn list(conn: &mut PgConnection) -> Result<Vec<Tag>, AppError> {
@@ -100,7 +100,7 @@ impl Tag {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn list_restricted(
@@ -118,6 +118,6 @@ impl Tag {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 }

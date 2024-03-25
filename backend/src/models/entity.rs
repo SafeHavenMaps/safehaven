@@ -100,7 +100,7 @@ impl Entity {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn update(
@@ -139,7 +139,7 @@ impl Entity {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn delete(id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
@@ -152,7 +152,7 @@ impl Entity {
         )
         .execute(conn)
         .await
-        .map_err(AppError::DatabaseError)?;
+        .map_err(AppError::Database)?;
 
         Ok(())
     }
@@ -172,7 +172,7 @@ impl Entity {
         )
         .execute(conn)
         .await
-        .map_err(AppError::DatabaseError)?;
+        .map_err(AppError::Database)?;
 
         Ok(())
     }
@@ -192,7 +192,7 @@ impl Entity {
         )
         .execute(conn)
         .await
-        .map_err(AppError::DatabaseError)?;
+        .map_err(AppError::Database)?;
 
         Ok(())
     }
@@ -212,7 +212,7 @@ impl Entity {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn get_public(
@@ -236,7 +236,7 @@ impl Entity {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn pending(conn: &mut PgConnection) -> Result<Vec<ListedEntity>, AppError> {
@@ -251,7 +251,7 @@ impl Entity {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn search(
@@ -270,7 +270,7 @@ impl Entity {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn get_children(
@@ -289,7 +289,7 @@ impl Entity {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn get_parents(
@@ -308,6 +308,6 @@ impl Entity {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 }

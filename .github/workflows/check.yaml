@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: DeterminateSystems/nix-installer-action@main
+      - run: nix develop -c prepare
+      - run: nix develop -c test_and_lint

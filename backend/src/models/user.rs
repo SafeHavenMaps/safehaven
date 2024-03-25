@@ -42,15 +42,13 @@ impl From<AuthenticableUser> for User {
 impl User {
     pub async fn new(user: NewUser, conn: &mut PgConnection) -> Result<User, AppError> {
         if user.password.is_empty() {
-            return Err(AppError::ValidationError(
-                "Password cannot be empty".to_string(),
-            ));
+            return Err(AppError::Validation("Password cannot be empty".to_string()));
         }
 
         let salt = SaltString::generate(&mut OsRng);
         let password_hash = Scrypt
             .hash_password(user.password.as_bytes(), &salt)
-            .map_err(|_| AppError::ValidationError("Error hashing password".to_string()))?
+            .map_err(|_| AppError::Validation("Error hashing password".to_string()))?
             .to_string();
 
         let new_user = NewUser {
@@ -66,7 +64,7 @@ impl User {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn change_password(
@@ -77,7 +75,7 @@ impl User {
         let salt = SaltString::generate(&mut OsRng);
         let password_hash = Scrypt
             .hash_password(new_password.as_bytes(), &salt)
-            .map_err(|_| AppError::ValidationError("Error hashing password".to_string()))?
+            .map_err(|_| AppError::Validation("Error hashing password".to_string()))?
             .to_string();
 
         sqlx::query!(
@@ -87,7 +85,7 @@ impl User {
         )
         .execute(conn)
         .await
-        .map_err(AppError::DatabaseError)?;
+        .map_err(AppError::Database)?;
 
         Ok(())
     }
@@ -104,14 +102,14 @@ impl User {
         )
         .fetch_one(conn)
         .await
-        .map_err(|_| AppError::BadUsernameOrPasswordError)?;
+        .map_err(|_| AppError::BadUsernameOrPassword)?;
 
         let password_hash =
-            PasswordHash::new(&user.password).map_err(|_| AppError::BadUsernameOrPasswordError)?;
+            PasswordHash::new(&user.password).map_err(|_| AppError::BadUsernameOrPassword)?;
 
         Scrypt
             .verify_password(given_password.as_bytes(), &password_hash)
-            .map_err(|_| AppError::BadUsernameOrPasswordError)?;
+            .map_err(|_| AppError::BadUsernameOrPassword)?;
 
         Ok(user.into())
     }
@@ -120,14 +118,14 @@ impl User {
         sqlx::query_as!(User, r#"SELECT id, name, is_admin FROM users"#)
             .fetch_all(conn)
             .await
-            .map_err(AppError::DatabaseError)
+            .map_err(AppError::Database)
     }
 
     pub async fn delete(given_id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
         sqlx::query!(r#"DELETE FROM users WHERE id = $1"#, given_id)
             .execute(conn)
             .await
-            .map_err(AppError::DatabaseError)?;
+            .map_err(AppError::Database)?;
         Ok(())
     }
 
@@ -139,6 +137,6 @@ impl User {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 }

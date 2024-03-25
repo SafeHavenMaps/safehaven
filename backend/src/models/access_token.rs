@@ -59,7 +59,7 @@ impl AccessToken {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn update(
@@ -89,7 +89,7 @@ impl AccessToken {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn delete(given_id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
@@ -102,7 +102,7 @@ impl AccessToken {
         )
         .execute(conn)
         .await
-        .map_err(AppError::DatabaseError)?;
+        .map_err(AppError::Database)?;
         Ok(())
     }
 
@@ -121,7 +121,7 @@ impl AccessToken {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn get_with_id(
@@ -139,7 +139,7 @@ impl AccessToken {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 
     pub async fn list(conn: &mut PgConnection) -> Result<Vec<AccessToken>, AppError> {
@@ -152,6 +152,6 @@ impl AccessToken {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)
+        .map_err(AppError::Database)
     }
 }

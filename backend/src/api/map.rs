@@ -183,7 +183,7 @@ async fn fetch_entity(
                 .all(|tag| token.perms.tags_policy.allow_list.contains(tag)));
 
     if !can_read_entity {
-        return Err(AppError::UnauthorizedError);
+        return Err(AppError::Unauthorized);
     }
 
     let comments = match token.perms.can_access_comments {
