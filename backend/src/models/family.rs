@@ -1,7 +1,7 @@
 use crate::api::AppError;
 use serde::{Deserialize, Serialize};
 use serde_json::{to_value, Value};
-use sqlx::{FromRow, PgConnection};
+use sqlx::{types::Json, FromRow, PgConnection};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -33,38 +33,12 @@ pub struct Field {
     pub display_weight: u8,
 }
 
-#[derive(FromRow, Serialize, Deserialize, Debug)]
-pub struct RawFamily {
-    pub id: Uuid,
-    pub title: String,
-    pub entity_form: Value,
-    pub comment_form: Value,
-}
-
-impl TryFrom<RawFamily> for Family {
-    type Error = AppError;
-
-    fn try_from(raw: RawFamily) -> Result<Family, AppError> {
-        let entity_form: Form = serde_json::from_value(raw.entity_form)
-            .map_err(|e| AppError::ValidationError(format!("Error parsing entity form: {}", e)))?;
-        let comment_form: Form = serde_json::from_value(raw.comment_form)
-            .map_err(|e| AppError::ValidationError(format!("Error parsing comment form: {}", e)))?;
-
-        Ok(Family {
-            id: raw.id,
-            title: raw.title,
-            entity_form,
-            comment_form,
-        })
-    }
-}
-
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
 pub struct Family {
     pub id: Uuid,
     pub title: String,
-    pub entity_form: Form,
-    pub comment_form: Form,
+    pub entity_form: Json<Form>,
+    pub comment_form: Json<Form>,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -143,11 +117,15 @@ impl Family {
         let comment_form = to_value(family.comment_form).unwrap();
 
         sqlx::query_as!(
-            RawFamily,
+            Family,
             r#"
             INSERT INTO families (title, entity_form, comment_form)
             VALUES ($1, $2, $3)
-            RETURNING id, title, entity_form, comment_form
+            RETURNING 
+                id,
+                title,
+                entity_form as "entity_form: Json<Form>",
+                comment_form as "comment_form: Json<Form>"
             "#,
             family.title,
             entity_form,
@@ -155,8 +133,7 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .try_into()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn update(
@@ -171,12 +148,16 @@ impl Family {
         let comment_form = to_value(update.comment_form).unwrap();
 
         sqlx::query_as!(
-            RawFamily,
+            Family,
             r#"
             UPDATE families
             SET title = $2, entity_form = $3, comment_form = $4
             WHERE id = $1
-            RETURNING id, title, entity_form, comment_form
+            RETURNING 
+                id,
+                title,
+                entity_form as "entity_form: Json<Form>",
+                comment_form as "comment_form: Json<Form>"
             "#,
             id,
             update.title,
@@ -185,8 +166,7 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .try_into()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn delete(given_id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
@@ -206,9 +186,11 @@ impl Family {
 
     pub async fn get(given_id: Uuid, conn: &mut PgConnection) -> Result<Family, AppError> {
         sqlx::query_as!(
-            RawFamily,
+            Family,
             r#"
-            SELECT id, title, entity_form, comment_form
+            SELECT id, title, 
+                entity_form as "entity_form: Json<Form>", 
+                comment_form as "comment_form: Json<Form>"
             FROM families
             WHERE id = $1
             "#,
@@ -216,24 +198,22 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .try_into()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn list(conn: &mut PgConnection) -> Result<Vec<Family>, AppError> {
         sqlx::query_as!(
-            RawFamily,
+            Family,
             r#"
-            SELECT id, title, entity_form, comment_form
+            SELECT id, title, 
+                entity_form as "entity_form: Json<Form>", 
+                comment_form as "comment_form: Json<Form>"
             FROM families
             "#
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .into_iter()
-        .map(|raw| raw.try_into())
-        .collect()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn list_restricted(
@@ -241,9 +221,11 @@ impl Family {
         conn: &mut PgConnection,
     ) -> Result<Vec<Family>, AppError> {
         sqlx::query_as!(
-            RawFamily,
+            Family,
             r#"
-            SELECT id, title, entity_form, comment_form
+            SELECT id, title, 
+                entity_form as "entity_form: Json<Form>", 
+                comment_form as "comment_form: Json<Form>"
             FROM families
             WHERE id = ANY($1)
             "#,
@@ -251,10 +233,7 @@ impl Family {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .into_iter()
-        .map(|raw| raw.try_into())
-        .collect()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn get_from_category(
@@ -262,9 +241,11 @@ impl Family {
         conn: &mut PgConnection,
     ) -> Result<Family, AppError> {
         sqlx::query_as!(
-            RawFamily,
+            Family,
             r#"
-            SELECT families.id, families.title, families.entity_form, families.comment_form
+            SELECT families.id, families.title, 
+                families.entity_form as "entity_form: Json<Form>", 
+                families.comment_form as "comment_form: Json<Form>"
             FROM families
             JOIN categories ON families.id = categories.family_id
             WHERE categories.id = $1
@@ -273,8 +254,7 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .try_into()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn get_from_entity(
@@ -282,9 +262,11 @@ impl Family {
         conn: &mut PgConnection,
     ) -> Result<Family, AppError> {
         sqlx::query_as!(
-            RawFamily,
+            Family,
             r#"
-            SELECT families.id, families.title, families.entity_form, families.comment_form
+            SELECT families.id, families.title, 
+                families.entity_form as "entity_form: Json<Form>", 
+                families.comment_form as "comment_form: Json<Form>"
             FROM families
             JOIN categories ON families.id = categories.family_id
             JOIN entities ON categories.id = entities.category_id
@@ -294,7 +276,6 @@ impl Family {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .try_into()
+        .map_err(AppError::DatabaseError)
     }
 }

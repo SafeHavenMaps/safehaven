@@ -2,7 +2,7 @@ use crate::api::AppError;
 use crate::models::family::Family;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::{FromRow, PgConnection};
+use sqlx::{types::Json, FromRow, PgConnection};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -29,83 +29,15 @@ pub struct ListedEntity {
     pub created_at: chrono::NaiveDateTime,
 }
 
-#[derive(FromRow, Deserialize, Serialize, Debug)]
-pub struct RawPublicEntity {
-    pub id: Uuid,
-    pub category_id: Uuid,
-    pub family_id: Uuid,
-    pub display_name: String,
-    pub locations: Value,
-    pub data: Value,
-    pub tags: Option<Vec<Uuid>>,
-}
-
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
 pub struct PublicEntity {
     pub id: Uuid,
     pub category_id: Uuid,
     pub family_id: Uuid,
     pub display_name: String,
-    pub locations: Vec<UnprocessedLocation>,
+    pub locations: Json<Vec<UnprocessedLocation>>,
     pub data: Value,
     pub tags: Vec<Uuid>,
-}
-
-impl TryFrom<RawPublicEntity> for PublicEntity {
-    type Error = AppError;
-
-    fn try_from(raw: RawPublicEntity) -> Result<PublicEntity, AppError> {
-        let locations: Vec<UnprocessedLocation> = serde_json::from_value(raw.locations)
-            .map_err(|e| AppError::ValidationError(format!("Error parsing locations: {}", e)))?;
-
-        Ok(PublicEntity {
-            id: raw.id,
-            category_id: raw.category_id,
-            family_id: raw.family_id,
-            display_name: raw.display_name,
-            locations,
-            data: raw.data,
-            tags: raw.tags.unwrap_or_default(),
-        })
-    }
-}
-
-#[derive(FromRow, Deserialize, Serialize, Debug)]
-pub struct RawEntity {
-    pub id: Uuid,
-    pub display_name: String,
-    pub category_id: Uuid,
-    pub locations: Value,
-    pub data: Value,
-    pub hide_from_map: bool,
-    pub moderation_notes: Option<String>,
-    pub moderated_at: Option<chrono::NaiveDateTime>,
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
-    pub last_update_by: Option<Uuid>,
-}
-
-impl TryFrom<RawEntity> for Entity {
-    type Error = AppError;
-
-    fn try_from(raw: RawEntity) -> Result<Entity, AppError> {
-        let locations: Vec<UnprocessedLocation> = serde_json::from_value(raw.locations)
-            .map_err(|e| AppError::ValidationError(format!("Error parsing locations: {}", e)))?;
-
-        Ok(Entity {
-            id: raw.id,
-            display_name: raw.display_name,
-            category_id: raw.category_id,
-            locations,
-            data: raw.data,
-            hide_from_map: raw.hide_from_map,
-            moderation_notes: raw.moderation_notes,
-            moderated_at: raw.moderated_at,
-            created_at: raw.created_at,
-            updated_at: raw.updated_at,
-            last_update_by: raw.last_update_by,
-        })
-    }
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -113,7 +45,7 @@ pub struct Entity {
     pub id: Uuid,
     pub display_name: String,
     pub category_id: Uuid,
-    pub locations: Vec<UnprocessedLocation>,
+    pub locations: Json<Vec<UnprocessedLocation>>,
     pub data: Value,
     pub hide_from_map: bool,
     pub moderation_notes: Option<String>,
@@ -145,7 +77,7 @@ impl Entity {
         family.entity_form.validate_data(entity.data.clone())?;
 
         sqlx::query_as!(
-            RawEntity,
+            Entity,
             r#"
             INSERT INTO entities (display_name, category_id, data)
             VALUES ($1, $2, $3)
@@ -153,7 +85,7 @@ impl Entity {
                 id,
                 display_name,
                 category_id,
-                locations,
+                locations as "locations: Json<Vec<UnprocessedLocation>>",
                 data,
                 hide_from_map,
                 moderation_notes,
@@ -168,8 +100,7 @@ impl Entity {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .try_into()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn update(
@@ -181,7 +112,7 @@ impl Entity {
         family.entity_form.validate_data(update.data.clone())?;
 
         sqlx::query_as!(
-            RawEntity,
+            Entity,
             r#"
             UPDATE entities
             SET display_name = $2, category_id = $3, data = $4, moderation_notes = $5, last_update_by = $6
@@ -190,7 +121,7 @@ impl Entity {
                 id,
                 display_name,
                 category_id,
-                locations,
+                locations as "locations: Json<Vec<UnprocessedLocation>>",
                 data,
                 hide_from_map,
                 moderation_notes,
@@ -208,8 +139,7 @@ impl Entity {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .try_into()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn delete(id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
@@ -269,10 +199,12 @@ impl Entity {
 
     pub async fn get(given_id: Uuid, conn: &mut PgConnection) -> Result<Entity, AppError> {
         sqlx::query_as!(
-            RawEntity,
+            Entity,
             r#"
-            SELECT e.id, e.display_name, e.category_id, e.locations, e.data, e.hide_from_map, 
-                   e.moderation_notes, e.moderated_at, e.created_at, e.updated_at, e.last_update_by
+            SELECT e.id, e.display_name, e.category_id, 
+            e.locations as "locations: Json<Vec<UnprocessedLocation>>", 
+            e.data, e.hide_from_map, e.moderation_notes, e.moderated_at, 
+            e.created_at, e.updated_at, e.last_update_by
             FROM entities e
             WHERE e.id = $1
             "#,
@@ -280,8 +212,7 @@ impl Entity {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .try_into()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn get_public(
@@ -289,10 +220,14 @@ impl Entity {
         conn: &mut PgConnection,
     ) -> Result<PublicEntity, AppError> {
         sqlx::query_as!(
-            RawPublicEntity,
+            PublicEntity,
             r#"
-            SELECT e.id, c.family_id, e.category_id, e.display_name, e.locations, e.data,
-                (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id) as tags
+            SELECT e.id, c.family_id, e.category_id, e.display_name, e.data,
+                e.locations as "locations: Json<Vec<UnprocessedLocation>>",
+                COALESCE(
+                    (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
+                    array[]::uuid[]
+                ) as "tags!"
             FROM entities e
             INNER JOIN categories c ON e.category_id = c.id
             WHERE e.id = $1
@@ -301,8 +236,7 @@ impl Entity {
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::DatabaseError)?
-        .try_into()
+        .map_err(AppError::DatabaseError)
     }
 
     pub async fn pending(conn: &mut PgConnection) -> Result<Vec<ListedEntity>, AppError> {

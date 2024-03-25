@@ -55,7 +55,7 @@ async fn boostrap(
     DbConn(mut conn): DbConn,
 ) -> Result<AppJson<BootstrapResponse>, AppError> {
     let access_token = AccessToken::get(token, &mut conn).await?;
-    let perms: crate::models::access_token::Permissions = access_token.permissions;
+    let perms: crate::models::access_token::Permissions = access_token.permissions.0;
 
     let signed_token = app_state.generate_token(MapUserTokenClaims {
         iat: Utc::now().timestamp() as usize,
