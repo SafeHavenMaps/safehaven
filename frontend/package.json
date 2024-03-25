@@ -7,11 +7,23 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "generate-api": "openapi-typescript ./openapi.json -o ./lib/api.d.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write ."
   },
-  "dependencies": {
+  "devDependencies": {
+    "@nuxt/eslint": "^0.3.0-beta.3",
+    "eslint": "^8.57.0",
     "nuxt": "^3.11.1",
+    "openapi-fetch": "^0.9.3",
+    "openapi-typescript": "^6.7.5",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.3",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "vue-tsc": "^1"
   }
 }

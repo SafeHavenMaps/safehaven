@@ -47,11 +47,12 @@
         set -e
 
         pushd backend
-        cargo run -- openapi > ../frontend/openapi.json
+        cargo run -- openapi ../frontend/openapi.json
         popd
 
         pushd frontend
-        # task to generate frontend client and types
+        yarn install
+        yarn generate-api
         popd
       '';
 
@@ -70,9 +71,15 @@
       testAndLint = pkgs.writeShellScriptBin "test_and_lint" ''
         set -e
 
-        cd ./backend
+        pushd backend
         cargo fmt -- --check
         cargo clippy -- -D warnings
+        popd
+
+        pushd frontend
+        yarn lint
+        yarn prettier
+        popd
       '';
     in
       with pkgs; {
@@ -83,7 +90,6 @@
             prepareBuild
             testAndLint
             generateOpenApi
-
             # Backend
             sqlx-cli
             openssl
