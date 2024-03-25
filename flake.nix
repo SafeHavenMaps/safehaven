@@ -43,20 +43,36 @@
         ];
       };
 
+      generateOpenApi = pkgs.writeShellScriptBin "generate_openapi" ''
+        set -e
+
+        pushd backend
+        cargo run -- openapi > ../frontend/openapi.json
+        popd
+
+        pushd frontend
+        # task to generate frontend client and types
+        popd
+      '';
+
       prepareBuild = pkgs.writeShellScriptBin "prepare" ''
         set -e
 
-        cd ./backend
+        pushd backend
         sqlx database create
         sqlx migrate run
         cargo sqlx prepare
+        popd
+
+        ${generateOpenApi}/bin/generate_openapi
       '';
+
       testAndLint = pkgs.writeShellScriptBin "test_and_lint" ''
         set -e
 
         cd ./backend
         cargo fmt -- --check
-        cargo clippy
+        cargo clippy -- -D warnings
       '';
     in
       with pkgs; {
@@ -66,6 +82,8 @@
             # Prepare scripts
             prepareBuild
             testAndLint
+            generateOpenApi
+
             # Backend
             sqlx-cli
             openssl

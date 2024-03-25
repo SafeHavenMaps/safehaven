@@ -187,7 +187,7 @@ async fn fetch_entity(
     }
 
     let comments = match token.perms.can_access_comments {
-        true => Comment::list_for_public_entity(id, &mut conn).await?,
+        true => Comment::list_for_public_entity(id, &entity.comment_form, &mut conn).await?,
         false => vec![],
     };
 

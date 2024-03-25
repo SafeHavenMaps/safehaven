@@ -1,4 +1,4 @@
-use super::family::Family;
+use super::family::{Family, Form};
 use crate::api::AppError;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -31,6 +31,23 @@ pub struct PublicComment {
     pub data: Value,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
+}
+
+impl PublicComment {
+    /// Remove all data that is not user_facing from the data object using the comment_form
+    pub fn cleanup_data(&mut self, comment_form: &Form) {
+        let data = self.data.as_object_mut().expect("data is not an object");
+        let non_user_facing_fields: Vec<String> = comment_form
+            .fields
+            .iter()
+            .filter(|field| !field.user_facing)
+            .map(|field| field.key.clone()) // Assuming each field has a 'name' attribute
+            .collect();
+
+        for field_name in non_user_facing_fields.iter() {
+            data.remove(field_name);
+        }
+    }
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -139,9 +156,10 @@ impl Comment {
 
     pub async fn list_for_public_entity(
         given_entity_id: Uuid,
+        comment_form: &Form,
         conn: &mut PgConnection,
     ) -> Result<Vec<PublicComment>, AppError> {
-        sqlx::query_as!(
+        let result = sqlx::query_as!(
             PublicComment,
             r#"
             SELECT c.id, c.author, c.text, c.data, c.created_at, c.updated_at
@@ -154,7 +172,15 @@ impl Comment {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::Database)
+        .map_err(AppError::Database)?
+        .into_iter()
+        .map(|mut comment| {
+            comment.cleanup_data(comment_form);
+            comment
+        })
+        .collect();
+
+        Ok(result)
     }
 
     pub async fn list_for_entity(

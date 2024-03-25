@@ -6,6 +6,8 @@ use sqlx::{types::Json, FromRow, PgConnection};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
+use super::family::Form;
+
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct UnprocessedLocation {
     pub plain_text: String,
@@ -38,6 +40,26 @@ pub struct PublicEntity {
     pub locations: Json<Vec<UnprocessedLocation>>,
     pub data: Value,
     pub tags: Vec<Uuid>,
+    pub entity_form: Json<Form>,
+    pub comment_form: Json<Form>,
+}
+
+impl PublicEntity {
+    /// Remove all data that is not user_facing from the data object using the entity_form
+    pub fn cleanup_data(&mut self) {
+        let data = self.data.as_object_mut().expect("data is not an object");
+        let non_user_facing_fields: Vec<String> = self
+            .entity_form
+            .fields
+            .iter()
+            .filter(|field| !field.user_facing)
+            .map(|field| field.key.clone()) // Assuming each field has a 'name' attribute
+            .collect();
+
+        for field_name in non_user_facing_fields.iter() {
+            data.remove(field_name);
+        }
+    }
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -219,7 +241,7 @@ impl Entity {
         given_id: Uuid,
         conn: &mut PgConnection,
     ) -> Result<PublicEntity, AppError> {
-        sqlx::query_as!(
+        let mut public_entity = sqlx::query_as!(
             PublicEntity,
             r#"
             SELECT e.id, c.family_id, e.category_id, e.display_name, e.data,
@@ -227,16 +249,22 @@ impl Entity {
                 COALESCE(
                     (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                     array[]::uuid[]
-                ) as "tags!"
+                ) as "tags!",
+                f.entity_form as "entity_form: Json<Form>",
+                f.comment_form as "comment_form: Json<Form>"
             FROM entities e
             INNER JOIN categories c ON e.category_id = c.id
+            INNER JOIN families f ON c.family_id = f.id
             WHERE e.id = $1
             "#,
             given_id
         )
         .fetch_one(conn)
         .await
-        .map_err(AppError::Database)
+        .map_err(AppError::Database)?;
+
+        public_entity.cleanup_data();
+        Ok(public_entity)
     }
 
     pub async fn pending(conn: &mut PgConnection) -> Result<Vec<ListedEntity>, AppError> {

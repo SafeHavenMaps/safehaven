@@ -18,18 +18,47 @@ pub enum FieldType {
     Number = 2,
     DiscreteScore = 3,
     Date = 4,
+    EnumSingleOption = 5,
+    EnumMultiOption = 6,
     EventList = 10,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct Field {
+    /// The key is used to identify the field in the data object
     pub key: String,
+
+    /// The display name is used to show the field in the UI
     pub display_name: String,
+
+    /// The help text is used to show additional information about the field in the UI
     pub help: Option<String>,
+
+    /// The type of the field
     pub field_type: FieldType,
+
+    /// Used to store detail about the field that relevent
+    /// only for the frontend. For instance, if the field is an enum
+    /// use it to store possible values. If it is a SingleLineText, specify
+    /// if it's an email, a phone number, etc...
+    pub field_type_metadata: Option<Value>,
+
+    /// Sets if the field is indexed (used in full text search)
     pub indexed: bool,
+
+    /// Sets if the field is mandatory
     pub mandatory: bool,
+
+    /// Sets if the field is displayed to the final user
+    pub user_facing: bool,
+
+    /// Form page number for the given field
+    pub form_page: u8,
+
+    /// The weight of the field in the form (when displayed, ordered by weight)
     pub form_weight: u8,
+
+    /// The weight of the field in the display (when displayed, ordered by weight)
     pub display_weight: u8,
 }
 

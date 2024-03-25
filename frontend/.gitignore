@@ -23,3 +23,5 @@ logs
 .env.*
 !.env.example
 
+# Generated from the backend
+openapi.json
