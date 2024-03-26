@@ -100,6 +100,7 @@
             fixedNodePackages.yarn
           ];
           DATABASE_URL = "postgres://postgres:postgres@localhost:5432/safehaven";
+          API_URL = "http://localhost:28669";
         };
       });
 }

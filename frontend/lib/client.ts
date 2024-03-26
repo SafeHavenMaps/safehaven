@@ -1,5 +1,10 @@
 import type { paths } from "./api";
 import createClient from "openapi-fetch";
 
-const client = createClient<paths>({ baseUrl: "/" });
-export default client;
+export default function useClient() {
+  const config = useRuntimeConfig();
+  const apiUrl = config.public.apiUrl;
+  const client = createClient<paths>({ baseUrl: apiUrl });
+
+  return client;
+}
