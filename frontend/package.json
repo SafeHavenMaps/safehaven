@@ -18,12 +18,19 @@
     "@nuxt/eslint": "^0.3.0-beta.3",
     "eslint": "^8.57.0",
     "nuxt": "^3.11.1",
+    "nuxt-primevue": "^0.3.1",
+    "ol": "^9.1.0",
+    "ol-contextmenu": "^5.4.0",
+    "ol-ext": "^4.0.17",
     "openapi-fetch": "^0.9.3",
     "openapi-typescript": "^6.7.5",
     "prettier": "^3.2.5",
+    "primevue": "^3.50.0",
+    "sass": "^1.72.0",
     "typescript": "^5.4.3",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
-    "vue-tsc": "^1"
+    "vue-tsc": "^1",
+    "vue3-openlayers": "^6.3.0"
   }
 }

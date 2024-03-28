@@ -7,6 +7,7 @@ use crate::{
         root::{self, BootstrapResponse, HealthCheckResponse},
         ErrorResponse,
     },
+    config::MapBoot,
     models::{
         access_token::{AccessToken, NewOrUpdateAccessToken, PermissionPolicy, Permissions},
         category::{Category, NewCategory, UpdateCategory},
@@ -133,6 +134,7 @@ use utoipa::OpenApi;
         NewCommentRequest,
         NewEntityRequest,
         FetchedEntity,
+        MapBoot,
     ))
 )]
 pub struct ApiDoc {}

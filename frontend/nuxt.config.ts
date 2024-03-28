@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ["@nuxt/eslint"],
+  modules: ["@nuxt/eslint", "nuxt-primevue"],
   ssr: false,
   devtools: { enabled: true },
   typescript: {
@@ -10,4 +10,8 @@ export default defineNuxtConfig({
       apiUrl: process.env.API_URL || "/",
     },
   },
+  css: [
+    "~/assets/main.css",
+    "primevue/resources/themes/aura-light-pink/theme.css",
+  ],
 });

@@ -119,7 +119,10 @@ impl IntoResponse for AppError {
             AppError::Validation(ve) => (StatusCode::BAD_REQUEST, "validation_error", Some(ve)),
             AppError::Database(de) => match de {
                 sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "not_found", None),
-                _ => (StatusCode::INTERNAL_SERVER_ERROR, "database_error", None),
+                _ => {
+                    tracing::error!("Sqlx error: {:?}", de);
+                    (StatusCode::INTERNAL_SERVER_ERROR, "database_error", None)
+                }
             },
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized", None),
         };

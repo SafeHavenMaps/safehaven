@@ -3,6 +3,7 @@ use figment::{
     Figment,
 };
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct SafeHavenConfig {
@@ -10,6 +11,14 @@ pub struct SafeHavenConfig {
     pub database: Database,
     pub token_secret: String,
     pub serve_public_path: Option<String>,
+    pub boot: MapBoot,
+}
+
+#[derive(Deserialize, Serialize, Clone, ToSchema)]
+pub struct MapBoot {
+    pub center_lat: f64,
+    pub center_lng: f64,
+    pub zoom: u8,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -30,6 +39,11 @@ impl Default for SafeHavenConfig {
             },
             token_secret: "SecretForValidatingAngSigngingTokens".to_string(),
             serve_public_path: None,
+            boot: MapBoot {
+                center_lat: 47.0,
+                center_lng: 2.0,
+                zoom: 5,
+            },
         }
     }
 }

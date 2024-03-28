@@ -1,7 +1,7 @@
 use crate::api::AppError;
 use serde::{Deserialize, Serialize};
 use serde_json::{to_value, Value};
-use sqlx::{types::Json, FromRow, PgConnection};
+use sqlx::{types::Json, PgConnection};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -13,14 +13,14 @@ pub struct Form {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub enum FieldType {
-    SingleLineText = 0,
-    MultiLineText = 1,
-    Number = 2,
-    DiscreteScore = 3,
-    Date = 4,
-    EnumSingleOption = 5,
-    EnumMultiOption = 6,
-    EventList = 10,
+    SingleLineText,
+    MultiLineText,
+    Number,
+    DiscreteScore,
+    Date,
+    EnumSingleOption,
+    EnumMultiOption,
+    EventList,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -62,7 +62,7 @@ pub struct Field {
     pub display_weight: u8,
 }
 
-#[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
+#[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct Family {
     pub id: Uuid,
     pub title: String,

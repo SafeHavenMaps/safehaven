@@ -74,7 +74,7 @@ async fn serve(args: &ServeArgs) {
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
                 if cfg!(debug_assertions) {
                     // Development build
-                    "safehaven=debug,tower_http=debug,axum::rejection=trace"
+                    "safehaven=trace,tower_http=debug,axum::rejection=trace"
                 } else {
                     // Release build
                     "safehaven=info,tower_http=info,axum::rejection=warn"

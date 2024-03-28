@@ -6,5 +6,21 @@ export default function useClient() {
   const apiUrl = config.public.apiUrl;
   const client = createClient<paths>({ baseUrl: apiUrl });
 
-  return client;
+  return {
+    rawClient: client,
+
+    async checkHealth() {
+      const { data } = await client.GET("/api/health");
+
+      return data?.status === "ok";
+    },
+
+    async bootstrap(token: string) {
+      const { data, error } = await client.GET("/api/bootstrap/{token}", {
+        params: { path: { token } },
+      });
+      if (error) throw error;
+      return data;
+    },
+  };
 }
