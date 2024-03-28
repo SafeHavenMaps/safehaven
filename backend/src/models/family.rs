@@ -16,6 +16,7 @@ pub enum FieldType {
     SingleLineText,
     MultiLineText,
     Number,
+    Boolean,
     DiscreteScore,
     Date,
     EnumSingleOption,

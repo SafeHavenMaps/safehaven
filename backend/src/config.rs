@@ -19,6 +19,7 @@ pub struct MapBoot {
     pub center_lat: f64,
     pub center_lng: f64,
     pub zoom: u8,
+    pub display_projection: String,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -43,6 +44,7 @@ impl Default for SafeHavenConfig {
                 center_lat: 47.0,
                 center_lng: 2.0,
                 zoom: 5,
+                display_projection: "EPSG:3857".to_string(),
             },
         }
     }
