@@ -62,7 +62,7 @@ BEGIN
     SELECT c.family_id, f.entity_form
         INTO family_id, family_entity_form
         FROM categories c
-        JOIN public.families f on f.id = c.family_id
+        JOIN families f on f.id = c.family_id
         WHERE c.id = refreshed_entity.category_id;
 
     -- Populate categories array
