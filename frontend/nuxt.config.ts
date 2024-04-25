@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ["@nuxt/eslint", "nuxt-primevue"],
+  modules: ["nuxt-primevue"],
   ssr: false,
   devtools: { enabled: true },
   typescript: {

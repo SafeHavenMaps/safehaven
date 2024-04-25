@@ -1,5 +1,5 @@
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -7,10 +7,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
 
     services:
       postgres:
@@ -23,5 +19,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: DeterminateSystems/nix-installer-action@main
-      - run: nix develop -c prepare
-      - run: nix develop -c test_and_lint
+      - run: nix develop -c check_project

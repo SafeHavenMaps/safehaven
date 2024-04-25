@@ -1,4 +1,6 @@
-html, body, #__nuxt {
+html,
+body,
+#__nuxt {
   height: 100%;
   width: 100%;
   margin: 0;

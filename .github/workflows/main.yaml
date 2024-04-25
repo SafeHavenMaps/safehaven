@@ -1,0 +1,40 @@
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Set container release tag
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            echo -n "${GITHUB_REF#refs/tags/}" > ./container_release
+          else
+            echo -n "main-$(git rev-parse --short HEAD)" > ./container_release
+          fi
+          # Export value to Github variables
+          echo "TAG=$(cat ./container_release)" >> $GITHUB_ENV
+  
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | skopeo login ghcr.io --username ${{ github.actor }} --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          nix build .#dockerImage
+          ./result | gzip --fast | \
+            skopeo copy \
+              docker-archive:/dev/stdin \
+              docker://ghcr.io/safehavenmaps/safehaven:$TAG

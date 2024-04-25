@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                categories_ids as \"categories_ids!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                latitude as \"latitude!\",\n                longitude as \"longitude!\",\n                plain_text_location as \"plain_text_location!\"\n            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "entity_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "category_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "categories_ids!",
+        "type_info": "UuidArray"
+      },
+      {
+        "ordinal": 4,
+        "name": "tags_ids!",
+        "type_info": "UuidArray"
+      },
+      {
+        "ordinal": 5,
+        "name": "family_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "display_name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "latitude!",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 8,
+        "name": "longitude!",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 9,
+        "name": "plain_text_location!",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Float8",
+        "Float8",
+        "Float8",
+        "Float8",
+        "Bool",
+        "Bool",
+        "Bool",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "a242a1e1be53d0bcb336af314b6ababd3c89346c40318ac6050a7114dc02845f"
+}
