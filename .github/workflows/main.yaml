@@ -18,6 +18,12 @@ jobs:
       - name: Set up Nix
         uses: DeterminateSystems/nix-installer-action@main
 
+      - name: Set up Nix Caching using GitHub Actions Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - name: Check health of Nix flake input
+        uses: DeterminateSystems/flake-checker-action@main
+
       - name: Set container release tag
         run: |
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then

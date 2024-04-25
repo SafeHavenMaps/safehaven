@@ -17,6 +17,17 @@ jobs:
           - 5432:5432
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: DeterminateSystems/nix-installer-action@main
-      - run: nix develop -c check_project
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Set up Nix Caching using GitHub Actions Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - name: Check health of Nix flake input
+        uses: DeterminateSystems/flake-checker-action@main
+
+      - name: Run project checks
+        run: nix develop -c check_project
