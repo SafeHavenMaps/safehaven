@@ -69,17 +69,19 @@ async fn boostrap(
     });
     tracing::trace!("Generated access token");
 
-    let categories = match perms.categories_policy.allow_all {
-        true => Category::list(&mut conn).await?,
-        false => Category::list_restricted(perms.categories_policy.allow_list, &mut conn).await?,
-    };
-    tracing::trace!("Loaded {} categories", categories.len());
-
     let families = match perms.families_policy.allow_all {
         true => Family::list(&mut conn).await?,
         false => Family::list_restricted(perms.families_policy.allow_list, &mut conn).await?,
     };
     tracing::trace!("Loaded {} families", families.len());
+
+    let families_ids: Vec<_> = families.iter().map(|f| f.id).collect();
+
+    let categories = match perms.categories_policy.allow_all {
+        true => Category::list_with_families(families_ids, &mut conn).await?,
+        false => Category::list_restricted(perms.categories_policy.allow_list, families_ids, &mut conn).await?,
+    };
+    tracing::trace!("Loaded {} categories", categories.len());
 
     let tags = match perms.tags_policy.allow_all {
         true => Tag::list(&mut conn).await?,

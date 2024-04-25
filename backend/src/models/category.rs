@@ -117,8 +117,24 @@ impl Category {
         .map_err(AppError::Database)
     }
 
+    pub async fn list_with_families(families: Vec<Uuid>, conn: &mut PgConnection) -> Result<Vec<Category>, AppError> {
+        sqlx::query_as!(
+            Category,
+            r#"
+            SELECT id, title, family_id, default_status, icon, fill_color, border_color
+            FROM categories
+            WHERE family_id = ANY($1)
+            "#,
+            &families
+        )
+        .fetch_all(conn)
+        .await
+        .map_err(AppError::Database)
+    }
+
     pub async fn list_restricted(
         ids: Vec<Uuid>,
+        families: Vec<Uuid>,
         conn: &mut PgConnection,
     ) -> Result<Vec<Category>, AppError> {
         sqlx::query_as!(
@@ -126,9 +142,10 @@ impl Category {
             r#"
             SELECT id, title, family_id, default_status, icon, fill_color, border_color
             FROM categories
-            WHERE id = ANY($1)
+            WHERE id = ANY($1) AND family_id = ANY($2)
             "#,
-            &ids
+            &ids,
+            &families
         )
         .fetch_all(conn)
         .await
