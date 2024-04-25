@@ -34,7 +34,8 @@ CREATE TABLE tags (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
     is_filter BOOLEAN NOT NULL DEFAULT FALSE,
-    filter_description TEXT
+    filter_description TEXT,
+    is_indexed BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE entities (
@@ -87,7 +88,7 @@ CREATE INDEX comments_entity_id_idx ON comments(entity_id);
 
 CREATE TABLE access_tokens (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    token VARCHAR(24) NOT NULL,
+    token VARCHAR(64) NOT NULL,
     permissions JSONB NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE
 );

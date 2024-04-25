@@ -98,7 +98,7 @@ BEGIN
         SELECT t.title
         FROM tags t
         JOIN entity_tags et ON t.id = et.tag_id
-        WHERE et.entity_id = refreshed_entity.id
+        WHERE t.is_indexed AND et.entity_id = refreshed_entity.id
     LOOP
         indexed_values := indexed_values || ' ' || tag_title;
     END LOOP;

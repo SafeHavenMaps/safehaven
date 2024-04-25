@@ -23,22 +23,34 @@ pub struct FindEntitiesRequest {
     pub upper_left_lon: f64,
     pub lower_right_lat: f64,
     pub lower_right_lon: f64,
+
     pub allow_all_families: bool,
     pub allow_all_categories: bool,
     pub allow_all_tags: bool,
+
     pub families_list: Vec<Uuid>,
     pub categories_list: Vec<Uuid>,
     pub tags_list: Vec<Uuid>,
+
+    pub exclude_families_list: Vec<Uuid>,
+    pub exclude_categories_list: Vec<Uuid>,
+    pub exclude_tags_list: Vec<Uuid>,
 }
 
 pub struct SearchEntitiesRequest {
     pub search_query: String,
+
     pub allow_all_families: bool,
     pub allow_all_categories: bool,
     pub allow_all_tags: bool,
+
     pub families_list: Vec<Uuid>,
     pub categories_list: Vec<Uuid>,
     pub tags_list: Vec<Uuid>,
+
+    pub exclude_families_list: Vec<Uuid>,
+    pub exclude_categories_list: Vec<Uuid>,
+    pub exclude_tags_list: Vec<Uuid>,
 }
 
 impl CachedEntity {
@@ -60,7 +72,7 @@ impl CachedEntity {
                 latitude as "latitude!",
                 longitude as "longitude!",
                 plain_text_location as "plain_text_location!"
-            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
             "#,
             request.upper_left_lat,
             request.upper_left_lon,
@@ -72,6 +84,9 @@ impl CachedEntity {
             &request.families_list,
             &request.categories_list,
             &request.tags_list,
+            &request.exclude_families_list,
+            &request.exclude_categories_list,
+            &request.exclude_tags_list,
         )
         .fetch_all(conn)
         .await
@@ -96,7 +111,7 @@ impl CachedEntity {
                 latitude as "latitude!",
                 longitude as "longitude!",
                 plain_text_location as "plain_text_location!"
-            FROM search_entities($1,$2,$3,$4,$5,$6,$7)"#,
+            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)"#,
             request.search_query,
             request.allow_all_families,
             request.allow_all_categories,
@@ -104,6 +119,9 @@ impl CachedEntity {
             &request.families_list,
             &request.categories_list,
             &request.tags_list,
+            &request.exclude_families_list,
+            &request.exclude_categories_list,
+            &request.exclude_tags_list,
         )
         .fetch_all(conn)
         .await

@@ -10,7 +10,11 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
 
     families_list UUID[],
     categories_list UUID[],
-    tags_list UUID[]
+    tags_list UUID[],
+
+    exclude_families_list UUID[],
+    exclude_categories_list UUID[],
+    exclude_tags_list UUID[]
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -47,12 +51,18 @@ BEGIN
                     4326
                 )
             )
+            -- Families
             AND
             (allow_all_families OR (family_id = ANY(families_list)))
+            AND NOT (family_id = ANY(exclude_families_list))
+            -- Categories
             AND
             (allow_all_categories OR (categories_ids && categories_list))
+            AND NOT (categories_ids && exclude_categories_list)
+            -- Tags
             AND
-            (allow_all_tags OR (tags_ids && tags_list));
+            (allow_all_tags OR (tags_ids && tags_list))
+            AND NOT (tags_ids && exclude_tags_list);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -65,7 +75,11 @@ CREATE OR REPLACE FUNCTION search_entities(
 
     families_list UUID[],
     categories_list UUID[],
-    tags_list UUID[]
+    tags_list UUID[],
+
+    exclude_families_list UUID[],
+    exclude_categories_list UUID[],
+    exclude_tags_list UUID[]
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -93,11 +107,17 @@ BEGIN
         FROM entities_caches
         WHERE
             (full_text_search_ts @@ to_tsquery(search_query))
+            -- Families
             AND
             (allow_all_families OR (family_id = ANY(families_list)))
+            AND NOT (family_id = ANY(exclude_families_list))
+            -- Categories
             AND
             (allow_all_categories OR (categories_ids && categories_list))
+            AND NOT (categories_ids && exclude_categories_list)
+            -- Tags
             AND
-            (allow_all_tags OR (tags_ids && tags_list));
+            (allow_all_tags OR (tags_ids && tags_list))
+            AND NOT (tags_ids && exclude_tags_list);
 END;
 $$ LANGUAGE plpgsql;

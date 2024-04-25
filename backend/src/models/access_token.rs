@@ -17,6 +17,7 @@ pub struct Permissions {
 pub struct PermissionPolicy {
     pub allow_all: bool,
     pub allow_list: Vec<Uuid>,
+    pub force_exclude: Vec<Uuid>,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]

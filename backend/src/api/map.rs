@@ -53,6 +53,9 @@ pub async fn view_request(
         families_list: token.perms.families_policy.allow_list.clone(),
         categories_list: token.perms.categories_policy.allow_list.clone(),
         tags_list: token.perms.tags_policy.allow_list.clone(),
+        exclude_families_list: token.perms.families_policy.force_exclude.clone(),
+        exclude_categories_list: token.perms.categories_policy.force_exclude.clone(),
+        exclude_tags_list: token.perms.tags_policy.force_exclude.clone(),
     };
 
     Ok(AppJson(
@@ -87,6 +90,9 @@ async fn search_request(
         families_list: token.perms.families_policy.allow_list.clone(),
         categories_list: token.perms.categories_policy.allow_list.clone(),
         tags_list: token.perms.tags_policy.allow_list.clone(),
+        exclude_families_list: token.perms.families_policy.force_exclude.clone(),
+        exclude_categories_list: token.perms.categories_policy.force_exclude.clone(),
+        exclude_tags_list: token.perms.tags_policy.force_exclude.clone(),
     };
 
     Ok(AppJson(
