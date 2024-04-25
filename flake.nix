@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1.tar.gz";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,89 +17,143 @@
     flake-utils,
     ...
   }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [rust-overlay.overlays.default];
-      };
-
-      # NodeJS environment
-      fixedNode = pkgs.nodejs_20;
-      fixedNodePackages = pkgs.nodePackages.override {
-        nodejs = fixedNode;
-      };
-
-      # Rust environment
-      rustVer = pkgs.rust-bin.stable."1.77.0";
-      rustChan = rustVer.default.override {
-        targets = [];
-        extensions = [
-          "clippy"
-          "rust-src"
-          "rustc-dev"
-          "rustfmt"
-          "rust-analyzer"
-        ];
-      };
-
-      generateOpenApi = pkgs.writeShellScriptBin "generate_openapi" ''
-        set -e
-
-        pushd backend
-        cargo run -- openapi ../frontend/openapi.json
-        popd
-
-        pushd frontend
-        yarn install
-        yarn generate-api
-        popd
-      '';
-
-      prepareBuild = pkgs.writeShellScriptBin "prepare" ''
-        set -e
-
-        pushd backend
-        sqlx database create
-        sqlx migrate run
-        cargo sqlx prepare
-        popd
-
-        ${generateOpenApi}/bin/generate_openapi
-      '';
-
-      testAndLint = pkgs.writeShellScriptBin "test_and_lint" ''
-        set -e
-
-        pushd backend
-        cargo fmt -- --check
-        cargo clippy -- -D warnings
-        popd
-
-        pushd frontend
-        yarn lint
-        yarn prettier
-        popd
-      '';
-    in
-      with pkgs; {
-        devShells.default = mkShell {
-          nativeBuildInputs = [rustChan];
-          buildInputs = [
-            # Prepare scripts
-            prepareBuild
-            testAndLint
-            generateOpenApi
-            # Backend
-            sqlx-cli
-            openssl
-            pkg-config
-            postgresql
-            # Front
-            fixedNode
-            fixedNodePackages.yarn
-          ];
-          DATABASE_URL = "postgres://postgres:postgres@localhost:5432/safehaven";
-          API_URL = "http://localhost:28669";
+    flake-utils.lib.eachDefaultSystem (
+      system: let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [rust-overlay.overlays.default];
         };
-      });
+
+        # NodeJS environment
+        fixedNode = pkgs.nodejs_18;
+        fixedNodePackages = pkgs.nodePackages.override {
+          nodejs = fixedNode;
+        };
+
+        # Rust environment
+        rustVer = pkgs.rust-bin.stable."1.77.0";
+        rustChan = rustVer.default.override {
+          targets = [];
+          extensions = [
+            "clippy"
+            "rust-src"
+            "rustc-dev"
+            "rustfmt"
+            "rust-analyzer"
+          ];
+        };
+
+        checkProject = pkgs.writeShellScriptBin "check_project" ''
+          set -e
+
+          pushd backend
+            echo "::group::sqlx migrations checks"
+              echo "Create the database"
+              cargo sqlx database create
+
+              echo "Run the migrations"
+              cargo sqlx migrate run
+
+              echo "Check the migrations"
+              cargo sqlx prepare --check
+            echo "::endgroup::"
+
+            echo "::group::Backend lint"
+              cargo fmt -- --check
+              cargo clippy -- -D warnings
+            echo "::endgroup::"
+
+            echo "::group::OpenAPI sync checks"
+              cargo run -- openapi ../frontend/calc-openapi.json
+              if ! diff ../frontend/calc-openapi.json ../frontend/openapi.json; then
+                echo "OpenAPI has changed, please run 'cargo run -- openapi ../frontend/openapi.json' in the frontend"
+                exit 1
+              fi
+              rm ../frontend/calc-openapi.json
+            echo "::endgroup::"
+          popd
+
+          pushd frontend
+            echo "::group::Frontend checks"
+              npm ci
+              npm run generate-api
+              npm run prettier
+            echo "::endgroup::"
+          popd
+        '';
+
+        # Version when compiling the packages
+        version = builtins.readFile ./container_release;
+
+        # Backend derivation
+        rustPlatform = with pkgs;
+          makeRustPlatform {
+            cargo = rustChan;
+            rustc = rustChan;
+          };
+        backend = rustPlatform.buildRustPackage rec {
+          inherit version;
+
+          name = "safehaven-backend";
+          src = ./backend;
+          cargoSha256 = "sha256-t1q0CNiRtHohMmAkQ7LdGsOk4NWKndYdCmuYCDIIg3o=";
+        };
+
+        # Frontend derivation
+        frontend = pkgs.buildNpmPackage rec {
+          inherit version;
+
+          name = "safehaven-frontend";
+          src = ./frontend;
+          nodejs = fixedNode;
+
+          npmDepsHash = "sha256-RwwKTcnb8sq7kz28rUKIcbiydtjAnE6tFJsbkrd9gsY=";
+
+          installPhase = ''
+            runHook preInstall
+            mkdir -p $out/usr/share/safehaven/static
+            cp -rv dist/* $out/usr/share/safehaven/static
+            runHook postInstall
+          '';
+        };
+
+        # Docker image
+        dockerImage = pkgs.dockerTools.streamLayeredImage {
+          name = "ghcr.io/SafeHavenMaps/safehaven";
+          tag = version;
+          contents = [
+            backend
+            frontend
+          ];
+          config = {
+            Cmd = ["/bin/safehaven"];
+            Env = [
+              "SAFEHAVEN_serve_public_path=/usr/share/safehaven/static"
+            ];
+            ExposedPorts = {"28669/tcp" = {};};
+          };
+        };
+      in
+        with pkgs; {
+          packages = {inherit backend frontend dockerImage;};
+          devShells.default = mkShell {
+            nativeBuildInputs = [rustChan];
+            buildInputs = [
+              # Prepare scripts
+              checkProject
+              # Backend
+              sqlx-cli
+              openssl
+              pkg-config
+              postgresql
+              # Front
+              fixedNode
+              # Used to copy image
+              skopeo
+            ];
+            DATABASE_URL = "postgres://postgres:postgres@localhost:5432/safehaven";
+            API_URL = "http://localhost:28669";
+          };
+        }
+    );
 }

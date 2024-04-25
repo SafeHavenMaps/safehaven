@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT e.id, c.family_id, e.category_id, e.display_name, e.data,\n                e.locations as \"locations: Json<Vec<UnprocessedLocation>>\",\n                COALESCE(\n                    (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), \n                    array[]::uuid[]\n                ) as \"tags!\",\n                f.entity_form as \"entity_form: Json<Form>\",\n                f.comment_form as \"comment_form: Json<Form>\"\n            FROM entities e\n            INNER JOIN categories c ON e.category_id = c.id\n            INNER JOIN families f ON c.family_id = f.id\n            WHERE e.id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "family_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "category_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "data",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "locations: Json<Vec<UnprocessedLocation>>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 6,
+        "name": "tags!",
+        "type_info": "UuidArray"
+      },
+      {
+        "ordinal": 7,
+        "name": "entity_form: Json<Form>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 8,
+        "name": "comment_form: Json<Form>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      false,
+      false
+    ]
+  },
+  "hash": "e931eedb2741f6cf21956c91568e5357e3675dd783503d26e1c58a2eac4af6a5"
+}

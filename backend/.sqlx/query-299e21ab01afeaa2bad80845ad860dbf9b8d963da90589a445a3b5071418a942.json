@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM entities_entities\n            WHERE parent_id = $1 AND child_id = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "299e21ab01afeaa2bad80845ad860dbf9b8d963da90589a445a3b5071418a942"
+}

@@ -1,0 +1,84 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO entities (display_name, category_id, data)\n            VALUES ($1, $2, $3)\n            RETURNING\n                id,\n                display_name,\n                category_id,\n                locations as \"locations: Json<Vec<UnprocessedLocation>>\",\n                data,\n                hide_from_map,\n                moderation_notes,\n                moderated_at,\n                created_at,\n                updated_at,\n                last_update_by\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "category_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "locations: Json<Vec<UnprocessedLocation>>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "data",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "hide_from_map",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "moderation_notes",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "moderated_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 10,
+        "name": "last_update_by",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "e0b98e6ed6b332038fcf160165fcd7107211de11a4a58c25b9e09dc6b0f2d5f5"
+}

@@ -35,7 +35,7 @@ await state.initWithToken(token); // TODO: Redirect to 404 if token is invalid
 const center = transform(
   [state.mapBoot.center_lng, state.mapBoot.center_lat],
   "EPSG:4326",
-  state.mapBoot.display_projection
+  state.mapBoot.display_projection,
 );
 const zoom = state.mapBoot.zoom;
 
@@ -52,7 +52,7 @@ async function getCurrentCoordinates() {
   const transformedExtent = transformExtent(
     extent,
     state.mapBoot.display_projection,
-    "EPSG:4326"
+    "EPSG:4326",
   );
   return {
     upperLeft: [transformedExtent[0], transformedExtent[3]],
