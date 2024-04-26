@@ -96,7 +96,7 @@
 
           name = "safehaven-backend";
           src = ./backend;
-          cargoSha256 = "sha256-t1q0CNiRtHohMmAkQ7LdGsOk4NWKndYdCmuYCDIIg3o=";
+          cargoSha256 = "sha256-ONMhePZCjS3SX53POAcTDVbMRF8WWicrtMxx7GFFZjk=";
         };
 
         # Frontend derivation

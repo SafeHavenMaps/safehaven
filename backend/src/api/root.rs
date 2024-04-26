@@ -94,7 +94,7 @@ async fn boostrap(
         families,
         categories,
         tags,
-        map_boot: app_state.config.boot.clone(),
+        map_boot: app_state.config.map.clone(),
     };
 
     Ok(AppJson(resp))

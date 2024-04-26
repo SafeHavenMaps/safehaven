@@ -2,7 +2,7 @@ use crate::api::{AppError, AppJson, AppState, DbConn, MapUserToken};
 use crate::models::comment::{Comment, NewComment, PublicComment};
 use crate::models::entity::{Entity, ListedEntity, NewEntity, PublicEntity};
 use crate::models::entity_cache::{CachedEntity, EntitiesAndClusters, FindEntitiesRequest, SearchEntitiesRequest};
-use axum::extract::Path;
+use axum::extract::{Path, State};
 use axum::{
     routing::{get, post, Router},
     Json,
@@ -29,27 +29,6 @@ pub struct ViewRequest {
     zoom_level: u8,
 }
 
-impl ViewRequest {
-    /// Returns the epsilon and min points for the DBSCAN clustering algorithm
-    /// Zoom goes from 1 to 28 (OpenLayers default zoom levels)
-    /// For each zoom level, we have a different epsilon and min points
-    pub fn get_eps_and_min_from_zoom(&self) -> (f64, i32) {
-        match self.zoom_level {
-            1..=5 => (1.0, 25),
-            6..=8 => (0.13, 10),
-            9 => (0.07, 10),
-            10 => (0.04, 10),
-            11..=12 => (0.01, 10),
-            13..=15 => (0.005, 10),
-            16..=18 => (0.0025, 10),
-            19..=21 => (0.001, 10),
-            22..=24 => (0.0005, 10),
-            25..=28 => (0.0001, 10),
-            _ => (0.0001, 10),
-        }
-    }
-}
-
 #[utoipa::path(
     post,
     path = "/api/map/view",
@@ -60,11 +39,13 @@ impl ViewRequest {
     )
 )]
 pub async fn view_request(
+    State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
     MapUserToken(token): MapUserToken,
     Json(request): Json<ViewRequest>,
 ) -> Result<AppJson<EntitiesAndClusters>, AppError> {
-    let (eps, min) = request.get_eps_and_min_from_zoom();
+    let (eps, min) = app_state.config.map.get_eps_min_for_zoom(request.zoom_level);
+
     let request = FindEntitiesRequest {
         upper_left_lat: request.upper_left_lat,
         upper_left_lon: request.upper_left_lon,
