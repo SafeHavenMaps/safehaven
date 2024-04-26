@@ -15,7 +15,7 @@ use crate::{
         entity::{
             Entity, ListedEntity, NewEntity, PublicEntity, UnprocessedLocation, UpdateEntity,
         },
-        entity_cache::CachedEntity,
+        entity_cache::{CachedEntity, Cluster, EntitiesAndClusters},
         family::{Family, Field, FieldType, Form, NewOrUpdateFamily},
         tag::{NewOrUpdateTag, Tag},
         user::{NewUser, User},
@@ -110,6 +110,8 @@ use utoipa::OpenApi;
         ListedEntity,
         PublicEntity,
         CachedEntity,
+        Cluster,
+        EntitiesAndClusters,
         UnprocessedLocation,
         // comments
         Comment,

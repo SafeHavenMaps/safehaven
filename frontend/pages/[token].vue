@@ -17,13 +17,39 @@
       <ol-tile-layer>
         <ol-source-osm />
       </ol-tile-layer>
+
+      <ol-overlay
+        :position="entity.coordinates"
+        v-for="entity in state.view.entities"
+        :key="entity"
+      >
+        <MapMarker
+          :width="24"
+          :height="38"
+          :fill="entity.category.fill_color"
+          :stroke="entity.category.border_color"
+        />
+      </ol-overlay>
+
+
+      <ol-overlay
+        :position="entity.coordinates"
+        v-for="entity in state.view.clusters"
+        :key="entity"
+      >
+        <MapMarker
+          :width="24"
+          :height="38"
+          fill="black"
+          stroke="black"
+        />
+      </ol-overlay>
     </ol-map>
   </div>
 </template>
 
 <script setup lang="ts">
 import state from "~/lib/state";
-import { transform, transformExtent } from "ol/proj.js";
 import type Map from "ol/Map";
 
 // Init state with url token
@@ -31,13 +57,8 @@ const route = useRoute();
 const token = route.params.token as string;
 await state.initWithToken(token); // TODO: Redirect to 404 if token is invalid
 
-// Init map with center and zoom
-const center = transform(
-  [state.mapBoot.center_lng, state.mapBoot.center_lat],
-  "EPSG:4326",
-  state.mapBoot.display_projection,
-);
-const zoom = state.mapBoot.zoom;
+let center = state.startCenter();
+let zoom = state.startZoom();
 
 // Properties to access the map and its view
 const mapRef = ref<{ map: Map }>();
@@ -47,22 +68,10 @@ onMounted(() => {
   map = mapRef.value!.map;
 });
 
-async function getCurrentCoordinates(): Promise<{ upperLeft: [number, number]; lowerRight: [number, number] }> {
-  const extent = map!.getView().calculateExtent(map!.getSize());
-  const transformedExtent = transformExtent(
-    extent,
-    state.mapBoot.display_projection,
-    "EPSG:4326",
-  );
-  return {
-    upperLeft: [transformedExtent[0], transformedExtent[3]],
-    lowerRight: [transformedExtent[2], transformedExtent[1]],
-  };
-}
-
 async function onMapMoveEnd() {
-  const coordinates = await getCurrentCoordinates();
-  state.refreshView(coordinates.upperLeft, coordinates.lowerRight);
+  const extent = map!.getView().calculateExtent(map!.getSize());
+  const currentZoom = map!.getView().getZoom()!;
+  state.refreshView(extent, currentZoom);
 }
 </script>
 

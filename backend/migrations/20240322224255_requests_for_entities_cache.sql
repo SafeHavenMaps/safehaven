@@ -14,7 +14,10 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
 
     exclude_families_list UUID[],
     exclude_categories_list UUID[],
-    exclude_tags_list UUID[]
+    exclude_tags_list UUID[],
+
+    cluster_eps DOUBLE PRECISION,
+    cluster_min_points INT
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -25,10 +28,14 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
     display_name TEXT,
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
-    plain_text_location TEXT
+    plain_text_location TEXT,
+    cluster_id INT,
+    cluster_center_lat DOUBLE PRECISION,
+    cluster_center_lon DOUBLE PRECISION
 ) AS $$
 BEGIN
     RETURN QUERY
+    WITH filtered_entities AS (
         SELECT ec.id,
             ec.entity_id,
             ec.category_id,
@@ -38,11 +45,12 @@ BEGIN
             ec.display_name,
             ST_Y(ec.location::geometry) AS latitude,
             ST_X(ec.location::geometry) AS longitude,
-            ec.plain_text_location
+            ec.plain_text_location,
+            ST_ClusterDBSCAN(ec.location::geometry, cluster_eps, cluster_min_points) OVER() AS cluster_id
         FROM entities_caches ec
         WHERE
             ST_Intersects(
-                "location",
+                ec.location,
                 ST_MakeEnvelope(
                     upper_left_lat,
                     upper_left_lon,
@@ -51,18 +59,41 @@ BEGIN
                     4326
                 )
             )
-            -- Families
-            AND
-            (allow_all_families OR (ec.family_id = ANY(families_list)))
+            -- Families filter
+            AND (allow_all_families OR ec.family_id = ANY(families_list))
             AND NOT (ec.family_id = ANY(exclude_families_list))
-            -- Categories
-            AND
-            (allow_all_categories OR (ec.categories_ids && categories_list))
+            -- Categories filter
+            AND (allow_all_categories OR ec.categories_ids && categories_list)
             AND NOT (ec.categories_ids && exclude_categories_list)
-            -- Tags
-            AND
-            (allow_all_tags OR (ec.tags_ids && tags_list))
-            AND NOT (ec.tags_ids && exclude_tags_list);
+            -- Tags filter
+            AND (allow_all_tags OR ec.tags_ids && tags_list)
+            AND NOT (ec.tags_ids && exclude_tags_list)
+    ),
+    clusters AS (
+        SELECT
+            fe.cluster_id,
+            AVG(fe.latitude) AS center_lat,
+            AVG(fe.longitude) AS center_lon
+        FROM filtered_entities fe
+        WHERE fe.cluster_id IS NOT NULL
+        GROUP BY fe.cluster_id
+    )
+    SELECT 
+        fe.id,
+        fe.entity_id,
+        fe.category_id,
+        fe.categories_ids,
+        fe.tags_ids,
+        fe.family_id,
+        fe.display_name,
+        fe.latitude,
+        fe.longitude,
+        fe.plain_text_location,
+        fe.cluster_id,
+        cl.center_lat AS cluster_center_lat,
+        cl.center_lon AS cluster_center_lon
+    FROM filtered_entities fe
+    LEFT JOIN clusters cl ON fe.cluster_id = cl.cluster_id;
 END;
 $$ LANGUAGE plpgsql;
 

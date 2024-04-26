@@ -58,7 +58,8 @@ export default function useClient() {
 
     async getEntitiesWithinBounds(
       upperLeft: [number, number],
-      lowerRight: [number, number]
+      lowerRight: [number, number],
+      zoomLevel: number
     ) {
       if (!this.authenticated) {
         throw new Error("Not authenticated");
@@ -70,6 +71,7 @@ export default function useClient() {
           upper_left_lon: upperLeft[1],
           lower_right_lat: lowerRight[0],
           lower_right_lon: lowerRight[1],
+          zoom_level: zoomLevel,
         },
       });
       if (error) throw error;

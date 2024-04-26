@@ -2110,10 +2110,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CachedEntity"
-                  }
+                  "$ref": "#/components/schemas/EntitiesAndClusters"
                 }
               }
             }
@@ -2303,6 +2300,33 @@
           }
         }
       },
+      "Cluster": {
+        "type": "object",
+        "required": [
+          "id",
+          "center_lat",
+          "center_lon",
+          "count"
+        ],
+        "properties": {
+          "center_lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "center_lon": {
+            "type": "number",
+            "format": "double"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "Comment": {
         "type": "object",
         "required": [
@@ -2347,6 +2371,27 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "EntitiesAndClusters": {
+        "type": "object",
+        "required": [
+          "entities",
+          "clusters"
+        ],
+        "properties": {
+          "clusters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cluster"
+            }
+          },
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CachedEntity"
+            }
           }
         }
       },
@@ -3153,7 +3198,8 @@
           "upper_left_lat",
           "upper_left_lon",
           "lower_right_lat",
-          "lower_right_lon"
+          "lower_right_lon",
+          "zoom_level"
         ],
         "properties": {
           "lower_right_lat": {
@@ -3171,6 +3217,11 @@
           "upper_left_lon": {
             "type": "number",
             "format": "double"
+          },
+          "zoom_level": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         }
       }
