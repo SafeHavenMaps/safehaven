@@ -55,13 +55,13 @@ BEGIN
         FROM entities_caches ec
         WHERE
             ST_Intersects(
-                ec.location,
+                ST_Transform(ec.location::geometry, 3857),
                 ST_MakeEnvelope(
                     left_long,
                     lower_lat,
                     right_long,
                     upper_lat,
-                    4326
+                    3857
                 )
             )
             -- Families filter

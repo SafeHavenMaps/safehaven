@@ -11,7 +11,7 @@
         ref="viewRef"
         :center="center"
         :zoom="zoom"
-        :projection="state.mapBoot.display_projection"
+        projection="EPSG:3857"
       />
 
       <ol-tile-layer>

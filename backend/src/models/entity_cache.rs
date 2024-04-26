@@ -90,6 +90,9 @@ pub struct SearchEntitiesRequest {
 
 
 impl CachedEntity {
+    /// This function fetches entities within a rectangle defined by the coordinates of the bottom left and top right corners of a view port.
+    /// It also filters entities based on the user's permissions.
+    /// Careful: The coordinates of the viewport are in the format of (longitude, latitude) in projection Web Mercator (EPSG:3857).
     pub async fn find_entities_in_rectangle(
         request: FindEntitiesRequest,
         conn: &mut PgConnection,

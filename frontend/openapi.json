@@ -2719,7 +2719,6 @@
           "center_lat",
           "center_lng",
           "zoom",
-          "display_projection",
           "clustering_parameters"
         ],
         "properties": {
@@ -2748,9 +2747,6 @@
                 ]
               }
             }
-          },
-          "display_projection": {
-            "type": "string"
           },
           "zoom": {
             "type": "integer",

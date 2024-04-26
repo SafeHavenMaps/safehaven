@@ -69,16 +69,8 @@ export class AppState {
   transformToProj(coordinate: Coordinate): Coordinate {
     return transform(
       coordinate,
-      "EPSG:4326", 
-      state.mapBoot.display_projection
-    );
-  }
-
-  transformExtentToProj(extent: Extent): Extent {
-    return transformExtent(
-      extent,
-      state.mapBoot.display_projection,
-      "EPSG:4326",
+      "EPSG:4326", // WGS84
+      "EPSG:3857"  // Web Mercator
     );
   }
 
@@ -118,17 +110,13 @@ export class AppState {
   }
 
   async refreshView(extent: Extent, zoomLevel: number) {
-    const transformedExtent = this.transformExtentToProj(extent);
-    const zoom = Math.floor(zoomLevel);
-
-    console.log(transformedExtent);
-
+    const zoom = Math.round(zoomLevel);
     this.viewData = await client.getEntitiesWithinBounds(
       {
-        leftLong: transformedExtent[0],
-        lowerLat: transformedExtent[1],
-        rightLong: transformedExtent[2],
-        upperLat: transformedExtent[3],
+        leftLong: extent[0],
+        lowerLat: extent[1],
+        rightLong: extent[2],
+        upperLat: extent[3],
       },
       zoom
     );

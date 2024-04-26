@@ -28,7 +28,6 @@ pub struct MapBoot {
     pub center_lat: f64,
     pub center_lng: f64,
     pub zoom: u8,
-    pub display_projection: String,
     pub clustering_parameters: HashMap<String, (f64, i32)>,
 
     #[serde(skip)]
@@ -84,7 +83,6 @@ impl Default for SafeHavenConfig {
                 center_lat: 47.0,
                 center_lng: 2.0,
                 zoom: 5,
-                display_projection: "EPSG:3857".to_string(),
                 clustering_parameters: {
                     let mut map = HashMap::new();
                     map.insert("1:6".to_string(), (1.0, 25));
