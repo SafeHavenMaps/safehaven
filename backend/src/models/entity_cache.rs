@@ -69,8 +69,7 @@ pub struct FindEntitiesRequest {
     pub exclude_categories_list: Vec<Uuid>,
     pub exclude_tags_list: Vec<Uuid>,
 
-    pub cluster_eps: f64,
-    pub cluster_min_points: i32,
+    pub cluster_params: Option<(f64,i32)>
 }
 
 pub struct SearchEntitiesRequest {
@@ -127,8 +126,8 @@ impl CachedEntity {
             &request.exclude_families_list,
             &request.exclude_categories_list,
             &request.exclude_tags_list,
-            request.cluster_eps,
-            request.cluster_min_points,
+            request.cluster_params.map(|(eps,_)| eps).unwrap_or(0.0),
+            request.cluster_params.map(|(_,min)| min).unwrap_or(0)
         )
         .fetch_all(conn)
         .await
@@ -155,7 +154,7 @@ impl CachedEntity {
                 plain_text_location: e.plain_text_location.clone(),
             })
             .collect();
-        
+
         // -- Creating the list of clusters
         let clusters = entities_with_clusters
             .iter()

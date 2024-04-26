@@ -51,14 +51,14 @@ impl MapBoot {
         );
     }
 
-    pub fn get_eps_min_for_zoom(&self, zoom: u8) -> (f64, i32) {
+    pub fn get_eps_min_for_zoom(&self, zoom: u8) -> Option<(f64, i32)> {
         self.parsed_clustering_parameters
             .as_ref()
             .expect("Not initialized")
             .iter()
             .find(|(range, _, _)| range.contains(&zoom))
-            .map(|(_, eps, min)| (*eps, *min))
-            .expect("No clustering parameters for zoom")
+            .map(|(_, eps, min)| Some((*eps, *min)))
+            .unwrap_or(None)
     }
 }
 

@@ -44,7 +44,7 @@ pub async fn view_request(
     MapUserToken(token): MapUserToken,
     Json(request): Json<ViewRequest>,
 ) -> Result<AppJson<EntitiesAndClusters>, AppError> {
-    let (eps, min) = app_state.config.map.get_eps_min_for_zoom(request.zoom_level);
+    let cluster_params = app_state.config.map.get_eps_min_for_zoom(request.zoom_level);
 
     let request = FindEntitiesRequest {
         upper_left_lat: request.upper_left_lat,
@@ -64,8 +64,7 @@ pub async fn view_request(
         exclude_categories_list: token.perms.categories_policy.force_exclude.clone(),
         exclude_tags_list: token.perms.tags_policy.force_exclude.clone(),
 
-        cluster_eps: eps,
-        cluster_min_points: min,
+        cluster_params,
     };
 
     Ok(AppJson(

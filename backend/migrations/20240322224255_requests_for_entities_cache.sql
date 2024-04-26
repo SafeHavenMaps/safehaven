@@ -46,7 +46,12 @@ BEGIN
             ST_Y(ec.location::geometry) AS latitude,
             ST_X(ec.location::geometry) AS longitude,
             ec.plain_text_location,
-            ST_ClusterDBSCAN(ec.location::geometry, cluster_eps, cluster_min_points) OVER() AS cluster_id
+            CASE
+                WHEN cluster_eps > 0 AND cluster_min_points > 0 THEN
+                    ST_ClusterDBSCAN(ec.location::geometry, cluster_eps, cluster_min_points) OVER()
+                ELSE
+                    NULL
+            END AS cluster_id
         FROM entities_caches ec
         WHERE
             ST_Intersects(
