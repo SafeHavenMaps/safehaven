@@ -29,17 +29,17 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
 ) AS $$
 BEGIN
     RETURN QUERY
-        SELECT id,
-            entity_id,
-            category_id,
-            categories_ids,
-            tags_ids,
-            family_id,
-            display_name,
-            ST_Y("location"::geometry) AS latitude,
-            ST_X("location"::geometry) AS longitude,
-            plain_text_location
-        FROM entities_caches
+        SELECT ec.id,
+            ec.entity_id,
+            ec.category_id,
+            ec.categories_ids,
+            ec.tags_ids,
+            ec.family_id,
+            ec.display_name,
+            ST_Y(ec.location::geometry) AS latitude,
+            ST_X(ec.location::geometry) AS longitude,
+            ec.plain_text_location
+        FROM entities_caches ec
         WHERE
             ST_Intersects(
                 "location",
@@ -53,16 +53,16 @@ BEGIN
             )
             -- Families
             AND
-            (allow_all_families OR (family_id = ANY(families_list)))
-            AND NOT (family_id = ANY(exclude_families_list))
+            (allow_all_families OR (ec.family_id = ANY(families_list)))
+            AND NOT (ec.family_id = ANY(exclude_families_list))
             -- Categories
             AND
-            (allow_all_categories OR (categories_ids && categories_list))
-            AND NOT (categories_ids && exclude_categories_list)
+            (allow_all_categories OR (ec.categories_ids && categories_list))
+            AND NOT (ec.categories_ids && exclude_categories_list)
             -- Tags
             AND
-            (allow_all_tags OR (tags_ids && tags_list))
-            AND NOT (tags_ids && exclude_tags_list);
+            (allow_all_tags OR (ec.tags_ids && tags_list))
+            AND NOT (ec.tags_ids && exclude_tags_list);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -94,30 +94,30 @@ CREATE OR REPLACE FUNCTION search_entities(
 ) AS $$
 BEGIN
     RETURN QUERY
-        SELECT id,
-            entity_id,
-            category_id,
-            categories_ids,
-            tags_ids,
-            family_id,
-            display_name,
-            ST_Y(location::geometry) AS latitude,
-            ST_X(location::geometry) AS longitude,
-            plain_text_location
-        FROM entities_caches
+        SELECT ec.id,
+            ec.entity_id,
+            ec.category_id,
+            ec.categories_ids,
+            ec.tags_ids,
+            ec.family_id,
+            ec.display_name,
+            ST_Y(ec.location::geometry) AS latitude,
+            ST_X(ec.location::geometry) AS longitude,
+            ec.plain_text_location
+        FROM entities_caches ec
         WHERE
             (full_text_search_ts @@ to_tsquery(search_query))
             -- Families
             AND
-            (allow_all_families OR (family_id = ANY(families_list)))
-            AND NOT (family_id = ANY(exclude_families_list))
+            (allow_all_families OR (ec.family_id = ANY(families_list)))
+            AND NOT (ec.family_id = ANY(exclude_families_list))
             -- Categories
             AND
-            (allow_all_categories OR (categories_ids && categories_list))
-            AND NOT (categories_ids && exclude_categories_list)
+            (allow_all_categories OR (ec.categories_ids && categories_list))
+            AND NOT (ec.categories_ids && exclude_categories_list)
             -- Tags
             AND
-            (allow_all_tags OR (tags_ids && tags_list))
-            AND NOT (tags_ids && exclude_tags_list);
+            (allow_all_tags OR (ec.tags_ids && tags_list))
+            AND NOT (ec.tags_ids && exclude_tags_list);
 END;
 $$ LANGUAGE plpgsql;
