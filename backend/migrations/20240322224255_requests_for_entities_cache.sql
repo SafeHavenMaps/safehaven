@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION fetch_entities_within_view(
-    left_long DOUBLE PRECISION,
-    lower_lat DOUBLE PRECISION,
-    right_long DOUBLE PRECISION,
-    upper_lat DOUBLE PRECISION,
+    input_xmin DOUBLE PRECISION,
+    input_ymin DOUBLE PRECISION,
+    input_xmax DOUBLE PRECISION,
+    input_ymax DOUBLE PRECISION,
 
     allow_all_families BOOL,
     allow_all_categories BOOL,
@@ -26,12 +26,12 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
     tags_ids UUID[],
     family_id UUID,
     display_name TEXT,
-    latitude DOUBLE PRECISION,
-    longitude DOUBLE PRECISION,
+    web_mercator_x DOUBLE PRECISION,
+    web_mercator_y DOUBLE PRECISION,
     plain_text_location TEXT,
     cluster_id INT,
-    cluster_center_lat DOUBLE PRECISION,
-    cluster_center_lon DOUBLE PRECISION
+    cluster_center_x DOUBLE PRECISION,
+    cluster_center_y DOUBLE PRECISION
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -43,26 +43,20 @@ BEGIN
             ec.tags_ids,
             ec.family_id,
             ec.display_name,
-            ST_Y(ec.location::geometry) AS latitude,
-            ST_X(ec.location::geometry) AS longitude,
+            ST_X(ec.web_mercator_location) AS web_mercator_x,
+            ST_Y(ec.web_mercator_location) AS web_mercator_y,
             ec.plain_text_location,
             CASE
                 WHEN cluster_eps > 0 AND cluster_min_points > 0 THEN
-                    ST_ClusterDBSCAN(ec.location::geometry, cluster_eps, cluster_min_points) OVER()
+                    ST_ClusterDBSCAN(ec.web_mercator_location, cluster_eps, cluster_min_points) OVER()
                 ELSE
                     NULL
             END AS cluster_id
         FROM entities_caches ec
         WHERE
             ST_Intersects(
-                ST_Transform(ec.location::geometry, 3857),
-                ST_MakeEnvelope(
-                    left_long,
-                    lower_lat,
-                    right_long,
-                    upper_lat,
-                    3857
-                )
+                ec.web_mercator_location,
+                ST_MakeEnvelope(input_xmin, input_ymin, input_xmax, input_ymax, 3857)
             )
             -- Families filter
             AND (allow_all_families OR ec.family_id = ANY(families_list))
@@ -77,13 +71,13 @@ BEGIN
     clusters AS (
         SELECT
             fe.cluster_id,
-            AVG(fe.latitude) AS center_lat,
-            AVG(fe.longitude) AS center_lon
+            AVG(fe.web_mercator_x) AS cluster_center_x,
+            AVG(fe.web_mercator_y) AS cluster_center_y
         FROM filtered_entities fe
         WHERE fe.cluster_id IS NOT NULL
         GROUP BY fe.cluster_id
     )
-    SELECT 
+    SELECT
         fe.id,
         fe.entity_id,
         fe.category_id,
@@ -91,12 +85,12 @@ BEGIN
         fe.tags_ids,
         fe.family_id,
         fe.display_name,
-        fe.latitude,
-        fe.longitude,
+        fe.web_mercator_x,
+        fe.web_mercator_y,
         fe.plain_text_location,
         fe.cluster_id,
-        cl.center_lat AS cluster_center_lat,
-        cl.center_lon AS cluster_center_lon
+        cl.cluster_center_x,
+        cl.cluster_center_y
     FROM filtered_entities fe
     LEFT JOIN clusters cl ON fe.cluster_id = cl.cluster_id;
 END;
@@ -124,8 +118,8 @@ CREATE OR REPLACE FUNCTION search_entities(
     tags_ids UUID[],
     family_id UUID,
     display_name TEXT,
-    latitude DOUBLE PRECISION,
-    longitude DOUBLE PRECISION,
+    web_mercator_x DOUBLE PRECISION,
+    web_mercator_y DOUBLE PRECISION,
     plain_text_location TEXT
 ) AS $$
 BEGIN
@@ -137,8 +131,8 @@ BEGIN
             ec.tags_ids,
             ec.family_id,
             ec.display_name,
-            ST_Y(ec.location::geometry) AS latitude,
-            ST_X(ec.location::geometry) AS longitude,
+            ST_X(ec.web_mercator_location) AS web_mercator_x,
+            ST_Y(ec.web_mercator_location) AS web_mercator_y,
             ec.plain_text_location
         FROM entities_caches ec
         WHERE

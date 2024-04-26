@@ -66,18 +66,15 @@ export class AppState {
     return this.mapBootData!;
   }
 
-  transformToProj(coordinate: Coordinate): Coordinate {
+  startCenter() {
+    // The configuration files is in WGS84 (EPSG:4326)
+    // The map is in Web Mercator (EPSG:3857)
+    // We need to transform the coordinates
     return transform(
-      coordinate,
+      [state.mapBoot.center_lng, state.mapBoot.center_lat],
       "EPSG:4326", // WGS84
       "EPSG:3857"  // Web Mercator
-    );
-  }
-
-  startCenter() {
-    return this.transformToProj(
-      [state.mapBoot.center_lng, state.mapBoot.center_lat]
-    );
+    )
   }
 
   startZoom() {
@@ -89,10 +86,10 @@ export class AppState {
       entities: this.viewData.entities.map((entity) => {
         return {
           ...entity,
-          coordinates: this.transformToProj([
-            entity.longitude,
-            entity.latitude,
-          ]),
+          coordinates: [
+            entity.web_mercator_x,
+            entity.web_mercator_y,
+          ],
           family: this.familiesLookupTable[entity.family_id],
           category: this.categoriesLookupTable[entity.category_id],
         };
@@ -100,10 +97,10 @@ export class AppState {
       clusters: this.viewData.clusters.map((cluster) => {
         return {
           ...cluster,
-          coordinates: this.transformToProj([
-            cluster.center_lon,
-            cluster.center_lat,
-          ]),
+          coordinates: [
+            cluster.center_x,
+            cluster.center_y,
+          ],
         };
       }),
     };
@@ -113,10 +110,8 @@ export class AppState {
     const zoom = Math.round(zoomLevel);
     this.viewData = await client.getEntitiesWithinBounds(
       {
-        leftLong: extent[0],
-        lowerLat: extent[1],
-        rightLong: extent[2],
-        upperLat: extent[3],
+        xmin: extent[0], ymin: extent[1],
+        xmax: extent[2], ymax: extent[3],
       },
       zoom
     );

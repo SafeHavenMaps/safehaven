@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                categories_ids as \"categories_ids!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                latitude as \"latitude!\",\n                longitude as \"longitude!\",\n                plain_text_location as \"plain_text_location!\",\n                cluster_id,\n                cluster_center_lat,\n                cluster_center_lon\n            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)\n            ",
+  "query": "\n            SELECT\n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                categories_ids as \"categories_ids!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                latitude as \"latitude!\",\n                longitude as \"longitude!\",\n                plain_text_location as \"plain_text_location!\",\n                cluster_id,\n                cluster_center_x,\n                cluster_center_y\n            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)\n            ",
   "describe": {
     "columns": [
       {
@@ -60,12 +60,12 @@
       },
       {
         "ordinal": 11,
-        "name": "cluster_center_lat",
+        "name": "cluster_center_x",
         "type_info": "Float8"
       },
       {
         "ordinal": 12,
-        "name": "cluster_center_lon",
+        "name": "cluster_center_y",
         "type_info": "Float8"
       }
     ],
@@ -104,5 +104,5 @@
       null
     ]
   },
-  "hash": "11d4b02ea1b818165e4beb01f142693774a2d6145b7b942f7450c6228fa19c2a"
+  "hash": "e3633aa9cf1f37d12317210e16d5282fc1737576bf4ec66b7e66948cde5e6d49"
 }

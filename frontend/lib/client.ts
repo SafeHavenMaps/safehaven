@@ -58,10 +58,8 @@ export default function useClient() {
 
     async getEntitiesWithinBounds(
       rectangle: {
-        leftLong: number,
-        lowerLat: number,
-        rightLong: number,
-        upperLat: number,
+        xmin: number, ymin: number,
+        xmax: number, ymax: number,
       },
       zoomLevel: number
     ) {
@@ -71,10 +69,10 @@ export default function useClient() {
 
       const { data, error } = await client.POST("/api/map/view", {
         body: {
-          left_long: rectangle.leftLong,
-          lower_lat: rectangle.lowerLat,
-          right_long: rectangle.rightLong,
-          upper_lat: rectangle.upperLat,
+          xmin: rectangle.xmin,
+          ymin: rectangle.ymin,
+          xmax: rectangle.xmax,
+          ymax: rectangle.ymax,
           zoom_level: zoomLevel,
         },
       });

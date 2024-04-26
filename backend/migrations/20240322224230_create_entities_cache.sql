@@ -11,15 +11,16 @@ CREATE TABLE entities_caches (
     tags_ids UUID[] NOT NULL,
     family_id UUID NOT NULL,
     display_name TEXT NOT NULL,
-    location GEOGRAPHY(POINT, 4326) NOT NULL,
+    gps_location GEOGRAPHY(POINT, 4326) NOT NULL,
+    web_mercator_location GEOMETRY(POINT, 3857) NOT NULL,
     plain_text_location TEXT NOT NULL,
-
     full_text_search TEXT NOT NULL,
     full_text_search_ts TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', full_text_search)) STORED,
 
     FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
 );
-CREATE INDEX entities_caches_location_idx ON entities_caches USING GIST(location);
+CREATE INDEX entities_caches_gps_location_idx ON entities_caches USING GIST(gps_location);
+CREATE INDEX entities_caches_web_mercator_location__idx ON entities_caches USING GIST(web_mercator_location);
 CREATE INDEX entities_caches_full_text_search_idx ON entities_caches USING GIN(full_text_search_ts);
 
 -- Refresh the cache for a given entity
@@ -116,7 +117,8 @@ BEGIN
             tags_ids,
             family_id,
             display_name,
-            location,
+            gps_location,
+            web_mercator_location,
             plain_text_location,
             full_text_search
         )
@@ -128,10 +130,23 @@ BEGIN
             tags_array,
             family_id,
             refreshed_entity.display_name,
-            ST_SetSRID(ST_MakePoint(
-                               (refreshed_entity.locations->i->>'x')::double precision,
-                               (refreshed_entity.locations->i->>'y')::double precision),
-                       4326),
+            ST_SetSRID(
+                ST_MakePoint(
+                    (refreshed_entity.locations->i->>'long')::double precision,
+                    (refreshed_entity.locations->i->>'lat')::double precision
+                ),
+                4326
+            ),
+            ST_Transform(
+                ST_SetSRID(
+                    ST_MakePoint(
+                        (refreshed_entity.locations->i->>'long')::double precision,
+                        (refreshed_entity.locations->i->>'lat')::double precision
+                    ),
+                    4326
+                ),
+                3857
+            ),
             refreshed_entity.locations->i->>'plain_text',
             indexed_values
         );

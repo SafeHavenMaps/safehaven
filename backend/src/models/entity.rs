@@ -11,8 +11,8 @@ use super::family::Form;
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct UnprocessedLocation {
     pub plain_text: String,
-    pub x: f64,
-    pub y: f64,
+    pub lat: f64,
+    pub long: f64,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]

@@ -23,10 +23,10 @@ pub fn routes() -> Router<AppState> {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ViewRequest {
-    left_long: f64,
-    lower_lat: f64,
-    right_long: f64,
-    upper_lat: f64,
+    xmin: f64,
+    ymin: f64,
+    xmax: f64,
+    ymax: f64,
     zoom_level: u8,
 }
 
@@ -34,8 +34,8 @@ impl Display for ViewRequest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "ViewRequest {{ left_long: {}, lower_lat: {}, right_long: {}, upper_lat: {}, zoom_level: {} }}",
-            self.left_long, self.lower_lat, self.right_long, self.upper_lat, self.zoom_level
+            "ViewRequest {{ xmin: {}, ymin: {}, xmax: {}, ymax: {}, zoom_level: {} }}",
+            self.xmin, self.ymin, self.xmax, self.ymax, self.zoom_level
         )
     }
 }
@@ -60,10 +60,10 @@ pub async fn view_request(
     tracing::trace!("Received view request {}", request);
 
     let request = FindEntitiesRequest {
-        left_long: request.left_long,
-        lower_lat: request.lower_lat,
-        right_long: request.right_long,
-        upper_lat: request.upper_lat,
+        xmin: request.xmin,
+        ymin: request.ymin,
+        xmax: request.xmax,
+        ymax: request.ymax,
 
         allow_all_families: token.perms.families_policy.allow_all,
         allow_all_categories: token.perms.categories_policy.allow_all,

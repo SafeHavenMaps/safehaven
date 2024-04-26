@@ -15,8 +15,8 @@ pub struct CachedEntity {
     pub tags_ids: Vec<Uuid>,
     pub family_id: Uuid,
     pub display_name: String,
-    pub latitude: f64,
-    pub longitude: f64,
+    pub web_mercator_x: f64,
+    pub web_mercator_y: f64,
     pub plain_text_location: String,
 }
 
@@ -29,19 +29,19 @@ pub struct CachedClusteredEntity {
     pub tags_ids: Vec<Uuid>,
     pub family_id: Uuid,
     pub display_name: String,
-    pub latitude: f64,
-    pub longitude: f64,
+    pub web_mercator_x: f64,
+    pub web_mercator_y: f64,
     pub plain_text_location: String,
     pub cluster_id: Option<i32>,
-    pub cluster_center_lat: Option<f64>,
-    pub cluster_center_lon: Option<f64>
+    pub cluster_center_x: Option<f64>,
+    pub cluster_center_y: Option<f64>
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct Cluster {
     pub id: i32,
-    pub center_lat: f64,
-    pub center_lon: f64,
+    pub center_x: f64,
+    pub center_y: f64,
     pub count: i32,
 }
 
@@ -52,10 +52,10 @@ pub struct EntitiesAndClusters {
 }
 
 pub struct FindEntitiesRequest {
-    pub left_long: f64,
-    pub lower_lat: f64,
-    pub right_long: f64,
-    pub upper_lat: f64,
+    pub xmin: f64,
+    pub ymin: f64,
+    pub xmax: f64,
+    pub ymax: f64,
 
     pub allow_all_families: bool,
     pub allow_all_categories: bool,
@@ -108,18 +108,18 @@ impl CachedEntity {
                 tags_ids as "tags_ids!",
                 family_id as "family_id!",
                 display_name as "display_name!",
-                latitude as "latitude!",
-                longitude as "longitude!",
+                web_mercator_x as "web_mercator_x!",
+                web_mercator_y as "web_mercator_y!",
                 plain_text_location as "plain_text_location!",
                 cluster_id,
-                cluster_center_lat,
-                cluster_center_lon
+                cluster_center_x,
+                cluster_center_y
             FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
             "#,
-            request.left_long,
-            request.lower_lat,
-            request.right_long,
-            request.upper_lat,
+            request.xmin,
+            request.ymin,
+            request.xmax,
+            request.ymax,
             request.allow_all_families,
             request.allow_all_categories,
             request.allow_all_tags,
@@ -152,8 +152,8 @@ impl CachedEntity {
                 tags_ids: e.tags_ids.clone(),
                 family_id: e.family_id,
                 display_name: e.display_name.clone(),
-                latitude: e.latitude,
-                longitude: e.longitude,
+                web_mercator_x: e.web_mercator_x,
+                web_mercator_y: e.web_mercator_y,
                 plain_text_location: e.plain_text_location.clone(),
             })
             .collect();
@@ -165,8 +165,8 @@ impl CachedEntity {
                 if let Some(cluster_id) = e.cluster_id {
                     let cluster = acc.entry(cluster_id).or_insert(Cluster {
                         id: cluster_id,
-                        center_lat: e.cluster_center_lat.unwrap(),
-                        center_lon: e.cluster_center_lon.unwrap(),
+                        center_x: e.cluster_center_x.unwrap(),
+                        center_y: e.cluster_center_y.unwrap(),
                         count: 0,
                     });
                     cluster.count += 1;
@@ -198,8 +198,8 @@ impl CachedEntity {
                 tags_ids as "tags_ids!",
                 family_id as "family_id!",
                 display_name as "display_name!",
-                latitude as "latitude!",
-                longitude as "longitude!",
+                web_mercator_x as "web_mercator_x!",
+                web_mercator_y as "web_mercator_y!",
                 plain_text_location as "plain_text_location!"
             FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)"#,
             request.search_query,

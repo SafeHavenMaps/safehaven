@@ -2201,8 +2201,8 @@
           "tags_ids",
           "family_id",
           "display_name",
-          "latitude",
-          "longitude",
+          "web_mercator_x",
+          "web_mercator_y",
           "plain_text_location"
         ],
         "properties": {
@@ -2232,14 +2232,6 @@
             "type": "string",
             "format": "uuid"
           },
-          "latitude": {
-            "type": "number",
-            "format": "double"
-          },
-          "longitude": {
-            "type": "number",
-            "format": "double"
-          },
           "plain_text_location": {
             "type": "string"
           },
@@ -2249,6 +2241,14 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "web_mercator_x": {
+            "type": "number",
+            "format": "double"
+          },
+          "web_mercator_y": {
+            "type": "number",
+            "format": "double"
           }
         }
       },
@@ -2304,16 +2304,16 @@
         "type": "object",
         "required": [
           "id",
-          "center_lat",
-          "center_lon",
+          "center_x",
+          "center_y",
           "count"
         ],
         "properties": {
-          "center_lat": {
+          "center_x": {
             "type": "number",
             "format": "double"
           },
-          "center_lon": {
+          "center_y": {
             "type": "number",
             "format": "double"
           },
@@ -3079,20 +3079,20 @@
         "type": "object",
         "required": [
           "plain_text",
-          "x",
-          "y"
+          "lat",
+          "long"
         ],
         "properties": {
+          "lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "long": {
+            "type": "number",
+            "format": "double"
+          },
           "plain_text": {
             "type": "string"
-          },
-          "x": {
-            "type": "number",
-            "format": "double"
-          },
-          "y": {
-            "type": "number",
-            "format": "double"
           }
         }
       },
@@ -3210,26 +3210,26 @@
       "ViewRequest": {
         "type": "object",
         "required": [
-          "left_long",
-          "lower_lat",
-          "right_long",
-          "upper_lat",
+          "xmin",
+          "ymin",
+          "xmax",
+          "ymax",
           "zoom_level"
         ],
         "properties": {
-          "left_long": {
+          "xmax": {
             "type": "number",
             "format": "double"
           },
-          "lower_lat": {
+          "xmin": {
             "type": "number",
             "format": "double"
           },
-          "right_long": {
+          "ymax": {
             "type": "number",
             "format": "double"
           },
-          "upper_lat": {
+          "ymin": {
             "type": "number",
             "format": "double"
           },
