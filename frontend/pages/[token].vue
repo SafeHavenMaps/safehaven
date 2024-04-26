@@ -47,7 +47,7 @@ onMounted(() => {
   map = mapRef.value!.map;
 });
 
-async function getCurrentCoordinates() {
+async function getCurrentCoordinates(): Promise<{ upperLeft: [number, number]; lowerRight: [number, number] }> {
   const extent = map!.getView().calculateExtent(map!.getSize());
   const transformedExtent = transformExtent(
     extent,
@@ -62,7 +62,7 @@ async function getCurrentCoordinates() {
 
 async function onMapMoveEnd() {
   const coordinates = await getCurrentCoordinates();
-  console.log("Current coordinates", coordinates);
+  state.refreshView(coordinates.upperLeft, coordinates.lowerRight);
 }
 </script>
 

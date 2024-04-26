@@ -4,6 +4,7 @@ import useClient from "~/lib/client";
 const client = useClient();
 
 type BootstrapResponse = api.components["schemas"]["BootstrapResponse"];
+type ViewResponse = api.components["schemas"]["CachedEntity"][];
 
 export class AppState {
   initialized = false;
@@ -12,6 +13,8 @@ export class AppState {
   private categoriesData: BootstrapResponse["categories"] | null = null;
   private tagsData: BootstrapResponse["tags"] | null = null;
   private mapBootData: BootstrapResponse["map_boot"] | null = null;
+
+  private viewData: ViewResponse | null = null;
 
   get families(): BootstrapResponse["families"] {
     if (!this.initialized) {
@@ -41,6 +44,13 @@ export class AppState {
     return this.mapBootData!;
   }
 
+  get view(): ViewResponse {
+    if (!this.initialized) {
+      throw new Error("App state not initialized");
+    }
+    return this.viewData!;
+  }
+
   async initWithToken(token: string) {
     const data = await client.bootstrap(token);
 
@@ -50,6 +60,16 @@ export class AppState {
     this.mapBootData = data.map_boot;
 
     this.initialized = true;
+  }
+
+  async refreshView(
+    upperLeft: [number, number],
+    lowerRight: [number, number]
+  ) {
+    if (!this.initialized) {
+      throw new Error("App state not initialized");
+    }
+    this.viewData = await client.getEntitiesWithinBounds(upperLeft, lowerRight);
   }
 }
 
