@@ -2719,7 +2719,8 @@
           "center_lat",
           "center_lng",
           "zoom",
-          "display_projection"
+          "display_projection",
+          "clustering_parameters"
         ],
         "properties": {
           "center_lat": {
@@ -2729,6 +2730,24 @@
           "center_lng": {
             "type": "number",
             "format": "double"
+          },
+          "clustering_parameters": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "allOf": [
+                  {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                ]
+              }
+            }
           },
           "display_projection": {
             "type": "string"
@@ -3195,26 +3214,26 @@
       "ViewRequest": {
         "type": "object",
         "required": [
-          "upper_left_lat",
-          "upper_left_lon",
-          "lower_right_lat",
-          "lower_right_lon",
+          "left_long",
+          "lower_lat",
+          "right_long",
+          "upper_lat",
           "zoom_level"
         ],
         "properties": {
-          "lower_right_lat": {
+          "left_long": {
             "type": "number",
             "format": "double"
           },
-          "lower_right_lon": {
+          "lower_lat": {
             "type": "number",
             "format": "double"
           },
-          "upper_left_lat": {
+          "right_long": {
             "type": "number",
             "format": "double"
           },
-          "upper_left_lon": {
+          "upper_lat": {
             "type": "number",
             "format": "double"
           },

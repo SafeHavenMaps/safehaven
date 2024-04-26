@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION fetch_entities_within_view(
-    upper_left_lat DOUBLE PRECISION,
-    upper_left_lon DOUBLE PRECISION,
-    lower_right_lat DOUBLE PRECISION,
-    lower_right_lon DOUBLE PRECISION,
+    left_long DOUBLE PRECISION,
+    lower_lat DOUBLE PRECISION,
+    right_long DOUBLE PRECISION,
+    upper_lat DOUBLE PRECISION,
 
     allow_all_families BOOL,
     allow_all_categories BOOL,
@@ -57,10 +57,10 @@ BEGIN
             ST_Intersects(
                 ec.location,
                 ST_MakeEnvelope(
-                    upper_left_lat,
-                    upper_left_lon,
-                    lower_right_lat,
-                    lower_right_lon,
+                    left_long,
+                    lower_lat,
+                    right_long,
+                    upper_lat,
                     4326
                 )
             )

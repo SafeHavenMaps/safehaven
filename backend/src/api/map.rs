@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use crate::api::{AppError, AppJson, AppState, DbConn, MapUserToken};
 use crate::models::comment::{Comment, NewComment, PublicComment};
 use crate::models::entity::{Entity, ListedEntity, NewEntity, PublicEntity};
@@ -22,11 +23,21 @@ pub fn routes() -> Router<AppState> {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ViewRequest {
-    upper_left_lat: f64,
-    upper_left_lon: f64,
-    lower_right_lat: f64,
-    lower_right_lon: f64,
+    left_long: f64,
+    lower_lat: f64,
+    right_long: f64,
+    upper_lat: f64,
     zoom_level: u8,
+}
+
+impl Display for ViewRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ViewRequest {{ left_long: {}, lower_lat: {}, right_long: {}, upper_lat: {}, zoom_level: {} }}",
+            self.left_long, self.lower_lat, self.right_long, self.upper_lat, self.zoom_level
+        )
+    }
 }
 
 #[utoipa::path(
@@ -46,11 +57,13 @@ pub async fn view_request(
 ) -> Result<AppJson<EntitiesAndClusters>, AppError> {
     let cluster_params = app_state.config.map.get_eps_min_for_zoom(request.zoom_level);
 
+    tracing::trace!("Received view request {}", request);
+
     let request = FindEntitiesRequest {
-        upper_left_lat: request.upper_left_lat,
-        upper_left_lon: request.upper_left_lon,
-        lower_right_lat: request.lower_right_lat,
-        lower_right_lon: request.lower_right_lon,
+        left_long: request.left_long,
+        lower_lat: request.lower_lat,
+        right_long: request.right_long,
+        upper_lat: request.upper_lat,
 
         allow_all_families: token.perms.families_policy.allow_all,
         allow_all_categories: token.perms.categories_policy.allow_all,

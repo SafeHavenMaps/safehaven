@@ -52,10 +52,10 @@ pub struct EntitiesAndClusters {
 }
 
 pub struct FindEntitiesRequest {
-    pub upper_left_lat: f64,
-    pub upper_left_lon: f64,
-    pub lower_right_lat: f64,
-    pub lower_right_lon: f64,
+    pub left_long: f64,
+    pub lower_lat: f64,
+    pub right_long: f64,
+    pub upper_lat: f64,
 
     pub allow_all_families: bool,
     pub allow_all_categories: bool,
@@ -113,10 +113,10 @@ impl CachedEntity {
                 cluster_center_lon
             FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
             "#,
-            request.upper_left_lat,
-            request.upper_left_lon,
-            request.lower_right_lat,
-            request.lower_right_lon,
+            request.left_long,
+            request.lower_lat,
+            request.right_long,
+            request.upper_lat,
             request.allow_all_families,
             request.allow_all_categories,
             request.allow_all_tags,

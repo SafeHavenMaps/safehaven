@@ -121,9 +121,15 @@ export class AppState {
     const transformedExtent = this.transformExtentToProj(extent);
     const zoom = Math.floor(zoomLevel);
 
+    console.log(transformedExtent);
+
     this.viewData = await client.getEntitiesWithinBounds(
-      [transformedExtent[0], transformedExtent[3]],
-      [transformedExtent[2], transformedExtent[1]],
+      {
+        leftLong: transformedExtent[0],
+        lowerLat: transformedExtent[1],
+        rightLong: transformedExtent[2],
+        upperLat: transformedExtent[3],
+      },
       zoom
     );
   }

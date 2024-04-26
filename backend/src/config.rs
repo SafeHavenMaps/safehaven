@@ -87,7 +87,7 @@ impl Default for SafeHavenConfig {
                 display_projection: "EPSG:3857".to_string(),
                 clustering_parameters: {
                     let mut map = HashMap::new();
-                    map.insert("1".to_string(), (1.0, 25));
+                    map.insert("1:6".to_string(), (1.0, 25));
                     map
                 },
                 parsed_clustering_parameters: None,

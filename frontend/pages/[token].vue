@@ -69,7 +69,7 @@ onMounted(() => {
 });
 
 async function onMapMoveEnd() {
-  const extent = map!.getView().calculateExtent(map!.getSize());
+  const extent = map!.getView().getViewStateAndExtent().extent;
   const currentZoom = map!.getView().getZoom()!;
   state.refreshView(extent, currentZoom);
 }
