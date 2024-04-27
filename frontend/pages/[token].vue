@@ -72,6 +72,7 @@ async function onMapMoveEnd() {
   const extent = map!.getView().getViewStateAndExtent().extent;
   const currentZoom = map!.getView().getZoom()!;
   state.refreshView(extent, currentZoom);
+  console.log(currentZoom);
 }
 </script>
 

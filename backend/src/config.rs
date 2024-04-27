@@ -84,9 +84,23 @@ impl Default for SafeHavenConfig {
                 center_lng: 2.0,
                 zoom: 5,
                 clustering_parameters: {
-                    let mut map = HashMap::new();
-                    map.insert("1:6".to_string(), (1.0, 25));
-                    map
+                    let characteric_distance: f64 = 5.; //in hundreds of kms
+                    let declustering_speed: f64 = 1.65;
+                    let minimal_cluster_size: i32 = 6;
+                    let mut params = HashMap::new();
+                    for k in 2..29 {
+                        params.insert(
+                            k.to_string(),
+                            (
+                                characteric_distance * 100000. * declustering_speed.powf(-k as f64),
+                                minimal_cluster_size,
+                            ),
+                        );
+                    }
+                    //params.insert("1:4".to_string(), (90000., 6));
+                    // params.insert("5:7".to_string(), (0.5, 6));
+                    // params.insert("8:20".to_string(), (0.3, 6));
+                    params
                 },
                 parsed_clustering_parameters: None,
             },
