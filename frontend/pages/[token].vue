@@ -1,4 +1,5 @@
 <template>
+  <MapNavBar/>
   <div id="map_container">
     <ol-map
       id="map"
