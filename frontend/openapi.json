@@ -2178,7 +2178,7 @@
             }
           },
           "map_boot": {
-            "$ref": "#/components/schemas/MapBoot"
+            "$ref": "#/components/schemas/CartographyConfig"
           },
           "signed_token": {
             "type": "string"
@@ -2249,6 +2249,30 @@
           "web_mercator_y": {
             "type": "number",
             "format": "double"
+          }
+        }
+      },
+      "CartographyInitConfig": {
+        "type": "object",
+        "required": [
+          "center_lat",
+          "center_lng",
+          "zoom"
+        ],
+        "properties": {
+          "center_lat": {
+            "type": "number",
+            "format": "double",
+            "description": "Displayed map initialization parameters"
+          },
+          "center_lng": {
+            "type": "number",
+            "format": "double"
+          },
+          "zoom": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -2323,7 +2347,8 @@
           },
           "id": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -2710,48 +2735,6 @@
         "properties": {
           "token": {
             "type": "string"
-          }
-        }
-      },
-      "MapBoot": {
-        "type": "object",
-        "required": [
-          "center_lat",
-          "center_lng",
-          "zoom",
-          "clustering_parameters"
-        ],
-        "properties": {
-          "center_lat": {
-            "type": "number",
-            "format": "double"
-          },
-          "center_lng": {
-            "type": "number",
-            "format": "double"
-          },
-          "clustering_parameters": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "allOf": [
-                  {
-                    "type": "number",
-                    "format": "double"
-                  },
-                  {
-                    "type": "integer",
-                    "format": "int32"
-                  }
-                ]
-              }
-            }
-          },
-          "zoom": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
           }
         }
       },

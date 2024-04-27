@@ -82,6 +82,18 @@
           popd
         '';
 
+        regenApi = pkgs.writeShellScriptBin "regen_api" ''
+          set -e
+
+          pushd backend
+            cargo run -- openapi ../frontend/openapi.json
+          popd
+
+          pushd frontend
+            npm run generate-api
+          popd
+        '';
+
         # Version when compiling the packages
         version = builtins.readFile ./container_release;
 
@@ -139,8 +151,9 @@
           devShells.default = mkShell {
             nativeBuildInputs = [rustChan];
             buildInputs = [
-              # Prepare scripts
+              # Various scripts
               checkProject
+              regenApi
               # Backend
               sqlx-cli
               openssl
