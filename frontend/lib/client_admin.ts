@@ -52,32 +52,5 @@ export default function useClient() {
 
       return data;
     },
-
-    async getEntitiesWithinBounds(
-      rectangle: {
-        xmin: number;
-        ymin: number;
-        xmax: number;
-        ymax: number;
-      },
-      zoomLevel: number
-    ) {
-      if (!this.authenticated) {
-        throw new Error("Not authenticated");
-      }
-
-      const { data, error } = await client.POST("/api/map/view", {
-        body: {
-          xmin: rectangle.xmin,
-          ymin: rectangle.ymin,
-          xmax: rectangle.xmax,
-          ymax: rectangle.ymax,
-          zoom_level: zoomLevel,
-        },
-      });
-      if (error) throw error;
-
-      return data;
-    },
   };
 }
