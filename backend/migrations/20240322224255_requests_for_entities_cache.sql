@@ -90,16 +90,14 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION search_entities(
     search_query TEXT,
+    input_family_id UUID,
 
-    allow_all_families BOOL,
     allow_all_categories BOOL,
     allow_all_tags BOOL,
 
-    families_list UUID[],
     categories_list UUID[],
     tags_list UUID[],
 
-    exclude_families_list UUID[],
     exclude_categories_list UUID[],
     exclude_tags_list UUID[]
 ) RETURNS TABLE (
@@ -129,10 +127,7 @@ BEGIN
         FROM entities_caches ec
         WHERE
             (full_text_search_ts @@ to_tsquery(search_query))
-            -- Families
-            AND
-            (allow_all_families OR (ec.family_id = ANY(families_list)))
-            AND NOT (ec.family_id = ANY(exclude_families_list))
+            AND ec.family_id = input_family_id
             -- Categories
             AND
             (allow_all_categories OR (ec.categories_ids && categories_list))

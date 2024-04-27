@@ -14,6 +14,8 @@ use std::fmt::Display;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
+use super::MapUserTokenClaims;
+
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/view", post(view_request))
@@ -58,6 +60,19 @@ fn clusterize(
     ))
 }
 
+fn is_token_allowed_for_family(token: &MapUserTokenClaims, family_id: &Uuid) -> bool {
+    let family_is_allowed = token.perms.families_policy.allow_all
+        || token.perms.families_policy.allow_list.contains(family_id);
+
+    let family_is_excluded = token
+        .perms
+        .families_policy
+        .force_exclude
+        .contains(family_id);
+
+    family_is_allowed && !family_is_excluded
+}
+
 #[utoipa::path(
     post,
     path = "/api/map/view",
@@ -73,6 +88,12 @@ pub async fn view_request(
     MapUserToken(token): MapUserToken,
     Json(request): Json<ViewRequest>,
 ) -> Result<AppJson<EntitiesAndClusters>, AppError> {
+    tracing::trace!("Received view request {}", request);
+
+    if !is_token_allowed_for_family(&token, &request.family_id) {
+        return Err(AppError::Unauthorized);
+    }
+
     let cluster_config = &app_state.config.cartography.cluster;
     let cluster_params = clusterize(
         cluster_config.characteristic_distance,
@@ -80,27 +101,6 @@ pub async fn view_request(
         cluster_config.minimal_cluster_size,
         request.zoom_level as f64,
     );
-
-    tracing::trace!("Received view request {}", request);
-
-    // Checking if the family is allowed
-    // We prefer readability here so we decompose the conditions
-    let family_is_allowed = token.perms.families_policy.allow_all
-        || token
-            .perms
-            .families_policy
-            .allow_list
-            .contains(&request.family_id);
-
-    let family_is_excluded = token
-        .perms
-        .families_policy
-        .force_exclude
-        .contains(&request.family_id);
-
-    if !family_is_allowed || family_is_excluded {
-        return Err(AppError::Unauthorized);
-    }
 
     // Doing the request
     let request = FindEntitiesRequest {
@@ -130,6 +130,17 @@ pub async fn view_request(
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct SearchRequest {
     search_query: String,
+    family_id: Uuid,
+}
+
+impl Display for SearchRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "SearchRequest {{ search_query: {}, family_id: {} }}",
+            self.search_query, self.family_id
+        )
+    }
 }
 
 #[utoipa::path(
@@ -146,15 +157,19 @@ async fn search_request(
     MapUserToken(token): MapUserToken,
     Json(request): Json<SearchRequest>,
 ) -> Result<AppJson<Vec<CachedEntity>>, AppError> {
+    tracing::trace!("Received search request {}", request);
+
+    if !is_token_allowed_for_family(&token, &request.family_id) {
+        return Err(AppError::Unauthorized);
+    }
+
     let request = SearchEntitiesRequest {
         search_query: request.search_query,
-        allow_all_families: token.perms.families_policy.allow_all,
+        family_id: request.family_id,
         allow_all_categories: token.perms.categories_policy.allow_all,
         allow_all_tags: token.perms.tags_policy.allow_all,
-        families_list: token.perms.families_policy.allow_list.clone(),
         categories_list: token.perms.categories_policy.allow_list.clone(),
         tags_list: token.perms.tags_policy.allow_list.clone(),
-        exclude_families_list: token.perms.families_policy.force_exclude.clone(),
         exclude_categories_list: token.perms.categories_policy.force_exclude.clone(),
         exclude_tags_list: token.perms.tags_policy.force_exclude.clone(),
     };

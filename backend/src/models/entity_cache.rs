@@ -80,16 +80,14 @@ pub struct FindEntitiesRequest {
 
 pub struct SearchEntitiesRequest {
     pub search_query: String,
+    pub family_id: Uuid,
 
-    pub allow_all_families: bool,
     pub allow_all_categories: bool,
     pub allow_all_tags: bool,
 
-    pub families_list: Vec<Uuid>,
     pub categories_list: Vec<Uuid>,
     pub tags_list: Vec<Uuid>,
 
-    pub exclude_families_list: Vec<Uuid>,
     pub exclude_categories_list: Vec<Uuid>,
     pub exclude_tags_list: Vec<Uuid>,
 }
@@ -207,15 +205,13 @@ impl CachedEntity {
                 web_mercator_x as "web_mercator_x!",
                 web_mercator_y as "web_mercator_y!",
                 plain_text_location as "plain_text_location!"
-            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)"#,
+            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8)"#,
             request.search_query,
-            request.allow_all_families,
+            request.family_id,
             request.allow_all_categories,
             request.allow_all_tags,
-            &request.families_list,
             &request.categories_list,
             &request.tags_list,
-            &request.exclude_families_list,
             &request.exclude_categories_list,
             &request.exclude_tags_list,
         )
