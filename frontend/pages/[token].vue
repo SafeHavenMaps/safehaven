@@ -20,8 +20,8 @@
 
       <ol-overlay
         :position="entity.coordinates"
-        v-for="entity in state.view.entities"
-        :key="entity"
+        v-for="entity in state.entities"
+        :key="entity.id"
       >
         <MapMarker
           :width="24"
@@ -31,18 +31,12 @@
         />
       </ol-overlay>
 
-
       <ol-overlay
-        :position="entity.coordinates"
-        v-for="entity in state.view.clusters"
-        :key="entity"
+        :position="cluster.coordinates"
+        v-for="cluster in state.clusters"
+        :key="cluster"
       >
-        <MapMarker
-          :width="24"
-          :height="38"
-          fill="black"
-          stroke="black"
-        />
+        <MapCluster :count="cluster.count" :seed="cluster.id" />
       </ol-overlay>
     </ol-map>
   </div>
@@ -72,7 +66,6 @@ async function onMapMoveEnd() {
   const extent = map!.getView().getViewStateAndExtent().extent;
   const currentZoom = map!.getView().getZoom()!;
   state.refreshView(extent, currentZoom);
-  console.log(currentZoom);
 }
 </script>
 

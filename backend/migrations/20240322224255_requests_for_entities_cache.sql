@@ -49,8 +49,6 @@ BEGIN
             CASE
                 WHEN cluster_eps > 0 AND cluster_min_points > 0 THEN
                     ST_ClusterDBSCAN(ec.web_mercator_location, cluster_eps, cluster_min_points) OVER()
-                ELSE
-                    NULL
             END AS cluster_id
         FROM entities_caches ec
         WHERE

@@ -7,7 +7,17 @@ import type { Coordinate } from "ol/coordinate";
 import type { Extent } from "ol/extent";
 
 type BootstrapResponse = api.components["schemas"]["BootstrapResponse"];
-type ViewResponse = api.components["schemas"]["EntitiesAndClusters"];
+
+type ViewData = {
+  entities: (api.components["schemas"]["CachedEntity"] & {
+    coordinates: Coordinate;
+    family: BootstrapResponse["families"][number];
+    category: BootstrapResponse["categories"][number];
+  })[];
+  clusters: (api.components["schemas"]["Cluster"] & {
+    coordinates: Coordinate;
+  })[];
+};
 
 export class AppState {
   initialized = false;
@@ -22,10 +32,18 @@ export class AppState {
   private categoriesLookupTable: Record<string, BootstrapResponse["categories"][number]> = {};
   private tagsLookupTable: Record<string, BootstrapResponse["tags"][number]> = {};
 
-  private viewData: ViewResponse = {
+  private viewData: ViewData = {
     entities: [],
     clusters: [],
   };
+
+  get entities() {
+    return this.viewData.entities;
+  }
+
+  get clusters() {
+    return this.viewData.clusters;
+  }
 
   async initWithToken(token: string) {
     const data = await client.bootstrap(token);
@@ -81,40 +99,41 @@ export class AppState {
     return state.mapBoot.zoom;
   }
 
-  get view() {
-    return {
-      entities: this.viewData.entities.map((entity) => {
-        return {
-          ...entity,
-          coordinates: [
-            entity.web_mercator_x,
-            entity.web_mercator_y,
-          ],
-          family: this.familiesLookupTable[entity.family_id],
-          category: this.categoriesLookupTable[entity.category_id],
-        };
-      }),
-      clusters: this.viewData.clusters.map((cluster) => {
-        return {
-          ...cluster,
-          coordinates: [
-            cluster.center_x,
-            cluster.center_y,
-          ],
-        };
-      }),
-    };
-  }
-
   async refreshView(extent: Extent, zoomLevel: number) {
     const zoom = Math.round(zoomLevel);
-    this.viewData = await client.getEntitiesWithinBounds(
+    const newViewData = await client.getEntitiesWithinBounds(
       {
         xmin: extent[0], ymin: extent[1],
         xmax: extent[2], ymax: extent[3],
       },
       zoom
     );
+
+    // Step 1: Identify and filter out entities that are no longer present
+    const existingEntityIds = new Set(newViewData.entities.map(ne => ne.id));
+    this.viewData.entities = this.viewData.entities.filter(e => existingEntityIds.has(e.id));
+    
+    // Step 2: Add new entities that are not already in viewData
+    const currentEntityIds = new Set(this.viewData.entities.map(e => e.id));
+    const newEntities = newViewData.entities.filter(ne => !currentEntityIds.has(ne.id));
+    this.viewData.entities.push(...newEntities.map(entity => ({
+      ...entity,
+      coordinates: [entity.web_mercator_x, entity.web_mercator_y],
+      family: this.familiesLookupTable[entity.family_id],
+      category: this.categoriesLookupTable[entity.category_id],
+    })));
+    
+    // Step 3: Identify and filter out clusters that are no longer present
+    const existingClusterIds = new Set(newViewData.clusters.map(nc => nc.id));
+    this.viewData.clusters = this.viewData.clusters.filter(c => existingClusterIds.has(c.id));
+    
+    // Step 4: Add new clusters that are not already in viewData
+    const currentClusterIds = new Set(this.viewData.clusters.map(c => c.id));
+    const newClusters = newViewData.clusters.filter(nc => !currentClusterIds.has(nc.id));
+    this.viewData.clusters.push(...newClusters.map(cluster => ({
+      ...cluster,
+      coordinates: [cluster.center_x, cluster.center_y],
+    })));
   }
 }
 

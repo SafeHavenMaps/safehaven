@@ -39,10 +39,18 @@ pub struct CachedClusteredEntity {
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct Cluster {
-    pub id: i32,
+    pub id: u32,
     pub center_x: f64,
     pub center_y: f64,
     pub count: i32,
+}
+
+impl Cluster {
+    fn calculate_id(&mut self) {
+        self.id = crc32fast::hash(
+            format!("{}-{}-{}", self.center_x, self.center_y, self.count).as_bytes(),
+        );
+    }
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -162,10 +170,10 @@ impl CachedEntity {
             .iter()
             .fold(
                 HashMap::new(),
-                |mut acc: std::collections::HashMap<i32, Cluster>, e| {
+                |mut acc: std::collections::HashMap<u32, Cluster>, e| {
                     if let Some(cluster_id) = e.cluster_id {
-                        let cluster = acc.entry(cluster_id).or_insert(Cluster {
-                            id: cluster_id,
+                        let cluster = acc.entry(cluster_id as u32).or_insert(Cluster {
+                            id: cluster_id as u32,
                             center_x: e.cluster_center_x.unwrap(),
                             center_y: e.cluster_center_y.unwrap(),
                             count: 0,
@@ -176,7 +184,10 @@ impl CachedEntity {
                 },
             )
             .into_iter()
-            .map(|(_, v)| v)
+            .map(|(_, mut v)| {
+                v.calculate_id();
+                v
+            })
             .collect();
 
         Ok(EntitiesAndClusters { entities, clusters })

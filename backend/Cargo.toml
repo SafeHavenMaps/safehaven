@@ -31,3 +31,4 @@ utoipa-redoc = { version = "3.0.0", features = ["axum"] }
 clap = { version = "4", features = ["derive"] }
 clap_derive = { version = "4" }
 number_range = "0.3.2"
+crc32fast = "1.4.0"
