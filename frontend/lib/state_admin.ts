@@ -26,7 +26,8 @@ export class AppState {
 
   private categoriesData: BootstrapResponse["categories"] | null = null;
   private tagsData: BootstrapResponse["tags"] | null = null;
-  private mapBootData: BootstrapResponse["map_boot"] | null = null;
+  private mapBootData: BootstrapResponse["cartography_init_config"] | null =
+    null;
 
   private familiesLookupTable: Record<
     string,
@@ -58,7 +59,7 @@ export class AppState {
     this.familiesData = data.families;
     this.categoriesData = data.categories;
     this.tagsData = data.tags;
-    this.mapBootData = data.map_boot;
+    this.mapBootData = data.cartography_init_config;
 
     this.familiesData.forEach((family) => {
       this.familiesLookupTable[family.id] = family;
@@ -87,74 +88,8 @@ export class AppState {
     return this.tagsData!;
   }
 
-  get mapBoot(): BootstrapResponse["map_boot"] {
+  get mapBoot(): BootstrapResponse["cartography_init_config"] {
     return this.mapBootData!;
-  }
-
-  startCenter() {
-    // The configuration files is in WGS84 (EPSG:4326)
-    // The map is in Web Mercator (EPSG:3857)
-    // We need to transform the coordinates
-    return transform(
-      [state.mapBoot.center_lng, state.mapBoot.center_lat],
-      "EPSG:4326", // WGS84
-      "EPSG:3857" // Web Mercator
-    );
-  }
-
-  startZoom() {
-    return state.mapBoot.zoom;
-  }
-
-  async refreshView(extent: Extent, zoomLevel: number) {
-    const zoom = Math.round(zoomLevel);
-    const newViewData = await client.getEntitiesWithinBounds(
-      {
-        xmin: extent[0],
-        ymin: extent[1],
-        xmax: extent[2],
-        ymax: extent[3],
-      },
-      zoom
-    );
-
-    // Step 1: Identify and filter out entities that are no longer present
-    const existingEntityIds = new Set(newViewData.entities.map((ne) => ne.id));
-    this.viewData.entities = this.viewData.entities.filter((e) =>
-      existingEntityIds.has(e.id)
-    );
-
-    // Step 2: Add new entities that are not already in viewData
-    const currentEntityIds = new Set(this.viewData.entities.map((e) => e.id));
-    const newEntities = newViewData.entities.filter(
-      (ne) => !currentEntityIds.has(ne.id)
-    );
-    this.viewData.entities.push(
-      ...newEntities.map((entity) => ({
-        ...entity,
-        coordinates: [entity.web_mercator_x, entity.web_mercator_y],
-        family: this.familiesLookupTable[entity.family_id],
-        category: this.categoriesLookupTable[entity.category_id],
-      }))
-    );
-
-    // Step 3: Identify and filter out clusters that are no longer present
-    const existingClusterIds = new Set(newViewData.clusters.map((nc) => nc.id));
-    this.viewData.clusters = this.viewData.clusters.filter((c) =>
-      existingClusterIds.has(c.id)
-    );
-
-    // Step 4: Add new clusters that are not already in viewData
-    const currentClusterIds = new Set(this.viewData.clusters.map((c) => c.id));
-    const newClusters = newViewData.clusters.filter(
-      (nc) => !currentClusterIds.has(nc.id)
-    );
-    this.viewData.clusters.push(
-      ...newClusters.map((cluster) => ({
-        ...cluster,
-        coordinates: [cluster.center_x, cluster.center_y],
-      }))
-    );
   }
 }
 

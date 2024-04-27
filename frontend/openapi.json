@@ -2162,9 +2162,12 @@
           "families",
           "categories",
           "tags",
-          "map_boot"
+          "cartography_init_config"
         ],
         "properties": {
+          "cartography_init_config": {
+            "$ref": "#/components/schemas/CartographyInitConfig"
+          },
           "categories": {
             "type": "array",
             "items": {
@@ -2176,9 +2179,6 @@
             "items": {
               "$ref": "#/components/schemas/Family"
             }
-          },
-          "map_boot": {
-            "$ref": "#/components/schemas/CartographyConfig"
           },
           "signed_token": {
             "type": "string"
