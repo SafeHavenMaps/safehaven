@@ -64,16 +64,14 @@ pub struct FindEntitiesRequest {
     pub ymin: f64,
     pub xmax: f64,
     pub ymax: f64,
+    pub family_id: Uuid,
 
-    pub allow_all_families: bool,
     pub allow_all_categories: bool,
     pub allow_all_tags: bool,
 
-    pub families_list: Vec<Uuid>,
     pub categories_list: Vec<Uuid>,
     pub tags_list: Vec<Uuid>,
 
-    pub exclude_families_list: Vec<Uuid>,
     pub exclude_categories_list: Vec<Uuid>,
     pub exclude_tags_list: Vec<Uuid>,
 
@@ -121,19 +119,17 @@ impl CachedEntity {
                 cluster_id,
                 cluster_center_x,
                 cluster_center_y
-            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
             "#,
             request.xmin,
             request.ymin,
             request.xmax,
             request.ymax,
-            request.allow_all_families,
+            request.family_id,
             request.allow_all_categories,
             request.allow_all_tags,
-            &request.families_list,
             &request.categories_list,
             &request.tags_list,
-            &request.exclude_families_list,
             &request.exclude_categories_list,
             &request.exclude_tags_list,
             request.cluster_params.map(|(eps, _)| eps).unwrap_or(0.0),

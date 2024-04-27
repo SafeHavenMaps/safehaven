@@ -3193,6 +3193,7 @@
       "ViewRequest": {
         "type": "object",
         "required": [
+          "family_id",
           "xmin",
           "ymin",
           "xmax",
@@ -3200,6 +3201,10 @@
           "zoom_level"
         ],
         "properties": {
+          "family_id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "xmax": {
             "type": "number",
             "format": "double"

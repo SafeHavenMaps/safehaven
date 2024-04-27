@@ -46,12 +46,25 @@ export class AppState {
     clusters: [],
   };
 
+  private activeFamilyId: string | null = null;
+
   get entities() {
     return this.viewData.entities;
   }
 
   get clusters() {
     return this.viewData.clusters;
+  }
+
+  get activeFamily() {
+    return this.familiesLookupTable[this.activeFamilyId!];
+  }
+
+  changeActiveFamily(familyId: string) {
+    if (!this.familiesLookupTable[familyId]) {
+      throw new Error(`Family with id ${familyId} does not exist`);
+    }
+    this.activeFamilyId = familyId;
   }
 
   async initWithToken(token: string) {
@@ -73,6 +86,12 @@ export class AppState {
     this.tagsData.forEach((tag) => {
       this.tagsLookupTable[tag.id] = tag;
     });
+
+    if (this.familiesData.length === 0) {
+      throw new Error("No families available");
+    }
+
+    this.activeFamilyId = this.familiesData[0].id;
 
     this.initialized = true;
   }
@@ -120,7 +139,8 @@ export class AppState {
         xmax: extent[2],
         ymax: extent[3],
       },
-      zoom
+      zoom,
+      this.activeFamilyId!
     );
 
     // Step 1: Identify and filter out entities that are no longer present

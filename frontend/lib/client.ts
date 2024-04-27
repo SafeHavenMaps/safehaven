@@ -60,7 +60,8 @@ export default function useClient() {
         xmax: number;
         ymax: number;
       },
-      zoomLevel: number
+      zoomLevel: number,
+      familyId: string
     ) {
       if (!this.authenticated) {
         throw new Error("Not authenticated");
@@ -73,6 +74,7 @@ export default function useClient() {
           xmax: rectangle.xmax,
           ymax: rectangle.ymax,
           zoom_level: zoomLevel,
+          family_id: familyId,
         },
       });
       if (error) throw error;

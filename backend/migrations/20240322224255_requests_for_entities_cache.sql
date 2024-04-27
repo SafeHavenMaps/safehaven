@@ -3,16 +3,12 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
     input_ymin DOUBLE PRECISION,
     input_xmax DOUBLE PRECISION,
     input_ymax DOUBLE PRECISION,
+    input_family_id UUID,
 
-    allow_all_families BOOL,
     allow_all_categories BOOL,
     allow_all_tags BOOL,
-
-    families_list UUID[],
     categories_list UUID[],
     tags_list UUID[],
-
-    exclude_families_list UUID[],
     exclude_categories_list UUID[],
     exclude_tags_list UUID[],
 
@@ -56,9 +52,7 @@ BEGIN
                 ec.web_mercator_location,
                 ST_MakeEnvelope(input_xmin, input_ymin, input_xmax, input_ymax, 3857)
             )
-            -- Families filter
-            AND (allow_all_families OR ec.family_id = ANY(families_list))
-            AND NOT (ec.family_id = ANY(exclude_families_list))
+            AND ec.family_id = input_family_id
             -- Categories filter
             AND (allow_all_categories OR ec.categories_ids && categories_list)
             AND NOT (ec.categories_ids && exclude_categories_list)

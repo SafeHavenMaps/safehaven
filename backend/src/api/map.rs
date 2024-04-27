@@ -25,6 +25,7 @@ pub fn routes() -> Router<AppState> {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ViewRequest {
+    family_id: Uuid,
     xmin: f64,
     ymin: f64,
     xmax: f64,
@@ -36,8 +37,8 @@ impl Display for ViewRequest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "ViewRequest {{ xmin: {}, ymin: {}, xmax: {}, ymax: {}, zoom_level: {} }}",
-            self.xmin, self.ymin, self.xmax, self.ymax, self.zoom_level
+            "ViewRequest {{ xmin: {}, ymin: {}, xmax: {}, ymax: {}, zoom_level: {}, family_id: {} }}",
+            self.xmin, self.ymin, self.xmax, self.ymax, self.zoom_level, self.family_id
         )
     }
 }
@@ -82,21 +83,39 @@ pub async fn view_request(
 
     tracing::trace!("Received view request {}", request);
 
+    // Checking if the family is allowed
+    // We prefer readability here so we decompose the conditions
+    let family_is_allowed = token.perms.families_policy.allow_all
+        || token
+            .perms
+            .families_policy
+            .allow_list
+            .contains(&request.family_id);
+
+    let family_is_excluded = token
+        .perms
+        .families_policy
+        .force_exclude
+        .contains(&request.family_id);
+
+    if !family_is_allowed || family_is_excluded {
+        return Err(AppError::Unauthorized);
+    }
+
+    // Doing the request
     let request = FindEntitiesRequest {
         xmin: request.xmin,
         ymin: request.ymin,
         xmax: request.xmax,
         ymax: request.ymax,
+        family_id: request.family_id,
 
-        allow_all_families: token.perms.families_policy.allow_all,
         allow_all_categories: token.perms.categories_policy.allow_all,
-
         allow_all_tags: token.perms.tags_policy.allow_all,
-        families_list: token.perms.families_policy.allow_list.clone(),
+
         categories_list: token.perms.categories_policy.allow_list.clone(),
         tags_list: token.perms.tags_policy.allow_list.clone(),
 
-        exclude_families_list: token.perms.families_policy.force_exclude.clone(),
         exclude_categories_list: token.perms.categories_policy.force_exclude.clone(),
         exclude_tags_list: token.perms.tags_policy.force_exclude.clone(),
 
