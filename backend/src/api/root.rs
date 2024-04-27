@@ -1,5 +1,5 @@
 use crate::api::{AppError, AppJson, AppState, DbConn, MapUserTokenClaims};
-use crate::config::MapBoot;
+use crate::config::CartographyConfig;
 use crate::models::{access_token::AccessToken, category::Category, family::Family, tag::Tag};
 use axum::extract::State;
 use axum::{
@@ -38,7 +38,7 @@ pub struct BootstrapResponse {
     families: Vec<Family>,
     categories: Vec<Category>,
     tags: Vec<Tag>,
-    map_boot: MapBoot,
+    map_boot: CartographyConfig,
 }
 
 #[utoipa::path(
@@ -97,7 +97,7 @@ async fn boostrap(
         families,
         categories,
         tags,
-        map_boot: app_state.config.map.clone(),
+        map_boot: app_state.config.cartography.clone(),
     };
 
     Ok(AppJson(resp))

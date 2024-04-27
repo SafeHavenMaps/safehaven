@@ -42,6 +42,21 @@ impl Display for ViewRequest {
     }
 }
 
+fn clusterize(
+    characteristic_distance: f64,
+    declustering_speed: f64,
+    minimal_cluster_size: i32,
+    zoom: f64,
+) -> Option<(f64, i32)> {
+    if zoom > 26.9 {
+        return None;
+    }
+    Some((
+        characteristic_distance * 100000. * declustering_speed.powf(-zoom),
+        minimal_cluster_size,
+    ))
+}
+
 #[utoipa::path(
     post,
     path = "/api/map/view",
@@ -57,10 +72,13 @@ pub async fn view_request(
     MapUserToken(token): MapUserToken,
     Json(request): Json<ViewRequest>,
 ) -> Result<AppJson<EntitiesAndClusters>, AppError> {
-    let cluster_params = app_state
-        .config
-        .map
-        .get_eps_min_for_zoom(request.zoom_level);
+    let cluster_config = &app_state.config.cartography.cluster;
+    let cluster_params = clusterize(
+        cluster_config.characteristic_distance,
+        cluster_config.declustering_speed,
+        cluster_config.minimal_cluster_size,
+        request.zoom_level as f64,
+    );
 
     tracing::trace!("Received view request {}", request);
 

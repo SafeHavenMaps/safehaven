@@ -85,11 +85,10 @@ async fn serve(args: &ServeArgs) {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let mut config = config::load(args.config.as_str()).unwrap_or_else(|e| {
+    let config = config::load(args.config.as_str()).unwrap_or_else(|e| {
         tracing::error!("Cannot load configuration: {}", e);
         exit(1);
     });
-    config.init();
 
     let config = Arc::new(config);
     let app_state = AppState::from_config(config.clone()).await;

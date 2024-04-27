@@ -1,10 +1,8 @@
-use std::collections::HashMap;
-
 use figment::{
     providers::{Env, Format, Serialized, Toml},
     Figment,
 };
-use number_range::NumberRange;
+
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -14,54 +12,28 @@ pub struct SafeHavenConfig {
     pub database: Database,
     pub token_secret: String,
     pub serve_public_path: Option<String>,
-    pub map: MapBoot,
-}
-
-impl SafeHavenConfig {
-    pub fn init(&mut self) {
-        self.map.init();
-    }
+    pub cartography: CartographyConfig,
 }
 
 #[derive(Deserialize, Serialize, Clone, ToSchema)]
-pub struct MapBoot {
+pub struct CartographyInitConfig {
+    ///Displayed map initialization parameters
     pub center_lat: f64,
     pub center_lng: f64,
     pub zoom: u8,
-    pub clustering_parameters: HashMap<String, (f64, i32)>,
-
-    #[serde(skip)]
-    parsed_clustering_parameters: Option<Vec<(Vec<u8>, f64, i32)>>,
 }
-
-impl MapBoot {
-    pub fn init(&mut self) {
-        self.parsed_clustering_parameters = Some(
-            self.clustering_parameters
-                .iter()
-                .map(|(k, v)| {
-                    (
-                        NumberRange::<u8>::default()
-                            .parse_str(&k)
-                            .expect("Invalid range")
-                            .collect(),
-                        v.0,
-                        v.1,
-                    )
-                })
-                .collect(),
-        );
-    }
-
-    pub fn get_eps_min_for_zoom(&self, zoom: u8) -> Option<(f64, i32)> {
-        self.parsed_clustering_parameters
-            .as_ref()
-            .expect("Not initialized")
-            .iter()
-            .find(|(range, _, _)| range.contains(&zoom))
-            .map(|(_, eps, min)| Some((*eps, *min)))
-            .unwrap_or(None)
-    }
+#[derive(Deserialize, Serialize, Clone)]
+pub struct CartographyClusterConfig {
+    ///Entity clusterization parameters
+    pub declustering_speed: f64,
+    pub characteristic_distance: f64,
+    pub minimal_cluster_size: i32,
+}
+#[derive(Deserialize, Serialize, Clone)]
+pub struct CartographyConfig {
+    /// Map configuration
+    pub init: CartographyInitConfig,
+    pub cluster: CartographyClusterConfig,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -80,32 +52,19 @@ impl Default for SafeHavenConfig {
                 pool_size: 5,
                 timeout: 3,
             },
-            token_secret: "SecretForValidatingAngSigngingTokens".to_string(),
+            token_secret: "SecretForValidatingAngSigningTokens".to_string(),
             serve_public_path: None,
-            map: MapBoot {
-                center_lat: 47.0,
-                center_lng: 2.0,
-                zoom: 5,
-                clustering_parameters: {
-                    let characteric_distance: f64 = 5.; //in hundreds of kms
-                    let declustering_speed: f64 = 1.65;
-                    let minimal_cluster_size: i32 = 6;
-                    let mut params = HashMap::new();
-                    for k in 2..29 {
-                        params.insert(
-                            k.to_string(),
-                            (
-                                characteric_distance * 100000. * declustering_speed.powf(-k as f64),
-                                minimal_cluster_size,
-                            ),
-                        );
-                    }
-                    //params.insert("1:4".to_string(), (90000., 6));
-                    // params.insert("5:7".to_string(), (0.5, 6));
-                    // params.insert("8:20".to_string(), (0.3, 6));
-                    params
+            cartography: CartographyConfig {
+                init: CartographyInitConfig {
+                    center_lat: 47.0,
+                    center_lng: 2.0,
+                    zoom: 5,
                 },
-                parsed_clustering_parameters: None,
+                cluster: CartographyClusterConfig {
+                    characteristic_distance: 5.,
+                    declustering_speed: 1.65,
+                    minimal_cluster_size: 6,
+                },
             },
         }
     }
