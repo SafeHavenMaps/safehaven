@@ -4,7 +4,13 @@ pub mod root;
 
 use std::{sync::Arc, time::Duration};
 
-use crate::{config::SafeHavenConfig, models::access_token::Permissions};
+use crate::{
+    config::SafeHavenConfig,
+    models::{
+        access_token::Permissions,
+        user::{NewUser, User},
+    },
+};
 use axum::{
     async_trait,
     extract::{FromRef, FromRequest, FromRequestParts},
@@ -36,6 +42,27 @@ impl AppState {
             .connect(&config.database.url)
             .await
             .expect("can't connect to database");
+
+        let mut conn = pool.acquire().await.expect("can't acquire connection");
+
+        if User::get_users_count(&mut conn)
+            .await
+            .expect("can't get users count")
+            == 0
+        {
+            tracing::info!("No users found, creating admin user");
+
+            let admin = NewUser {
+                name: "admin".to_string(),
+                password: "safehaven".to_string(),
+            };
+
+            User::new(admin, &mut conn)
+                .await
+                .expect("can't create admin user");
+
+            tracing::warn!("Default admin user created, please change the password");
+        }
 
         Self { config, pool }
     }
@@ -82,6 +109,7 @@ where
     }
 }
 
+#[derive(Debug)]
 pub enum AppError {
     Pool,
     TokenValidation,

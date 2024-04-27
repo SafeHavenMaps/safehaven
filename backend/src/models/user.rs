@@ -40,6 +40,14 @@ impl From<AuthenticableUser> for User {
 }
 
 impl User {
+    pub async fn get_users_count(conn: &mut PgConnection) -> Result<i64, AppError> {
+        let (count,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM users")
+            .fetch_one(conn)
+            .await
+            .map_err(AppError::Database)?;
+        Ok(count)
+    }
+
     pub async fn new(user: NewUser, conn: &mut PgConnection) -> Result<User, AppError> {
         if user.password.is_empty() {
             return Err(AppError::Validation("Password cannot be empty".to_string()));
