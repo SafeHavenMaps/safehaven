@@ -39,14 +39,17 @@ impl MapBoot {
         self.parsed_clustering_parameters = Some(
             self.clustering_parameters
                 .iter()
-                .map(|(k, v)| 
+                .map(|(k, v)| {
                     (
-                        NumberRange::<u8>::default().parse_str(&k).expect("Invalid range").collect(),
+                        NumberRange::<u8>::default()
+                            .parse_str(&k)
+                            .expect("Invalid range")
+                            .collect(),
                         v.0,
-                        v.1
+                        v.1,
                     )
-                )
-                .collect()
+                })
+                .collect(),
         );
     }
 

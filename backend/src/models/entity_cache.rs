@@ -34,7 +34,7 @@ pub struct CachedClusteredEntity {
     pub plain_text_location: String,
     pub cluster_id: Option<i32>,
     pub cluster_center_x: Option<f64>,
-    pub cluster_center_y: Option<f64>
+    pub cluster_center_y: Option<f64>,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -69,7 +69,7 @@ pub struct FindEntitiesRequest {
     pub exclude_categories_list: Vec<Uuid>,
     pub exclude_tags_list: Vec<Uuid>,
 
-    pub cluster_params: Option<(f64,i32)>
+    pub cluster_params: Option<(f64, i32)>,
 }
 
 pub struct SearchEntitiesRequest {
@@ -87,7 +87,6 @@ pub struct SearchEntitiesRequest {
     pub exclude_categories_list: Vec<Uuid>,
     pub exclude_tags_list: Vec<Uuid>,
 }
-
 
 impl CachedEntity {
     /// This function fetches entities within a rectangle defined by the coordinates of the bottom left and top right corners of a view port.
@@ -129,8 +128,8 @@ impl CachedEntity {
             &request.exclude_families_list,
             &request.exclude_categories_list,
             &request.exclude_tags_list,
-            request.cluster_params.map(|(eps,_)| eps).unwrap_or(0.0),
-            request.cluster_params.map(|(_,min)| min).unwrap_or(0)
+            request.cluster_params.map(|(eps, _)| eps).unwrap_or(0.0),
+            request.cluster_params.map(|(_, min)| min).unwrap_or(0)
         )
         .fetch_all(conn)
         .await
@@ -161,26 +160,26 @@ impl CachedEntity {
         // -- Creating the list of clusters
         let clusters = entities_with_clusters
             .iter()
-            .fold(HashMap::new(), |mut acc: std::collections::HashMap<i32, Cluster>, e| {
-                if let Some(cluster_id) = e.cluster_id {
-                    let cluster = acc.entry(cluster_id).or_insert(Cluster {
-                        id: cluster_id,
-                        center_x: e.cluster_center_x.unwrap(),
-                        center_y: e.cluster_center_y.unwrap(),
-                        count: 0,
-                    });
-                    cluster.count += 1;
-                }
-                acc
-            })
+            .fold(
+                HashMap::new(),
+                |mut acc: std::collections::HashMap<i32, Cluster>, e| {
+                    if let Some(cluster_id) = e.cluster_id {
+                        let cluster = acc.entry(cluster_id).or_insert(Cluster {
+                            id: cluster_id,
+                            center_x: e.cluster_center_x.unwrap(),
+                            center_y: e.cluster_center_y.unwrap(),
+                            count: 0,
+                        });
+                        cluster.count += 1;
+                    }
+                    acc
+                },
+            )
             .into_iter()
             .map(|(_, v)| v)
             .collect();
-        
-        Ok(EntitiesAndClusters {
-            entities,
-            clusters,
-        })
+
+        Ok(EntitiesAndClusters { entities, clusters })
     }
 
     pub async fn search_entities(

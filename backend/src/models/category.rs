@@ -117,7 +117,10 @@ impl Category {
         .map_err(AppError::Database)
     }
 
-    pub async fn list_with_families(families: Vec<Uuid>, conn: &mut PgConnection) -> Result<Vec<Category>, AppError> {
+    pub async fn list_with_families(
+        families: Vec<Uuid>,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Category>, AppError> {
         sqlx::query_as!(
             Category,
             r#"

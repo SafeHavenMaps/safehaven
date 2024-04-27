@@ -90,7 +90,7 @@ async fn serve(args: &ServeArgs) {
         exit(1);
     });
     config.init();
-    
+
     let config = Arc::new(config);
     let app_state = AppState::from_config(config.clone()).await;
     app_state.execute_migration().await;

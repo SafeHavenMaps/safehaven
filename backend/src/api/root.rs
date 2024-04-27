@@ -79,7 +79,10 @@ async fn boostrap(
 
     let categories = match perms.categories_policy.allow_all {
         true => Category::list_with_families(families_ids, &mut conn).await?,
-        false => Category::list_restricted(perms.categories_policy.allow_list, families_ids, &mut conn).await?,
+        false => {
+            Category::list_restricted(perms.categories_policy.allow_list, families_ids, &mut conn)
+                .await?
+        }
     };
     tracing::trace!("Loaded {} categories", categories.len());
 

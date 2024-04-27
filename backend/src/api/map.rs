@@ -1,14 +1,16 @@
-use std::fmt::Display;
 use crate::api::{AppError, AppJson, AppState, DbConn, MapUserToken};
 use crate::models::comment::{Comment, NewComment, PublicComment};
 use crate::models::entity::{Entity, ListedEntity, NewEntity, PublicEntity};
-use crate::models::entity_cache::{CachedEntity, EntitiesAndClusters, FindEntitiesRequest, SearchEntitiesRequest};
+use crate::models::entity_cache::{
+    CachedEntity, EntitiesAndClusters, FindEntitiesRequest, SearchEntitiesRequest,
+};
 use axum::extract::{Path, State};
 use axum::{
     routing::{get, post, Router},
     Json,
 };
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -55,7 +57,10 @@ pub async fn view_request(
     MapUserToken(token): MapUserToken,
     Json(request): Json<ViewRequest>,
 ) -> Result<AppJson<EntitiesAndClusters>, AppError> {
-    let cluster_params = app_state.config.map.get_eps_min_for_zoom(request.zoom_level);
+    let cluster_params = app_state
+        .config
+        .map
+        .get_eps_min_for_zoom(request.zoom_level);
 
     tracing::trace!("Received view request {}", request);
 
