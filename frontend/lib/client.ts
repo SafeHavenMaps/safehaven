@@ -1,9 +1,10 @@
+import type { Entity, FetchedEntity } from "~/lib";
 import type { paths } from "./api";
 import createClient, { type Middleware } from "openapi-fetch";
 
 function createAuthMiddleware(
   authToken: string,
-  onAuthError: () => void
+  onAuthError: () => void,
 ): Middleware {
   return {
     async onRequest(req, options) {
@@ -61,7 +62,7 @@ export default function useClient() {
         ymax: number;
       },
       zoomLevel: number,
-      familyId: string
+      familyId: string,
     ) {
       if (!this.authenticated) {
         throw new Error("Not authenticated");
@@ -81,5 +82,18 @@ export default function useClient() {
 
       return data;
     },
+
+    async fetchEntity(id: string): Promise<FetchedEntity> {
+      if (!this.authenticated) {
+        throw new Error("Not authenticated");
+      }
+
+      const { data, error } = await client.GET("/api/map/entities/{id}", {
+        params: { path: { id } },
+      });
+      if (error) throw error;
+
+      return data;
+    }
   };
 }

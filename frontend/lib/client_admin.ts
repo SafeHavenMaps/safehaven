@@ -3,7 +3,7 @@ import createClient, { type Middleware } from "openapi-fetch";
 
 function createAuthMiddleware(
   authToken: string,
-  onAuthError: () => void
+  onAuthError: () => void,
 ): Middleware {
   return {
     async onRequest(req, options) {

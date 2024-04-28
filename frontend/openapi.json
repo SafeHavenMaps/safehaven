@@ -2005,12 +2005,23 @@
         }
       }
     },
-    "/api/map/entities/:id": {
+    "/api/map/entities/{id}": {
       "get": {
         "tags": [
           "map"
         ],
         "operationId": "fetch_entity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Entity",
@@ -3026,9 +3037,14 @@
       "SearchRequest": {
         "type": "object",
         "required": [
-          "search_query"
+          "search_query",
+          "family_id"
         ],
         "properties": {
+          "family_id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "search_query": {
             "type": "string"
           }

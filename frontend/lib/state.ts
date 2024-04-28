@@ -1,45 +1,35 @@
 import { reactive } from "vue";
-import type * as api from "~/lib/api";
 import useClient from "~/lib/client";
 const client = useClient();
-import { transform, transformExtent } from "ol/proj.js";
-import type { Coordinate } from "ol/coordinate";
+import { transform } from "ol/proj.js";
 import type { Extent } from "ol/extent";
-
-type BootstrapResponse = api.components["schemas"]["BootstrapResponse"];
+import type {
+  CartographyInitConfig,
+  Category,
+  Family,
+  Tag,
+  DisplayableCachedEntity,
+  DisplayableCluster,
+  FetchedEntity,
+} from "~/lib";
 
 type ViewData = {
-  entities: (api.components["schemas"]["CachedEntity"] & {
-    coordinates: Coordinate;
-    family: BootstrapResponse["families"][number];
-    category: BootstrapResponse["categories"][number];
-  })[];
-  clusters: (api.components["schemas"]["Cluster"] & {
-    coordinates: Coordinate;
-  })[];
+  entities: DisplayableCachedEntity[];
+  clusters: DisplayableCluster[];
 };
 
 export class AppState {
   initialized = false;
 
-  private familiesData: BootstrapResponse["families"] | null = null;
+  private familiesData: Family[] | null = null;
 
-  private categoriesData: BootstrapResponse["categories"] | null = null;
-  private tagsData: BootstrapResponse["tags"] | null = null;
-  private cartographyInitConfigData:
-    | BootstrapResponse["cartography_init_config"]
-    | null = null;
+  private categoriesData: Category[] | null = null;
+  private tagsData: Tag[] | null = null;
+  private cartographyInitConfigData: CartographyInitConfig | null = null;
 
-  private familiesLookupTable: Record<
-    string,
-    BootstrapResponse["families"][number]
-  > = {};
-  private categoriesLookupTable: Record<
-    string,
-    BootstrapResponse["categories"][number]
-  > = {};
-  private tagsLookupTable: Record<string, BootstrapResponse["tags"][number]> =
-    {};
+  private familiesLookupTable: Record<string, Family> = {};
+  private categoriesLookupTable: Record<string, Category> = {};
+  private tagsLookupTable: Record<string, Tag> = {};
 
   private viewData: ViewData = {
     entities: [],
@@ -47,6 +37,8 @@ export class AppState {
   };
 
   private activeFamilyId: string | null = null;
+
+  public activeEntity: FetchedEntity | null = null;
 
   get entities() {
     return this.viewData.entities;
@@ -96,20 +88,30 @@ export class AppState {
     this.initialized = true;
   }
 
-  get families(): BootstrapResponse["families"] {
+  get families(): Family[] {
     return this.familiesData!;
   }
 
-  get categories(): BootstrapResponse["categories"] {
+  get categories(): Category[] {
     return this.categoriesData!;
   }
 
-  get tags(): BootstrapResponse["tags"] {
+  get tags(): Tag[] {
     return this.tagsData!;
   }
 
-  get cartographyInitConfig(): BootstrapResponse["cartography_init_config"] {
+  get cartographyInitConfig(): CartographyInitConfig {
     return this.cartographyInitConfigData!;
+  }
+
+  get hasActiveEntity() {
+    return this.activeEntity !== null;
+  }
+
+  set hasActiveEntity(value: boolean) {
+    if (!value) {
+      this.activeEntity = null;
+    }
   }
 
   startCenter() {
@@ -122,12 +124,16 @@ export class AppState {
         state.cartographyInitConfig.center_lat,
       ],
       "EPSG:4326", // WGS84
-      "EPSG:3857" // Web Mercator
+      "EPSG:3857", // Web Mercator
     );
   }
 
   startZoom() {
     return state.cartographyInitConfig.zoom;
+  }
+
+  async selectedCachedEntity(cacheEntity: DisplayableCachedEntity) {
+    this.activeEntity = await client.fetchEntity(cacheEntity.entity_id);
   }
 
   async refreshView(extent: Extent, zoomLevel: number) {
@@ -140,19 +146,19 @@ export class AppState {
         ymax: extent[3],
       },
       zoom,
-      this.activeFamilyId!
+      this.activeFamilyId!,
     );
 
     // Step 1: Identify and filter out entities that are no longer present
     const existingEntityIds = new Set(newViewData.entities.map((ne) => ne.id));
     this.viewData.entities = this.viewData.entities.filter((e) =>
-      existingEntityIds.has(e.id)
+      existingEntityIds.has(e.id),
     );
 
     // Step 2: Add new entities that are not already in viewData
     const currentEntityIds = new Set(this.viewData.entities.map((e) => e.id));
     const newEntities = newViewData.entities.filter(
-      (ne) => !currentEntityIds.has(ne.id)
+      (ne) => !currentEntityIds.has(ne.id),
     );
     this.viewData.entities.push(
       ...newEntities.map((entity) => ({
@@ -160,25 +166,25 @@ export class AppState {
         coordinates: [entity.web_mercator_x, entity.web_mercator_y],
         family: this.familiesLookupTable[entity.family_id],
         category: this.categoriesLookupTable[entity.category_id],
-      }))
+      })),
     );
 
     // Step 3: Identify and filter out clusters that are no longer present
     const existingClusterIds = new Set(newViewData.clusters.map((nc) => nc.id));
     this.viewData.clusters = this.viewData.clusters.filter((c) =>
-      existingClusterIds.has(c.id)
+      existingClusterIds.has(c.id),
     );
 
     // Step 4: Add new clusters that are not already in viewData
     const currentClusterIds = new Set(this.viewData.clusters.map((c) => c.id));
     const newClusters = newViewData.clusters.filter(
-      (nc) => !currentClusterIds.has(nc.id)
+      (nc) => !currentClusterIds.has(nc.id),
     );
     this.viewData.clusters.push(
       ...newClusters.map((cluster) => ({
         ...cluster,
         coordinates: [cluster.center_x, cluster.center_y],
-      }))
+      })),
     );
   }
 }

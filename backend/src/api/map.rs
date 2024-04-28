@@ -235,7 +235,7 @@ pub struct FetchedEntity {
 
 #[utoipa::path(
     get,
-    path = "/api/map/entities/:id",
+    path = "/api/map/entities/{id}",
     responses(
         (status = 200, description = "Entity", body = FetchedEntity),
         (status = 401, description = "Invalid token", body = ErrorResponse),

@@ -1,79 +1,60 @@
 <template>
-  <MapNavBar/>
-  <div id="map_container">
-    <ol-map
-      id="map"
-      ref="mapRef"
-      :load-tiles-while-animating="true"
-      :load-tiles-while-interacting="true"
-      @moveend="onMapMoveEnd"
-    >
-      <ol-view
-        ref="viewRef"
-        :center="center"
-        :zoom="zoom"
-        projection="EPSG:3857"
-      />
-
-      <ol-tile-layer>
-        <ol-source-osm />
-      </ol-tile-layer>
-
-      <ol-overlay
-        :position="entity.coordinates"
-        v-for="entity in state.entities"
-        :key="entity.id"
+  <div class="p-grid p-dir-col" style="height: 100%; width: 100%;">
+    <div class="p-col-fixed">
+      <Menubar :model="items" />
+    </div>
+    <div class="p-col" style="height: 100%; width: 100%;">
+      <Sidebar
+        v-model:visible="state.hasActiveEntity"
+        :modal="false"
+        position="left"
       >
-        <MapMarker
-          :width="24"
-          :height="38"
-          :fill="entity.category.fill_color"
-          :stroke="entity.category.border_color"
+        <pre>{{ state.activeEntity }}</pre>
+      </Sidebar>
+      <div class="app-body">
+        <Map
+          :center="state.startCenter()"
+          :zoom="state.startZoom()"
+          :entities="state.entities"
+          :clusters="state.clusters"
+          @move="mapMoved"
+          @entity-click="e => state.selectedCachedEntity(e)"
         />
-      </ol-overlay>
-
-      <ol-overlay
-        :position="cluster.coordinates"
-        v-for="cluster in state.clusters"
-        :key="cluster"
-      >
-        <MapCluster :count="cluster.count" :seed="cluster.id" />
-      </ol-overlay>
-    </ol-map>
+      </div>
+    </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import state from "~/lib/state";
 import type Map from "ol/Map";
+import type { Extent } from "ol/extent";
+
+// ToDo: Change between families ? Maybe Menubar is not the best option
+const items = [
+  {
+    label: 'Item 1',
+  },
+  {
+    label: 'Item 2',
+  },
+  // Add more items as needed
+]
 
 // Init state with url token
 const route = useRoute();
 const token = route.params.token as string;
 await state.initWithToken(token); // TODO: Redirect to 404 if token is invalid
 
-let center = state.startCenter();
-let zoom = state.startZoom();
-
-// Properties to access the map and its view
-const mapRef = ref<{ map: Map }>();
-let map: Map | null = null;
-
-onMounted(() => {
-  map = mapRef.value!.map;
-});
-
-async function onMapMoveEnd() {
-  const extent = map!.getView().getViewStateAndExtent().extent;
-  const currentZoom = map!.getView().getZoom()!;
-  state.refreshView(extent, currentZoom);
+async function mapMoved(extent: Extent, zoom: number) {
+  state.refreshView(extent, zoom);
 }
 </script>
 
-<style scoped lang="scss">
-#map_container,
-#map {
-  width: 100%;
+<style scoped>
+.app-body {
   height: 100%;
+  width: 100%;
 }
 </style>
