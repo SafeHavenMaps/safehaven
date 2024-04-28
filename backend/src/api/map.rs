@@ -51,7 +51,7 @@ fn clusterize(
     minimal_cluster_size: i32,
     zoom: f64,
 ) -> Option<(f64, i32)> {
-    if zoom > 26.9 {
+    if zoom > 18.9 {
         return None;
     }
     Some((

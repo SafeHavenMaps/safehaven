@@ -11,7 +11,7 @@
         ref="viewRef"
         :center="center"
         :zoom="zoom"
-        :max-zoom="19"
+        :max-zoom="20"
         projection="EPSG:3857"
       />
 
