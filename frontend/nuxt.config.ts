@@ -12,6 +12,7 @@ export default defineNuxtConfig({
   },
   css: [
     "~/assets/main.css",
+    "primeflex/primeflex.css",
     "primevue/resources/themes/aura-light-pink/theme.css",
   ],
 });
