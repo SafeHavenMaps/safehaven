@@ -1,9 +1,9 @@
 <template>
-  <div class="p-grid p-dir-col" style="height: 100%; width: 100%;">
+  <div class="p-grid p-dir-col" style="height: 100%; width: 100%; display: flex; flex-direction: column;">
     <div class="p-col-fixed">
-      <Menubar :model="items" />
+      <MapNavBar />
     </div>
-    <div class="p-col" style="height: 100%; width: 100%;">
+    <div class="p-col" style="height: 100%; width: 100%; flex-grow: 1; overflow: auto;">
       <Sidebar
         v-model:visible="state.hasActiveEntity"
         :modal="false"
@@ -25,22 +25,10 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import state from "~/lib/state";
 import type Map from "ol/Map";
 import type { Extent } from "ol/extent";
-
-// ToDo: Change between families ? Maybe Menubar is not the best option
-const items = [
-  {
-    label: 'Item 1',
-  },
-  {
-    label: 'Item 2',
-  },
-  // Add more items as needed
-]
 
 // Init state with url token
 const route = useRoute();
