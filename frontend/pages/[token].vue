@@ -1,7 +1,9 @@
 <template>
   <div class="p-grid p-dir-col" style="height: 100%; width: 100%; display: flex; flex-direction: column;">
     <div class="p-col-fixed">
-      <MapNavBar />
+      <MapNavBar 
+        :
+      />
     </div>
     <div class="p-col" style="height: 100%; width: 100%; flex-grow: 1; overflow: auto;">
       <Sidebar
