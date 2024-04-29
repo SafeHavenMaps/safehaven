@@ -12,9 +12,10 @@
       </div>
     </template>
     <template #center>
-      <FamilySwitcher>
-
-      </FamilySwitcher>
+      <ClientFamilySwitcher
+        :selectedFamily=selectedFamily
+        :families=families
+        />
     </template>
 
     <template #end>
@@ -29,7 +30,6 @@
 
 <script  setup lang="ts">
 import type { Family } from '~/lib';
-
 
 const props = defineProps<{
   selectedFamily: Family|null;

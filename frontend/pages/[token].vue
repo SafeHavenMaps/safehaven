@@ -1,8 +1,9 @@
 <template>
   <div class="p-grid p-dir-col" style="height: 100%; width: 100%; display: flex; flex-direction: column;">
     <div class="p-col-fixed">
-      <MapNavBar 
-        :
+      <ClientNavBar 
+        :families=state.families
+        :selectedFamily=state.activeFamily
       />
     </div>
     <div class="p-col" style="height: 100%; width: 100%; flex-grow: 1; overflow: auto;">
@@ -14,7 +15,7 @@
         <pre>{{ state.activeEntity }}</pre>
       </Sidebar>
       <div class="app-body">
-        <Map
+        <ClientMap
           :center="state.startCenter()"
           :zoom="state.startZoom()"
           :entities="state.entities"

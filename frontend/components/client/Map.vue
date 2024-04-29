@@ -24,7 +24,7 @@
         v-for="entity in props.entities"
         :key="entity.id"
       >
-        <MapMarker
+        <ClientMapMarker
           :callbackItem="entity"
           :width="24"
           :height="38"
@@ -39,7 +39,7 @@
         v-for="cluster in props.clusters"
         :key="cluster"
       >
-        <MapCluster
+        <ClientMapCluster
           :callbackItem="cluster"
           :count="cluster.count"
           :seed="cluster.id"

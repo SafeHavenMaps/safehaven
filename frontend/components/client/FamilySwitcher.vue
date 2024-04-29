@@ -1,9 +1,9 @@
 <template>
-    <SelectButton v-model="selectedFamily" :options="families" @change="setFamily" optionLabel="name" optionValue="id"
+    <SelectButton :modelValue="selectedFamily!.id" :options="families" @change="state.changeActiveFamily" optionLabel="title" optionValue="id"
         aria-labelledby="custom">
-        <template #item="slotProps">
+        <template #option="slotProps">
             <i :class="slotProps.option.icon" class="mr-2"></i>
-            {{ slotProps.option.name }}
+            {{ slotProps.option.title }}
         </template>
     </SelectButton>
 </template>
@@ -11,10 +11,12 @@
 
 <script  setup lang="ts">
 import type { Family } from '~/lib';
+import state from "~/lib/state";
 
 
 const props = defineProps<{
   selectedFamily: Family|null;
   families: Family[];
-}>();
+}>(); 
+
 </script>
