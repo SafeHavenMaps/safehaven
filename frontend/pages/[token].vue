@@ -3,11 +3,12 @@
     <div class="p-col-fixed">
       <ClientNavBar/>
     </div>
-    <div class="p-col" style="height: 100%; width: 100%; flex-grow: 1; overflow: auto;">
+    <div class="p-col" style="height: 100%; width: 100%; flex-grow: 1; overflow: auto;" ref="containerRef">
       <Sidebar
         v-model:visible="state.hasActiveEntity"
         :modal="false"
         position="left"
+        :style="{height: $refs.containerRef.clientHeight + 'px', top: 'calc(100% - ' + $refs.containerRef.clientHeight + 'px)'}"
       >
         <pre>{{ state.activeEntity }}</pre>
       </Sidebar>
