@@ -8,7 +8,8 @@
         v-model:visible="state.hasActiveEntity"
         :modal="false"
         position="left"
-        :style="{height: $refs.containerRef.clientHeight + 'px', top: 'calc(100% - ' + $refs.containerRef.clientHeight + 'px)'}"
+                :style=dynamicStyles
+
       >
         <pre>{{ state.activeEntity }}</pre>
       </Sidebar>
@@ -29,10 +30,23 @@
 import state from "~/lib/state";
 import ClientMap from "~/components/client/Map.vue";
 import type { Extent } from "ol/extent";
+import { computed } from 'vue';
 
 // Init state with url token
 const route = useRoute();
 const token = route.params.token as string;
+const containerRef = ref<HTMLElement | null>(null);
+
+const dynamicStyles = computed(() => {
+  if (containerRef.value) {
+    const height = `${containerRef.value.clientHeight}px`;
+    const top = containerRef.value.getBoundingClientRect().top + 'px';
+    //const top = `${navBarRef.value.clientHeight}px`;
+    return { height, top };
+  }
+  return {};  // Return default/fallback styles if needed
+});
+
 await state.initWithToken(token); // TODO: Redirect to 404 if token is invalid
 </script>
 

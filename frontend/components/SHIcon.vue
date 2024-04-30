@@ -1,28 +1,31 @@
 <template>
-    <MdiIcon :icon="icon_dict[icon_name]"  style="width:1.5em; height:1.5em"/>
+    <MdiIcon :icon="iconDict[props.iconName]"  style="width:1.5em; height:1.5em"/>
 </template>
 
 <script setup lang="ts">
+import * as Icons from '@mdi/js'
+type MdiIconString = keyof typeof Icons
+
 const props = defineProps<{
-    icon_name: string
+    iconName: string
 }>();
 
-const icon_dict={
-    "user": "mdiAccount",
-    "family":"mdiFamilyTree",
-    "category":"mdiLabel",
-    "tag":"mdiTagOutline",
-    "entity": "mdiMapMarkerAccount",
-    "userGroup": "mdiAccountGroup",
-    "accessToken": "mdiLock",
-    "mapSearch": "mdiMapSearch",
-    "filter": "mdiFilterCog",
-    "information": "mdiInformationOutline",
-    "addEntity": "mdiMapMarkerPlus",
-    "edit": "mdiPencil",
-    "addComment": "mdiCommentPlus",
-    "delete": "mdiDelete",
-    "save": "mdiSave",
-    "lightDark": "mdiThemeLightDark"
+const iconDict: Record<string, MdiIconString>={
+    user: "mdiAccount",
+    family:"mdiFamilyTree",
+    category:"mdiLabel",
+    tag:"mdiTagOutline",
+    entity: "mdiMapMarkerAccount",
+    userGroup: "mdiAccountGroup",
+    accessToken: "mdiLock",
+    mapSearch: "mdiMapSearch",
+    filter: "mdiFilterCog",
+    information: "mdiInformationOutline",
+    addEntity: "mdiMapMarkerPlus",
+    edit: "mdiPencil",
+    addComment: "mdiCommentPlus",
+    delete: "mdiDelete",
+    save: "mdiUpload",
+    lightDark: "mdiThemeLightDark"
 }
 </script>
