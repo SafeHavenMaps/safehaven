@@ -58,6 +58,7 @@ import type {
   DisplayableCachedEntity,
   DisplayableCluster,
 } from "~/lib";
+import state from "~/lib/state";
 
 const props = defineProps<{
   center: Coordinate;
@@ -85,7 +86,12 @@ async function onMapMoveEnd() {
   emit("move", extent, currentZoom);
 }
 
-function getExtentAndZoom() {
+watch (() => state.activeFamily, async () => {
+  const { extent, currentZoom } = getExtentAndZoom();
+  emit("move", extent, currentZoom);
+});
+
+const getExtentAndZoom = function() {
   const extent = map!.getView().getViewStateAndExtent().extent;
   const currentZoom = map!.getView().getZoom()!;
   return { extent, currentZoom };

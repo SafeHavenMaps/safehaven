@@ -1,9 +1,7 @@
 <template>
   <div class="p-grid p-dir-col" style="height: 100%; width: 100%; display: flex; flex-direction: column;">
     <div class="p-col-fixed">
-      <ClientNavBar
-        @change="triggerRefresh"
-      />
+      <ClientNavBar/>
     </div>
     <div class="p-col" style="height: 100%; width: 100%; flex-grow: 1; overflow: auto;">
       <Sidebar
@@ -15,7 +13,6 @@
       </Sidebar>
       <div class="app-body">
         <ClientMap
-          ref="mapRef"
           :center="state.startCenter()"
           :zoom="state.startZoom()"
           :entities="state.entities"
@@ -38,15 +35,8 @@ const route = useRoute();
 const token = route.params.token as string;
 await state.initWithToken(token); // TODO: Redirect to 404 if token is invalid
 
-// Ref to ClientMap
-const mapRef = ref();
-
-async function triggerRefresh() {
-  console.log("refresh !")
-}
-
 async function mapMoved(extent: Extent, zoom: number) {
-  state.refreshView(extent, zoom);
+  await state.refreshView(extent, zoom);
 }
 </script>
 

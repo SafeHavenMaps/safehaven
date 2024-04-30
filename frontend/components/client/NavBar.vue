@@ -13,7 +13,7 @@
     </template>
 
     <template #center>
-      <ClientFamilySwitcher @change="emit('change')" />
+      <ClientFamilySwitcher />
     </template>
 
     <template #end>
@@ -48,8 +48,5 @@
   </Toolbar>
 </template>
 
-<script  setup lang="ts">
-const emit = defineEmits<{
-  change: [];
-}>();
+<script setup lang="ts">
 </script>
