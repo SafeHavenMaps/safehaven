@@ -70,11 +70,6 @@ const props = defineProps<{
 let zoom = props.zoom;
 let center = props.center;
 
-const emit = defineEmits<{
-  move: [extent: Extent, zoom: number];
-  entityClick: [entity: DisplayableCachedEntity];
-}>();
-
 const mapRef = ref<{ map: Map }>();
 let map: Map | null = null;
 onMounted(() => {
@@ -83,12 +78,12 @@ onMounted(() => {
 
 async function onMapMoveEnd() {
   const { extent, currentZoom } = getExtentAndZoom();
-  emit("move", extent, currentZoom);
+  await state.refreshView(extent, currentZoom);
 }
 
 watch (() => state.activeFamily, async () => {
   const { extent, currentZoom } = getExtentAndZoom();
-  emit("move", extent, currentZoom);
+  await state.refreshView(extent, currentZoom);
 });
 
 function getExtentAndZoom() {
@@ -111,7 +106,7 @@ async function handleClusterClick(cluster: DisplayableCluster) {
 
 async function handleEntityClick(entity: DisplayableCachedEntity) {
   zoomTo(entity.coordinates)
-  emit("entityClick", entity);
+  state.selectedCachedEntity(entity);
 }
 </script>
 

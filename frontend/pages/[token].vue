@@ -17,7 +17,6 @@
           :zoom="state.startZoom()"
           :entities="state.entities"
           :clusters="state.clusters"
-          @move="mapMoved"
           @entity-click="e => state.selectedCachedEntity(e)"
         />
       </div>
@@ -34,10 +33,6 @@ import type { Extent } from "ol/extent";
 const route = useRoute();
 const token = route.params.token as string;
 await state.initWithToken(token); // TODO: Redirect to 404 if token is invalid
-
-async function mapMoved(extent: Extent, zoom: number) {
-  await state.refreshView(extent, zoom);
-}
 </script>
 
 <style scoped>
