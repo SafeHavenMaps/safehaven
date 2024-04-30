@@ -1,6 +1,11 @@
 <template>
-    <SelectButton :modelValue="selectedFamily!.id" :options="families" @change="state.changeActiveFamily" optionLabel="title" optionValue="id"
-        aria-labelledby="custom">
+    <SelectButton 
+        v-model="state.activeFamily"
+        :options="state.families"
+        optionLabel="title"
+        @onchange="triggerChange"
+        aria-labelledby="custom"
+    >
         <template #option="slotProps">
             <i :class="slotProps.option.icon" class="mr-2"></i>
             {{ slotProps.option.title }}
@@ -10,13 +15,13 @@
 
 
 <script  setup lang="ts">
-import type { Family } from '~/lib';
 import state from "~/lib/state";
 
+async function triggerChange() {
+  emit('change');
+}
 
-const props = defineProps<{
-  selectedFamily: Family|null;
-  families: Family[];
-}>(); 
-
+const emit = defineEmits<{
+  change: [];
+}>();
 </script>

@@ -81,9 +81,14 @@ onMounted(() => {
 });
 
 async function onMapMoveEnd() {
+  const { extent, currentZoom } = getExtentAndZoom();
+  emit("move", extent, currentZoom);
+}
+
+function getExtentAndZoom() {
   const extent = map!.getView().getViewStateAndExtent().extent;
   const currentZoom = map!.getView().getZoom()!;
-  emit("move", extent, currentZoom);
+  return { extent, currentZoom };
 }
 
 function zoomTo(coordinates: Coordinate) {

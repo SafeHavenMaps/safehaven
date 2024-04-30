@@ -52,11 +52,8 @@ export class AppState {
     return this.familiesLookupTable[this.activeFamilyId!];
   }
 
-  changeActiveFamily(familyId: string) {
-    if (!this.familiesLookupTable[familyId]) {
-      throw new Error(`Family with id ${familyId} does not exist`);
-    }
-    this.activeFamilyId = familyId;
+  set activeFamily(family: Family) {
+    this.activeFamilyId = family.id
   }
 
   async initWithToken(token: string) {
