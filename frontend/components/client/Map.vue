@@ -91,7 +91,7 @@ watch (() => state.activeFamily, async () => {
   emit("move", extent, currentZoom);
 });
 
-const getExtentAndZoom = function() {
+function getExtentAndZoom() {
   const extent = map!.getView().getViewStateAndExtent().extent;
   const currentZoom = map!.getView().getZoom()!;
   return { extent, currentZoom };
