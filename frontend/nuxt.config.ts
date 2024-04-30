@@ -1,5 +1,8 @@
 export default defineNuxtConfig({
-  modules: ["nuxt-primevue"],
+  modules: [
+    "nuxt-primevue",
+    "nuxt-mdi",
+  ],
   ssr: false,
   devtools: { enabled: true },
   typescript: {
@@ -15,4 +18,9 @@ export default defineNuxtConfig({
     "primeflex/primeflex.css",
     "primevue/resources/themes/aura-light-pink/theme.css",
   ],
+  mdi: {
+    cache: false,
+    componentName: 'MdiIcon',
+    defaultSize: '1em'
+  }
 });
