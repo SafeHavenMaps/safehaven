@@ -155,4 +155,23 @@ impl AccessToken {
         .await
         .map_err(AppError::Database)
     }
+
+    pub async fn register_visit(
+        access_token_id: Uuid,
+        referrer: Option<String>,
+        conn: &mut PgConnection,
+    ) -> Result<(), AppError> {
+        sqlx::query!(
+            r#"
+            INSERT INTO access_tokens_visits (token_id, referrer)
+            VALUES ($1, $2)
+            "#,
+            access_token_id,
+            referrer
+        )
+        .execute(conn)
+        .await
+        .map_err(AppError::Database)?;
+        Ok(())
+    }
 }

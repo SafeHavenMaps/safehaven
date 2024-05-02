@@ -82,6 +82,7 @@ fn is_token_allowed_for_family(token: &MapUserTokenClaims, family_id: &Uuid) -> 
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
+#[axum::debug_handler]
 pub async fn view_request(
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
@@ -94,11 +95,12 @@ pub async fn view_request(
         return Err(AppError::Unauthorized);
     }
 
-    let cluster_config = &app_state.config.cartography.cluster;
+    let dyn_config = app_state.dyn_config.read().await;
+
     let cluster_params = clusterize(
-        cluster_config.characteristic_distance,
-        cluster_config.declustering_speed,
-        cluster_config.minimal_cluster_size,
+        dyn_config.cartography_cluster.characteristic_distance,
+        dyn_config.cartography_cluster.declustering_speed,
+        dyn_config.cartography_cluster.minimal_cluster_size,
         request.zoom_level as f64,
     );
 

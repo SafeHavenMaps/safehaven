@@ -93,6 +93,17 @@ CREATE TABLE access_tokens (
     active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+-- Table to track visits to access tokens
+CREATE TABLE access_tokens_visits (
+    token_id UUID NOT NULL,
+    visited_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    referrer TEXT,
+
+    FOREIGN KEY (token_id) REFERENCES access_tokens(id) ON DELETE CASCADE
+);
+CREATE INDEX ON access_tokens_visits (token_id);
+CREATE INDEX ON access_tokens_visits (visited_at);
+
 -- Many-to-many table for entities
 -- since an entity can have multiple parents and children
 CREATE TABLE entities_entities (

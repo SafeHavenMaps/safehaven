@@ -4,42 +4,27 @@ use figment::{
 };
 
 use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct SafeHavenConfig {
+    /// Address to listen on
     pub listen_addr: String,
+    /// Database configuration
     pub database: Database,
+    /// Secret for JWT validation
     pub token_secret: String,
+    /// Path to serve public files from
     pub serve_public_path: Option<String>,
-    pub cartography: CartographyConfig,
-}
-
-#[derive(Deserialize, Serialize, Clone, ToSchema)]
-pub struct CartographyInitConfig {
-    ///Displayed map initialization parameters
-    pub center_lat: f64,
-    pub center_lng: f64,
-    pub zoom: u8,
-}
-#[derive(Deserialize, Serialize, Clone)]
-pub struct CartographyClusterConfig {
-    ///Entity clusterization parameters
-    pub declustering_speed: f64,
-    pub characteristic_distance: f64,
-    pub minimal_cluster_size: i32,
-}
-#[derive(Deserialize, Serialize, Clone)]
-pub struct CartographyConfig {
-    /// Map configuration
-    pub init: CartographyInitConfig,
-    pub cluster: CartographyClusterConfig,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
+/// Database configuration
 pub struct Database {
+    /// Database URL ('postgresql://user:password@host/database')
     pub url: String,
+    /// Database connection pool size (default to 5)
     pub pool_size: u32,
+    /// Database connection timeout in seconds (default to 3)
     pub timeout: u64,
 }
 
@@ -54,18 +39,6 @@ impl Default for SafeHavenConfig {
             },
             token_secret: "SecretForValidatingAngSigningTokens".to_string(),
             serve_public_path: None,
-            cartography: CartographyConfig {
-                init: CartographyInitConfig {
-                    center_lat: 47.0,
-                    center_lng: 2.0,
-                    zoom: 5,
-                },
-                cluster: CartographyClusterConfig {
-                    characteristic_distance: 5.,
-                    declustering_speed: 1.65,
-                    minimal_cluster_size: 6,
-                },
-            },
         }
     }
 }

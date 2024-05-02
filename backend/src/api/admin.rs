@@ -3,6 +3,7 @@ pub mod categories;
 pub mod comments;
 pub mod entities;
 pub mod families;
+pub mod options;
 pub mod tags;
 pub mod users;
 
@@ -20,6 +21,9 @@ use utoipa::ToSchema;
 
 pub fn routes() -> Router<AppState> {
     Router::new()
+        // options
+        .route("/options", get(options::get))
+        .route("/options/:name", put(options::update))
         // login
         .route("/login", post(login))
         // users

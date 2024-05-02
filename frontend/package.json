@@ -10,6 +10,7 @@
     "prettier:fix": "prettier --write ."
   },
   "dependencies": {
+    "@mdi/js": "^7.4.47",
     "nuxt": "^3.11.2",
     "nuxt-primevue": "^0.3.1",
     "ol": "^9.1.0",
@@ -26,8 +27,5 @@
     "vue-router": "^4.3.0",
     "vue-tsc": "^1",
     "vue3-openlayers": "^6.3.0"
-  },
-  "devDependencies": {
-    "nuxt-mdi": "git@github.com:Synar/nuxt-mdi.git"
   }
 }

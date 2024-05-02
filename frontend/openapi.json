@@ -1889,6 +1889,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "referrer",
+            "in": "query",
+            "description": "The referrer URL to register the visit",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
           }
         ],
         "responses": {
@@ -1898,26 +1908,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BootstrapResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/health": {
-      "get": {
-        "tags": [
-          "root"
-        ],
-        "operationId": "health_check",
-        "responses": {
-          "200": {
-            "description": "Health check",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HealthCheckResponse"
                 }
               }
             }
@@ -2138,6 +2128,106 @@
           }
         }
       }
+    },
+    "/api/options": {
+      "get": {
+        "tags": [
+          "options"
+        ],
+        "operationId": "get",
+        "responses": {
+          "200": {
+            "description": "Option map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafeHavenOptions"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/options/{name}": {
+      "put": {
+        "tags": [
+          "options"
+        ],
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationOption"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Option map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafeHavenOptions"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/status": {
+      "get": {
+        "tags": [
+          "root"
+        ],
+        "operationId": "status",
+        "responses": {
+          "200": {
+            "description": "Status check and pre init",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2263,8 +2353,33 @@
           }
         }
       },
+      "CartographyClusterConfig": {
+        "type": "object",
+        "description": "Entity clusterization parameters",
+        "properties": {
+          "characteristic_distance": {
+            "type": "number",
+            "format": "double",
+            "description": "Characteristic distance for clusterization",
+            "default": 5.0
+          },
+          "declustering_speed": {
+            "type": "number",
+            "format": "double",
+            "description": "Declustering speed (most of the time between 1.5 and 2, defaults to 1.65)",
+            "default": 1.65
+          },
+          "minimal_cluster_size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Minimal entity count for forming a cluster",
+            "default": 6
+          }
+        }
+      },
       "CartographyInitConfig": {
         "type": "object",
+        "description": "Displayed map initialization parameters",
         "required": [
           "center_lat",
           "center_lng",
@@ -2274,15 +2389,17 @@
           "center_lat": {
             "type": "number",
             "format": "double",
-            "description": "Displayed map initialization parameters"
+            "description": "Latitude of the map center (WGS84)"
           },
           "center_lng": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "description": "Longitude of the map center (WGS84)"
           },
           "zoom": {
             "type": "integer",
             "format": "int32",
+            "description": "Zoom level of the map (from 2 to 20)",
             "minimum": 0
           }
         }
@@ -2409,6 +2526,43 @@
             "format": "date-time"
           }
         }
+      },
+      "ConfigurationOption": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "SafeMode"
+            ],
+            "properties": {
+              "SafeMode": {
+                "$ref": "#/components/schemas/SafeModeConfig"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "CartographyInit"
+            ],
+            "properties": {
+              "CartographyInit": {
+                "$ref": "#/components/schemas/CartographyInitConfig"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "CartographyCluster"
+            ],
+            "properties": {
+              "CartographyCluster": {
+                "$ref": "#/components/schemas/CartographyClusterConfig"
+              }
+            }
+          }
+        ]
       },
       "EntitiesAndClusters": {
         "type": "object",
@@ -2651,17 +2805,6 @@
             }
           },
           "title": {
-            "type": "string"
-          }
-        }
-      },
-      "HealthCheckResponse": {
-        "type": "object",
-        "required": [
-          "status"
-        ],
-        "properties": {
-          "status": {
             "type": "string"
           }
         }
@@ -3034,6 +3177,83 @@
           }
         }
       },
+      "SafeHavenOptions": {
+        "type": "object",
+        "required": [
+          "safe_mode",
+          "cartography_init",
+          "cartography_cluster"
+        ],
+        "properties": {
+          "cartography_cluster": {
+            "$ref": "#/components/schemas/CartographyClusterConfig"
+          },
+          "cartography_init": {
+            "$ref": "#/components/schemas/CartographyInitConfig"
+          },
+          "safe_mode": {
+            "$ref": "#/components/schemas/SafeModeConfig"
+          }
+        }
+      },
+      "SafeMode": {
+        "type": "object",
+        "required": [
+          "recaptcha_v3_sitekey",
+          "popup_title",
+          "popup_message"
+        ],
+        "properties": {
+          "popup_message": {
+            "type": "string"
+          },
+          "popup_title": {
+            "type": "string"
+          },
+          "recaptcha_v3_sitekey": {
+            "type": "string"
+          }
+        }
+      },
+      "SafeModeConfig": {
+        "type": "object",
+        "description": "Safe mode configuration, when enabled, the application will require recaptcha validation for\nalmost every action making it harder to spam the application or dump the database content",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Enable safe mode",
+            "default": false
+          },
+          "popup_message": {
+            "type": "string",
+            "description": "Message of the popup shown for first recaptcha validation",
+            "default": null,
+            "nullable": true
+          },
+          "popup_title": {
+            "type": "string",
+            "description": "Title of the popup shown for first recaptcha validation",
+            "default": null,
+            "nullable": true
+          },
+          "recaptcha_v3_secret": {
+            "type": "string",
+            "description": "Secret key for recaptcha v3",
+            "default": ""
+          },
+          "recaptcha_v3_sitekey": {
+            "type": "string",
+            "description": "Site key for recaptcha v3",
+            "default": ""
+          },
+          "recaptcha_v3_threshold": {
+            "type": "number",
+            "format": "double",
+            "description": "Threshold for recaptcha v3",
+            "default": 0.5
+          }
+        }
+      },
       "SearchRequest": {
         "type": "object",
         "required": [
@@ -3046,6 +3266,25 @@
             "format": "uuid"
           },
           "search_query": {
+            "type": "string"
+          }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "safe_mode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SafeMode"
+              }
+            ],
+            "nullable": true
+          },
+          "status": {
             "type": "string"
           }
         }

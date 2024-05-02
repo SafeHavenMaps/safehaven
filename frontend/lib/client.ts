@@ -30,14 +30,15 @@ export default function useClient() {
     authenticated: false,
     rawClient: client,
 
-    async checkHealth() {
-      const { data } = await client.GET("/api/health");
-      return data?.status === "ok";
+    async checkStatus() {
+      const { data, error } = await client.GET("/api/status");
+      if (error) throw error;
+      return data;
     },
 
     async bootstrap(token: string) {
       const { data, error } = await client.GET("/api/bootstrap/{token}", {
-        params: { path: { token } },
+        params: { path: { token }, query: { referrer: document.referrer } },
       });
       if (error) throw error;
 

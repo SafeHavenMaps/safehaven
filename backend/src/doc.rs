@@ -1,13 +1,12 @@
 use crate::{
     api::{
-        admin::{self, users::ChangePassword, LoginRequest, LoginResponse},
+        admin::{self, options, users::ChangePassword, LoginRequest, LoginResponse},
         map::{
             self, FetchedEntity, NewCommentRequest, NewEntityRequest, SearchRequest, ViewRequest,
         },
-        root::{self, BootstrapResponse, HealthCheckResponse},
+        root::{self, BootstrapResponse, SafeMode, StatusResponse},
         ErrorResponse,
     },
-    config::CartographyInitConfig,
     models::{
         access_token::{AccessToken, NewOrUpdateAccessToken, PermissionPolicy, Permissions},
         category::{Category, NewCategory, UpdateCategory},
@@ -17,6 +16,10 @@ use crate::{
         },
         entity_cache::{CachedEntity, Cluster, EntitiesAndClusters},
         family::{Family, Field, FieldType, Form, NewOrUpdateFamily},
+        options::{
+            CartographyClusterConfig, CartographyInitConfig, ConfigurationOption, SafeHavenOptions,
+            SafeModeConfig,
+        },
         tag::{NewOrUpdateTag, Tag},
         user::{NewUser, User},
     },
@@ -26,7 +29,7 @@ use utoipa::OpenApi;
 #[derive(OpenApi)]
 #[openapi(
     paths(
-        root::health_check,
+        root::status,
         root::boostrap,
         // map
         map::view_request,
@@ -36,6 +39,9 @@ use utoipa::OpenApi;
         map::new_entity,
         // admin
         admin::login,
+        // admin::options
+        options::get,
+        options::update,
         // admin::users
         admin::users::list,
         admin::users::new,
@@ -88,8 +94,15 @@ use utoipa::OpenApi;
         // general
         ErrorResponse,
         // root
-        HealthCheckResponse,
+        StatusResponse,
+        SafeMode,
         BootstrapResponse,
+        // options
+        SafeHavenOptions,
+        ConfigurationOption,
+        SafeModeConfig,
+        CartographyInitConfig,
+        CartographyClusterConfig,
         // families
         Family,
         NewOrUpdateFamily,
@@ -136,7 +149,6 @@ use utoipa::OpenApi;
         NewCommentRequest,
         NewEntityRequest,
         FetchedEntity,
-        CartographyInitConfig,
     ))
 )]
 pub struct ApiDoc {}

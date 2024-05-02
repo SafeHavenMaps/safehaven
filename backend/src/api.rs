@@ -8,6 +8,7 @@ use crate::{
     config::SafeHavenConfig,
     models::{
         access_token::Permissions,
+        options::SafeHavenOptions,
         user::{NewUser, User},
     },
 };
@@ -23,13 +24,17 @@ use axum_extra::{
     TypedHeader,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
+use sqlx::{postgres::PgPoolOptions, PgConnection, Pool, Postgres};
+use tokio::sync::RwLock;
 use utoipa::ToSchema;
 use uuid::Uuid;
+
+pub type DynOptions = Arc<RwLock<SafeHavenOptions>>;
 
 #[derive(Clone)]
 pub struct AppState {
     pub config: Arc<SafeHavenConfig>,
+    pub dyn_config: DynOptions,
     pub pool: Pool<Postgres>,
 }
 
@@ -64,7 +69,20 @@ impl AppState {
             tracing::warn!("Default admin user created, please change the password");
         }
 
-        Self { config, pool }
+        tracing::info!("Loading dynamic configuration from database");
+        let dyn_config = Arc::new(RwLock::new(SafeHavenOptions::load(&mut conn).await));
+
+        Self {
+            config,
+            pool,
+            dyn_config,
+        }
+    }
+
+    /// Reload the dynamic configuration from the database
+    pub async fn reload_data(&self, conn: &mut PgConnection) {
+        let mut dyn_config = self.dyn_config.write().await;
+        *dyn_config = SafeHavenOptions::load(conn).await;
     }
 
     pub async fn execute_migration(&self) {

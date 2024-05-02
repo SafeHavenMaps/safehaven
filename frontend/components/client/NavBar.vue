@@ -20,27 +20,27 @@
       <div class = align-items-center >
         <Button label="Informations" class="p-button-text mr-2">          
           <template #icon>
-            <SHIcon iconName="information" class="-ml-1 mr-1"/>
+            <AppIcon iconName="information" />
           </template>
         </Button>
         <Button label="Ajouter"  class="p-button-success mr-2" >          
           <template #icon>
-            <SHIcon iconName="addEntity" class="-ml-1 mr-1"/>
+            <AppIcon iconName="addEntity" class="-ml-1 mr-1"/>
           </template>
         </Button>
         <Button label="Filtres" class="p-button-help mr-2">
           <template #icon>
-            <SHIcon iconName="filter" class="-ml-1 mr-1"/>
+            <AppIcon iconName="filter" class="-ml-1 mr-1"/>
           </template>
         </Button>
         <Button icon="pi pi-search" class="p-button-warning mr-2" >          
           <template #icon>
-            <SHIcon iconName="mapSearch"/>
+            <AppIcon iconName="mapSearch"/>
           </template>
         </Button>
         <Button icon="pi pi-cog" class="p-button-secondary" >          
           <template #icon>
-            <SHIcon iconName="lightDark"/>
+            <AppIcon iconName="lightDark"/>
           </template>
         </Button>
       </div>

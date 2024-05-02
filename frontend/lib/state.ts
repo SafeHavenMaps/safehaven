@@ -1,6 +1,5 @@
 import { reactive } from "vue";
 import useClient from "~/lib/client";
-const client = useClient();
 import { transform } from "ol/proj.js";
 import type { Extent } from "ol/extent";
 import type {
@@ -11,7 +10,10 @@ import type {
   DisplayableCachedEntity,
   DisplayableCluster,
   FetchedEntity,
+  Status,
 } from "~/lib";
+
+const client = useClient();
 
 type ViewData = {
   entities: DisplayableCachedEntity[];
@@ -38,7 +40,13 @@ export class AppState {
 
   private activeFamilyId: string | null = null;
 
-  public activeEntity: FetchedEntity | null = null;
+  private _activeEntity: FetchedEntity | null = null;
+
+  get activeEntity() {
+    return this._activeEntity;
+  }
+
+  private status: Status | null = null;
 
   get entities() {
     return this.viewData.entities;
@@ -54,6 +62,22 @@ export class AppState {
 
   set activeFamily(family: Family) {
     this.activeFamilyId = family.id
+  }
+
+  get online() {
+    return this.status?.status === 'ok';
+  }
+
+  get hasSafeMode() {
+    return !!this.status?.safe_mode;
+  }
+
+  get safeMode() {
+    return this.status!.safe_mode;
+  }
+
+  async checkStatus() {
+    this.status = await client.checkStatus();
   }
 
   async initWithToken(token: string) {
@@ -107,7 +131,7 @@ export class AppState {
 
   set hasActiveEntity(value: boolean) {
     if (!value) {
-      this.activeEntity = null;
+      this._activeEntity = null;
     }
   }
 
@@ -130,7 +154,7 @@ export class AppState {
   }
 
   async selectedCachedEntity(cacheEntity: DisplayableCachedEntity) {
-    this.activeEntity = await client.fetchEntity(cacheEntity.entity_id);
+    this._activeEntity = await client.fetchEntity(cacheEntity.entity_id);
   }
 
   async refreshView(extent: Extent, zoomLevel: number) {

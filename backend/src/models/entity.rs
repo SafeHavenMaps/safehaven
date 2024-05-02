@@ -87,12 +87,6 @@ pub struct UpdateEntity {
     pub last_update_by: Option<Uuid>,
 }
 
-#[derive(Debug)]
-pub struct EntityEntity {
-    pub parent_id: Uuid,
-    pub child_id: Uuid,
-}
-
 impl Entity {
     pub async fn new(entity: NewEntity, conn: &mut PgConnection) -> Result<Entity, AppError> {
         let family = Family::get_from_category(entity.category_id, conn).await?;
@@ -224,9 +218,9 @@ impl Entity {
             Entity,
             r#"
             SELECT e.id, e.display_name, e.category_id, 
-            e.locations as "locations: Json<Vec<UnprocessedLocation>>", 
-            e.data, e.hide_from_map, e.moderation_notes, e.moderated_at, 
-            e.created_at, e.updated_at, e.last_update_by
+                e.locations as "locations: Json<Vec<UnprocessedLocation>>", 
+                e.data, e.hide_from_map, e.moderation_notes, e.moderated_at, 
+                e.created_at, e.updated_at, e.last_update_by
             FROM entities e
             WHERE e.id = $1
             "#,

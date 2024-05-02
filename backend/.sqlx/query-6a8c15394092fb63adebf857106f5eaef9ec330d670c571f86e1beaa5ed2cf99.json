@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT e.id, e.display_name, e.category_id, \n            e.locations as \"locations: Json<Vec<UnprocessedLocation>>\", \n            e.data, e.hide_from_map, e.moderation_notes, e.moderated_at, \n            e.created_at, e.updated_at, e.last_update_by\n            FROM entities e\n            WHERE e.id = $1\n            ",
+  "query": "\n            SELECT e.id, e.display_name, e.category_id, \n                e.locations as \"locations: Json<Vec<UnprocessedLocation>>\", \n                e.data, e.hide_from_map, e.moderation_notes, e.moderated_at, \n                e.created_at, e.updated_at, e.last_update_by\n            FROM entities e\n            WHERE e.id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -78,5 +78,5 @@
       true
     ]
   },
-  "hash": "3a03864ce18d59ad43e7bf3247c7a18f3450a2bf0f6d29d76c63d0473e082b35"
+  "hash": "6a8c15394092fb63adebf857106f5eaef9ec330d670c571f86e1beaa5ed2cf99"
 }

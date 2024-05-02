@@ -177,8 +177,8 @@ impl CachedEntity {
                     acc
                 },
             )
-            .into_iter()
-            .map(|(_, mut v)| {
+            .into_values()
+            .map(|mut v| {
                 v.calculate_id();
                 v
             })

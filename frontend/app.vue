@@ -9,7 +9,5 @@
 </template>
 
 <script setup lang="ts">
-import useClient from "~/lib/client";
-const client = useClient();
-const isApiAvailable = !client.checkHealth();
+const isApiAvailable = true;
 </script>
