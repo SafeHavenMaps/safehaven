@@ -28,5 +28,8 @@ export interface HasCategory {
   category: Category;
 }
 
-export type DisplayableCachedEntity = CachedEntity & HasCoordinates & HasFamily & HasCategory;
+export type DisplayableCachedEntity = CachedEntity &
+  HasCoordinates &
+  HasFamily &
+  HasCategory;
 export type DisplayableCluster = Cluster & HasCoordinates;

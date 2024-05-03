@@ -7,10 +7,13 @@
     "generate-api": "openapi-typescript ./openapi.json -o ./lib/api.d.ts",
     "build": "npm run generate-api && MINIMAL=1 nuxt generate",
     "prettier": "prettier --check .",
-    "prettier:fix": "prettier --write ."
+    "prettier:fix": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
+    "@nuxt/eslint": "^0.3.10",
     "nuxt": "^3.11.2",
     "nuxt-primevue": "^0.3.1",
     "ol": "^9.1.0",

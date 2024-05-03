@@ -8,8 +8,8 @@
       xml:space="preserve"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
+      style="cursor: pointer"
       @click="handleClick"
-      style="cursor: pointer;"
     >
       <path
         d="m21.905 1.2688c-11.397-1.86e-5 -20.637 9.5307-20.636 

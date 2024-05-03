@@ -20,12 +20,12 @@
       </ol-tile-layer>
 
       <ol-overlay
-        :position="entity.coordinates"
         v-for="entity in props.entities"
         :key="entity.id"
+        :position="entity.coordinates"
       >
         <ClientMapMarker
-          :callbackItem="entity"
+          :callback-item="entity"
           :width="24"
           :height="38"
           :fill="entity.category.fill_color"
@@ -35,12 +35,12 @@
       </ol-overlay>
 
       <ol-overlay
-        :position="cluster.coordinates"
         v-for="cluster in props.clusters"
         :key="cluster"
+        :position="cluster.coordinates"
       >
         <ClientMapCluster
-          :callbackItem="cluster"
+          :callback-item="cluster"
           :count="cluster.count"
           :seed="cluster.id"
           @click="handleClusterClick(cluster)"
@@ -53,11 +53,7 @@
 <script setup lang="ts">
 import type Map from "ol/Map";
 import type { Coordinate } from "ol/coordinate";
-import type { Extent } from "ol/extent";
-import type {
-  DisplayableCachedEntity,
-  DisplayableCluster,
-} from "~/lib";
+import type { DisplayableCachedEntity, DisplayableCluster } from "~/lib";
 import state from "~/lib/state";
 
 const props = defineProps<{
@@ -67,8 +63,8 @@ const props = defineProps<{
   clusters: DisplayableCluster[];
 }>();
 
-let zoom = props.zoom;
-let center = props.center;
+const zoom = props.zoom;
+const center = props.center;
 
 const mapRef = ref<{ map: Map }>();
 let map: Map | null = null;
@@ -81,10 +77,13 @@ async function onMapMoveEnd() {
   await state.refreshView(extent, currentZoom);
 }
 
-watch (() => state.activeFamily, async () => {
-  const { extent, currentZoom } = getExtentAndZoom();
-  await state.refreshView(extent, currentZoom);
-});
+watch(
+  () => state.activeFamily,
+  async () => {
+    const { extent, currentZoom } = getExtentAndZoom();
+    await state.refreshView(extent, currentZoom);
+  },
+);
 
 function getExtentAndZoom() {
   const extent = map!.getView().getViewStateAndExtent().extent;
@@ -101,11 +100,11 @@ function zoomTo(coordinates: Coordinate) {
 }
 
 async function handleClusterClick(cluster: DisplayableCluster) {
-    zoomTo(cluster.coordinates)
+  zoomTo(cluster.coordinates);
 }
 
 async function handleEntityClick(entity: DisplayableCachedEntity) {
-  zoomTo(entity.coordinates)
+  zoomTo(entity.coordinates);
   state.selectedCachedEntity(entity);
 }
 </script>

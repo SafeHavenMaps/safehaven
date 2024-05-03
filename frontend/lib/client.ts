@@ -1,4 +1,4 @@
-import type { Entity, FetchedEntity } from "~/lib";
+import type { FetchedEntity } from "~/lib";
 import type { paths } from "./api";
 import createClient, { type Middleware } from "openapi-fetch";
 
@@ -7,12 +7,12 @@ function createAuthMiddleware(
   onAuthError: () => void,
 ): Middleware {
   return {
-    async onRequest(req, options) {
+    async onRequest(req, _options) {
       req.headers.set("Authorization", `Bearer ${authToken}`);
       return req;
     },
 
-    async onResponse(res, options) {
+    async onResponse(res, _options) {
       if (res.status === 401) {
         onAuthError();
       }
@@ -95,6 +95,6 @@ export default function useClient() {
       if (error) throw error;
 
       return data;
-    }
+    },
   };
 }

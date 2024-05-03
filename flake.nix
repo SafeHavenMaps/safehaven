@@ -77,7 +77,7 @@
             echo "::group::Frontend checks"
               npm ci
               npm run generate-api
-              npm run prettier
+              npm run lint
             echo "::endgroup::"
           popd
         '';

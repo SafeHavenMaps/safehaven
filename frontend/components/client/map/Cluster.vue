@@ -3,8 +3,8 @@
     <div
       class="cluster"
       :style="{ backgroundColor: generateColor(props.seed) }"
+      style="cursor: pointer"
       @click="handleClick"
-      style="cursor: pointer;"
     >
       {{ props.count }}
     </div>

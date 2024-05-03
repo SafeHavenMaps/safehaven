@@ -1,7 +1,5 @@
 export default defineNuxtConfig({
-  modules: [
-    "nuxt-primevue"
-  ],
+  modules: ["nuxt-primevue", "@nuxt/eslint"],
   ssr: false,
   devtools: { enabled: true },
   typescript: {
@@ -16,5 +14,5 @@ export default defineNuxtConfig({
     "~/assets/main.css",
     "primeflex/primeflex.css",
     "primevue/resources/themes/aura-light-pink/theme.css",
-  ]
+  ],
 });
