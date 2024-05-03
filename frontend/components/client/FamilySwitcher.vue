@@ -7,7 +7,10 @@
   >
     <template #option="slotProps">
       <div class="button-content">
-        <i :class="slotProps.option.icon" class="mr-2" />
+        <i
+          :class="slotProps.option.icon"
+          class="mr-2"
+        />
         <span>{{ slotProps.option.title }}</span>
       </div>
     </template>

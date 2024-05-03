@@ -3,7 +3,10 @@
     :style="{ width: props.size ?? '24px', height: props.size ?? '24px' }"
     viewBox="0 0 24 24"
   >
-    <path :d="iconDict[props.iconName]" fill="currentColor" />
+    <path
+      :d="iconDict[props.iconName]"
+      fill="currentColor"
+    />
   </svg>
 </template>
 

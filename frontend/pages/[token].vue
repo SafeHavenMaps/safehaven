@@ -33,9 +33,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import state from '~/lib/state'
 import ClientMap from '~/components/client/Map.vue'
-import { computed } from 'vue'
 
 // Init state with url token
 const route = useRoute()

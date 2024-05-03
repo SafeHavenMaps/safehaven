@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
-import useClient from '~/lib/client'
 import { transform } from 'ol/proj.js'
 import type { Extent } from 'ol/extent'
+import useClient from '~/lib/client'
 import type {
   CartographyInitConfig,
   Category,

@@ -1,6 +1,6 @@
-import type { FetchedEntity } from '~/lib'
-import type { paths } from './api'
 import createClient, { type Middleware } from 'openapi-fetch'
+import type { paths } from './api'
+import type { FetchedEntity } from '~/lib'
 
 function createAuthMiddleware(
   authToken: string,
