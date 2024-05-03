@@ -51,44 +51,44 @@
 </template>
 
 <script setup lang="ts">
-import type Map from "ol/Map";
-import type { Coordinate } from "ol/coordinate";
-import type { DisplayableCachedEntity, DisplayableCluster } from "~/lib";
-import state from "~/lib/state";
+import type Map from 'ol/Map'
+import type { Coordinate } from 'ol/coordinate'
+import type { DisplayableCachedEntity, DisplayableCluster } from '~/lib'
+import state from '~/lib/state'
 
 const props = defineProps<{
-  center: Coordinate;
-  zoom: number;
-  entities: DisplayableCachedEntity[];
-  clusters: DisplayableCluster[];
-}>();
+  center: Coordinate
+  zoom: number
+  entities: DisplayableCachedEntity[]
+  clusters: DisplayableCluster[]
+}>()
 
-const zoom = props.zoom;
-const center = props.center;
+const zoom = props.zoom
+const center = props.center
 
-const mapRef = ref<{ map: Map }>();
-let map: Map | null = null;
+const mapRef = ref<{ map: Map }>()
+let map: Map | null = null
 onMounted(() => {
-  map = mapRef.value!.map;
-});
+  map = mapRef.value!.map
+})
 
 async function onMapMoveEnd() {
-  const { extent, currentZoom } = getExtentAndZoom();
-  await state.refreshView(extent, currentZoom);
+  const { extent, currentZoom } = getExtentAndZoom()
+  await state.refreshView(extent, currentZoom)
 }
 
 watch(
   () => state.activeFamily,
   async () => {
-    const { extent, currentZoom } = getExtentAndZoom();
-    await state.refreshView(extent, currentZoom);
+    const { extent, currentZoom } = getExtentAndZoom()
+    await state.refreshView(extent, currentZoom)
   },
-);
+)
 
 function getExtentAndZoom() {
-  const extent = map!.getView().getViewStateAndExtent().extent;
-  const currentZoom = map!.getView().getZoom()!;
-  return { extent, currentZoom };
+  const extent = map!.getView().getViewStateAndExtent().extent
+  const currentZoom = map!.getView().getZoom()!
+  return { extent, currentZoom }
 }
 
 function zoomTo(coordinates: Coordinate) {
@@ -96,16 +96,16 @@ function zoomTo(coordinates: Coordinate) {
     center: coordinates,
     zoom: Math.min(map!.getView().getZoom()! + 2, map!.getView().getMaxZoom()!),
     duration: 500,
-  });
+  })
 }
 
 async function handleClusterClick(cluster: DisplayableCluster) {
-  zoomTo(cluster.coordinates);
+  zoomTo(cluster.coordinates)
 }
 
 async function handleEntityClick(entity: DisplayableCachedEntity) {
-  zoomTo(entity.coordinates);
-  state.selectedCachedEntity(entity);
+  zoomTo(entity.coordinates)
+  state.selectedCachedEntity(entity)
 }
 </script>
 

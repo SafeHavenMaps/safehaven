@@ -3,11 +3,11 @@
     <template #start>
       <div class="grid nested-grid align-items-center -my-5 px-4">
         <div class="col-2">
-          <img class="max-h-2rem" alt="icon" src="/assets/default-logo.png" />
+          <img class="max-h-2rem" alt="icon" src="/assets/default-logo.png">
         </div>
         <div class="col-10">
           <h3 class="my-0">Carte associative</h3>
-          <span class="text-xs font-italic">Powered by SafeHaven</span>
+          <span class="text-xs font-italic">SafeHaven</span>
         </div>
       </div>
     </template>

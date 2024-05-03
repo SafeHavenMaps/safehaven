@@ -33,26 +33,26 @@
 </template>
 
 <script setup lang="ts">
-import state from "~/lib/state";
-import ClientMap from "~/components/client/Map.vue";
-import { computed } from "vue";
+import state from '~/lib/state'
+import ClientMap from '~/components/client/Map.vue'
+import { computed } from 'vue'
 
 // Init state with url token
-const route = useRoute();
-const token = route.params.token as string;
-const containerRef = ref<HTMLElement | null>(null);
+const route = useRoute()
+const token = route.params.token as string
+const containerRef = ref<HTMLElement | null>(null)
 
 const dynamicStyles = computed(() => {
   if (containerRef.value) {
-    const height = `${containerRef.value.clientHeight}px`;
-    const top = containerRef.value.getBoundingClientRect().top + "px";
-    //const top = `${navBarRef.value.clientHeight}px`;
-    return { height, top };
+    const height = `${containerRef.value.clientHeight}px`
+    const top = containerRef.value.getBoundingClientRect().top + 'px'
+    // const top = `${navBarRef.value.clientHeight}px`;
+    return { height, top }
   }
-  return {}; // Return default/fallback styles if needed
-});
+  return {} // Return default/fallback styles if needed
+})
 
-await state.initWithToken(token); // TODO: Redirect to 404 if token is invalid
+await state.initWithToken(token) // TODO: Redirect to 404 if token is invalid
 </script>
 
 <style scoped>

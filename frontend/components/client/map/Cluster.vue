@@ -13,26 +13,26 @@
 
 <script setup lang="ts" generic="T">
 const props = defineProps<{
-  count: number;
-  seed: number;
-  callbackItem: T;
-}>();
+  count: number
+  seed: number
+  callbackItem: T
+}>()
 
 function generateColor(seed: number): string {
-  const hue = seed % 360;
-  const saturation = 50;
-  const lightness = 30;
+  const hue = seed % 360
+  const saturation = 50
+  const lightness = 30
 
-  return `hsl(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
+  return `hsl(${hue}, ${saturation}%, ${lightness}%, 0.5)`
 }
 
 const emit = defineEmits<{
-  click: [item: T];
-}>();
+  click: [item: T]
+}>()
 
 const handleClick = () => {
-  emit("click", props.callbackItem);
-};
+  emit('click', props.callbackItem)
+}
 </script>
 
 <style scoped>

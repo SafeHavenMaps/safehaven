@@ -6,8 +6,6 @@
     "dev": "nuxt dev",
     "generate-api": "openapi-typescript ./openapi.json -o ./lib/api.d.ts",
     "build": "npm run generate-api && MINIMAL=1 nuxt generate",
-    "prettier": "prettier --check .",
-    "prettier:fix": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
   },
@@ -21,7 +19,6 @@
     "ol-ext": "^4.0.17",
     "openapi-fetch": "^0.9.3",
     "openapi-typescript": "^6.7.5",
-    "prettier": "^3.2.5",
     "primeflex": "^3.3.1",
     "primevue": "^3.50.0",
     "sass": "^1.72.0",

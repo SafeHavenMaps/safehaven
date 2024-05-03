@@ -1,0 +1,52 @@
+{
+	"extensions": {
+		"recommendations": [
+			"bbenoist.nix", // Nix highlighting
+			"alejandra.alejandra", // Nix formatting
+			"dbaeumer.vscode-eslint", // ESLint
+			"rust-lang.rust-analyzer", // Rust
+			"vue.volar", // Vue
+			"mkhl.direnv", // DirEnv for loading flake
+		]
+	},
+	"folders": [
+		{
+			"path": "backend"
+		},
+		{
+			"path": "frontend"
+		}
+	],
+	"settings": {
+		"eslint.useFlatConfig": true,
+		"alejandra.program": "alejandra",
+		"[nix]": {
+			"editor.defaultFormatter": "kamadorueda.alejandra",
+			"editor.formatOnPaste": true,
+			"editor.formatOnSave": true,
+			"editor.formatOnType": false
+		},
+		"[rust]": {
+			"editor.defaultFormatter": "rust-lang.rust-analyzer",
+			"editor.formatOnSave": true,
+		},
+		"[vue]": {
+			"editor.formatOnSave": false,
+			"editor.codeActionsOnSave": {
+				"source.fixAll.eslint": "always"
+			},
+		},
+		"[javascript]": {
+			"editor.formatOnSave": false,
+			"editor.codeActionsOnSave": {
+				"source.fixAll.eslint": "always"
+			},
+		},
+		"[typescript]": {
+			"editor.formatOnSave": false,
+			"editor.codeActionsOnSave": {
+				"source.fixAll.eslint": "always"
+			},
+		}
+	}
+}

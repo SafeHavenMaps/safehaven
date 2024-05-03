@@ -9,5 +9,5 @@
 </template>
 
 <script setup lang="ts">
-const isApiAvailable = true;
+const isApiAvailable = true
 </script>

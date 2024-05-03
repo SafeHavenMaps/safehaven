@@ -8,12 +8,12 @@
 </template>
 
 <script setup lang="ts">
-import * as mdi from "@mdi/js";
+import * as mdi from '@mdi/js'
 
 const props = defineProps<{
-  iconName: keyof typeof iconDict;
-  size?: string;
-}>();
+  iconName: keyof typeof iconDict
+  size?: string
+}>()
 
 const iconDict: Record<string, string> = {
   user: mdi.mdiAccount,
@@ -32,7 +32,7 @@ const iconDict: Record<string, string> = {
   delete: mdi.mdiDelete,
   save: mdi.mdiUpload,
   lightDark: mdi.mdiThemeLightDark,
-};
+}
 </script>
 
 <style scoped>

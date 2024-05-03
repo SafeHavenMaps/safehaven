@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ["nuxt-primevue", "@nuxt/eslint"],
+  modules: ['nuxt-primevue', '@nuxt/eslint'],
   ssr: false,
   devtools: { enabled: true },
   typescript: {
@@ -7,12 +7,17 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiUrl: process.env.API_URL || "/",
+      apiUrl: process.env.API_URL || '/',
     },
   },
   css: [
-    "~/assets/main.css",
-    "primeflex/primeflex.css",
-    "primevue/resources/themes/aura-light-pink/theme.css",
+    '~/assets/main.css',
+    'primeflex/primeflex.css',
+    'primevue/resources/themes/aura-light-pink/theme.css',
   ],
-});
+  eslint: {
+    config: {
+      stylistic: true,
+    },
+  },
+})
