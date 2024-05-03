@@ -4,6 +4,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    alejandra = {
+      url = "github:kamadorueda/alejandra/3.0.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -14,6 +18,7 @@
     self,
     nixpkgs,
     rust-overlay,
+    alejandra,
     flake-utils,
     ...
   }:
@@ -31,7 +36,7 @@
         };
 
         # Rust environment
-        rustVer = pkgs.rust-bin.stable."1.77.0";
+        rustVer = pkgs.rust-bin.stable."1.78.0";
         rustChan = rustVer.default.override {
           targets = [];
           extensions = [
@@ -98,18 +103,21 @@
         version = builtins.readFile ./container_release;
 
         # Backend derivation
-        rustPlatform = with pkgs;
-          makeRustPlatform {
+        backend =
+          (pkgs.makeRustPlatform {
             cargo = rustChan;
             rustc = rustChan;
-          };
-        backend = rustPlatform.buildRustPackage rec {
-          inherit version;
+          })
+          .buildRustPackage rec {
+            inherit version;
 
-          name = "safehaven-backend";
-          src = ./backend;
-          cargoSha256 = "sha256-ONMhePZCjS3SX53POAcTDVbMRF8WWicrtMxx7GFFZjk=";
-        };
+            name = "safehaven-backend";
+            src = ./backend;
+
+            # When modifying cargo dependencies, replace the hash with pkgs.lib.fakeSha256
+            # then run `nix build .#backend`. Use the hash in the error to replace the value.
+            cargoSha256 = "sha256-VYZ69OcayjgO4aA5b/UDfnDwUBO73Ro5e1NwX3ACzrQ=";
+          };
 
         # Frontend derivation
         frontend = pkgs.buildNpmPackage rec {
@@ -119,7 +127,9 @@
           src = ./frontend;
           nodejs = fixedNode;
 
-          npmDepsHash = "sha256-RwwKTcnb8sq7kz28rUKIcbiydtjAnE6tFJsbkrd9gsY=";
+          # When modifying cargo dependencies, replace the hash with pkgs.lib.fakeSha256
+          # then run `nix build .#frontend`. Use the hash in the error to replace the value.
+          npmDepsHash = "sha256-PKWt4KtFNq4fFK14tKpwd4EKq9N5Eq+dmrp3FWLBNjQ=";
 
           installPhase = ''
             runHook preInstall
@@ -161,6 +171,8 @@
               postgresql
               # Front
               fixedNode
+              # Nix formatting
+              alejandra.defaultPackage.${system}
             ];
             DATABASE_URL = "postgres://postgres:postgres@localhost:5432/safehaven";
             API_URL = "http://localhost:28669";
