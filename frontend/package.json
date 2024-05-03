@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "nuxt dev",
+    "postinstall": "nuxt prepare",
     "generate-api": "openapi-typescript ./openapi.json -o ./lib/api.d.ts",
     "build": "npm run generate-api && MINIMAL=1 nuxt generate",
     "lint": "eslint .",
