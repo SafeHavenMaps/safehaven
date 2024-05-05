@@ -1,35 +1,25 @@
 <template>
+  <ClientNavBar />
   <div
-    class="p-grid p-dir-col"
-    style="height: 100%; width: 100%; display: flex; flex-direction: column"
+    ref="containerRef"
+    class="h-full w-full"
   >
-    <div class="p-col-fixed">
-      <ClientNavBar />
-    </div>
-    <div
-      ref="containerRef"
-      class="p-col"
-      style="height: 100%; width: 100%; flex-grow: 1; overflow: auto"
-    >
-      <Sidebar
+    <ClientMap
+      :center="state.startCenter()"
+      :zoom="state.startZoom()"
+      :entities="state.entities"
+      :clusters="state.clusters"
+      @entity-click="(e) => state.selectedCachedEntity(e)"
+    />
+  </div>
+  <Sidebar
         v-model:visible="state.hasActiveEntity"
         :modal="false"
         position="left"
-        :style="dynamicStyles"
+        :style="fitContainer()"
       >
         <pre>{{ state.activeEntity }}</pre>
-      </Sidebar>
-      <div class="app-body">
-        <ClientMap
-          :center="state.startCenter()"
-          :zoom="state.startZoom()"
-          :entities="state.entities"
-          :clusters="state.clusters"
-          @entity-click="(e) => state.selectedCachedEntity(e)"
-        />
-      </div>
-    </div>
-  </div>
+  </Sidebar>
 </template>
 
 <script setup lang="ts">
@@ -42,7 +32,8 @@ const route = useRoute()
 const token = route.params.token as string
 const containerRef = ref<HTMLElement | null>(null)
 
-const dynamicStyles = computed(() => {
+
+function fitContainer() {
   if (containerRef.value) {
     const height = `${containerRef.value.clientHeight}px`
     const top = containerRef.value.getBoundingClientRect().top + 'px'
@@ -50,14 +41,7 @@ const dynamicStyles = computed(() => {
     return { height, top }
   }
   return {} // Return default/fallback styles if needed
-})
+}
 
 await state.initWithToken(token) // TODO: Redirect to 404 if token is invalid
 </script>
-
-<style scoped>
-.app-body {
-  height: 100%;
-  width: 100%;
-}
-</style>
