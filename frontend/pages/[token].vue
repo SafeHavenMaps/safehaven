@@ -1,31 +1,26 @@
 <template>
-  <ClientNavBar />
-  <div
-    ref="containerRef"
-    class="h-full w-full"
-  >
-    <ClientMap
-      :center="state.startCenter()"
-      :zoom="state.startZoom()"
-      :entities="state.entities"
-      :clusters="state.clusters"
-      @entity-click="(e) => state.selectedCachedEntity(e)"
-    />
+  <div class="h-full flex flex-column">
+    <ClientNavBar class="flex-none"/>
+    <div
+      ref="containerRef"
+      class="h-full"
+    >
+      <ClientMap 
+        class="h-full"
+        :center="state.startCenter()"
+        :zoom="state.startZoom()"
+        :entities="state.entities"
+        :clusters="state.clusters"
+        @entity-click="(e) => state.selectedCachedEntity(e)"
+      />
+    </div>
   </div>
-  <Sidebar
-        v-model:visible="state.hasActiveEntity"
-        :modal="false"
-        position="left"
-        :style="fitContainer()"
-      >
-        <pre>{{ state.activeEntity }}</pre>
-  </Sidebar>
+  <ClientEntitySideBar :style="fitContainer()"/>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import state from '~/lib/state'
-import ClientMap from '~/components/client/Map.vue'
 
 // Init state with url token
 const route = useRoute()
@@ -37,8 +32,7 @@ function fitContainer() {
   if (containerRef.value) {
     const height = `${containerRef.value.clientHeight}px`
     const top = containerRef.value.getBoundingClientRect().top + 'px'
-    // const top = `${navBarRef.value.clientHeight}px`;
-    return { height, top }
+    return { height, top, "position": "absolute"}
   }
   return {} // Return default/fallback styles if needed
 }
