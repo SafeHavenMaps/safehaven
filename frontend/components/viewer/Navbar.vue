@@ -19,7 +19,7 @@
     </template>
 
     <template #center>
-      <ClientFamilySwitcher />
+      <ViewerFamilySwitcher />
     </template>
 
     <template #end>

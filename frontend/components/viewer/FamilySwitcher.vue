@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import state from '~/lib/state'
+import state from '~/lib/viewer-state'
 </script>
 
 <style>

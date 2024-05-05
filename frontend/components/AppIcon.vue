@@ -20,12 +20,13 @@ const props = defineProps<{
 
 const iconDict: Record<string, string> = {
   user: mdi.mdiAccount,
+  login: mdi.mdiAccountLockOpen,
   family: mdi.mdiFamilyTree,
   category: mdi.mdiLabel,
   tag: mdi.mdiTagOutline,
   entity: mdi.mdiTagOutline,
   userGroup: mdi.mdiAccountGroup,
-  accessToken: mdi.mdiAccountGroup,
+  accessToken: mdi.mdiLock,
   mapSearch: mdi.mdiMapSearch,
   filter: mdi.mdiFilterCog,
   information: mdi.mdiInformationOutline,

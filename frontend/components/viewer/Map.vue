@@ -24,7 +24,7 @@
         :key="entity.id"
         :position="entity.coordinates"
       >
-        <ClientMapMarker
+        <ViewerMapMarker
           :callback-item="entity"
           :width="24"
           :height="38"
@@ -39,7 +39,7 @@
         :key="cluster"
         :position="cluster.coordinates"
       >
-        <ClientMapCluster
+        <ViewerMapCluster
           :callback-item="cluster"
           :count="cluster.count"
           :seed="cluster.id"
@@ -54,7 +54,7 @@
 import type Map from 'ol/Map'
 import type { Coordinate } from 'ol/coordinate'
 import type { DisplayableCachedEntity, DisplayableCluster } from '~/lib'
-import state from '~/lib/state'
+import state from '~/lib/viewer-state'
 
 const props = defineProps<{
   center: Coordinate
