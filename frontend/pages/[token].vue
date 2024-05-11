@@ -1,11 +1,11 @@
 <template>
   <div class="h-full flex flex-column">
-    <ViewerNavbar class="flex-none"/>
+    <ViewerNavbar class="flex-none" />
     <div
       ref="containerRef"
       class="h-full"
     >
-      <ViewerMap 
+      <ViewerMap
         class="h-full"
         :center="state.startCenter()"
         :zoom="state.startZoom()"
@@ -15,11 +15,11 @@
       />
     </div>
   </div>
-  <ViewerEntitySidebar :style="fitContainer()"/>
+  <ViewerEntitySidebar :style="fitContainer()" />
 </template>
 
 <script setup lang="ts">
-import type { DisplayableCachedEntity } from '~/lib';
+import type { DisplayableCachedEntity } from '~/lib'
 import state from '~/lib/viewer-state'
 
 // Init state with url token
@@ -33,7 +33,7 @@ function fitContainer() {
   if (containerRef.value) {
     const height = `${containerRef.value.clientHeight}px`
     const top = containerRef.value.getBoundingClientRect().top + 'px'
-    return { height, top, "position": "absolute"}
+    return { height, top, position: 'absolute' }
   }
   return {} // Return default/fallback styles if needed
 }

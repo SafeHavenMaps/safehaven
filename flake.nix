@@ -8,8 +8,8 @@
       url = "github:kamadorueda/alejandra/3.0.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
+    fenix = {
+      url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -17,7 +17,7 @@
   outputs = {
     self,
     nixpkgs,
-    rust-overlay,
+    fenix,
     alejandra,
     flake-utils,
     ...
@@ -26,7 +26,7 @@
       system: let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [rust-overlay.overlays.default];
+          overlays = [fenix.overlays.default];
         };
 
         # NodeJS environment
@@ -36,17 +36,14 @@
         };
 
         # Rust environment
-        rustVer = pkgs.rust-bin.stable."1.78.0";
-        rustChan = rustVer.default.override {
-          targets = [];
-          extensions = [
-            "clippy"
-            "rust-src"
-            "rustc-dev"
-            "rustfmt"
-            "rust-analyzer"
-          ];
-        };
+        rustVer = fenix.packages.${system}.complete;
+        rustChan = rustVer.withComponents [
+          "cargo"
+          "clippy"
+          "rust-src"
+          "rustc"
+          "rustfmt"
+        ];
 
         checkProject = pkgs.writeShellScriptBin "check_project" ''
           set -e
@@ -105,8 +102,8 @@
         # Backend derivation
         backend =
           (pkgs.makeRustPlatform {
-            cargo = rustChan;
-            rustc = rustChan;
+            cargo = rustVer.toolchain;
+            rustc = rustVer.toolchain;
           })
           .buildRustPackage rec {
             inherit version;
@@ -159,13 +156,12 @@
         with pkgs; {
           packages = {inherit backend frontend dockerImage;};
           devShells.default = mkShell {
-            nativeBuildInputs = [rustChan];
             buildInputs = [
+              rustChan
               # Various scripts
               checkProject
               regenApi
               # Backend
-              sqlx-cli
               openssl
               pkg-config
               postgresql
