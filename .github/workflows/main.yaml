@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Set up Nix
         uses: DeterminateSystems/nix-installer-action@main
 
@@ -23,6 +23,9 @@ jobs:
 
       - name: Check health of Nix flake input
         uses: DeterminateSystems/flake-checker-action@main
+
+      - name: Run project checks
+        run: nix develop -c check_project
 
       - name: Set container release tag
         run: |
@@ -33,7 +36,7 @@ jobs:
           fi
           # Export value to Github variables
           echo "TAG=$(cat ./container_release)" >> $GITHUB_ENV
-  
+
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | skopeo login ghcr.io --username ${{ github.actor }} --password-stdin
 
