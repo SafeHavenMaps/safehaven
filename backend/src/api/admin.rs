@@ -94,7 +94,7 @@ pub struct LoginResponse {
 
 #[utoipa::path(
     post,
-    path = "/admin/login",
+    path = "/api/admin/login",
     request_body = LoginRequest,
     responses(
         (status = 200, description = "Login", body = LoginResponse),
