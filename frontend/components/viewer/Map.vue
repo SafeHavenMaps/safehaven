@@ -30,6 +30,7 @@
           :height="38"
           :fill="entity.category.fill_color"
           :stroke="entity.category.border_color"
+          :highlighted="entity.entity_id === state.activeEntity?.entity.id"
           @click="handleEntityClick"
         />
       </ol-overlay>
@@ -99,12 +100,19 @@ function zoomTo(coordinates: Coordinate) {
   })
 }
 
+function centerTo(coordinates: Coordinate) {
+  map!.getView().animate({
+    center: coordinates,
+    duration: 500,
+  })
+}
+
 async function handleClusterClick(cluster: DisplayableCluster) {
   zoomTo(cluster.coordinates)
 }
 
 async function handleEntityClick(entity: DisplayableCachedEntity) {
-  zoomTo(entity.coordinates)
+  centerTo(entity.coordinates)
   state.selectedCachedEntity(entity)
 }
 </script>

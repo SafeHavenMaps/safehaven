@@ -16,6 +16,10 @@ export type CartographyInitConfig =
   api.components['schemas']['CartographyInitConfig']
 export type FetchedEntity = api.components['schemas']['FetchedEntity']
 
+export interface CanBeHighlighted {
+  highlighted: boolean
+}
+
 export interface HasCoordinates {
   coordinates: Coordinate
 }
@@ -31,5 +35,7 @@ export interface HasCategory {
 export type DisplayableCachedEntity = CachedEntity &
   HasCoordinates &
   HasFamily &
-  HasCategory
+  HasCategory &
+  CanBeHighlighted
+
 export type DisplayableCluster = Cluster & HasCoordinates

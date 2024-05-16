@@ -25,7 +25,7 @@ import state from '~/lib/viewer-state'
 // Init state with url token
 const route = useRoute()
 const token = route.params.token as string
-await state.initWithToken(token) // TODO: Redirect to 404 if token is invalid
+await state.bootstrapWithToken(token) // TODO: Redirect to 404 if token is invalid
 
 // Compute the dynamic positioning of the sidebar
 const containerRef = ref<HTMLElement | null>(null)

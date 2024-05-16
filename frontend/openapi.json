@@ -2532,6 +2532,17 @@
           {
             "type": "object",
             "required": [
+              "General"
+            ],
+            "properties": {
+              "General": {
+                "$ref": "#/components/schemas/GeneralOptions"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
               "SafeMode"
             ],
             "properties": {
@@ -2806,6 +2817,25 @@
           },
           "title": {
             "type": "string"
+          }
+        }
+      },
+      "GeneralOptions": {
+        "type": "object",
+        "properties": {
+          "logo_url": {
+            "type": "string",
+            "default": null,
+            "nullable": true
+          },
+          "subtitle": {
+            "type": "string",
+            "default": "Carte associative",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "default": "SafeHaven"
           }
         }
       },
@@ -3180,6 +3210,7 @@
       "SafeHavenOptions": {
         "type": "object",
         "required": [
+          "general",
           "safe_mode",
           "cartography_init",
           "cartography_cluster"
@@ -3190,6 +3221,9 @@
           },
           "cartography_init": {
             "$ref": "#/components/schemas/CartographyInitConfig"
+          },
+          "general": {
+            "$ref": "#/components/schemas/GeneralOptions"
           },
           "safe_mode": {
             "$ref": "#/components/schemas/SafeModeConfig"
@@ -3273,9 +3307,13 @@
       "StatusResponse": {
         "type": "object",
         "required": [
-          "status"
+          "status",
+          "general"
         ],
         "properties": {
+          "general": {
+            "$ref": "#/components/schemas/GeneralOptions"
+          },
           "safe_mode": {
             "allOf": [
               {

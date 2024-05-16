@@ -17,8 +17,8 @@ use crate::{
         entity_cache::{CachedEntity, Cluster, EntitiesAndClusters},
         family::{Family, Field, FieldType, Form, NewOrUpdateFamily},
         options::{
-            CartographyClusterConfig, CartographyInitConfig, ConfigurationOption, SafeHavenOptions,
-            SafeModeConfig,
+            CartographyClusterConfig, CartographyInitConfig, ConfigurationOption, GeneralOptions,
+            SafeHavenOptions, SafeModeConfig,
         },
         tag::{NewOrUpdateTag, Tag},
         user::{NewUser, User},
@@ -100,6 +100,7 @@ use utoipa::OpenApi;
         // options
         SafeHavenOptions,
         ConfigurationOption,
+        GeneralOptions,
         SafeModeConfig,
         CartographyInitConfig,
         CartographyClusterConfig,

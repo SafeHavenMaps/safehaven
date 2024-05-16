@@ -13,8 +13,6 @@ import type {
   Status,
 } from '~/lib'
 
-const client = useClient()
-
 type ViewData = {
   entities: DisplayableCachedEntity[]
   clusters: DisplayableCluster[]
@@ -22,6 +20,12 @@ type ViewData = {
 
 export class AppState {
   initialized = false
+
+  private _client: ReturnType<typeof useClient> | null = null
+
+  get client() {
+    return this._client!
+  }
 
   private familiesData: Family[] | null = null
 
@@ -76,12 +80,29 @@ export class AppState {
     return this.status!.safe_mode
   }
 
-  async checkStatus() {
-    this.status = await client.checkStatus()
+  get title() {
+    return this.status!.general.title!
   }
 
-  async initWithToken(token: string) {
-    const data = await client.bootstrap(token)
+  get subtitle() {
+    return this.status!.general.subtitle ?? null
+  }
+
+  get logo() {
+    return this.status!.general.logo_url ?? null
+  }
+
+  get loaded() {
+    return this.status !== null
+  }
+
+  async init() {
+    this._client = useClient()
+    this.status = await this.client.checkStatus()
+  }
+
+  async bootstrapWithToken(token: string) {
+    const data = await this.client.bootstrap(token)
 
     this.familiesData = data.families
     this.categoriesData = data.categories
@@ -154,12 +175,12 @@ export class AppState {
   }
 
   async selectedCachedEntity(cacheEntity: DisplayableCachedEntity) {
-    this._activeEntity = await client.fetchEntity(cacheEntity.entity_id)
+    this._activeEntity = await this.client.fetchEntity(cacheEntity.entity_id)
   }
 
   async refreshView(extent: Extent, zoomLevel: number) {
     const zoom = Math.round(zoomLevel)
-    const newViewData = await client.getEntitiesWithinBounds(
+    const newViewData = await this.client.getEntitiesWithinBounds(
       {
         xmin: extent[0],
         ymin: extent[1],
@@ -187,6 +208,7 @@ export class AppState {
         coordinates: [entity.web_mercator_x, entity.web_mercator_y],
         family: this.familiesLookupTable[entity.family_id],
         category: this.categoriesLookupTable[entity.category_id],
+        highlighted: false,
       })),
     )
 

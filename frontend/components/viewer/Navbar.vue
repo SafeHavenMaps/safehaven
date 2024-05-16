@@ -6,14 +6,16 @@
           <img
             class="max-h-2rem"
             alt="icon"
-            src="/assets/default-logo.png"
+            :src="state.logo ?? defaultLogo"
           >
         </div>
         <div class="col-10">
           <h3 class="my-0">
-            Carte associative
+            {{ state.title }}
           </h3>
-          <span class="text-xs font-italic">SafeHaven</span>
+          <span class="text-xs font-italic">
+            {{ state.subtitle }}
+          </span>
         </div>
       </div>
     </template>
@@ -75,4 +77,7 @@
   </Toolbar>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import state from '~/lib/viewer-state'
+import defaultLogo from '~/assets/default-logo.png'
+</script>

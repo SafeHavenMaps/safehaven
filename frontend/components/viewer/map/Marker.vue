@@ -1,6 +1,7 @@
 <template>
   <div class="map-marker">
     <svg
+      :class="{ highlighted: props.highlighted }"
       :width="props.width"
       :height="props.height"
       version="1.1"
@@ -30,6 +31,7 @@ const props = defineProps<{
   height: number
   fill: string
   stroke: string
+  highlighted: boolean
   callbackItem: T
 }>()
 
@@ -54,5 +56,20 @@ const handleClick = () => {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.map-marker svg.highlighted {
+  transform: translateX(-50%) scale(1.2);
+  animation: bounce 0.75s infinite alternate;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1.2);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-10px) scale(1.2);
+  }
 }
 </style>

@@ -1,5 +1,5 @@
 use crate::api::{AppError, AppJson, AppState, DbConn, MapUserTokenClaims};
-use crate::models::options::CartographyInitConfig;
+use crate::models::options::{CartographyInitConfig, GeneralOptions};
 use crate::models::{access_token::AccessToken, category::Category, family::Family, tag::Tag};
 use axum::extract::{Query, State};
 use axum::{
@@ -21,6 +21,7 @@ pub fn routes() -> Router<AppState> {
 #[derive(Serialize, ToSchema)]
 pub struct StatusResponse {
     status: &'static str,
+    general: GeneralOptions,
     safe_mode: Option<SafeMode>,
 }
 
@@ -43,6 +44,7 @@ pub async fn status(State(app_state): State<AppState>) -> AppJson<StatusResponse
 
     AppJson(StatusResponse {
         status: "ok",
+        general: app_state.dyn_config.read().await.general.clone(),
         safe_mode: match safe_mode.enabled {
             true => Some(SafeMode {
                 recaptcha_v3_sitekey: safe_mode.recaptcha_v3_sitekey,

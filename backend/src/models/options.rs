@@ -6,6 +6,7 @@ use crate::api::AppError;
 
 #[derive(Deserialize, Serialize, Clone, ToSchema)]
 pub struct SafeHavenOptions {
+    pub general: GeneralOptions,
     pub safe_mode: SafeModeConfig,
     pub cartography_init: CartographyInitConfig,
     pub cartography_cluster: CartographyClusterConfig,
@@ -13,6 +14,7 @@ pub struct SafeHavenOptions {
 
 #[derive(Deserialize, Serialize, Clone, ToSchema)]
 pub enum ConfigurationOption {
+    General(GeneralOptions),
     SafeMode(SafeModeConfig),
     CartographyInit(CartographyInitConfig),
     CartographyCluster(CartographyClusterConfig),
@@ -21,6 +23,7 @@ pub enum ConfigurationOption {
 impl ConfigurationOption {
     pub fn option_name(&self) -> &'static str {
         match self {
+            ConfigurationOption::General(_) => GeneralOptions::option_name(),
             ConfigurationOption::SafeMode(_) => SafeModeConfig::option_name(),
             ConfigurationOption::CartographyInit(_) => CartographyInitConfig::option_name(),
             ConfigurationOption::CartographyCluster(_) => CartographyClusterConfig::option_name(),
@@ -30,6 +33,30 @@ impl ConfigurationOption {
 
 trait OptionConfig {
     fn option_name() -> &'static str;
+}
+
+#[derive(Deserialize, Serialize, Clone, ToSchema)]
+#[serde(default)]
+pub struct GeneralOptions {
+    pub title: String,
+    pub subtitle: Option<String>,
+    pub logo_url: Option<String>,
+}
+
+impl OptionConfig for GeneralOptions {
+    fn option_name() -> &'static str {
+        "general"
+    }
+}
+
+impl Default for GeneralOptions {
+    fn default() -> Self {
+        Self {
+            title: "SafeHaven".to_string(),
+            subtitle: Some("Carte associative".to_string()),
+            logo_url: None,
+        }
+    }
 }
 
 #[derive(Deserialize, Serialize, Clone, ToSchema)]
@@ -170,6 +197,9 @@ impl SafeHavenOptions {
     }
 
     pub async fn load(conn: &mut PgConnection) -> Self {
+        let general = Self::fetch_option::<GeneralOptions>(conn)
+            .await
+            .expect("Failed to load general");
         let safe_mode = Self::fetch_option::<SafeModeConfig>(conn)
             .await
             .expect("Failed to load safe mode");
@@ -181,6 +211,7 @@ impl SafeHavenOptions {
             .expect("Failed to load cartography cluster");
 
         Self {
+            general,
             safe_mode,
             cartography_init,
             cartography_cluster,
