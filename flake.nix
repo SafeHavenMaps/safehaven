@@ -162,7 +162,7 @@
               checkProject
               regenApi
               # Backend
-              sqlx
+              sqlx-cli
               openssl
               pkg-config
               postgresql
