@@ -1,5 +1,3 @@
-# SafeHaven
-
 <img src=".github/assets/banner.webp" alt="SafeHaven Banner"/>
 
 An open-source project to create a map of safe spaces for people in need.
