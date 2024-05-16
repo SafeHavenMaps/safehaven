@@ -1,10 +1,10 @@
 <template>
   <Sidebar
-        v-model:visible="state.hasActiveEntity"
-        :modal="false"
-        position="left"
-      >
-        <pre>{{ state.activeEntity }}</pre>
+    v-model:visible="state.hasActiveEntity"
+    :modal="false"
+    position="left"
+  >
+    <pre>{{ state.activeEntity }}</pre>
   </Sidebar>
 </template>
 

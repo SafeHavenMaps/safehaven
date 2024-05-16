@@ -1,7 +1,7 @@
-import { reactive } from "vue";
-import { transform } from "ol/proj.js";
-import type { Extent } from "ol/extent";
-import useClient from "~/lib/viewer-client";
+import { reactive } from 'vue'
+import { transform } from 'ol/proj.js'
+import type { Extent } from 'ol/extent'
+import useClient from '~/lib/viewer-client'
 import type {
   CartographyInitConfig,
   Category,
@@ -11,127 +11,127 @@ import type {
   DisplayableCluster,
   FetchedEntity,
   Status,
-} from "~/lib";
+} from '~/lib'
 
-const client = useClient();
+const client = useClient()
 
 type ViewData = {
-  entities: DisplayableCachedEntity[];
-  clusters: DisplayableCluster[];
-};
+  entities: DisplayableCachedEntity[]
+  clusters: DisplayableCluster[]
+}
 
 export class AppState {
-  initialized = false;
+  initialized = false
 
-  private familiesData: Family[] | null = null;
+  private familiesData: Family[] | null = null
 
-  private categoriesData: Category[] | null = null;
-  private tagsData: Tag[] | null = null;
-  private cartographyInitConfigData: CartographyInitConfig | null = null;
+  private categoriesData: Category[] | null = null
+  private tagsData: Tag[] | null = null
+  private cartographyInitConfigData: CartographyInitConfig | null = null
 
-  private familiesLookupTable: Record<string, Family> = {};
-  private categoriesLookupTable: Record<string, Category> = {};
-  private tagsLookupTable: Record<string, Tag> = {};
+  private familiesLookupTable: Record<string, Family> = {}
+  private categoriesLookupTable: Record<string, Category> = {}
+  private tagsLookupTable: Record<string, Tag> = {}
 
   private viewData: ViewData = {
     entities: [],
     clusters: [],
-  };
-
-  private activeFamilyId: string | null = null;
-
-  private _activeEntity: FetchedEntity | null = null;
-
-  get activeEntity() {
-    return this._activeEntity;
   }
 
-  private status: Status | null = null;
+  private activeFamilyId: string | null = null
+
+  private _activeEntity: FetchedEntity | null = null
+
+  get activeEntity() {
+    return this._activeEntity
+  }
+
+  private status: Status | null = null
 
   get entities() {
-    return this.viewData.entities;
+    return this.viewData.entities
   }
 
   get clusters() {
-    return this.viewData.clusters;
+    return this.viewData.clusters
   }
 
   get activeFamily() {
-    return this.familiesLookupTable[this.activeFamilyId!];
+    return this.familiesLookupTable[this.activeFamilyId!]
   }
 
   set activeFamily(family: Family) {
-    this.activeFamilyId = family.id;
+    this.activeFamilyId = family.id
   }
 
   get online() {
-    return this.status?.status === "ok";
+    return this.status?.status === 'ok'
   }
 
   get hasSafeMode() {
-    return !!this.status?.safe_mode;
+    return !!this.status?.safe_mode
   }
 
   get safeMode() {
-    return this.status!.safe_mode;
+    return this.status!.safe_mode
   }
 
   async checkStatus() {
-    this.status = await client.checkStatus();
+    this.status = await client.checkStatus()
   }
 
   async initWithToken(token: string) {
-    const data = await client.bootstrap(token);
+    const data = await client.bootstrap(token)
 
-    this.familiesData = data.families;
-    this.categoriesData = data.categories;
-    this.tagsData = data.tags;
-    this.cartographyInitConfigData = data.cartography_init_config;
+    this.familiesData = data.families
+    this.categoriesData = data.categories
+    this.tagsData = data.tags
+    this.cartographyInitConfigData = data.cartography_init_config
 
     this.familiesData.forEach((family) => {
-      this.familiesLookupTable[family.id] = family;
-    });
+      this.familiesLookupTable[family.id] = family
+    })
 
     this.categoriesData.forEach((category) => {
-      this.categoriesLookupTable[category.id] = category;
-    });
+      this.categoriesLookupTable[category.id] = category
+    })
 
     this.tagsData.forEach((tag) => {
-      this.tagsLookupTable[tag.id] = tag;
-    });
+      this.tagsLookupTable[tag.id] = tag
+    })
 
     if (this.familiesData.length === 0) {
-      throw new Error("No families available");
+      throw new Error('No families available')
     }
 
-    this.activeFamilyId = this.familiesData[0].id;
+    this.activeFamilyId = this.familiesData[0].id
 
-    this.initialized = true;
+    this.initialized = true
   }
 
   get families(): Family[] {
-    return this.familiesData!;
+    return this.familiesData!
   }
 
   get categories(): Category[] {
-    return this.categoriesData!;
+    return this.categoriesData!
   }
 
   get tags(): Tag[] {
-    return this.tagsData!;
+    return this.tagsData!
   }
 
   get cartographyInitConfig(): CartographyInitConfig {
-    return this.cartographyInitConfigData!;
+    return this.cartographyInitConfigData!
   }
 
   get hasActiveEntity() {
-    return this.activeEntity !== null;
+    return this.activeEntity !== null
   }
 
   set hasActiveEntity(value: boolean) {
     if (!value) {
-      this._activeEntity = null;
+      this._activeEntity = null
     }
   }
 
@@ -144,21 +144,21 @@ export class AppState {
         state.cartographyInitConfig.center_lng,
         state.cartographyInitConfig.center_lat,
       ],
-      "EPSG:4326", // WGS84
-      "EPSG:3857" // Web Mercator
-    );
+      'EPSG:4326', // WGS84
+      'EPSG:3857', // Web Mercator
+    )
   }
 
   startZoom() {
-    return state.cartographyInitConfig.zoom;
+    return state.cartographyInitConfig.zoom
   }
 
   async selectedCachedEntity(cacheEntity: DisplayableCachedEntity) {
-    this._activeEntity = await client.fetchEntity(cacheEntity.entity_id);
+    this._activeEntity = await client.fetchEntity(cacheEntity.entity_id)
   }
 
   async refreshView(extent: Extent, zoomLevel: number) {
-    const zoom = Math.round(zoomLevel);
+    const zoom = Math.round(zoomLevel)
     const newViewData = await client.getEntitiesWithinBounds(
       {
         xmin: extent[0],
@@ -167,48 +167,48 @@ export class AppState {
         ymax: extent[3],
       },
       zoom,
-      this.activeFamilyId!
-    );
+      this.activeFamilyId!,
+    )
 
     // Step 1: Identify and filter out entities that are no longer present
-    const existingEntityIds = new Set(newViewData.entities.map((ne) => ne.id));
-    this.viewData.entities = this.viewData.entities.filter((e) =>
-      existingEntityIds.has(e.id)
-    );
+    const existingEntityIds = new Set(newViewData.entities.map(ne => ne.id))
+    this.viewData.entities = this.viewData.entities.filter(e =>
+      existingEntityIds.has(e.id),
+    )
 
     // Step 2: Add new entities that are not already in viewData
-    const currentEntityIds = new Set(this.viewData.entities.map((e) => e.id));
+    const currentEntityIds = new Set(this.viewData.entities.map(e => e.id))
     const newEntities = newViewData.entities.filter(
-      (ne) => !currentEntityIds.has(ne.id)
-    );
+      ne => !currentEntityIds.has(ne.id),
+    )
     this.viewData.entities.push(
-      ...newEntities.map((entity) => ({
+      ...newEntities.map(entity => ({
         ...entity,
         coordinates: [entity.web_mercator_x, entity.web_mercator_y],
         family: this.familiesLookupTable[entity.family_id],
         category: this.categoriesLookupTable[entity.category_id],
-      }))
-    );
+      })),
+    )
 
     // Step 3: Identify and filter out clusters that are no longer present
-    const existingClusterIds = new Set(newViewData.clusters.map((nc) => nc.id));
-    this.viewData.clusters = this.viewData.clusters.filter((c) =>
-      existingClusterIds.has(c.id)
-    );
+    const existingClusterIds = new Set(newViewData.clusters.map(nc => nc.id))
+    this.viewData.clusters = this.viewData.clusters.filter(c =>
+      existingClusterIds.has(c.id),
+    )
 
     // Step 4: Add new clusters that are not already in viewData
-    const currentClusterIds = new Set(this.viewData.clusters.map((c) => c.id));
+    const currentClusterIds = new Set(this.viewData.clusters.map(c => c.id))
     const newClusters = newViewData.clusters.filter(
-      (nc) => !currentClusterIds.has(nc.id)
-    );
+      nc => !currentClusterIds.has(nc.id),
+    )
     this.viewData.clusters.push(
-      ...newClusters.map((cluster) => ({
+      ...newClusters.map(cluster => ({
         ...cluster,
         coordinates: [cluster.center_x, cluster.center_y],
-      }))
-    );
+      })),
+    )
   }
 }
 
-const state = reactive(new AppState());
-export default state;
+const state = reactive(new AppState())
+export default state

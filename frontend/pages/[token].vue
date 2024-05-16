@@ -14,8 +14,8 @@
         @entity-click="(e: DisplayableCachedEntity) => state.selectedCachedEntity(e)"
       />
     </div>
+    <ViewerEntitySidebar :style="fitContainer()" />
   </div>
-  <ViewerEntitySidebar :style="fitContainer()" />
 </template>
 
 <script setup lang="ts">
