@@ -1369,6 +1369,14 @@
         "responses": {
           "200": {
             "description": "Login",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "$ref": "#/components/schemas/CookieJar"
+                },
+                "description": "Cookie jar with auth cookie inside"
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2934,10 +2942,10 @@
       "LoginResponse": {
         "type": "object",
         "required": [
-          "token"
+          "status"
         ],
         "properties": {
-          "token": {
+          "status": {
             "type": "string"
           }
         }

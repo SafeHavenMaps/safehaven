@@ -1,38 +1,25 @@
 import createClient from 'openapi-fetch'
 import type { paths } from './api'
-import createAuthMiddleware from './auth-middleware'
 
 export default function useClient() {
   const config = useRuntimeConfig()
   const apiUrl = config.public.apiUrl
-  const client = createClient<paths>({ baseUrl: apiUrl })
+  const client = createClient<paths>({
+    baseUrl: apiUrl,
+    credentials: 'include', // Ensures cookies are sent with the request
+  })
 
   return {
     authenticated: false,
     rawClient: client,
 
-    async checkStatus() {
-      const { data, error } = await client.GET('/api/status')
-      if (error) throw error
-      return data
-    },
-
     async bootstrap(username: string, password: string) {
-      const { data, error } = await client.POST('/api/admin/login', {
+      const { error } = await client.POST('/api/admin/login', {
         body: { password: password, username: username },
       })
-      if (error) throw error
+      // const _token_cookie = response.headers.getSetCookie()[0]
 
-      // Install auth middleware to the stack. If it fails, ejects it.
-      this.authenticated = true
-      const authMiddleware = createAuthMiddleware(data.token, () => {
-        client.eject(authMiddleware)
-        // ToDo: Handle lifecycle of the app when the token is invalid
-        // Maybe refresh it using the bootstrapped token?
-        // For now, the only fix is refreshing the page for the user
-      })
-      client.use(authMiddleware)
-      return data
+      if (error) throw error
     },
   }
 }

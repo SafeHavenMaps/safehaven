@@ -32,10 +32,6 @@ export class AppState {
     return this.status!.safe_mode
   }
 
-  async checkStatus() {
-    this.status = await client.checkStatus()
-  }
-
   async initWithUsernamePassword(username: string, password: string) {
     await client.bootstrap(username, password)
     this.initialized = true

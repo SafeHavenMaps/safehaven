@@ -20,7 +20,7 @@ uuid = { version = "1.8", features = ["serde", "v4"] }
 scrypt = "0.11"
 chrono = { version = "0.4", features = ["serde"] }
 axum = { version = "0.7", features = ["macros"] }
-axum-extra = { version = "0.9", features = ["typed-header"] }
+axum-extra = { version = "0.9", features = ["typed-header", "cookie"] }
 tokio = { version = "1.36", features = ["full"] }
 figment = { version = "0.10", features = ["toml", "env"] }
 jsonwebtoken = "9"

@@ -8,13 +8,14 @@ pub mod tags;
 pub mod users;
 
 use super::AdminUserTokenClaims;
-use crate::api::{AppError, AppJson, AppState, DbConn};
+use crate::api::{AppError, AppJsonWCookies, AppState, DbConn};
 use crate::models::user::User;
 use axum::extract::State;
 use axum::{
     routing::{delete, get, post, put, Router},
     Json,
 };
+use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use chrono::{TimeDelta, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -89,7 +90,7 @@ pub struct LoginRequest {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct LoginResponse {
-    token: String,
+    status: String,
 }
 
 #[utoipa::path(
@@ -97,7 +98,7 @@ pub struct LoginResponse {
     path = "/api/admin/login",
     request_body = LoginRequest,
     responses(
-        (status = 200, description = "Login", body = LoginResponse),
+        (status = 200, description = "Login", body = LoginResponse, headers(("Set-Cookie" = CookieJar, description = "Cookie jar with auth cookie inside"))),
         (status = 404, description = "User or password not found", body = ErrorResponse),
     )
 )]
@@ -105,7 +106,7 @@ async fn login(
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
     Json(request): Json<LoginRequest>,
-) -> Result<AppJson<LoginResponse>, AppError> {
+) -> Result<AppJsonWCookies<LoginResponse>, AppError> {
     let auth_user = User::authenticate(request.username, request.password, &mut conn).await?;
     let token = app_state.generate_token(AdminUserTokenClaims {
         admin_id: auth_user.id,
@@ -115,5 +116,19 @@ async fn login(
         exp: (Utc::now() + TimeDelta::try_hours(1).expect("valid duration")).timestamp() as usize,
     });
 
-    Ok(AppJson(LoginResponse { token }))
+    let auth_cookie = Cookie::build(("token", token))
+        .path("/") //api/admin/
+        .secure(false)
+        //.secure(true)  // #TODO : control this with a flag for dev/prod, or perhaps with a config setting
+        .http_only(true)
+        .same_site(SameSite::None);
+
+    let jar = CookieJar::new().add(auth_cookie);
+
+    Ok(AppJsonWCookies {
+        body: LoginResponse {
+            status: "200".to_owned(),
+        },
+        jar,
+    })
 }
