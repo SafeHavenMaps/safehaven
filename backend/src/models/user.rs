@@ -103,23 +103,41 @@ impl User {
         given_password: String,
         conn: &mut PgConnection,
     ) -> Result<User, AppError> {
-        let user: AuthenticableUser = sqlx::query_as!(
+        let user_result: Result<AuthenticableUser, AppError> = sqlx::query_as!(
             AuthenticableUser,
             r#"SELECT id, name, password, is_admin FROM users WHERE name = $1"#,
             given_name
         )
         .fetch_one(conn)
         .await
-        .map_err(|_| AppError::BadUsernameOrPassword)?;
+        .map_err(|_| AppError::BadUsernameOrPassword);
 
-        let password_hash =
-            PasswordHash::new(&user.password).map_err(|_| AppError::BadUsernameOrPassword)?;
-
-        Scrypt
-            .verify_password(given_password.as_bytes(), &password_hash)
-            .map_err(|_| AppError::BadUsernameOrPassword)?;
-
-        Ok(user.into())
+        match user_result {
+            Ok(user) => {
+                let password_hash = PasswordHash::new(&user.password)
+                    .map_err(|_| AppError::BadUsernameOrPassword)?;
+                Scrypt
+                    .verify_password(given_password.as_bytes(), &password_hash)
+                    .map_err(|_| AppError::BadUsernameOrPassword)?;
+                return Ok(user.into());
+            }
+            Err(error) => {
+                // Hashing of the password is done even though the user was not found to reduce the risk of timing attacks
+                // Tracing of the hash is done to avoid compiler optimizing out the hash computation
+                let salt = SaltString::generate(&mut OsRng);
+                let _ = Scrypt
+                    .hash_password(given_password.as_bytes(), &salt)
+                    .and_then(|hash| {
+                        tracing::warn!(
+                            "Failed admin site authentication attempt with username {:?} and password hash starting with {:?}",
+                            given_name,
+                            &hash.to_string()[..5]
+                        );
+                        Ok(())
+                    });
+                return Err(error);
+            }
+        }
     }
 
     pub async fn list(conn: &mut PgConnection) -> Result<Vec<User>, AppError> {
