@@ -9,7 +9,6 @@ use clap::{arg, command, Args, Parser, Subcommand};
 use std::fs;
 use std::{process::exit, sync::Arc};
 use tokio::net::TcpListener;
-use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::{ServeDir, ServeFile};
 use tower_http::trace::TraceLayer;
 use tracing::info_span;
@@ -119,16 +118,6 @@ async fn serve(args: &ServeArgs) {
 
     if args.redoc {
         app = app.merge(Redoc::with_url("/redoc", doc::ApiDoc::openapi()));
-    }
-
-    // Enable CORS in debug mode, for easier development
-    if cfg!(debug_assertions) {
-        app = app.layer(
-            CorsLayer::new()
-                .allow_origin(Any)
-                .allow_methods(Any)
-                .allow_headers(Any),
-        );
     }
 
     if let Some(public_path) = &config.serve_public_path {
