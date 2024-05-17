@@ -117,11 +117,11 @@ async fn login(
     });
 
     let auth_cookie = Cookie::build(("token", token))
-        .path("/") //api/admin/
+        .path("/api/admin/")
         .secure(false)
         //.secure(true)  // #TODO : control this with a flag for dev/prod, or perhaps with a config setting
         .http_only(true)
-        .same_site(SameSite::None);
+        .same_site(SameSite::Strict);
 
     let jar = CookieJar::new().add(auth_cookie);
 

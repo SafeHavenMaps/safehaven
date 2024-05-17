@@ -12,14 +12,15 @@
       <InputText
         id="username"
         v-model="username"
-        type="text"
       />
       <label for="username">Username</label>
     </FloatLabel>
     <FloatLabel>
-      <InputText
+      <Password
         id="password"
         v-model="password"
+        :feedback="false"
+        toggle-mask
       />
       <label for="password">Password</label>
     </FloatLabel>
