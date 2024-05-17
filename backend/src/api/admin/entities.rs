@@ -16,13 +16,17 @@ use crate::{
 #[derive(Deserialize, Debug)]
 pub struct SearchQuery {
     pub search: String,
+    pub page: Option<i64>,
+    pub page_size: Option<i64>,
 }
 
 #[utoipa::path(
     get,
     path = "/api/admin/entities/search",
     params(
-        ("search" = String, Query, description = "Search query")
+        ("search" = String, Query, description = "Search query"),
+        ("page" = i64, Query, description = "Current page (default: 1)"),
+        ("page_size" = i64, Query, description = "Number of items per page (default: 20)")
     ),
     responses(
         (status = 200, description = "Search results for entities", body = Vec<ListedEntity>),
@@ -35,7 +39,12 @@ pub async fn search(
     DbConn(mut conn): DbConn,
     Query(query): Query<SearchQuery>,
 ) -> Result<AppJson<Vec<ListedEntity>>, AppError> {
-    Ok(AppJson(Entity::search(query.search, &mut conn).await?))
+    let page = query.page.unwrap_or(1);
+    let page_size = query.page_size.unwrap_or(20);
+
+    Ok(AppJson(
+        Entity::search(query.search, page, page_size, &mut conn).await?,
+    ))
 }
 
 #[utoipa::path(

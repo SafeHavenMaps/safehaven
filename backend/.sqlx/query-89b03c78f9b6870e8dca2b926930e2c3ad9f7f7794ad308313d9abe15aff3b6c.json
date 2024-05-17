@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT \n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                categories_ids as \"categories_ids!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                web_mercator_x as \"web_mercator_x!\",\n                web_mercator_y as \"web_mercator_y!\",\n                plain_text_location as \"plain_text_location!\"\n            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8)",
+  "query": "\n            SELECT \n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                categories_ids as \"categories_ids!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                web_mercator_x as \"web_mercator_x!\",\n                web_mercator_y as \"web_mercator_y!\",\n                plain_text_location as \"plain_text_location!\"\n            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
   "describe": {
     "columns": [
       {
@@ -63,7 +63,9 @@
         "UuidArray",
         "UuidArray",
         "UuidArray",
-        "UuidArray"
+        "UuidArray",
+        "Int8",
+        "Int8"
       ]
     },
     "nullable": [
@@ -79,5 +81,5 @@
       null
     ]
   },
-  "hash": "cb7b87f21906247975896c1fabeffcf8fb1f98bba6f29a67c51085545d6764aa"
+  "hash": "89b03c78f9b6870e8dca2b926930e2c3ad9f7f7794ad308313d9abe15aff3b6c"
 }

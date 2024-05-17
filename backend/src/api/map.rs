@@ -133,6 +133,8 @@ pub async fn view_request(
 pub struct SearchRequest {
     search_query: String,
     family_id: Uuid,
+    page: i64,
+    page_size: i64,
 }
 
 impl Display for SearchRequest {
@@ -174,6 +176,8 @@ async fn search_request(
         tags_list: token.perms.tags_policy.allow_list.clone(),
         exclude_categories_list: token.perms.categories_policy.force_exclude.clone(),
         exclude_tags_list: token.perms.tags_policy.force_exclude.clone(),
+        page: request.page,
+        page_size: request.page_size,
     };
 
     Ok(AppJson(

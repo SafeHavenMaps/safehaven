@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT e.id, e.display_name, e.category_id, e.created_at\n            FROM entities e\n            WHERE e.full_text_search_ts @@ to_tsquery($1)\n            ORDER BY created_at\n            ",
+  "query": "\n            SELECT e.id, e.display_name, e.category_id, e.created_at\n            FROM entities e\n            WHERE e.full_text_search_ts @@ to_tsquery($1)\n            ORDER BY ts_rank(e.full_text_search_ts, to_tsquery($1)) DESC\n            LIMIT $2\n            OFFSET $3\n            ",
   "describe": {
     "columns": [
       {
@@ -26,7 +26,9 @@
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Text",
+        "Int8",
+        "Int8"
       ]
     },
     "nullable": [
@@ -36,5 +38,5 @@
       false
     ]
   },
-  "hash": "2ae2803176f247a08c7dac400d300c84557bdf5e0eeac7d0b0ed1db15e861ded"
+  "hash": "817fbba8561bf9f2d9a8b5f77b4c843d8b4acff7d4841a9aa8dcf24e6dc55a07"
 }

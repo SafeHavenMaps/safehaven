@@ -135,6 +135,7 @@ pub enum AppError {
     Unauthorized,
     Validation(String),
     Database(sqlx::Error),
+    InvalidPagination,
 }
 
 #[derive(FromRequest)]
@@ -171,6 +172,7 @@ impl IntoResponse for AppError {
                 }
             },
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized", None),
+            AppError::InvalidPagination => (StatusCode::BAD_REQUEST, "invalid_pagination", None),
         };
 
         let resp = (

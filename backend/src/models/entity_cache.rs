@@ -90,6 +90,9 @@ pub struct SearchEntitiesRequest {
 
     pub exclude_categories_list: Vec<Uuid>,
     pub exclude_tags_list: Vec<Uuid>,
+
+    pub page: i64,
+    pub page_size: i64,
 }
 
 impl CachedEntity {
@@ -191,6 +194,10 @@ impl CachedEntity {
         request: SearchEntitiesRequest,
         conn: &mut PgConnection,
     ) -> Result<Vec<Self>, AppError> {
+        if (request.page_size < 1) || (request.page < 1) {
+            return Err(AppError::InvalidPagination);
+        }
+
         query_as!(
             Self,
             r#"
@@ -205,7 +212,7 @@ impl CachedEntity {
                 web_mercator_x as "web_mercator_x!",
                 web_mercator_y as "web_mercator_y!",
                 plain_text_location as "plain_text_location!"
-            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8)"#,
+            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)"#,
             request.search_query,
             request.family_id,
             request.allow_all_categories,
@@ -214,6 +221,8 @@ impl CachedEntity {
             &request.tags_list,
             &request.exclude_categories_list,
             &request.exclude_tags_list,
+            request.page_size,
+            (request.page - 1) * request.page_size
         )
         .fetch_all(conn)
         .await

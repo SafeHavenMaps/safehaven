@@ -99,7 +99,10 @@ CREATE OR REPLACE FUNCTION search_entities(
     tags_list UUID[],
 
     exclude_categories_list UUID[],
-    exclude_tags_list UUID[]
+    exclude_tags_list UUID[],
+
+    current_page BIGINT,
+    page_size BIGINT
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -135,6 +138,10 @@ BEGIN
             -- Tags
             AND
             (allow_all_tags OR (ec.tags_ids && tags_list))
-            AND NOT (ec.tags_ids && exclude_tags_list);
+            AND NOT (ec.tags_ids && exclude_tags_list)
+        ORDER BY ts_rank(full_text_search_ts, to_tsquery(search_query)) DESC
+        LIMIT page_size
+        OFFSET (current_page - 1) * page_size;
 END;
 $$ LANGUAGE plpgsql;
+

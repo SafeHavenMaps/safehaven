@@ -777,6 +777,26 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Current page (default: 1)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items per page (default: 20)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
@@ -3292,12 +3312,22 @@
         "type": "object",
         "required": [
           "search_query",
-          "family_id"
+          "family_id",
+          "page",
+          "page_size"
         ],
         "properties": {
           "family_id": {
             "type": "string",
             "format": "uuid"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "page_size": {
+            "type": "integer",
+            "format": "int64"
           },
           "search_query": {
             "type": "string"

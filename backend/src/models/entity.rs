@@ -278,17 +278,29 @@ impl Entity {
 
     pub async fn search(
         query: String,
+        page: i64,
+        page_size: i64,
         conn: &mut PgConnection,
     ) -> Result<Vec<ListedEntity>, AppError> {
+        if (page_size < 1) || (page < 1) {
+            return Err(AppError::InvalidPagination);
+        }
+
+        let offset = (page - 1) * page_size;
+
         sqlx::query_as!(
             ListedEntity,
             r#"
             SELECT e.id, e.display_name, e.category_id, e.created_at
             FROM entities e
             WHERE e.full_text_search_ts @@ to_tsquery($1)
-            ORDER BY created_at
+            ORDER BY ts_rank(e.full_text_search_ts, to_tsquery($1)) DESC
+            LIMIT $2
+            OFFSET $3
             "#,
-            query
+            query,
+            page_size,
+            offset
         )
         .fetch_all(conn)
         .await
