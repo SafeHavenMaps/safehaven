@@ -5,11 +5,6 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: true,
   },
-  runtimeConfig: {
-    public: {
-      apiUrl: process.env.API_URL || '/',
-    },
-  },
   css: [
     '~/assets/main.css',
     'primeflex/primeflex.css',

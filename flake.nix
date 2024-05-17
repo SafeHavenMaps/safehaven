@@ -96,6 +96,66 @@
           popd
         '';
 
+        nginxConfigFile = pkgs.writeText "" ''
+          daemon off;
+          error_log stderr info;
+          pid /tmp/nginx.pid;
+
+          worker_processes auto;
+
+          events {
+            worker_connections 1024;
+          }
+
+          http {
+            default_type application/octet-stream;
+
+            sendfile on;
+            keepalive_timeout 65;
+
+            access_log /dev/stdout;
+
+            server {
+              listen 4000;
+
+              location / {
+                proxy_pass http://localhost:3000;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+              }
+
+              location /api {
+                proxy_pass http://localhost:28669;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+              }
+            }
+          }
+
+        '';
+
+        processConfigFile = pkgs.writeText "process.yaml" ''
+          version: "0.5"
+          processes:
+            backend:
+              command: cargo run -- serve
+              working_dir: ./backend
+            frontend:
+              command: npm run dev
+              working_dir: ./frontend
+            reverse:
+              command: ${pkgs.nginx}/bin/nginx -c ${nginxConfigFile}
+        '';
+
+        startDevEnv = pkgs.writeShellScriptBin "start_dev_env" ''
+          set -e
+          ${pkgs.process-compose}/bin/process-compose -f ${processConfigFile}
+        '';
+
         # Version when compiling the packages
         version = builtins.readFile ./container_release;
 
@@ -161,6 +221,7 @@
               # Various scripts
               checkProject
               regenApi
+              startDevEnv
               # Backend
               sqlx-cli
               openssl
@@ -170,9 +231,10 @@
               fixedNode
               # Nix formatting
               alejandra.defaultPackage.${system}
+              # Process composing
+              process-compose
             ];
             DATABASE_URL = "postgres://postgres:postgres@localhost:5432/safehaven";
-            API_URL = "http://localhost:28669";
           };
         }
     );

@@ -4,9 +4,7 @@ import createAuthMiddleware from './auth-middleware'
 import type { FetchedEntity } from '~/lib'
 
 export default function useClient() {
-  const config = useRuntimeConfig()
-  const apiUrl = config.public.apiUrl
-  const client = createClient<paths>({ baseUrl: apiUrl })
+  const client = createClient<paths>({ baseUrl: '/' })
 
   return {
     authenticated: false,
