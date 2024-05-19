@@ -1,36 +1,34 @@
 import createClient from 'openapi-fetch'
 import type { paths } from './api'
-import createAuthMiddleware from './auth-middleware'
+import createAuthMiddleware from './viewer-auth-middleware'
 import type { FetchedEntity } from '~/lib'
 
 export default function useClient() {
-  const client = createClient<paths>({ baseUrl: '/' })
+  const rawClient = createClient<paths>({ baseUrl: '/' })
 
   return {
-    authenticated: false,
-    rawClient: client,
+    rawClient: rawClient,
 
     async checkStatus() {
-      const { data, error } = await client.GET('/api/status')
+      const { data, error } = await rawClient.GET('/api/status')
       if (error) throw error
       return data
     },
 
     async bootstrap(token: string) {
-      const { data, error } = await client.GET('/api/bootstrap/{token}', {
+      const { data, error } = await rawClient.GET('/api/bootstrap/{token}', {
         params: { path: { token }, query: { referrer: document.referrer } },
       })
       if (error) throw error
 
       // Install auth middleware to the stack. If it fails, ejects it.
-      this.authenticated = true
       const authMiddleware = createAuthMiddleware(data.signed_token, () => {
-        client.eject(authMiddleware)
+        rawClient.eject(authMiddleware)
         // ToDo: Handle lifecycle of the app when the token is invalid
         // Maybe refresh it using the bootstrapped token?
         // For now, the only fix is refreshing the page for the user
       })
-      client.use(authMiddleware)
+      rawClient.use(authMiddleware)
 
       return data
     },
@@ -45,11 +43,7 @@ export default function useClient() {
       zoomLevel: number,
       familyId: string,
     ) {
-      if (!this.authenticated) {
-        throw new Error('Not authenticated')
-      }
-
-      const { data, error } = await client.POST('/api/map/view', {
+      const { data, error } = await rawClient.POST('/api/map/view', {
         body: {
           xmin: rectangle.xmin,
           ymin: rectangle.ymin,
@@ -65,11 +59,7 @@ export default function useClient() {
     },
 
     async fetchEntity(id: string): Promise<FetchedEntity> {
-      if (!this.authenticated) {
-        throw new Error('Not authenticated')
-      }
-
-      const { data, error } = await client.GET('/api/map/entities/{id}', {
+      const { data, error } = await rawClient.GET('/api/map/entities/{id}', {
         params: { path: { id } },
       })
       if (error) throw error
