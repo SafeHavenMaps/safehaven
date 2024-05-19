@@ -2942,11 +2942,11 @@
       "LoginResponse": {
         "type": "object",
         "required": [
-          "status"
+          "is_admin"
         ],
         "properties": {
-          "status": {
-            "type": "string"
+          "is_admin": {
+            "type": "boolean"
           }
         }
       },

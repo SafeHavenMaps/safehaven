@@ -90,7 +90,7 @@ pub struct LoginRequest {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct LoginResponse {
-    status: String,
+    is_admin: bool,
 }
 
 #[utoipa::path(
@@ -127,7 +127,7 @@ async fn login(
 
     Ok(AppJsonWCookies {
         body: LoginResponse {
-            status: "200".to_owned(),
+            is_admin: auth_user.is_admin,
         },
         jar,
     })
