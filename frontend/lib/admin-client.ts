@@ -4,7 +4,6 @@ import createAuthMiddleware from './admin-auth-middleware'
 import type { FetchedEntity } from '~/lib'
 
 // client as a closure
-
 export default function useClient() {
   const rawClient = createClient<paths>({ baseUrl: '/',
     credentials: 'include', // Ensures cookies are sent with the request
