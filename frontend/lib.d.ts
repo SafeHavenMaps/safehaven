@@ -1,4 +1,4 @@
-// This file re-exports types from the API schema, and other convienient types
+// This file re-exports types from the API schema, and other convenient types
 // so that they can be easily imported in other files.
 
 import type { Coordinate } from 'ol/coordinate'
@@ -15,6 +15,7 @@ export type Tag = api.components['schemas']['Tag']
 export type CartographyInitConfig =
   api.components['schemas']['CartographyInitConfig']
 export type FetchedEntity = api.components['schemas']['FetchedEntity']
+export type ErrorResponse = api.components['schemas']['ErrorResponse']
 
 export interface CanBeHighlighted {
   highlighted: boolean
