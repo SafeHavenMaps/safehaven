@@ -2,9 +2,6 @@ pub mod admin;
 pub mod map;
 pub mod root;
 
-use axum_extra::extract::cookie::CookieJar;
-use std::{sync::Arc, time::Duration};
-
 use crate::{
     config::SafeHavenConfig,
     models::{
@@ -26,9 +23,9 @@ use axum_extra::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, PgConnection, Pool, Postgres};
+use std::{sync::Arc, time::Duration};
 use tokio::sync::RwLock;
 use utoipa::ToSchema;
-use uuid::Uuid;
 
 pub type DynOptions = Arc<RwLock<SafeHavenOptions>>;
 
@@ -152,21 +149,6 @@ where
     }
 }
 
-pub struct AppJsonWCookies<T> {
-    pub body: T,
-    pub jar: CookieJar,
-}
-
-impl<T> IntoResponse for AppJsonWCookies<T>
-where
-    axum::Json<T>: IntoResponse,
-{
-    fn into_response(self) -> Response {
-        println!("{:?}", self.jar);
-        (self.jar, axum::Json(self.body)).into_response()
-    }
-}
-
 #[derive(ToSchema, Serialize)]
 pub struct ErrorResponse {
     error_code: String,
@@ -231,51 +213,6 @@ where
 
         let token_data = jsonwebtoken::decode::<MapUserTokenClaims>(
             bearer.token(),
-            &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
-            &jsonwebtoken::Validation::default(),
-        )
-        .map_err(|_| AppError::TokenValidation)?;
-
-        Ok(Self(token_data.claims))
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AdminUserTokenClaims {
-    pub admin_id: Uuid,
-    pub username: String,
-    pub is_admin: bool,
-    pub exp: usize,
-    pub iat: usize,
-}
-
-pub struct AdminUserToken(AdminUserTokenClaims);
-
-#[async_trait]
-impl<S> FromRequestParts<S> for AdminUserToken
-where
-    S: Send + Sync,
-    AppState: FromRef<S>,
-{
-    type Rejection = AppError;
-
-    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let app_state = AppState::from_ref(state);
-
-        // Extract the token from the cookie jar
-        let cookies = parts
-            .extract::<CookieJar>()
-            .await
-            .map_err(|_| AppError::TokenValidation)?;
-
-        let token = cookies
-            .get("token")
-            .ok_or(AppError::TokenValidation)?
-            .value()
-            .to_string();
-
-        let token_data = jsonwebtoken::decode::<AdminUserTokenClaims>(
-            &token,
             &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
             &jsonwebtoken::Validation::default(),
         )

@@ -4,9 +4,11 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::{
-    api::{AdminUserToken, AppError, AppJson, DbConn},
+    api::{AppError, AppJson, DbConn},
     models::user::{NewUser, User},
 };
+
+use super::AdminUserTokenClaims;
 
 #[utoipa::path(
     get,
@@ -17,8 +19,7 @@ use crate::{
     )
 )]
 pub async fn list(
-    AdminUserToken(token): AdminUserToken,
-
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
 ) -> Result<AppJson<Vec<User>>, AppError> {
     if !token.is_admin {
@@ -38,8 +39,7 @@ pub async fn list(
     )
 )]
 pub async fn new(
-    AdminUserToken(token): AdminUserToken,
-
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Json(new_user): Json<NewUser>,
 ) -> Result<AppJson<User>, AppError> {
@@ -63,8 +63,7 @@ pub async fn new(
     )
 )]
 pub async fn get(
-    AdminUserToken(token): AdminUserToken,
-
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<User>, AppError> {
@@ -91,8 +90,7 @@ pub struct ChangePassword {
     )
 )]
 pub async fn change_self_password(
-    AdminUserToken(token): AdminUserToken,
-
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Json(change_password): Json<ChangePassword>,
 ) -> Result<AppJson<()>, AppError> {
@@ -115,8 +113,7 @@ pub async fn change_self_password(
     )
 )]
 pub async fn change_password(
-    AdminUserToken(token): AdminUserToken,
-
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(change_password): Json<ChangePassword>,
@@ -143,8 +140,7 @@ pub async fn change_password(
     )
 )]
 pub async fn delete(
-    AdminUserToken(token): AdminUserToken,
-
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {

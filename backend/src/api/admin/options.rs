@@ -4,9 +4,11 @@ use axum::{
 };
 
 use crate::{
-    api::{AdminUserToken, AppError, AppJson, AppState, DbConn},
+    api::{AppError, AppJson, AppState, DbConn},
     models::options::{ConfigurationOption, SafeHavenOptions},
 };
+
+use super::AdminUserTokenClaims;
 
 #[utoipa::path(
     get,
@@ -17,8 +19,7 @@ use crate::{
     )
 )]
 pub async fn get(
-    AdminUserToken(token): AdminUserToken,
-
+    token: AdminUserTokenClaims,
     State(app_state): State<AppState>,
 ) -> Result<AppJson<SafeHavenOptions>, AppError> {
     if !token.is_admin {
@@ -41,7 +42,7 @@ pub async fn get(
 )]
 pub async fn update(
     Path(name): Path<String>,
-    AdminUserToken(token): AdminUserToken,
+    token: AdminUserTokenClaims,
 
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,

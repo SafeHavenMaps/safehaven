@@ -15,6 +15,8 @@ pub struct SafeHavenConfig {
     pub token_secret: String,
     /// Path to serve public files from
     pub serve_public_path: Option<String>,
+    /// Secure cookie flag
+    pub secure_cookie: bool,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -39,6 +41,7 @@ impl Default for SafeHavenConfig {
             },
             token_secret: "SecretForValidatingAngSigningTokens".to_string(),
             serve_public_path: None,
+            secure_cookie: false,
         }
     }
 }

@@ -2,7 +2,7 @@ use axum::{extract::Path, Json};
 use uuid::Uuid;
 
 use crate::{
-    api::{AdminUserToken, AppError, AppJson, DbConn},
+    api::{AppError, AppJson, DbConn},
     models::tag::{NewOrUpdateTag, Tag},
 };
 
@@ -14,11 +14,7 @@ use crate::{
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn list(
-    AdminUserToken(_token): AdminUserToken,
-
-    DbConn(mut conn): DbConn,
-) -> Result<AppJson<Vec<Tag>>, AppError> {
+pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<Tag>>, AppError> {
     Ok(AppJson(Tag::list(&mut conn).await?))
 }
 
@@ -32,8 +28,6 @@ pub async fn list(
     )
 )]
 pub async fn new(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Json(new_tag): Json<NewOrUpdateTag>,
 ) -> Result<AppJson<Tag>, AppError> {
@@ -52,12 +46,7 @@ pub async fn new(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn get(
-    AdminUserToken(_token): AdminUserToken,
-
-    DbConn(mut conn): DbConn,
-    Path(id): Path<Uuid>,
-) -> Result<AppJson<Tag>, AppError> {
+pub async fn get(DbConn(mut conn): DbConn, Path(id): Path<Uuid>) -> Result<AppJson<Tag>, AppError> {
     Ok(AppJson(Tag::get(id, &mut conn).await?))
 }
 
@@ -75,8 +64,6 @@ pub async fn get(
     )
 )]
 pub async fn update(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(new_tag): Json<NewOrUpdateTag>,
@@ -97,8 +84,6 @@ pub async fn update(
     )
 )]
 pub async fn delete(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {

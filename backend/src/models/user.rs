@@ -98,6 +98,8 @@ impl User {
         Ok(())
     }
 
+    // We do not want the password hash to be optimized out, so we do not use map
+    #[allow(clippy::bind_instead_of_map)]
     pub async fn authenticate(
         given_name: String,
         given_password: String,
@@ -119,7 +121,8 @@ impl User {
                 Scrypt
                     .verify_password(given_password.as_bytes(), &password_hash)
                     .map_err(|_| AppError::BadUsernameOrPassword)?;
-                return Ok(user.into());
+
+                Ok(user.into())
             }
             Err(error) => {
                 // Hashing of the password is done even though the user was not found to reduce the risk of timing attacks
@@ -135,7 +138,8 @@ impl User {
                         );
                         Ok(())
                     });
-                return Err(error);
+
+                Err(error)
             }
         }
     }

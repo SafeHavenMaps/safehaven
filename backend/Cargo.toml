@@ -28,7 +28,6 @@ tracing = "0.1"
 tower-http = { version = "0.5", features = ["fs", "trace", "cors"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 utoipa = { version = "4.2.0", features = ["axum_extras", "uuid", "chrono"] }
-utoipa-redoc = { version = "3.0.0", features = ["axum"] }
 clap = { version = "4", features = ["derive"] }
 clap_derive = { version = "4" }
 number_range = "0.3.2"

@@ -48,7 +48,7 @@ pub struct Cluster {
 impl Cluster {
     fn calculate_id(&mut self) {
         self.id = crc32fast::hash(
-            format!("{}-{}-{}", self.center_x, self.center_y, self.count).as_bytes(),
+            format!("{:.4}-{:.4}-{}", self.center_x, self.center_y, self.count).as_bytes(),
         );
     }
 }

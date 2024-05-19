@@ -14,7 +14,6 @@ use tower_http::trace::TraceLayer;
 use tracing::info_span;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use utoipa::OpenApi;
-use utoipa_redoc::{Redoc, Servable};
 
 #[derive(Parser)]
 #[command(name = "safehaven", about = "SafeHaven API server")]
@@ -98,7 +97,7 @@ async fn serve(args: &ServeArgs) {
     let mut app = Router::new()
         .nest("/api/", api::root::routes())
         .nest("/api/map", api::map::routes())
-        .nest("/api/admin", api::admin::routes())
+        .nest("/api/admin", api::admin::routes(&app_state))
         .with_state(app_state)
         .layer(
             TraceLayer::new_for_http().make_span_with(|request: &Request<_>| {
@@ -115,10 +114,6 @@ async fn serve(args: &ServeArgs) {
                 )
             }),
         );
-
-    if args.redoc {
-        app = app.merge(Redoc::with_url("/redoc", doc::ApiDoc::openapi()));
-    }
 
     if let Some(public_path) = &config.serve_public_path {
         let serve_dir = ServeDir::new(public_path)

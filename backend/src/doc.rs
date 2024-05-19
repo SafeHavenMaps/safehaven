@@ -39,6 +39,7 @@ use utoipa::OpenApi;
         map::new_entity,
         // admin
         admin::login,
+        admin::logout,
         // admin::options
         options::get,
         options::update,

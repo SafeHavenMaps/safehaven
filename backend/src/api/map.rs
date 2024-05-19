@@ -82,7 +82,6 @@ fn is_token_allowed_for_family(token: &MapUserTokenClaims, family_id: &Uuid) -> 
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
-#[axum::debug_handler]
 pub async fn view_request(
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,

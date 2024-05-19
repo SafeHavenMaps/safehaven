@@ -1,5 +1,5 @@
 use crate::{
-    api::{AdminUserToken, AppError, AppJson, DbConn},
+    api::{AppError, AppJson, DbConn},
     models::access_token::{AccessToken, NewOrUpdateAccessToken},
 };
 use axum::{extract::Path, Json};
@@ -13,11 +13,7 @@ use uuid::Uuid;
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn list(
-    AdminUserToken(_token): AdminUserToken,
-
-    DbConn(mut conn): DbConn,
-) -> Result<AppJson<Vec<AccessToken>>, AppError> {
+pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<AccessToken>>, AppError> {
     Ok(AppJson(AccessToken::list(&mut conn).await?))
 }
 
@@ -31,8 +27,6 @@ pub async fn list(
     )
 )]
 pub async fn new(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Json(new_access_token): Json<NewOrUpdateAccessToken>,
 ) -> Result<AppJson<AccessToken>, AppError> {
@@ -54,8 +48,6 @@ pub async fn new(
     )
 )]
 pub async fn get(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<AccessToken>, AppError> {
@@ -76,8 +68,6 @@ pub async fn get(
     )
 )]
 pub async fn update(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(new_access_token): Json<NewOrUpdateAccessToken>,
@@ -100,8 +90,6 @@ pub async fn update(
     )
 )]
 pub async fn delete(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {

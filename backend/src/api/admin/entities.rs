@@ -6,12 +6,14 @@ use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::{
-    api::{AdminUserToken, AppError, AppJson, DbConn},
+    api::{AppError, AppJson, DbConn},
     models::{
         comment::{Comment, ListedComment},
         entity::{Entity, ListedEntity, NewEntity, UpdateEntity},
     },
 };
+
+use super::AdminUserTokenClaims;
 
 #[derive(Deserialize, Debug)]
 pub struct SearchQuery {
@@ -34,8 +36,6 @@ pub struct SearchQuery {
     )
 )]
 pub async fn search(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Query(query): Query<SearchQuery>,
 ) -> Result<AppJson<Vec<ListedEntity>>, AppError> {
@@ -55,11 +55,7 @@ pub async fn search(
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn pending(
-    AdminUserToken(_token): AdminUserToken,
-
-    DbConn(mut conn): DbConn,
-) -> Result<AppJson<Vec<ListedEntity>>, AppError> {
+pub async fn pending(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<ListedEntity>>, AppError> {
     Ok(AppJson(Entity::pending(&mut conn).await?))
 }
 
@@ -73,8 +69,6 @@ pub async fn pending(
     )
 )]
 pub async fn new(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Json(new_entity): Json<NewEntity>,
 ) -> Result<AppJson<Entity>, AppError> {
@@ -94,8 +88,6 @@ pub async fn new(
     )
 )]
 pub async fn get(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<Entity>, AppError> {
@@ -116,8 +108,7 @@ pub async fn get(
     )
 )]
 pub async fn update(
-    AdminUserToken(token): AdminUserToken,
-
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(mut updated_entity): Json<UpdateEntity>,
@@ -143,8 +134,6 @@ pub async fn update(
     )
 )]
 pub async fn delete(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
@@ -164,8 +153,6 @@ pub async fn delete(
     )
 )]
 pub async fn get_comments(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<Vec<ListedComment>>, AppError> {
@@ -185,8 +172,6 @@ pub async fn get_comments(
     )
 )]
 pub async fn register_parent(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path((parent_id, child_id)): Path<(Uuid, Uuid)>,
 ) -> Result<AppJson<()>, AppError> {
@@ -208,8 +193,6 @@ pub async fn register_parent(
     )
 )]
 pub async fn remove_parent(
-    AdminUserToken(_token): AdminUserToken,
-
     DbConn(mut conn): DbConn,
     Path((parent_id, child_id)): Path<(Uuid, Uuid)>,
 ) -> Result<AppJson<()>, AppError> {

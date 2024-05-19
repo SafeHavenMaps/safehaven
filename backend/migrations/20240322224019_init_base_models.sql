@@ -10,6 +10,12 @@ CREATE TABLE users (
 );
 CREATE INDEX users_name_idx ON users(name);
 
+CREATE TABLE options (
+    name VARCHAR(255) NOT NULL,
+    value JSONB NOT NULL
+);
+CREATE UNIQUE INDEX options_name_uindex ON options (name);
+
 CREATE TABLE families (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,

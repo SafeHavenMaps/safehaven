@@ -1350,7 +1350,7 @@
         }
       }
     },
-    "/api/admin/login": {
+    "/api/admin/session": {
       "post": {
         "tags": [
           "admin"
@@ -1384,6 +1384,27 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "User or password not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Cookie jar cleaned"
           },
           "404": {
             "description": "User or password not found",
@@ -2928,11 +2949,15 @@
         "type": "object",
         "required": [
           "username",
-          "password"
+          "password",
+          "remember_me"
         ],
         "properties": {
           "password": {
             "type": "string"
+          },
+          "remember_me": {
+            "type": "boolean"
           },
           "username": {
             "type": "string"
