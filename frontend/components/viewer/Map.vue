@@ -23,6 +23,7 @@
         v-for="entity in props.entities"
         :key="entity.id"
         :position="entity.coordinates"
+        :stop-event="false"
       >
         <ViewerMapMarker
           :callback-item="entity"
@@ -39,6 +40,7 @@
         v-for="cluster in props.clusters"
         :key="cluster"
         :position="cluster.coordinates"
+        :stop-event="false"
       >
         <ViewerMapCluster
           :callback-item="cluster"
@@ -100,19 +102,11 @@ function zoomTo(coordinates: Coordinate) {
   })
 }
 
-function centerTo(coordinates: Coordinate) {
-  map!.getView().animate({
-    center: coordinates,
-    duration: 500,
-  })
-}
-
 async function handleClusterClick(cluster: DisplayableCluster) {
   zoomTo(cluster.coordinates)
 }
 
 async function handleEntityClick(entity: DisplayableCachedEntity) {
-  centerTo(entity.coordinates)
   state.selectedCachedEntity(entity)
 }
 </script>

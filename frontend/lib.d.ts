@@ -9,7 +9,13 @@ export type Status = api.components['schemas']['StatusResponse']
 export type Entity = api.components['schemas']['Entity']
 export type Cluster = api.components['schemas']['Cluster']
 export type CachedEntity = api.components['schemas']['CachedEntity']
-export type Family = api.components['schemas']['Family']
+
+export
+export type Family = Omit<api.components['schemas']['Family'], 'entity_form' | 'comment_form'> & {
+  entity_form: api.components['schemas']['Form']
+  comment_form: api.components['schemas']['Form']
+}
+
 export type Category = api.components['schemas']['Category']
 export type Tag = api.components['schemas']['Tag']
 export type CartographyInitConfig =

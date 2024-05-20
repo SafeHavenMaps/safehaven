@@ -1,15 +1,16 @@
 <template>
   <Toolbar>
     <template #start>
-      <div class="grid nested-grid align-items-center -my-5 px-4">
-        <div class="col-2">
+      <div class="flex align-items-center">
+        <div class="flex-shrink-0">
           <img
-            class="max-h-2rem"
+            height="40"
+            width="40"
             alt="icon"
             :src="state.logo ?? defaultLogo"
           >
         </div>
-        <div class="col-10">
+        <div class="flex-grow-1 pl-3">
           <h3 class="my-0">
             {{ state.title }}
           </h3>
@@ -79,5 +80,5 @@
 
 <script setup lang="ts">
 import state from '~/lib/viewer-state'
-import defaultLogo from '~/assets/default-logo.png'
+import defaultLogo from '~/assets/logo_square.svg'
 </script>

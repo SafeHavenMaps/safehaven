@@ -47,7 +47,16 @@ export class AppState {
   private _activeEntity: FetchedEntity | null = null
 
   get activeEntity() {
-    return this._activeEntity
+    if (this._activeEntity === null) {
+      return null
+    }
+
+    return {
+      ...this._activeEntity!,
+      family: this.familiesLookupTable[this._activeEntity!.entity.family_id],
+      category: this.categoriesLookupTable[this._activeEntity!.entity.category_id],
+      tags: this._activeEntity!.entity.tags.map(tagId => this.tagsLookupTable[tagId]),
+    }
   }
 
   private status: Status | null = null
