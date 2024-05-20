@@ -76,6 +76,10 @@ pub struct FindEntitiesRequest {
     pub exclude_tags_list: Vec<Uuid>,
 
     pub cluster_params: Option<(f64, i32)>,
+
+    pub active_categories: Vec<Uuid>,
+    pub active_required_tags: Vec<Uuid>,
+    pub active_hidden_tags: Vec<Uuid>,
 }
 
 pub struct SearchEntitiesRequest {
@@ -93,6 +97,10 @@ pub struct SearchEntitiesRequest {
 
     pub page: i64,
     pub page_size: i64,
+
+    pub active_categories: Vec<Uuid>,
+    pub active_required_tags: Vec<Uuid>,
+    pub active_hidden_tags: Vec<Uuid>,
 }
 
 impl CachedEntity {
@@ -121,6 +129,9 @@ impl CachedEntity {
                 cluster_center_x,
                 cluster_center_y
             FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+            WHERE $14 && categories_ids
+                AND (array_length($15::uuid[], 1) = 0 OR $15::uuid[] <@ tags_ids)
+                AND NOT (tags_ids && $16::uuid[]);
             "#,
             request.xmin,
             request.ymin,
@@ -134,7 +145,10 @@ impl CachedEntity {
             &request.exclude_categories_list,
             &request.exclude_tags_list,
             request.cluster_params.map(|(eps, _)| eps).unwrap_or(0.0),
-            request.cluster_params.map(|(_, min)| min).unwrap_or(0)
+            request.cluster_params.map(|(_, min)| min).unwrap_or(0),
+            &request.active_categories,
+            &request.active_required_tags,
+            &request.active_hidden_tags
         )
         .fetch_all(conn)
         .await
@@ -212,7 +226,11 @@ impl CachedEntity {
                 web_mercator_x as "web_mercator_x!",
                 web_mercator_y as "web_mercator_y!",
                 plain_text_location as "plain_text_location!"
-            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)"#,
+            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+            WHERE $11 && categories_ids
+                AND (array_length($12::uuid[], 1) = 0 OR $12::uuid[] <@ tags_ids)
+                AND NOT (tags_ids && $13::uuid[]);
+            "#,
             request.search_query,
             request.family_id,
             request.allow_all_categories,
@@ -222,7 +240,10 @@ impl CachedEntity {
             &request.exclude_categories_list,
             &request.exclude_tags_list,
             request.page_size,
-            (request.page - 1) * request.page_size
+            (request.page - 1) * request.page_size,
+            &request.active_categories,
+            &request.active_required_tags,
+            &request.active_hidden_tags
         )
         .fetch_all(conn)
         .await

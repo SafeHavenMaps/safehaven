@@ -57,6 +57,7 @@
       <Tag
         v-for="value in getKeyValue(field.key)"
         :key="value"
+        class="mr-1 mb-1"
       >
         {{ getValueForEnum(field.key, value) }}
       </Tag>
@@ -77,6 +78,7 @@
 <script setup>
 import DOMPurify from 'dompurify'
 
+// eslint-disable-next-line vue/require-prop-types
 const props = defineProps(['fields', 'data'])
 
 function isUrlField(key) {

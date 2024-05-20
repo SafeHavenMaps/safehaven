@@ -33,6 +33,9 @@ pub struct ViewRequest {
     xmax: f64,
     ymax: f64,
     zoom_level: u8,
+    active_categories: Vec<Uuid>,
+    active_required_tags: Vec<Uuid>,
+    active_hidden_tags: Vec<Uuid>,
 }
 
 impl Display for ViewRequest {
@@ -110,17 +113,16 @@ pub async fn viewer_view_request(
         xmax: request.xmax,
         ymax: request.ymax,
         family_id: request.family_id,
-
         allow_all_categories: token.perms.categories_policy.allow_all,
         allow_all_tags: token.perms.tags_policy.allow_all,
-
         categories_list: token.perms.categories_policy.allow_list.clone(),
         tags_list: token.perms.tags_policy.allow_list.clone(),
-
         exclude_categories_list: token.perms.categories_policy.force_exclude.clone(),
         exclude_tags_list: token.perms.tags_policy.force_exclude.clone(),
-
         cluster_params,
+        active_categories: request.active_categories,
+        active_required_tags: request.active_required_tags,
+        active_hidden_tags: request.active_hidden_tags,
     };
 
     Ok(AppJson(
@@ -134,6 +136,9 @@ pub struct SearchRequest {
     family_id: Uuid,
     page: i64,
     page_size: i64,
+    active_categories: Vec<Uuid>,
+    active_required_tags: Vec<Uuid>,
+    active_hidden_tags: Vec<Uuid>,
 }
 
 impl Display for SearchRequest {
@@ -177,6 +182,9 @@ async fn viewer_search_request(
         exclude_tags_list: token.perms.tags_policy.force_exclude.clone(),
         page: request.page,
         page_size: request.page_size,
+        active_categories: request.active_categories,
+        active_required_tags: request.active_required_tags,
+        active_hidden_tags: request.active_hidden_tags,
     };
 
     Ok(AppJson(

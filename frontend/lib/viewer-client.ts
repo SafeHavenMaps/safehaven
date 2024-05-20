@@ -42,6 +42,9 @@ export default function useClient() {
       },
       zoomLevel: number,
       familyId: string,
+      activeCategories: string[],
+      activeRequiredTags: string[],
+      activeHiddenTags: string[],
     ) {
       const { data, error } = await rawClient.POST('/api/map/view', {
         body: {
@@ -51,6 +54,9 @@ export default function useClient() {
           ymax: rectangle.ymax,
           zoom_level: zoomLevel,
           family_id: familyId,
+          active_categories: activeCategories,
+          active_required_tags: activeRequiredTags,
+          active_hidden_tags: activeHiddenTags,
         },
       })
       if (error) throw error

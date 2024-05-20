@@ -3100,9 +3100,13 @@
         "type": "object",
         "required": [
           "title",
-          "is_filter"
+          "is_filter",
+          "default_filter_status"
         ],
         "properties": {
+          "default_filter_status": {
+            "type": "boolean"
+          },
           "filter_description": {
             "type": "string",
             "nullable": true
@@ -3347,9 +3351,33 @@
           "search_query",
           "family_id",
           "page",
-          "page_size"
+          "page_size",
+          "active_categories",
+          "active_required_tags",
+          "active_hidden_tags"
         ],
         "properties": {
+          "active_categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "active_hidden_tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "active_required_tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           "family_id": {
             "type": "string",
             "format": "uuid"
@@ -3395,9 +3423,13 @@
         "required": [
           "id",
           "title",
-          "is_filter"
+          "is_filter",
+          "default_filter_status"
         ],
         "properties": {
+          "default_filter_status": {
+            "type": "boolean"
+          },
           "filter_description": {
             "type": "string",
             "nullable": true
@@ -3554,9 +3586,33 @@
           "ymin",
           "xmax",
           "ymax",
-          "zoom_level"
+          "zoom_level",
+          "active_categories",
+          "active_required_tags",
+          "active_hidden_tags"
         ],
         "properties": {
+          "active_categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "active_hidden_tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "active_required_tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           "family_id": {
             "type": "string",
             "format": "uuid"

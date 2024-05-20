@@ -46,6 +46,21 @@ export class AppState {
 
   private _activeEntity: FetchedEntity | null = null
 
+  private filteringTags: (Tag & { active: boolean | null })[] = []
+  private filteringCategories: (Category & { active: boolean })[] = []
+
+  get activeFilteringCategories() {
+    return this.filteringCategories.filter(c => c.active).map(c => c.id)
+  }
+
+  get activeRequiredTags() {
+    return this.filteringTags.filter(t => t.active).map(t => t.id)
+  }
+
+  get activeHiddenTags() {
+    return this.filteringTags.filter(t => t.active === false).map(t => t.id)
+  }
+
   get activeEntity() {
     if (this._activeEntity === null) {
       return null
@@ -75,6 +90,14 @@ export class AppState {
 
   set activeFamily(family: Family) {
     this.activeFamilyId = family.id
+    this.filteringCategories = this.categories
+      .filter(c => c.family_id === family.id)
+      .map((c) => {
+        return {
+          ...c,
+          active: c.default_status,
+        }
+      })
   }
 
   get online() {
@@ -116,6 +139,12 @@ export class AppState {
     this.familiesData = data.families
     this.categoriesData = data.categories
     this.tagsData = data.tags
+    this.filteringTags = this.tagsData.map((tag) => {
+      return {
+        ...tag,
+        active: tag.default_filter_status ? null : false,
+      }
+    })
     this.cartographyInitConfigData = data.cartography_init_config
 
     this.familiesData.forEach((family) => {
@@ -134,7 +163,7 @@ export class AppState {
       throw new Error('No families available')
     }
 
-    this.activeFamilyId = this.familiesData[0].id
+    this.activeFamily = this.familiesData[0]
 
     this.initialized = true
   }
@@ -202,6 +231,9 @@ export class AppState {
       },
       zoom,
       this.activeFamilyId!,
+      this.activeFilteringCategories,
+      this.activeRequiredTags,
+      this.activeHiddenTags,
     )
 
     // Step 1: Identify and filter out entities that are no longer present

@@ -9,6 +9,7 @@ pub struct Tag {
     pub id: Uuid,
     pub title: String,
     pub is_filter: bool,
+    pub default_filter_status: bool,
     pub filter_description: Option<String>,
 }
 
@@ -17,6 +18,7 @@ pub struct NewOrUpdateTag {
     pub title: String,
     pub is_filter: bool,
     pub filter_description: Option<String>,
+    pub default_filter_status: bool,
 }
 
 impl Tag {
@@ -24,13 +26,14 @@ impl Tag {
         sqlx::query_as!(
             Tag,
             r#"
-            INSERT INTO tags (title, is_filter, filter_description)
-            VALUES ($1, $2, $3)
-            RETURNING id, title, is_filter, filter_description
+            INSERT INTO tags (title, is_filter, filter_description, default_filter_status)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id, title, is_filter, filter_description, default_filter_status
             "#,
             tag.title,
             tag.is_filter,
-            tag.filter_description
+            tag.filter_description,
+            tag.default_filter_status
         )
         .fetch_one(conn)
         .await
@@ -48,7 +51,7 @@ impl Tag {
             UPDATE tags
             SET title = $2, is_filter = $3, filter_description = $4
             WHERE id = $1
-            RETURNING id, title, is_filter, filter_description
+            RETURNING id, title, is_filter, filter_description, default_filter_status
             "#,
             given_id,
             update.title,
@@ -79,7 +82,7 @@ impl Tag {
         sqlx::query_as!(
             Tag,
             r#"
-            SELECT id, title, is_filter, filter_description
+            SELECT id, title, is_filter, filter_description, default_filter_status
             FROM tags
             WHERE id = $1
             "#,
@@ -94,7 +97,7 @@ impl Tag {
         sqlx::query_as!(
             Tag,
             r#"
-            SELECT id, title, is_filter, filter_description
+            SELECT id, title, is_filter, filter_description, default_filter_status
             FROM tags
             "#
         )
@@ -110,7 +113,7 @@ impl Tag {
         sqlx::query_as!(
             Tag,
             r#"
-            SELECT id, title, is_filter, filter_description
+            SELECT id, title, is_filter, filter_description, default_filter_status
             FROM tags
             WHERE id = ANY($1)
             "#,

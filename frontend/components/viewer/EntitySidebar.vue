@@ -94,7 +94,9 @@
           </div>
 
           <div>
-            <h3>Lieux de consultations</h3>
+            <h3>
+              {{ state.activeEntity?.entity.locations.length > 1 ? 'Adresses' : 'Adresse' }}
+            </h3>
             <ul>
               <li
                 v-for="location in state.activeEntity?.entity.locations"
@@ -176,13 +178,16 @@
           v-if="hasComments()"
           header="Commentaires"
         >
-          <Accordion :active-index="null">
+          <Accordion :active-index="0">
             <AccordionTab
               v-for="comment in sortedComments()"
               :key="comment.id"
               :header="commentDisplayTitle(comment)"
             >
-              <p v-html="commentWithBreaks(comment.text)" />
+              <p
+                style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;"
+                v-html="commentWithBreaks(comment.text)"
+              />
 
               <ViewerSidebarFormFields
                 :fields="state.activeEntity?.family.comment_form.fields"
@@ -209,23 +214,16 @@ function commentWithBreaks(txt) {
 }
 
 function discreteScoreAveragesOnComments() {
-  const discreteScoreFields = state.activeEntity.family.comment_form.fields
-    .sort((a, b) => a.display_weight - b.display_weight)
+  return state.activeEntity.family.comment_form.fields
     .filter(f => f.field_type === 'DiscreteScore')
-
-  const discreteScoreAverages = []
-
-  discreteScoreFields.forEach((field) => {
-    const scores = state.activeEntity.comments.map(c => c.data[field.key])
-    const average = scores.reduce((acc, score) => acc + score, 0) / scores.length
-    discreteScoreAverages.push({
+    .sort((a, b) => a.display_weight - b.display_weight)
+    .map(field => ({
       key: field.key,
       display_name: field.display_name,
-      average,
-    })
-  })
-
-  return discreteScoreAverages
+      average: state.activeEntity.comments
+        .map(c => c.data[field.key])
+        .reduce((acc, score) => acc + score, 0) / state.activeEntity.comments.length,
+    }))
 }
 
 function hasScores() {
@@ -243,7 +241,6 @@ function hasChildren() {
 }
 
 function hasParent() {
-  console.log(state.activeEntity.parents)
   return state.activeEntity.parents.length > 0
 }
 
@@ -252,6 +249,7 @@ function getCategory(category_id) {
 }
 
 function sortedComments() {
-  return state.activeEntity.comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+  return state.activeEntity.comments
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 }
 </script>
