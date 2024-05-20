@@ -12,9 +12,9 @@ export default function useClient() {
   return {
     rawClient: rawClient,
 
-    async bootstrap(username: string, password: string) {
-      const { data, error } = await rawClient.POST('/api/admin/login', {
-        body: { password: password, username: username },
+    async bootstrap(username: string, password: string, remember_me: boolean) {
+      const { data, error } = await rawClient.POST('/api/admin/session', {
+        body: { password: password, username: username, remember_me: remember_me },
       })
 
       if (error) throw error

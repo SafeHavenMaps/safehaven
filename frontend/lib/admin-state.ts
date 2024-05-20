@@ -32,8 +32,8 @@ export class AppState {
     return this.status!.safe_mode
   }
 
-  async initWithUsernamePassword(username: string, password: string) {
-    await client.bootstrap(username, password)
+  async initWithUsernamePassword(username: string, password: string, remember_me: boolean) {
+    await client.bootstrap(username, password, remember_me)
     this.initialized = true
   }
 
