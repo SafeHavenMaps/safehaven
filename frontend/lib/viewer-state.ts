@@ -187,6 +187,10 @@ export class AppState {
     this._activeEntity = await this.client.fetchEntity(cacheEntity.entity_id)
   }
 
+  async selectEntity(id: string) {
+    this._activeEntity = await this.client.fetchEntity(id)
+  }
+
   async refreshView(extent: Extent, zoomLevel: number) {
     const zoom = Math.round(zoomLevel)
     const newViewData = await this.client.getEntitiesWithinBounds(

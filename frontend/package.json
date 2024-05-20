@@ -15,7 +15,6 @@
     "@nuxt/eslint": "^0.3.10",
     "@types/dompurify": "^3.0.5",
     "dompurify": "^3.1.4",
-    "eslint-plugin-risxss": "^2.1.0",
     "nuxt": "^3.11.2",
     "nuxt-primevue": "^0.3.1",
     "ol": "^9.1.0",
