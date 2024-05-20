@@ -35,7 +35,7 @@ pub struct SearchQuery {
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn search(
+pub async fn admin_entities_search(
     DbConn(mut conn): DbConn,
     Query(query): Query<SearchQuery>,
 ) -> Result<AppJson<Vec<ListedEntity>>, AppError> {
@@ -55,7 +55,9 @@ pub async fn search(
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn pending(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<ListedEntity>>, AppError> {
+pub async fn admin_entities_pending(
+    DbConn(mut conn): DbConn,
+) -> Result<AppJson<Vec<ListedEntity>>, AppError> {
     Ok(AppJson(Entity::pending(&mut conn).await?))
 }
 
@@ -68,7 +70,7 @@ pub async fn pending(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<ListedEntit
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn new(
+pub async fn admin_entity_new(
     DbConn(mut conn): DbConn,
     Json(new_entity): Json<NewEntity>,
 ) -> Result<AppJson<Entity>, AppError> {
@@ -87,7 +89,7 @@ pub async fn new(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn get(
+pub async fn admin_entity_get(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<Entity>, AppError> {
@@ -107,7 +109,7 @@ pub async fn get(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn update(
+pub async fn admin_entity_update(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
@@ -133,7 +135,7 @@ pub async fn update(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn delete(
+pub async fn admin_entity_delete(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
@@ -152,7 +154,7 @@ pub async fn delete(
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn get_comments(
+pub async fn admin_entity_get_comments(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<Vec<ListedComment>>, AppError> {
@@ -171,7 +173,7 @@ pub async fn get_comments(
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn register_parent(
+pub async fn admin_entity_register_parent(
     DbConn(mut conn): DbConn,
     Path((parent_id, child_id)): Path<(Uuid, Uuid)>,
 ) -> Result<AppJson<()>, AppError> {
@@ -192,7 +194,7 @@ pub async fn register_parent(
         (status = 404, description = "Relationship not found", body = ErrorResponse),
     )
 )]
-pub async fn remove_parent(
+pub async fn admin_entity_remove_parent(
     DbConn(mut conn): DbConn,
     Path((parent_id, child_id)): Path<(Uuid, Uuid)>,
 ) -> Result<AppJson<()>, AppError> {

@@ -18,11 +18,11 @@ use super::MapUserTokenClaims;
 
 pub fn routes() -> Router<AppState> {
     Router::new()
-        .route("/view", post(view_request))
-        .route("/search", post(search_request))
-        .route("/entities/:id", get(fetch_entity))
-        .route("/entities", post(new_entity))
-        .route("/comments", post(new_comment))
+        .route("/view", post(viewer_view_request))
+        .route("/search", post(viewer_search_request))
+        .route("/entities/:id", get(viewer_fetch_entity))
+        .route("/entities", post(viewer_new_entity))
+        .route("/comments", post(viewer_new_comment))
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -82,7 +82,7 @@ fn is_token_allowed_for_family(token: &MapUserTokenClaims, family_id: &Uuid) -> 
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
-pub async fn view_request(
+pub async fn viewer_view_request(
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
     MapUserToken(token): MapUserToken,
@@ -155,7 +155,7 @@ impl Display for SearchRequest {
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
-async fn search_request(
+async fn viewer_search_request(
     DbConn(mut conn): DbConn,
     MapUserToken(token): MapUserToken,
     Json(request): Json<SearchRequest>,
@@ -198,7 +198,7 @@ pub struct NewEntityRequest {
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
-async fn new_entity(
+async fn viewer_new_entity(
     DbConn(mut conn): DbConn,
     MapUserToken(_token): MapUserToken,
     Json(request): Json<NewEntityRequest>,
@@ -221,7 +221,7 @@ pub struct NewCommentRequest {
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
-async fn new_comment(
+async fn viewer_new_comment(
     DbConn(mut conn): DbConn,
     MapUserToken(_token): MapUserToken,
     Json(request): Json<NewCommentRequest>,
@@ -247,7 +247,7 @@ pub struct FetchedEntity {
         (status = 404, description = "Entity not found", body = ErrorResponse),
     )
 )]
-async fn fetch_entity(
+async fn viewer_fetch_entity(
     DbConn(mut conn): DbConn,
     MapUserToken(token): MapUserToken,
     Path(id): Path<Uuid>,

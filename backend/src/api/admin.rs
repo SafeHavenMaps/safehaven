@@ -30,66 +30,90 @@ const REFRESH_TOKEN_COOKIE_NAME: &str = "refresh_token";
 
 pub fn routes(state: &AppState) -> Router<AppState> {
     let unauthenticated_router: Router<AppState> = Router::new()
-        .route("/session", post(login))
-        .route("/session", delete(logout));
+        .route("/session", post(admin_login))
+        .route("/session", delete(admin_logout));
 
     let authenticated_router: Router<AppState> = Router::new()
         // options
-        .route("/options", get(options::get))
-        .route("/options/:name", put(options::update))
+        .route("/options", get(options::admin_options_get))
+        .route("/options/:name", put(options::admin_options_update))
         // users
-        .route("/users", get(users::list))
-        .route("/users", post(users::new))
-        .route("/users/:id", get(users::get))
-        .route("/users/self/password", put(users::change_self_password))
-        .route("/users/:id/password", put(users::change_password))
-        .route("/users/:id", delete(users::delete))
-        // access_tokens
-        .route("/access_tokens", get(access_tokens::list))
-        .route("/access_tokens", post(access_tokens::new))
-        .route("/access_tokens/:id", get(access_tokens::get))
-        .route("/access_tokens/:id", put(access_tokens::update))
-        .route("/access_tokens/:id", delete(access_tokens::delete))
-        // families
-        .route("/families", get(families::list))
-        .route("/families", post(families::new))
-        .route("/families/:id", get(families::get))
-        .route("/families/:id", put(families::update))
-        .route("/families/:id", delete(families::delete))
-        // categories
-        .route("/categories", get(categories::list))
-        .route("/categories", post(categories::new))
-        .route("/categories/:id", get(categories::get))
-        .route("/categories/:id", put(categories::update))
-        .route("/categories/:id", delete(categories::delete))
-        // tags
-        .route("/tags", get(tags::list))
-        .route("/tags", post(tags::new))
-        .route("/tags/:id", get(tags::get))
-        .route("/tags/:id", put(tags::update))
-        .route("/tags/:id", delete(tags::delete))
-        // entities
-        .route("/entities/pending", get(entities::pending))
-        .route("/entities/search", get(entities::search))
-        .route("/entities", post(entities::new))
-        .route("/entities/:id", get(entities::get))
-        .route("/entities/:id", put(entities::update))
-        .route("/entities/:id", delete(entities::delete))
-        .route("/entities/:id/comments", get(entities::get_comments))
+        .route("/users", get(users::admin_users_list))
+        .route("/users", post(users::admin_user_new))
+        .route("/users/:id", get(users::admin_user_get))
         .route(
-            "/entities/:parent_id/parent/:child_id",
-            post(entities::register_parent),
+            "/users/self/password",
+            put(users::admin_user_change_self_password),
+        )
+        .route(
+            "/users/:id/password",
+            put(users::admin_user_change_password),
+        )
+        .route("/users/:id", delete(users::admin_user_delete))
+        // access_tokens
+        .route(
+            "/access_tokens",
+            get(access_tokens::admin_access_tokens_list),
+        )
+        .route(
+            "/access_tokens",
+            post(access_tokens::admin_access_token_new),
+        )
+        .route(
+            "/access_tokens/:id",
+            get(access_tokens::admin_access_token_get),
+        )
+        .route(
+            "/access_tokens/:id",
+            put(access_tokens::admin_access_token_update),
+        )
+        .route(
+            "/access_tokens/:id",
+            delete(access_tokens::admin_access_token_delete),
+        )
+        // families
+        .route("/families", get(families::admin_families_list))
+        .route("/families", post(families::admin_family_new))
+        .route("/families/:id", get(families::admin_family_get))
+        .route("/families/:id", put(families::admin_family_update))
+        .route("/families/:id", delete(families::admin_family_delete))
+        // categories
+        .route("/categories", get(categories::admin_categories_list))
+        .route("/categories", post(categories::admin_category_new))
+        .route("/categories/:id", get(categories::admin_category_get))
+        .route("/categories/:id", put(categories::admin_category_update))
+        .route("/categories/:id", delete(categories::admin_category_delete))
+        // tags
+        .route("/tags", get(tags::admin_tags_list))
+        .route("/tags", post(tags::admin_tag_new))
+        .route("/tags/:id", get(tags::admin_tag_get))
+        .route("/tags/:id", put(tags::admin_tag_update))
+        .route("/tags/:id", delete(tags::admin_tag_delete))
+        // entities
+        .route("/entities/pending", get(entities::admin_entities_pending))
+        .route("/entities/search", get(entities::admin_entities_search))
+        .route("/entities", post(entities::admin_entity_new))
+        .route("/entities/:id", get(entities::admin_entity_get))
+        .route("/entities/:id", put(entities::admin_entity_update))
+        .route("/entities/:id", delete(entities::admin_entity_delete))
+        .route(
+            "/entities/:id/comments",
+            get(entities::admin_entity_get_comments),
         )
         .route(
             "/entities/:parent_id/parent/:child_id",
-            delete(entities::remove_parent),
+            post(entities::admin_entity_register_parent),
+        )
+        .route(
+            "/entities/:parent_id/parent/:child_id",
+            delete(entities::admin_entity_remove_parent),
         )
         // comments
-        .route("/comments/pending", get(comments::pending))
-        .route("/comments", post(comments::new))
-        .route("/comments/:id", get(comments::get))
-        .route("/comments/:id", put(comments::update))
-        .route("/comments/:id", delete(comments::delete))
+        .route("/comments/pending", get(comments::admin_comments_pending))
+        .route("/comments", post(comments::admin_comment_new))
+        .route("/comments/:id", get(comments::admin_comment_get))
+        .route("/comments/:id", put(comments::admin_comment_update))
+        .route("/comments/:id", delete(comments::admin_comment_delete))
         .route_layer(middleware::from_fn_with_state(
             state.clone(),
             authentication_middleware,
@@ -236,7 +260,7 @@ where
         (status = 404, description = "User or password not found", body = ErrorResponse),
     )
 )]
-async fn login(
+async fn admin_login(
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
     Json(request): Json<LoginRequest>,
@@ -263,7 +287,7 @@ async fn login(
         (status = 404, description = "User or password not found", body = ErrorResponse),
     )
 )]
-async fn logout(cookies: CookieJar) -> Response {
+async fn admin_logout(cookies: CookieJar) -> Response {
     let jar = cookies
         .remove(TOKEN_COOKIE_NAME)
         .remove(REFRESH_TOKEN_COOKIE_NAME);

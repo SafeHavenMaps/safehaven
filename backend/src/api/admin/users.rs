@@ -18,7 +18,7 @@ use super::AdminUserTokenClaims;
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn list(
+pub async fn admin_users_list(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
 ) -> Result<AppJson<Vec<User>>, AppError> {
@@ -38,7 +38,7 @@ pub async fn list(
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn new(
+pub async fn admin_user_new(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Json(new_user): Json<NewUser>,
@@ -62,7 +62,7 @@ pub async fn new(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn get(
+pub async fn admin_user_get(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
@@ -89,7 +89,7 @@ pub struct ChangePassword {
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn change_self_password(
+pub async fn admin_user_change_self_password(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Json(change_password): Json<ChangePassword>,
@@ -112,7 +112,7 @@ pub async fn change_self_password(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn change_password(
+pub async fn admin_user_change_password(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
@@ -139,7 +139,7 @@ pub async fn change_password(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn delete(
+pub async fn admin_user_delete(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,

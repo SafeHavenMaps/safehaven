@@ -14,7 +14,9 @@ use crate::{
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn pending(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<ListedComment>>, AppError> {
+pub async fn admin_comments_pending(
+    DbConn(mut conn): DbConn,
+) -> Result<AppJson<Vec<ListedComment>>, AppError> {
     Ok(AppJson(Comment::pending(&mut conn).await?))
 }
 
@@ -27,7 +29,7 @@ pub async fn pending(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<ListedComme
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn new(
+pub async fn admin_comment_new(
     DbConn(mut conn): DbConn,
     Json(new_comment): Json<NewComment>,
 ) -> Result<AppJson<Comment>, AppError> {
@@ -46,7 +48,7 @@ pub async fn new(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn get(
+pub async fn admin_comment_get(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<Comment>, AppError> {
@@ -66,7 +68,7 @@ pub async fn get(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn update(
+pub async fn admin_comment_update(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(updated_comment): Json<UpdateComment>,
@@ -88,7 +90,7 @@ pub async fn update(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn delete(
+pub async fn admin_comment_delete(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {

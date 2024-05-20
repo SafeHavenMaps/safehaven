@@ -13,7 +13,9 @@ use uuid::Uuid;
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<AccessToken>>, AppError> {
+pub async fn admin_access_tokens_list(
+    DbConn(mut conn): DbConn,
+) -> Result<AppJson<Vec<AccessToken>>, AppError> {
     Ok(AppJson(AccessToken::list(&mut conn).await?))
 }
 
@@ -26,7 +28,7 @@ pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<AccessToken>>,
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn new(
+pub async fn admin_access_token_new(
     DbConn(mut conn): DbConn,
     Json(new_access_token): Json<NewOrUpdateAccessToken>,
 ) -> Result<AppJson<AccessToken>, AppError> {
@@ -47,7 +49,7 @@ pub async fn new(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn get(
+pub async fn admin_access_token_get(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<AccessToken>, AppError> {
@@ -67,7 +69,7 @@ pub async fn get(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn update(
+pub async fn admin_access_token_update(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(new_access_token): Json<NewOrUpdateAccessToken>,
@@ -89,7 +91,7 @@ pub async fn update(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn delete(
+pub async fn admin_access_token_delete(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {

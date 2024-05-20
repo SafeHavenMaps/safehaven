@@ -12,13 +12,13 @@ use super::AdminUserTokenClaims;
 
 #[utoipa::path(
     get,
-    path = "/api/options",
+    path = "/api/admin/options",
     responses(
         (status = 200, description = "Option map", body = SafeHavenOptions),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn get(
+pub async fn admin_options_get(
     token: AdminUserTokenClaims,
     State(app_state): State<AppState>,
 ) -> Result<AppJson<SafeHavenOptions>, AppError> {
@@ -33,14 +33,14 @@ pub async fn get(
 
 #[utoipa::path(
     put,
-    path = "/api/options/{name}",
+    path = "/api/admin/options/{name}",
     request_body = ConfigurationOption,
     responses(
         (status = 200, description = "Option map", body = SafeHavenOptions),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn update(
+pub async fn admin_options_update(
     Path(name): Path<String>,
     token: AdminUserTokenClaims,
 

@@ -14,7 +14,9 @@ use crate::{
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<Family>>, AppError> {
+pub async fn admin_families_list(
+    DbConn(mut conn): DbConn,
+) -> Result<AppJson<Vec<Family>>, AppError> {
     Ok(AppJson(Family::list(&mut conn).await?))
 }
 
@@ -27,7 +29,7 @@ pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<Family>>, AppE
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn new(
+pub async fn admin_family_new(
     DbConn(mut conn): DbConn,
     Json(new_family): Json<NewOrUpdateFamily>,
 ) -> Result<AppJson<Family>, AppError> {
@@ -46,7 +48,7 @@ pub async fn new(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn get(
+pub async fn admin_family_get(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<Family>, AppError> {
@@ -66,7 +68,7 @@ pub async fn get(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn update(
+pub async fn admin_family_update(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(new_family): Json<NewOrUpdateFamily>,
@@ -86,7 +88,7 @@ pub async fn update(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn delete(
+pub async fn admin_family_delete(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {

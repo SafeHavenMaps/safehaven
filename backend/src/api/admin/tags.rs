@@ -14,7 +14,7 @@ use crate::{
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<Tag>>, AppError> {
+pub async fn admin_tags_list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<Tag>>, AppError> {
     Ok(AppJson(Tag::list(&mut conn).await?))
 }
 
@@ -27,7 +27,7 @@ pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<Tag>>, AppErro
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn new(
+pub async fn admin_tag_new(
     DbConn(mut conn): DbConn,
     Json(new_tag): Json<NewOrUpdateTag>,
 ) -> Result<AppJson<Tag>, AppError> {
@@ -46,7 +46,10 @@ pub async fn new(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn get(DbConn(mut conn): DbConn, Path(id): Path<Uuid>) -> Result<AppJson<Tag>, AppError> {
+pub async fn admin_tag_get(
+    DbConn(mut conn): DbConn,
+    Path(id): Path<Uuid>,
+) -> Result<AppJson<Tag>, AppError> {
     Ok(AppJson(Tag::get(id, &mut conn).await?))
 }
 
@@ -63,7 +66,7 @@ pub async fn get(DbConn(mut conn): DbConn, Path(id): Path<Uuid>) -> Result<AppJs
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn update(
+pub async fn admin_tag_update(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(new_tag): Json<NewOrUpdateTag>,
@@ -83,7 +86,7 @@ pub async fn update(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn delete(
+pub async fn admin_tag_delete(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {

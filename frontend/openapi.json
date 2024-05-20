@@ -14,7 +14,7 @@
         "tags": [
           "admin::access_tokens"
         ],
-        "operationId": "list",
+        "operationId": "admin_access_tokens_list",
         "responses": {
           "200": {
             "description": "List of access tokens",
@@ -45,7 +45,7 @@
         "tags": [
           "admin::access_tokens"
         ],
-        "operationId": "new",
+        "operationId": "admin_access_token_new",
         "requestBody": {
           "content": {
             "application/json": {
@@ -85,7 +85,7 @@
         "tags": [
           "admin::access_tokens"
         ],
-        "operationId": "get",
+        "operationId": "admin_access_token_get",
         "parameters": [
           {
             "name": "id",
@@ -135,7 +135,7 @@
         "tags": [
           "admin::access_tokens"
         ],
-        "operationId": "update",
+        "operationId": "admin_access_token_update",
         "parameters": [
           {
             "name": "id",
@@ -195,7 +195,7 @@
         "tags": [
           "admin::access_tokens"
         ],
-        "operationId": "delete",
+        "operationId": "admin_access_token_delete",
         "parameters": [
           {
             "name": "id",
@@ -240,7 +240,7 @@
         "tags": [
           "admin::categories"
         ],
-        "operationId": "list",
+        "operationId": "admin_categories_list",
         "responses": {
           "200": {
             "description": "List of categories",
@@ -271,7 +271,7 @@
         "tags": [
           "admin::categories"
         ],
-        "operationId": "new",
+        "operationId": "admin_category_new",
         "requestBody": {
           "content": {
             "application/json": {
@@ -311,7 +311,7 @@
         "tags": [
           "admin::categories"
         ],
-        "operationId": "get",
+        "operationId": "admin_category_get",
         "parameters": [
           {
             "name": "id",
@@ -361,7 +361,7 @@
         "tags": [
           "admin::categories"
         ],
-        "operationId": "update",
+        "operationId": "admin_category_update",
         "parameters": [
           {
             "name": "id",
@@ -421,7 +421,7 @@
         "tags": [
           "admin::categories"
         ],
-        "operationId": "delete",
+        "operationId": "admin_category_delete",
         "parameters": [
           {
             "name": "id",
@@ -466,7 +466,7 @@
         "tags": [
           "admin::comments"
         ],
-        "operationId": "new",
+        "operationId": "admin_comment_new",
         "requestBody": {
           "content": {
             "application/json": {
@@ -506,7 +506,7 @@
         "tags": [
           "admin::comments"
         ],
-        "operationId": "pending",
+        "operationId": "admin_comments_pending",
         "responses": {
           "200": {
             "description": "List of pending comments",
@@ -539,7 +539,7 @@
         "tags": [
           "admin::comments"
         ],
-        "operationId": "get",
+        "operationId": "admin_comment_get",
         "parameters": [
           {
             "name": "id",
@@ -589,7 +589,7 @@
         "tags": [
           "admin::comments"
         ],
-        "operationId": "update",
+        "operationId": "admin_comment_update",
         "parameters": [
           {
             "name": "id",
@@ -649,7 +649,7 @@
         "tags": [
           "admin::comments"
         ],
-        "operationId": "delete",
+        "operationId": "admin_comment_delete",
         "parameters": [
           {
             "name": "id",
@@ -694,7 +694,7 @@
         "tags": [
           "admin::entities"
         ],
-        "operationId": "new",
+        "operationId": "admin_entity_new",
         "requestBody": {
           "content": {
             "application/json": {
@@ -734,7 +734,7 @@
         "tags": [
           "admin::entities"
         ],
-        "operationId": "pending",
+        "operationId": "admin_entities_pending",
         "responses": {
           "200": {
             "description": "List of pending entities",
@@ -767,7 +767,7 @@
         "tags": [
           "admin::entities"
         ],
-        "operationId": "search",
+        "operationId": "admin_entities_search",
         "parameters": [
           {
             "name": "search",
@@ -831,7 +831,7 @@
         "tags": [
           "admin::entities"
         ],
-        "operationId": "get",
+        "operationId": "admin_entity_get",
         "parameters": [
           {
             "name": "id",
@@ -881,7 +881,7 @@
         "tags": [
           "admin::entities"
         ],
-        "operationId": "update",
+        "operationId": "admin_entity_update",
         "parameters": [
           {
             "name": "id",
@@ -941,7 +941,7 @@
         "tags": [
           "admin::entities"
         ],
-        "operationId": "delete",
+        "operationId": "admin_entity_delete",
         "parameters": [
           {
             "name": "id",
@@ -986,7 +986,7 @@
         "tags": [
           "admin::entities"
         ],
-        "operationId": "get_comments",
+        "operationId": "admin_entity_get_comments",
         "parameters": [
           {
             "name": "id",
@@ -1031,7 +1031,7 @@
         "tags": [
           "admin::entities"
         ],
-        "operationId": "register_parent",
+        "operationId": "admin_entity_register_parent",
         "parameters": [
           {
             "name": "parent_id",
@@ -1074,7 +1074,7 @@
         "tags": [
           "admin::entities"
         ],
-        "operationId": "remove_parent",
+        "operationId": "admin_entity_remove_parent",
         "parameters": [
           {
             "name": "parent_id",
@@ -1129,7 +1129,7 @@
         "tags": [
           "admin::families"
         ],
-        "operationId": "list",
+        "operationId": "admin_families_list",
         "responses": {
           "200": {
             "description": "List of families",
@@ -1160,7 +1160,7 @@
         "tags": [
           "admin::families"
         ],
-        "operationId": "new",
+        "operationId": "admin_family_new",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1200,7 +1200,7 @@
         "tags": [
           "admin::families"
         ],
-        "operationId": "get",
+        "operationId": "admin_family_get",
         "parameters": [
           {
             "name": "id",
@@ -1250,7 +1250,7 @@
         "tags": [
           "admin::families"
         ],
-        "operationId": "update",
+        "operationId": "admin_family_update",
         "parameters": [
           {
             "name": "id",
@@ -1310,7 +1310,7 @@
         "tags": [
           "admin::families"
         ],
-        "operationId": "delete",
+        "operationId": "admin_family_delete",
         "parameters": [
           {
             "name": "id",
@@ -1350,12 +1350,92 @@
         }
       }
     },
+    "/api/admin/options": {
+      "get": {
+        "tags": [
+          "admin::options"
+        ],
+        "operationId": "admin_options_get",
+        "responses": {
+          "200": {
+            "description": "Option map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafeHavenOptions"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/options/{name}": {
+      "put": {
+        "tags": [
+          "admin::options"
+        ],
+        "operationId": "admin_options_update",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationOption"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Option map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafeHavenOptions"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/session": {
       "post": {
         "tags": [
           "admin"
         ],
-        "operationId": "login",
+        "operationId": "admin_login",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1401,7 +1481,7 @@
         "tags": [
           "admin"
         ],
-        "operationId": "logout",
+        "operationId": "admin_logout",
         "responses": {
           "200": {
             "description": "Cookie jar cleaned"
@@ -1424,7 +1504,7 @@
         "tags": [
           "admin::tags"
         ],
-        "operationId": "list",
+        "operationId": "admin_tags_list",
         "responses": {
           "200": {
             "description": "List of tags",
@@ -1455,7 +1535,7 @@
         "tags": [
           "admin::tags"
         ],
-        "operationId": "new",
+        "operationId": "admin_tag_new",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1495,7 +1575,7 @@
         "tags": [
           "admin::tags"
         ],
-        "operationId": "get",
+        "operationId": "admin_tag_get",
         "parameters": [
           {
             "name": "id",
@@ -1545,7 +1625,7 @@
         "tags": [
           "admin::tags"
         ],
-        "operationId": "update",
+        "operationId": "admin_tag_update",
         "parameters": [
           {
             "name": "id",
@@ -1605,7 +1685,7 @@
         "tags": [
           "admin::tags"
         ],
-        "operationId": "delete",
+        "operationId": "admin_tag_delete",
         "parameters": [
           {
             "name": "id",
@@ -1650,7 +1730,7 @@
         "tags": [
           "admin::users"
         ],
-        "operationId": "list",
+        "operationId": "admin_users_list",
         "responses": {
           "200": {
             "description": "List of users",
@@ -1681,7 +1761,7 @@
         "tags": [
           "admin::users"
         ],
-        "operationId": "new",
+        "operationId": "admin_user_new",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1721,7 +1801,7 @@
         "tags": [
           "admin::users"
         ],
-        "operationId": "change_self_password",
+        "operationId": "admin_user_change_self_password",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1771,7 +1851,7 @@
         "tags": [
           "admin::users"
         ],
-        "operationId": "get",
+        "operationId": "admin_user_get",
         "parameters": [
           {
             "name": "id",
@@ -1821,7 +1901,7 @@
         "tags": [
           "admin::users"
         ],
-        "operationId": "delete",
+        "operationId": "admin_user_delete",
         "parameters": [
           {
             "name": "id",
@@ -1866,7 +1946,7 @@
         "tags": [
           "admin::users"
         ],
-        "operationId": "change_password",
+        "operationId": "admin_user_change_password",
         "parameters": [
           {
             "name": "id",
@@ -1969,7 +2049,7 @@
         "tags": [
           "map"
         ],
-        "operationId": "new_comment",
+        "operationId": "viewer_new_comment",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2009,7 +2089,7 @@
         "tags": [
           "map"
         ],
-        "operationId": "new_entity",
+        "operationId": "viewer_new_entity",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2049,7 +2129,7 @@
         "tags": [
           "map"
         ],
-        "operationId": "fetch_entity",
+        "operationId": "viewer_fetch_entity",
         "parameters": [
           {
             "name": "id",
@@ -2100,7 +2180,7 @@
         "tags": [
           "map"
         ],
-        "operationId": "search_request",
+        "operationId": "viewer_search_request",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2143,7 +2223,7 @@
         "tags": [
           "map"
         ],
-        "operationId": "view_request",
+        "operationId": "viewer_view_request",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2167,86 +2247,6 @@
           },
           "401": {
             "description": "Invalid token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/options": {
-      "get": {
-        "tags": [
-          "options"
-        ],
-        "operationId": "get",
-        "responses": {
-          "200": {
-            "description": "Option map",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SafeHavenOptions"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/options/{name}": {
-      "put": {
-        "tags": [
-          "options"
-        ],
-        "operationId": "update",
-        "parameters": [
-          {
-            "name": "name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ConfigurationOption"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Option map",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SafeHavenOptions"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid permissions",
             "content": {
               "application/json": {
                 "schema": {

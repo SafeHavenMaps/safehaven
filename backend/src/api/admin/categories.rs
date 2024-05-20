@@ -14,7 +14,9 @@ use crate::{
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<Category>>, AppError> {
+pub async fn admin_categories_list(
+    DbConn(mut conn): DbConn,
+) -> Result<AppJson<Vec<Category>>, AppError> {
     Ok(AppJson(Category::list(&mut conn).await?))
 }
 
@@ -27,7 +29,7 @@ pub async fn list(DbConn(mut conn): DbConn) -> Result<AppJson<Vec<Category>>, Ap
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-pub async fn new(
+pub async fn admin_category_new(
     DbConn(mut conn): DbConn,
     Json(new_category): Json<NewCategory>,
 ) -> Result<AppJson<Category>, AppError> {
@@ -46,7 +48,7 @@ pub async fn new(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn get(
+pub async fn admin_category_get(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<Category>, AppError> {
@@ -66,7 +68,7 @@ pub async fn get(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn update(
+pub async fn admin_category_update(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(update_category): Json<UpdateCategory>,
@@ -88,7 +90,7 @@ pub async fn update(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn delete(
+pub async fn admin_category_delete(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
