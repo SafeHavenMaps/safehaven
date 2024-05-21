@@ -1,7 +1,7 @@
 import createClient from 'openapi-fetch'
 import type { paths } from './api'
 import createAuthMiddleware from './admin-auth-middleware'
-import type { FetchedEntity } from '~/lib'
+import type { Family, FetchedEntity } from '~/lib'
 
 // client as a closure
 export default function useClient() {
@@ -22,6 +22,12 @@ export default function useClient() {
       // Install auth middleware to the stack. If it fails, ejects it.
       const authMiddleware = createAuthMiddleware()
       this.rawClient.use(authMiddleware)
+      return data
+    },
+
+    async getFamily(): Promise<Family[]> {
+      const { data, error } = await this.rawClient.GET('/api/admin/families')
+      if (error) throw error
       return data
     },
 

@@ -37,6 +37,10 @@ export class AppState {
     this.initialized = true
   }
 
+  async fetchFamilies() {
+    this.familiesData = await client.getFamily()
+  }
+
   get families(): Family[] {
     return this.familiesData!
   }
