@@ -2382,6 +2382,15 @@
             "type": "string",
             "format": "uuid"
           },
+          "parent_display_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "parent_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
           "plain_text_location": {
             "type": "string"
           },

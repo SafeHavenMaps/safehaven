@@ -31,7 +31,7 @@
 
             <template #content>
               <p class="m-0">
-                <ViewerCategoryTag :category="getCategory(child.category_id)" />
+                <ViewerCategoryTag :category="state.getCategory(child.category_id)" />
               </p>
             </template>
 
@@ -122,7 +122,7 @@
 
             <template #content>
               <p class="m-0">
-                <ViewerCategoryTag :category="getCategory(parent.category_id)" />
+                <ViewerCategoryTag :category="state.getCategory(parent.category_id)" />
               </p>
             </template>
 
@@ -209,10 +209,6 @@ function hasChildren() {
 
 function hasParent() {
   return state.activeEntity.parents.length > 0
-}
-
-function getCategory(category_id) {
-  return state.categories.find(c => c.id === category_id)
 }
 
 function sortedComments() {

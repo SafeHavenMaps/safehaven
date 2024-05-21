@@ -11,6 +11,8 @@ CREATE TABLE entities_caches (
     tags_ids UUID[] NOT NULL,
     family_id UUID NOT NULL,
     display_name TEXT NOT NULL,
+    parent_id UUID,
+    parent_display_name TEXT,
     gps_location GEOGRAPHY(POINT, 4326) NOT NULL,
     web_mercator_location GEOMETRY(POINT, 3857) NOT NULL,
     plain_text_location TEXT NOT NULL,
@@ -45,6 +47,8 @@ DECLARE
     indexed_values TEXT := '';
     categories_array UUID[];
     tags_array UUID[];
+    parent_entity RECORD;
+    parent_location JSONB;
 BEGIN
     SELECT e.* INTO refreshed_entity FROM entities e WHERE e.id = given_entity_id;
 
@@ -150,6 +154,62 @@ BEGIN
             refreshed_entity.locations->i->>'plain_text',
             indexed_values
         );
+    END LOOP;
+
+    -- Insert new entries for each location of each parent of the entity
+    FOR parent_entity IN
+        SELECT e.*
+        FROM entities_entities ee
+        JOIN entities e ON ee.parent_id = e.id
+        WHERE ee.child_id = refreshed_entity.id
+    LOOP
+        FOR i IN 0..jsonb_array_length(parent_entity.locations)-1 LOOP
+            INSERT INTO entities_caches (
+                id,
+                entity_id,
+                category_id,
+                categories_ids,
+                tags_ids,
+                family_id,
+                display_name,
+                parent_id,
+                parent_display_name,
+                gps_location,
+                web_mercator_location,
+                plain_text_location,
+                full_text_search
+            )
+            VALUES (
+                uuid_generate_v4(),
+                refreshed_entity.id,
+                refreshed_entity.category_id,
+                categories_array,
+                tags_array,
+                family_id,
+                refreshed_entity.display_name,
+                parent_entity.id,
+                parent_entity.display_name,
+                ST_SetSRID(
+                    ST_MakePoint(
+                        (parent_entity.locations->i->>'long')::double precision,
+                        (parent_entity.locations->i->>'lat')::double precision
+                    ),
+                    4326
+                ),
+                ST_Transform(
+                    ST_SetSRID(
+                        ST_MakePoint(
+                            (parent_entity.locations->i->>'long')::double precision,
+                            (parent_entity.locations->i->>'lat')::double precision
+                        ),
+                        4326
+                    ),
+                    3857
+                ),
+                parent_entity.locations->i->>'plain_text',
+                indexed_values
+            );
+        END LOOP;
     END LOOP;
 
     -- For each entity that refreshed_entity is a child of, update the cache

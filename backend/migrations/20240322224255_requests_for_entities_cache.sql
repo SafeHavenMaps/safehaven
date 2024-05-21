@@ -26,6 +26,8 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
     tags_ids UUID[],
     family_id UUID,
     display_name TEXT,
+    parent_id UUID,
+    parent_display_name TEXT,
     web_mercator_x DOUBLE PRECISION,
     web_mercator_y DOUBLE PRECISION,
     plain_text_location TEXT,
@@ -43,6 +45,8 @@ BEGIN
             ec.tags_ids,
             ec.family_id,
             ec.display_name,
+            ec.parent_id,
+            ec.parent_display_name,
             ST_X(ec.web_mercator_location) AS web_mercator_x,
             ST_Y(ec.web_mercator_location) AS web_mercator_y,
             ec.plain_text_location,
@@ -57,6 +61,7 @@ BEGIN
                 ST_MakeEnvelope(input_xmin, input_ymin, input_xmax, input_ymax, 3857)
             )
             AND ec.family_id = input_family_id
+            AND ec.parent_id IS NULL
             -- Categories filter
             AND (allow_all_categories OR ec.categories_ids && categories_list)
             AND NOT (ec.categories_ids && exclude_categories_list)
@@ -85,6 +90,8 @@ BEGIN
         fe.tags_ids,
         fe.family_id,
         fe.display_name,
+        fe.parent_id,
+        fe.parent_display_name,
         fe.web_mercator_x,
         fe.web_mercator_y,
         fe.plain_text_location,
@@ -123,6 +130,8 @@ CREATE OR REPLACE FUNCTION search_entities(
     tags_ids UUID[],
     family_id UUID,
     display_name TEXT,
+    parent_id UUID,
+    parent_display_name TEXT,
     web_mercator_x DOUBLE PRECISION,
     web_mercator_y DOUBLE PRECISION,
     plain_text_location TEXT
@@ -136,12 +145,14 @@ BEGIN
             ec.tags_ids,
             ec.family_id,
             ec.display_name,
+            ec.parent_id,
+            ec.parent_display_name,
             ST_X(ec.web_mercator_location) AS web_mercator_x,
             ST_Y(ec.web_mercator_location) AS web_mercator_y,
             ec.plain_text_location
         FROM entities_caches ec
         WHERE
-            (full_text_search_ts @@ to_tsquery(search_query))
+            (full_text_search_ts @@ plainto_tsquery('english', search_query))
             AND ec.family_id = input_family_id
             -- Categories
             AND
@@ -152,12 +163,11 @@ BEGIN
             (allow_all_tags OR (ec.tags_ids && tags_list))
             AND NOT (ec.tags_ids && exclude_tags_list)
             -- User filters
-            AND active_categories_ids && "ec.categories_ids"
-            AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ "ec.tags_ids")
-            AND NOT ("ec.tags_id" && exluded_tags_ids)
-        ORDER BY ts_rank(full_text_search_ts, to_tsquery(search_query)) DESC
+            AND (active_categories_ids && ec.categories_ids)
+            AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
+            AND NOT (ec.tags_ids && exluded_tags_ids)
+        ORDER BY ts_rank(full_text_search_ts, plainto_tsquery('english', search_query)) DESC
         LIMIT page_size
         OFFSET (current_page - 1) * page_size;
 END;
 $$ LANGUAGE plpgsql;
-

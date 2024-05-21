@@ -103,6 +103,14 @@ function goToGpsCoordinates(coordinates: Coordinate, zoom: number) {
   })
 }
 
+function goToWebMercatorCoordinates(coordinates: Coordinate, zoom: number) {
+  map!.getView().animate({
+    center: coordinates,
+    zoom: zoom,
+    duration: 1500,
+  })
+}
+
 async function handleClusterClick(cluster: DisplayableCluster) {
   map!.getView().animate({
     center: cluster.coordinates,
@@ -118,6 +126,7 @@ async function handleEntityClick(entity: DisplayableCachedEntity) {
 defineExpose({
   forceRefresh,
   goToGpsCoordinates,
+  goToWebMercatorCoordinates,
 })
 </script>
 

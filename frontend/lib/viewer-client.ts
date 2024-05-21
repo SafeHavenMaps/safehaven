@@ -72,5 +72,28 @@ export default function useClient() {
 
       return data
     },
+
+    async searchEntities(
+      query: string,
+      familyId: string,
+      activeCategories: string[],
+      activeRequiredTags: string[],
+      activeHiddenTags: string[],
+    ) {
+      const { data, error } = await rawClient.POST('/api/map/search', {
+        body: {
+          search_query: query,
+          family_id: familyId,
+          page: 1,
+          page_size: 5,
+          active_categories: activeCategories,
+          active_required_tags: activeRequiredTags,
+          active_hidden_tags: activeHiddenTags,
+        },
+      })
+      if (error) throw error
+
+      return data
+    },
   }
 }

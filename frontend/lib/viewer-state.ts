@@ -255,6 +255,20 @@ export class AppState {
     this._activeEntity = await this.client.fetchEntity(id)
   }
 
+  async searchEntities(query: string) {
+    return await this.client.searchEntities(
+      query,
+      this.activeFamilyId!,
+      this.activeFilteringCategories,
+      this.activeRequiredTags,
+      this.activeHiddenTags,
+    )
+  }
+
+  getCategory(category_id: string) {
+    return this.categories.find(c => c.id === category_id)!
+  }
+
   async refreshView(extent: Extent, zoomLevel: number) {
     const zoom = Math.round(zoomLevel)
     const newViewData = await this.client.getEntitiesWithinBounds(

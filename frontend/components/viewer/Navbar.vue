@@ -133,22 +133,69 @@
   <OverlayPanel ref="searchOp">
     <div class="flex flex-column gap-3 w-25rem">
       <TabView>
-        <TabPanel header="Chercher un lieu">
-          <label for="placeSearch">
-            Recherche d'une ville, d'un lieu, d'une adresse
-          </label>
+        <TabPanel header="Chercher un point">
+          <form @submit="searchEntity">
+            <label for="placeSearch">
+              Recherche d'un point sur la carte
+            </label>
 
-          <InputGroup>
-            <InputText
-              v-model="placeSearch"
-              placeholder="Tours, France"
-            />
-            <Button @click="searchLocation">
-              <template #icon>
-                <AppIcon icon-name="search" />
-              </template>
-            </Button>
-          </InputGroup>
+            <InputGroup>
+              <InputText
+                v-model="entitySearch"
+              />
+              <Button type="submit">
+                <template #icon>
+                  <AppIcon icon-name="search" />
+                </template>
+              </Button>
+            </InputGroup>
+          </form>
+
+          <div v-if="currentEntitiesResults.length > 0">
+            <Divider type="dotted" />
+
+            <div style="max-height: 500px; overflow-y: auto;">
+              <div
+                v-for="result in currentEntitiesResults"
+                :key="result.id"
+                class="result mb-2 p-2"
+                @click="entityChosen(result)"
+              >
+                <div>{{ result.display_name }}</div>
+
+                <div
+                  v-if="result.parent_display_name"
+                  class="text-xs"
+                >
+                  {{ result.parent_display_name }}
+                </div>
+
+                <div class="mt-1">
+                  <ViewerCategoryTag :category="state.getCategory(result.category_id)" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabPanel>
+
+        <TabPanel header="Chercher un lieu">
+          <form @submit="searchLocation">
+            <label for="placeSearch">
+              Recherche d'une ville, d'un lieu, d'une adresse
+            </label>
+
+            <InputGroup>
+              <InputText
+                v-model="placeSearch"
+                placeholder="Tours, France"
+              />
+              <Button type="submit">
+                <template #icon>
+                  <AppIcon icon-name="search" />
+                </template>
+              </Button>
+            </InputGroup>
+          </form>
 
           <div v-if="currentLocationsResults.length > 0">
             <Divider type="dotted" />
@@ -164,16 +211,13 @@
                 <span class="text-xs text-800">{{ result.subtitle }}</span>
               </div>
             </div>
-
-            <Divider type="dotted" />
-
-            <div class="text-xs text-800">
-              Recherche avec Nominatim © OpenStreetMap Contributor
-            </div>
           </div>
-        </TabPanel>
-        <TabPanel header="Chercher un point">
-          <span>Entités</span>
+
+          <Divider type="dotted" />
+
+          <div class="text-xs text-800">
+            Recherche avec Nominatim © OpenStreetMap Contributor
+          </div>
         </TabPanel>
       </TabView>
     </div>
@@ -187,18 +231,22 @@ import state from '~/lib/viewer-state'
 import defaultLogo from '~/assets/logo_square.svg'
 import type { Result as NominatimResult } from '~/lib/nominatim'
 import { freeFormSearch } from '~/lib/nominatim'
+import type { CachedEntity } from '~/lib'
 
 const emit = defineEmits<{
   filtersChanged: []
   locationChosen: [Coordinate]
+  entityChosen: [CachedEntity]
 }>()
 
 const filterOp = ref<OverlayPanel>()
 const searchOp = ref<OverlayPanel>()
 
 const placeSearch: Ref<string> = ref('')
+const entitySearch: Ref<string> = ref('')
 
 const currentLocationsResults: Ref<NominatimResult[]> = ref([])
+const currentEntitiesResults: Ref<CachedEntity[]> = ref([])
 
 function openFilterPanel(event: Event) {
   filterOp!.value!.toggle(event)
@@ -208,13 +256,24 @@ function openSearchPanel(event: Event) {
   searchOp!.value!.toggle(event)
 }
 
-async function searchLocation() {
+async function searchLocation(event: Event) {
+  event.preventDefault()
   currentLocationsResults.value = await freeFormSearch(placeSearch.value)
+}
+
+async function searchEntity(event: Event) {
+  event.preventDefault()
+  currentEntitiesResults.value = await state.searchEntities(entitySearch.value)
 }
 
 function locationChosen(result: NominatimResult) {
   const gpsCoordinates: Coordinate = [result.lon, result.lat]
   emit('locationChosen', gpsCoordinates)
+}
+
+function entityChosen(result: CachedEntity) {
+  emit('entityChosen', result)
+  searchOp!.value!.hide()
 }
 
 function filtersChanged() {
@@ -235,6 +294,7 @@ function filtersChanged() {
 .result {
   cursor: pointer;
   transition: background-color 0.2s;
+  border-radius: 0.25rem;
 }
 
 .result:hover {

@@ -3,6 +3,7 @@
     <ViewerNavbar
       @filters-changed="refreshMap"
       @location-chosen="goToGpsCoordinates"
+      @entity-chosen="goToEntity"
     />
     <div
       ref="containerRef"
@@ -24,7 +25,7 @@
 
 <script setup lang="ts">
 import type { Coordinate } from 'ol/coordinate'
-import type { DisplayableCachedEntity } from '~/lib'
+import type { CachedEntity, DisplayableCachedEntity } from '~/lib'
 import state from '~/lib/viewer-state'
 import ViewerMap from '~/components/viewer/Map.vue'
 
@@ -52,5 +53,14 @@ function goToGpsCoordinates(coordinates: Coordinate) {
 
 async function refreshMap() {
   await mapRef.value?.forceRefresh()
+}
+
+async function goToEntity(entity: CachedEntity) {
+  await state.selectEntity(entity.entity_id)
+
+  mapRef.value?.goToWebMercatorCoordinates([
+    entity.web_mercator_x,
+    entity.web_mercator_y,
+  ], 14)
 }
 </script>
