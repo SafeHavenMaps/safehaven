@@ -33,7 +33,7 @@ export class AppState {
   }
 
   async initWithUsernamePassword(username: string, password: string, remember_me: boolean) {
-    await client.bootstrap(username, password, remember_me)
+    await client.login(username, password, remember_me)
     this.initialized = true
   }
 

@@ -9,19 +9,18 @@ export default function useClient() {
     credentials: 'include', // Ensures cookies are sent with the request
   })
 
+  // Install auth middleware to the stack.
+  const authMiddleware = createAuthMiddleware()
+  rawClient.use(authMiddleware)
+
   return {
     rawClient: rawClient,
 
-    async bootstrap(username: string, password: string, remember_me: boolean) {
+    async login(username: string, password: string, remember_me: boolean) {
       const { data, error } = await rawClient.POST('/api/admin/session', {
         body: { password: password, username: username, remember_me: remember_me },
       })
-
       if (error) throw error
-
-      // Install auth middleware to the stack. If it fails, ejects it.
-      const authMiddleware = createAuthMiddleware()
-      this.rawClient.use(authMiddleware)
       return data
     },
 
