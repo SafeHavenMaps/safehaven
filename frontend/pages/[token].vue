@@ -2,6 +2,7 @@
   <div class="h-full flex flex-column">
     <ViewerNavbar
       @filters-changed="refreshMap"
+      @location-chosen="goToGpsCoordinates"
     />
     <div
       ref="containerRef"
@@ -22,6 +23,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Coordinate } from 'ol/coordinate'
 import type { DisplayableCachedEntity } from '~/lib'
 import state from '~/lib/viewer-state'
 import ViewerMap from '~/components/viewer/Map.vue'
@@ -42,6 +44,10 @@ function fitContainer() {
     return { height, top, position: 'absolute' }
   }
   return {} // Return default/fallback styles if needed
+}
+
+function goToGpsCoordinates(coordinates: Coordinate) {
+  mapRef.value?.goToGpsCoordinates(coordinates, 13)
 }
 
 async function refreshMap() {

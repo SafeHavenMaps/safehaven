@@ -56,6 +56,7 @@
 <script setup lang="ts">
 import type Map from 'ol/Map'
 import type { Coordinate } from 'ol/coordinate'
+import { transform } from 'ol/proj.js'
 import type { DisplayableCachedEntity, DisplayableCluster } from '~/lib'
 import state from '~/lib/viewer-state'
 
@@ -91,16 +92,22 @@ function getExtentAndZoom() {
   return { extent, currentZoom }
 }
 
-function zoomTo(coordinates: Coordinate) {
+function goToGpsCoordinates(coordinates: Coordinate, zoom: number) {
+  const transformedCoordinates = transform(coordinates, 'EPSG:4326', 'EPSG:3857')
+
   map!.getView().animate({
-    center: coordinates,
-    zoom: Math.min(map!.getView().getZoom()! + 2, map!.getView().getMaxZoom()!),
-    duration: 500,
+    center: transformedCoordinates,
+    zoom: zoom,
+    duration: 1500,
   })
 }
 
 async function handleClusterClick(cluster: DisplayableCluster) {
-  zoomTo(cluster.coordinates)
+  map!.getView().animate({
+    center: cluster.coordinates,
+    zoom: Math.min(map!.getView().getZoom()! + 2, map!.getView().getMaxZoom()!),
+    duration: 500,
+  })
 }
 
 async function handleEntityClick(entity: DisplayableCachedEntity) {
@@ -109,6 +116,7 @@ async function handleEntityClick(entity: DisplayableCachedEntity) {
 
 defineExpose({
   forceRefresh,
+  goToGpsCoordinates,
 })
 </script>
 

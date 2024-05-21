@@ -28,6 +28,7 @@ const iconDict: Record<string, string> = {
   userGroup: mdi.mdiAccountGroup,
   accessToken: mdi.mdiLock,
   mapSearch: mdi.mdiMapSearch,
+  search: mdi.mdiMagnify,
   filter: mdi.mdiFilterCog,
   information: mdi.mdiInformationOutline,
   addEntity: mdi.mdiMapMarkerPlus,
