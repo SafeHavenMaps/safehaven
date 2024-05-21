@@ -10,7 +10,7 @@ import type {
   DisplayableCachedEntity,
   DisplayableCluster,
   FetchedEntity,
-  Status,
+  InitConfig,
 } from '~/lib'
 
 type ViewData = {
@@ -27,8 +27,9 @@ export class AppState {
     return this._client!
   }
 
-  private familiesData: Family[] | null = null
+  private initConfig: InitConfig | null = null
 
+  private familiesData: Family[] | null = null
   private categoriesData: Category[] | null = null
   private tagsData: Tag[] | null = null
   private cartographyInitConfigData: CartographyInitConfig | null = null
@@ -74,8 +75,6 @@ export class AppState {
     }
   }
 
-  private status: Status | null = null
-
   get entities() {
     return this.viewData.entities
   }
@@ -101,36 +100,36 @@ export class AppState {
   }
 
   get online() {
-    return this.status?.status === 'ok'
+    return this.initConfig?.status === 'ok'
   }
 
   get hasSafeMode() {
-    return !!this.status?.safe_mode
+    return !!this.initConfig?.safe_mode
   }
 
   get safeMode() {
-    return this.status!.safe_mode
+    return this.initConfig!.safe_mode
   }
 
   get title() {
-    return this.status!.general.title!
+    return this.initConfig!.general.title!
   }
 
   get subtitle() {
-    return this.status!.general.subtitle ?? null
+    return this.initConfig!.general.subtitle ?? null
   }
 
   get logo() {
-    return this.status!.general.logo_url ?? null
+    return this.initConfig!.general.logo_url ?? null
   }
 
   get loaded() {
-    return this.status !== null
+    return this.initConfig !== null
   }
 
   async init() {
     this._client = useClient()
-    this.status = await this.client.checkStatus()
+    this.initConfig = await this.client.checkStatus()
   }
 
   cleanupSvg(svg: string | null | undefined): string | null {

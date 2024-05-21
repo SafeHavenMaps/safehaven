@@ -7,7 +7,13 @@
 </template>
 
 <script setup lang="ts">
+import { useHead } from '#imports'
 import state from '~/lib/viewer-state'
 
 await state.init()
+
+useHead({
+  title: state.title,
+  link: [{ rel: 'icon', href: state.logo ?? '/default_favicon.ico' }],
+})
 </script>

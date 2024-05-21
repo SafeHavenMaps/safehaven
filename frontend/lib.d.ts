@@ -4,7 +4,7 @@
 import type { Coordinate } from 'ol/coordinate'
 import type * as api from '~/lib/api'
 
-export type Status = api.components['schemas']['StatusResponse']
+export type InitConfig = api.components['schemas']['StatusResponse']
 
 export type Entity = api.components['schemas']['Entity']
 export type Cluster = api.components['schemas']['Cluster']

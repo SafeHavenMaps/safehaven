@@ -5,7 +5,7 @@ import type {
   Category,
   Family,
   Tag,
-  Status,
+  InitConfig,
 } from '~/lib'
 
 const client = useClient()
@@ -18,7 +18,7 @@ export class AppState {
   private tagsData: Tag[] | null = null
   private cartographyInitConfigData: CartographyInitConfig | null = null
 
-  private status: Status | null = null
+  private status: InitConfig | null = null
 
   get online() {
     return this.status?.status === 'ok'

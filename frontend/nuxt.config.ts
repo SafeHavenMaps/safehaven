@@ -16,4 +16,9 @@ export default defineNuxtConfig({
       stylistic: true,
     },
   },
+  app: {
+    head: {
+      title: 'Safehaven',
+    },
+  },
 })
