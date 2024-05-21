@@ -97,7 +97,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div class="filter-settings">
         <span class="font-medium text-900 block mb-2">Filtres</span>
         <div
           v-for="tag in state.filteringTags"
@@ -299,5 +299,9 @@ function filtersChanged() {
 
 .result:hover {
   background-color: #f0f0f0;
+}
+
+.filter-settings .button-content {
+  z-index: 9;
 }
 </style>

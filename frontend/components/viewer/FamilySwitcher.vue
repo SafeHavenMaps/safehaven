@@ -6,7 +6,7 @@
     aria-labelledby="custom"
   >
     <template #option="slotProps">
-      <div class="button-content flex align-items-center justify-between  ">
+      <div class="button-content flex align-items-center justify-between">
         <div
           class="mr-2"
           :style="{
