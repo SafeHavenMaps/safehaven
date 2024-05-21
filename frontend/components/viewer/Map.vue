@@ -32,6 +32,7 @@
           :fill="entity.category.fill_color"
           :stroke="entity.category.border_color"
           :highlighted="entity.entity_id === state.activeEntity?.entity.id"
+          :inside-icon="entity.category.icon"
           @click="handleEntityClick"
         />
       </ol-overlay>

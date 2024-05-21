@@ -19,8 +19,10 @@ CREATE UNIQUE INDEX options_name_uindex ON options (name);
 CREATE TABLE families (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
+    icon TEXT,
     entity_form JSONB NOT NULL,
-    comment_form JSONB NOT NULL
+    comment_form JSONB NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE categories (

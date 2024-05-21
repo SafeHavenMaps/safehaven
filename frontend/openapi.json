@@ -2721,7 +2721,8 @@
           "id",
           "title",
           "entity_form",
-          "comment_form"
+          "comment_form",
+          "sort_order"
         ],
         "properties": {
           "comment_form": {
@@ -2730,9 +2731,17 @@
           "entity_form": {
             "$ref": "#/components/schemas/Json"
           },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32"
           },
           "title": {
             "type": "string"
@@ -3082,7 +3091,8 @@
         "required": [
           "title",
           "entity_form",
-          "comment_form"
+          "comment_form",
+          "sort_order"
         ],
         "properties": {
           "comment_form": {
@@ -3090,6 +3100,14 @@
           },
           "entity_form": {
             "$ref": "#/components/schemas/Form"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32"
           },
           "title": {
             "type": "string"

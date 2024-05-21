@@ -91,6 +91,7 @@
                 backgroundColor: category.fill_color,
                 borderColor: category.border_color,
               }"
+              v-html="category.icon"
             />
             {{ category.title }}
           </div>
@@ -101,8 +102,11 @@
         <div
           v-for="tag in state.filteringTags"
           :key="tag.id"
+          class="mb-2 p-1"
         >
-          <span class="text-800">{{ tag.title }}</span>
+          <div class="text-800 mb-1">
+            {{ tag.filter_description }}
+          </div>
 
           <SelectButton
             v-model="tag.active"

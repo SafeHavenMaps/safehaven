@@ -67,8 +67,10 @@ pub struct Field {
 pub struct Family {
     pub id: Uuid,
     pub title: String,
+    pub icon: Option<String>,
     pub entity_form: Json<Form>,
     pub comment_form: Json<Form>,
+    pub sort_order: i32,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -76,6 +78,8 @@ pub struct NewOrUpdateFamily {
     pub title: String,
     pub entity_form: Form,
     pub comment_form: Form,
+    pub icon: Option<String>,
+    pub sort_order: i32,
 }
 
 impl Form {
@@ -147,17 +151,21 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            INSERT INTO families (title, entity_form, comment_form)
-            VALUES ($1, $2, $3)
+            INSERT INTO families (title, entity_form, comment_form, icon, sort_order)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING 
                 id,
                 title,
+                icon,
                 entity_form as "entity_form: Json<Form>",
-                comment_form as "comment_form: Json<Form>"
+                comment_form as "comment_form: Json<Form>",
+                sort_order
             "#,
             family.title,
             entity_form,
-            comment_form
+            comment_form,
+            family.icon,
+            family.sort_order
         )
         .fetch_one(conn)
         .await
@@ -179,18 +187,22 @@ impl Family {
             Family,
             r#"
             UPDATE families
-            SET title = $2, entity_form = $3, comment_form = $4
+            SET title = $2, entity_form = $3, comment_form = $4, icon = $5, sort_order = $6
             WHERE id = $1
             RETURNING 
                 id,
                 title,
+                icon,
                 entity_form as "entity_form: Json<Form>",
-                comment_form as "comment_form: Json<Form>"
+                comment_form as "comment_form: Json<Form>",
+                sort_order
             "#,
             id,
             update.title,
             entity_form,
-            comment_form
+            comment_form,
+            update.icon,
+            update.sort_order
         )
         .fetch_one(conn)
         .await
@@ -216,9 +228,10 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT id, title, 
+            SELECT id, title, icon, 
                 entity_form as "entity_form: Json<Form>", 
-                comment_form as "comment_form: Json<Form>"
+                comment_form as "comment_form: Json<Form>",
+                sort_order
             FROM families
             WHERE id = $1
             "#,
@@ -233,9 +246,10 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT id, title, 
+            SELECT id, title, icon,
                 entity_form as "entity_form: Json<Form>", 
-                comment_form as "comment_form: Json<Form>"
+                comment_form as "comment_form: Json<Form>",
+                sort_order
             FROM families
             "#
         )
@@ -251,9 +265,10 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT id, title, 
+            SELECT id, title, icon,
                 entity_form as "entity_form: Json<Form>", 
-                comment_form as "comment_form: Json<Form>"
+                comment_form as "comment_form: Json<Form>",
+                sort_order
             FROM families
             WHERE id = ANY($1)
             "#,
@@ -271,9 +286,10 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT families.id, families.title, 
+            SELECT families.id, families.title, families.icon,
                 families.entity_form as "entity_form: Json<Form>", 
-                families.comment_form as "comment_form: Json<Form>"
+                families.comment_form as "comment_form: Json<Form>",
+                families.sort_order
             FROM families
             JOIN categories ON families.id = categories.family_id
             WHERE categories.id = $1
@@ -292,9 +308,10 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT families.id, families.title, 
+            SELECT families.id, families.title, families.icon,
                 families.entity_form as "entity_form: Json<Form>", 
-                families.comment_form as "comment_form: Json<Form>"
+                families.comment_form as "comment_form: Json<Form>",
+                families.sort_order
             FROM families
             JOIN categories ON families.id = categories.family_id
             JOIN entities ON categories.id = entities.category_id

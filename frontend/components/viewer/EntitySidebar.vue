@@ -1,13 +1,4 @@
 <template>
-  <!-- eslint-disable vue/no-v-html -->
-  <!--
-    In this file we use v-html to render the content of the fields.
-    This is safe because we use DOMPurify to sanitize the content when required.
-    All "v-html" usages are unsafe UNLESS they are sanitized.
-
-    Developers and reviewers should be aware of the risks associated with using v-html when reading this file.
-  -->
-
   <Sidebar
     v-model:visible="state.hasActiveEntity"
     :modal="false"
@@ -16,15 +7,7 @@
   >
     <template #header>
       <div class="flex align-items-center gap-2">
-        <Tag
-          :style="{
-            backgroundColor: state.activeEntity?.category.fill_color,
-            borderColor: state.activeEntity?.category.border_color,
-            color: 'white',
-          }"
-        >
-          {{ state.activeEntity?.category.title }}
-        </Tag>
+        <ViewerCategoryTag :category="state.activeEntity?.category" />
         <h3 class="m-0">
           {{ state.activeEntity?.entity.display_name }}
         </h3>
@@ -48,15 +31,7 @@
 
             <template #content>
               <p class="m-0">
-                <Tag
-                  :style="{
-                    backgroundColor: getCategory(child.category_id)?.fill_color,
-                    borderColor: getCategory(child.category_id)?.border_color,
-                    color: 'white',
-                  }"
-                >
-                  {{ getCategory(child.category_id)?.title }}
-                </Tag>
+                <ViewerCategoryTag :category="getCategory(child.category_id)" />
               </p>
             </template>
 
@@ -147,15 +122,7 @@
 
             <template #content>
               <p class="m-0">
-                <Tag
-                  :style="{
-                    backgroundColor: getCategory(parent.category_id)?.fill_color,
-                    borderColor: getCategory(parent.category_id)?.border_color,
-                    color: 'white',
-                  }"
-                >
-                  {{ getCategory(parent.category_id)?.title }}
-                </Tag>
+                <ViewerCategoryTag :category="getCategory(parent.category_id)" />
               </p>
             </template>
 

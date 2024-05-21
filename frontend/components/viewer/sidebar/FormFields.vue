@@ -1,13 +1,4 @@
 <template>
-  <!-- eslint-disable vue/no-v-html -->
-  <!--
-    In this file we use v-html to render the content of the fields.
-    This is safe because we use DOMPurify to sanitize the content when required.
-    All "v-html" usages are unsafe UNLESS they are sanitized.
-
-    Developers and reviewers should be aware of the risks associated with using v-html when reading this file.
-  -->
-
   <Fieldset
     v-for="field in fieldsToDisplay()"
     :key="field.key"

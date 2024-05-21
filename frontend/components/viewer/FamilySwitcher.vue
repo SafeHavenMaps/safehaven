@@ -6,10 +6,14 @@
     aria-labelledby="custom"
   >
     <template #option="slotProps">
-      <div class="button-content">
-        <i
-          :class="slotProps.option.icon"
+      <div class="button-content flex align-items-center justify-between  ">
+        <div
           class="mr-2"
+          :style="{
+            width: '16px',
+            height: '16px',
+          }"
+          v-html="slotProps.option.icon"
         />
         <span>{{ slotProps.option.title }}</span>
       </div>
@@ -21,7 +25,7 @@
 import state from '~/lib/viewer-state'
 </script>
 
-<style>
+<style scoped>
 .button-content {
   z-index: 9;
 }
