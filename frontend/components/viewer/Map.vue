@@ -5,7 +5,7 @@
       ref="mapRef"
       :load-tiles-while-animating="true"
       :load-tiles-while-interacting="true"
-      @moveend="onMapMoveEnd"
+      @moveend="forceRefresh"
     >
       <ol-view
         ref="viewRef"
@@ -75,17 +75,14 @@ onMounted(() => {
   map = mapRef.value!.map
 })
 
-async function onMapMoveEnd() {
+async function forceRefresh() {
   const { extent, currentZoom } = getExtentAndZoom()
   await state.refreshView(extent, currentZoom)
 }
 
 watch(
   () => state.activeFamily,
-  async () => {
-    const { extent, currentZoom } = getExtentAndZoom()
-    await state.refreshView(extent, currentZoom)
-  },
+  forceRefresh,
 )
 
 function getExtentAndZoom() {
@@ -109,6 +106,10 @@ async function handleClusterClick(cluster: DisplayableCluster) {
 async function handleEntityClick(entity: DisplayableCachedEntity) {
   state.selectedCachedEntity(entity)
 }
+
+defineExpose({
+  forceRefresh,
+})
 </script>
 
 <style scoped lang="scss">

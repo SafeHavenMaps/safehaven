@@ -49,6 +49,7 @@
         <Button
           label="Filtres"
           class="p-button-help mr-2"
+          @click="openFilterPanel"
         >
           <template #icon>
             <AppIcon
@@ -76,9 +77,70 @@
       </div>
     </template>
   </Toolbar>
+
+  <OverlayPanel
+    ref="filterOp"
+  >
+    <div class="flex flex-column gap-3 w-25rem">
+      <div>
+        <span class="font-medium text-900 block mb-2">Catégories</span>
+        <ToggleButton
+          v-for="category in state.filteringCategories"
+          :key="category.id"
+          v-model="category.active"
+          :on-label="category.title"
+          :off-label="category.title"
+          class="mr-1 mb-1"
+          @change="filtersChanged"
+        />
+      </div>
+      <div>
+        <span class="font-medium text-900 block mb-2">Tags</span>
+        <div
+          v-for="tag in state.filteringTags"
+          :key="tag.id"
+        >
+          <span class="text-800">{{ tag.title }}</span>
+
+          <SelectButton
+            v-model="tag.active"
+            :options="[true, null, false]"
+            option-label="title"
+            aria-labelledby="custom"
+            @change="filtersChanged"
+          >
+            <template #option="slotProps">
+              <div class="button-content">
+                <span>{{
+                  slotProps.option === false ? 'Caché'
+                  : slotProps.option === null
+                    ? 'Affiché' : 'Requis'
+                }}</span>
+              </div>
+            </template>
+          </SelectButton>
+        </div>
+      </div>
+    </div>
+  </OverlayPanel>
 </template>
 
 <script setup lang="ts">
+import type OverlayPanel from 'primevue/overlaypanel'
 import state from '~/lib/viewer-state'
 import defaultLogo from '~/assets/logo_square.svg'
+
+const emit = defineEmits<{
+  filtersChanged: []
+}>()
+
+const filterOp = ref<OverlayPanel>()
+
+function openFilterPanel(event: Event) {
+  filterOp!.value!.toggle(event)
+}
+
+function filtersChanged() {
+  emit('filtersChanged')
+}
 </script>

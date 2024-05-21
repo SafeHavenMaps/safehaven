@@ -13,7 +13,11 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
     exclude_tags_list UUID[],
 
     cluster_eps DOUBLE PRECISION,
-    cluster_min_points INT
+    cluster_min_points INT,
+
+    active_categories_ids UUID[],
+    required_tags_ids UUID[],
+    exluded_tags_ids UUID[]
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -59,6 +63,10 @@ BEGIN
             -- Tags filter
             AND (allow_all_tags OR ec.tags_ids && tags_list)
             AND NOT (ec.tags_ids && exclude_tags_list)
+            -- User filters
+            AND (active_categories_ids && ec.categories_ids)
+            AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
+            AND NOT (ec.tags_ids && exluded_tags_ids)
     ),
     clusters AS (
         SELECT
@@ -102,7 +110,11 @@ CREATE OR REPLACE FUNCTION search_entities(
     exclude_tags_list UUID[],
 
     current_page BIGINT,
-    page_size BIGINT
+    page_size BIGINT,
+
+    active_categories_ids UUID[],
+    required_tags_ids UUID[],
+    exluded_tags_ids UUID[]
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -139,6 +151,10 @@ BEGIN
             AND
             (allow_all_tags OR (ec.tags_ids && tags_list))
             AND NOT (ec.tags_ids && exclude_tags_list)
+            -- User filters
+            AND active_categories_ids && "ec.categories_ids"
+            AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ "ec.tags_ids")
+            AND NOT ("ec.tags_id" && exluded_tags_ids)
         ORDER BY ts_rank(full_text_search_ts, to_tsquery(search_query)) DESC
         LIMIT page_size
         OFFSET (current_page - 1) * page_size;

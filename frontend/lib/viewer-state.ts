@@ -46,8 +46,8 @@ export class AppState {
 
   private _activeEntity: FetchedEntity | null = null
 
-  private filteringTags: (Tag & { active: boolean | null })[] = []
-  private filteringCategories: (Category & { active: boolean })[] = []
+  public filteringTags: (Tag & { active: boolean | null })[] = []
+  public filteringCategories: (Category & { active: boolean })[] = []
 
   get activeFilteringCategories() {
     return this.filteringCategories.filter(c => c.active).map(c => c.id)
@@ -139,12 +139,14 @@ export class AppState {
     this.familiesData = data.families
     this.categoriesData = data.categories
     this.tagsData = data.tags
-    this.filteringTags = this.tagsData.map((tag) => {
-      return {
-        ...tag,
-        active: tag.default_filter_status ? null : false,
-      }
-    })
+    this.filteringTags = this.tagsData
+      .filter(t => t.is_filter)
+      .map((tag) => {
+        return {
+          ...tag,
+          active: tag.default_filter_status ? null : false,
+        }
+      })
     this.cartographyInitConfigData = data.cartography_init_config
 
     this.familiesData.forEach((family) => {

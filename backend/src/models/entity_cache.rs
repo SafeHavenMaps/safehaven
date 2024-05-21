@@ -128,10 +128,7 @@ impl CachedEntity {
                 cluster_id,
                 cluster_center_x,
                 cluster_center_y
-            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
-            WHERE $14 && categories_ids
-                AND (array_length($15::uuid[], 1) = 0 OR $15::uuid[] <@ tags_ids)
-                AND NOT (tags_ids && $16::uuid[]);
+            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
             "#,
             request.xmin,
             request.ymin,
@@ -226,10 +223,7 @@ impl CachedEntity {
                 web_mercator_x as "web_mercator_x!",
                 web_mercator_y as "web_mercator_y!",
                 plain_text_location as "plain_text_location!"
-            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-            WHERE $11 && categories_ids
-                AND (array_length($12::uuid[], 1) = 0 OR $12::uuid[] <@ tags_ids)
-                AND NOT (tags_ids && $13::uuid[]);
+            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
             "#,
             request.search_query,
             request.family_id,
