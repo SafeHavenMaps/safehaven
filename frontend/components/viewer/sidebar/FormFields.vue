@@ -61,7 +61,29 @@
     </div>
 
     <div v-else-if="field.field_type == 'EventList'">
-      <strong>ToDo: Implement EventList</strong>
+      <Accordion :active-index="0">
+        <AccordionTab
+          v-for="event in getSortedEventList(field.key)"
+          :key="event"
+        >
+          <template #header>
+            <Tag
+              :severity="event.severity"
+              :value="event.title"
+            />
+          </template>
+
+          <p>
+            <strong>Date :</strong> {{ event.date.toLocaleDateString() }}
+          </p>
+
+          <p v-if="event.comment && event.comment.length > 0">
+            <strong>Commentaire :</strong>
+            <br>
+            {{ event.comment }}
+          </p>
+        </AccordionTab>
+      </Accordion>
     </div>
   </Fieldset>
 </template>
@@ -71,6 +93,38 @@ import DOMPurify from 'dompurify'
 
 // eslint-disable-next-line vue/require-prop-types
 const props = defineProps(['fields', 'data'])
+
+function getSortedEventList(fieldKey) {
+  return getKeyValue(fieldKey).map(e => eventWithMetadata(e, fieldKey)).sort((a, b) => a.date - b.date)
+}
+
+function eventWithMetadata(event, fieldKey) {
+  const field = props.fields.find(f => f.key === fieldKey)
+  const field_type_metadata = field.field_type_metadata
+  const current_metadata = field_type_metadata?.event_types?.find(m => m.value === event.type)
+
+  return {
+    ...event,
+    date: new Date(event.date),
+    title: current_metadata.label,
+    severity: eventColorToSeverity(current_metadata.color),
+  }
+}
+
+function eventColorToSeverity(color) {
+  switch (color) {
+    case 'neutral':
+      return 'secondary'
+    case 'success':
+      return 'success'
+    case 'fail':
+      return 'danger'
+    case 'warning':
+      return 'warning'
+    default:
+      return 'secondary'
+  }
+}
 
 function isUrlField(key) {
   const field = props.fields.find(f => f.key === key)
