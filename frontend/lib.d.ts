@@ -18,10 +18,31 @@ export type Family = Omit<api.components['schemas']['Family'], 'entity_form' | '
 
 export type Category = api.components['schemas']['Category']
 export type Tag = api.components['schemas']['Tag']
+export type SHComment = api.components['schemas']['Comment']
+
 export type CartographyInitConfig =
   api.components['schemas']['CartographyInitConfig']
 export type FetchedEntity = api.components['schemas']['FetchedEntity']
 export type ErrorResponse = api.components['schemas']['ErrorResponse']
+
+export type NewCategory = api.components['schemas']['NewCategory']
+export type UpdateCategory = api.components['schemas']['UpdateCategory']
+export type NewOrUpdateTag = api.components['schemas']['NewOrUpdateTag']
+export type NewComment = api.components['schemas']['NewComment']
+export type UpdateComment = api.components['schemas']['UpdateComment']
+export type NewEntity = api.components['schemas']['NewEntity']
+export type UpdateEntity = api.components['schemas']['UpdateEntity']
+export type ListedEntity = api.components['schemas']['ListedEntity']
+export type ListedComment = api.components['schemas']['ListedComment']
+export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAccessToken']
+export type AccessToken = api.components['schemas']['AccessToken']
+export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily']
+
+export type User = components['schemas']['User']
+export type NewUser = components['schemas']['NewUser']
+export type ChangePassword = components['schemas']['ChangePassword']
+export type SafeHavenOptions = components['schemas']['SafeHavenOptions']
+export type ConfigurationOption = components['schemas']['ConfigurationOption']
 
 export interface CanBeHighlighted {
   highlighted: boolean
