@@ -1007,7 +1007,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ListedComment"
+                    "$ref": "#/components/schemas/Comment"
                   }
                 }
               }

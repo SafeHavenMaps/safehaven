@@ -162,10 +162,9 @@ impl Comment {
         let result = sqlx::query_as!(
             PublicComment,
             r#"
-            SELECT c.id, c.author, c.text, c.data, c.created_at, c.updated_at
-            FROM comments c
-            INNER JOIN entities e ON c.entity_id = e.id
-            WHERE c.entity_id = $1
+            SELECT id, author, text, data, created_at, updated_at
+            FROM comments 
+            WHERE entity_id = $1
             ORDER BY created_at
             "#,
             given_entity_id
@@ -186,14 +185,13 @@ impl Comment {
     pub async fn list_for_entity(
         given_entity_id: Uuid,
         conn: &mut PgConnection,
-    ) -> Result<Vec<ListedComment>, AppError> {
+    ) -> Result<Vec<Comment>, AppError> {
         sqlx::query_as!(
-            ListedComment,
+            Comment,
             r#"
-            SELECT c.id, c.entity_id, e.display_name as entity_display_name, e.category_id as entity_category_id, c.created_at
-            FROM comments c
-            INNER JOIN entities e ON c.entity_id = e.id
-            WHERE c.entity_id = $1
+            SELECT *
+            FROM comments 
+            WHERE entity_id = $1
             ORDER BY created_at
             "#,
             given_entity_id

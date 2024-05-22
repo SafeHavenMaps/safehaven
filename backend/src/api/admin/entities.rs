@@ -8,7 +8,7 @@ use uuid::Uuid;
 use crate::{
     api::{AppError, AppJson, DbConn},
     models::{
-        comment::{Comment, ListedComment},
+        comment::Comment,
         entity::{Entity, ListedEntity, NewEntity, UpdateEntity},
     },
 };
@@ -150,14 +150,14 @@ pub async fn admin_entity_delete(
         ("id" = Uuid, Path, description = "Entity identifier")
     ),
     responses(
-        (status = 200, description = "List of comments for the entity", body = Vec<ListedComment>),
+        (status = 200, description = "List of comments for the entity", body = Vec<Comment>),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
 pub async fn admin_entity_get_comments(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-) -> Result<AppJson<Vec<ListedComment>>, AppError> {
+) -> Result<AppJson<Vec<Comment>>, AppError> {
     Ok(AppJson(Comment::list_for_entity(id, &mut conn).await?))
 }
 
