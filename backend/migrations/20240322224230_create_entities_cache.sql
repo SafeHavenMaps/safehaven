@@ -13,8 +13,8 @@ CREATE TABLE entities_caches (
     display_name TEXT NOT NULL,
     parent_id UUID,
     parent_display_name TEXT,
-    gps_location GEOGRAPHY(POINT, 4326) NOT NULL,
-    web_mercator_location GEOMETRY(POINT, 3857) NOT NULL,
+    gps_location GEOGRAPHY(POINT, 4326),
+    web_mercator_location GEOMETRY(POINT, 3857),
     plain_text_location TEXT NOT NULL,
     full_text_search TEXT NOT NULL,
     full_text_search_ts TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', full_text_search)) STORED,
@@ -211,6 +211,36 @@ BEGIN
             );
         END LOOP;
     END LOOP;
+
+    -- Finally, if the entity has no location, we insert it with empty coordinates
+    IF jsonb_array_length(refreshed_entity.locations) = 0 THEN
+        INSERT INTO entities_caches (
+            id,
+            entity_id,
+            category_id,
+            categories_ids,
+            tags_ids,
+            family_id,
+            display_name,
+            gps_location,
+            web_mercator_location,
+            plain_text_location,
+            full_text_search
+        )
+        VALUES (
+            uuid_generate_v4(),
+            refreshed_entity.id,
+            refreshed_entity.category_id,
+            categories_array,
+            tags_array,
+            family_id,
+            refreshed_entity.display_name,
+            NULL,
+            NULL,
+            '',
+            indexed_values
+        );
+    END IF;
 
     -- For each entity that refreshed_entity is a child of, update the cache
     IF recurse THEN

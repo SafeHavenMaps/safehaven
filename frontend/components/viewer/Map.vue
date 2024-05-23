@@ -8,7 +8,6 @@
       @moveend="forceRefresh"
     >
       <ol-view
-        ref="viewRef"
         :center="center"
         :zoom="zoom"
         :max-zoom="20"
@@ -68,6 +67,12 @@ const props = defineProps<{
   clusters: DisplayableCluster[]
 }>()
 
+defineExpose({
+  forceRefresh,
+  goToGpsCoordinates,
+  goToWebMercatorCoordinates,
+})
+
 const zoom = props.zoom
 const center = props.center
 
@@ -122,12 +127,6 @@ async function handleClusterClick(cluster: DisplayableCluster) {
 async function handleEntityClick(entity: DisplayableCachedEntity) {
   state.selectedCachedEntity(entity)
 }
-
-defineExpose({
-  forceRefresh,
-  goToGpsCoordinates,
-  goToWebMercatorCoordinates,
-})
 </script>
 
 <style scoped lang="scss">

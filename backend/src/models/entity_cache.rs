@@ -17,8 +17,8 @@ pub struct CachedEntity {
     pub display_name: String,
     pub parent_id: Option<Uuid>,
     pub parent_display_name: Option<String>,
-    pub web_mercator_x: f64,
-    pub web_mercator_y: f64,
+    pub web_mercator_x: Option<f64>,
+    pub web_mercator_y: Option<f64>,
     pub plain_text_location: String,
 }
 
@@ -105,6 +105,8 @@ pub struct SearchEntitiesRequest {
     pub active_categories: Vec<Uuid>,
     pub active_required_tags: Vec<Uuid>,
     pub active_hidden_tags: Vec<Uuid>,
+
+    pub require_locations: bool,
 }
 
 impl CachedEntity {
@@ -175,8 +177,8 @@ impl CachedEntity {
                 display_name: e.display_name.clone(),
                 parent_id: e.parent_id,
                 parent_display_name: e.parent_display_name.clone(),
-                web_mercator_x: e.web_mercator_x,
-                web_mercator_y: e.web_mercator_y,
+                web_mercator_x: Some(e.web_mercator_x),
+                web_mercator_y: Some(e.web_mercator_y),
                 plain_text_location: e.plain_text_location.clone(),
             })
             .collect();
@@ -233,7 +235,7 @@ impl CachedEntity {
                 web_mercator_x as "web_mercator_x!",
                 web_mercator_y as "web_mercator_y!",
                 plain_text_location as "plain_text_location!"
-            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
             "#,
             request.search_query,
             request.family_id,
@@ -247,7 +249,8 @@ impl CachedEntity {
             request.page_size,
             &request.active_categories,
             &request.active_required_tags,
-            &request.active_hidden_tags
+            &request.active_hidden_tags,
+            request.require_locations
         )
         .fetch_all(conn)
         .await

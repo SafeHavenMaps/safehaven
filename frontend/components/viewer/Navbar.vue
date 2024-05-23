@@ -98,7 +98,7 @@
       <div class="filter-settings">
         <span class="font-medium text-900 block mb-2">Filtres</span>
         <div
-          v-for="tag in state.filteringTags"
+          v-for="tag in state.filteringTags.filter(t => t.is_filter)"
           :key="tag.id"
           class="mb-2 p-1"
         >
@@ -261,7 +261,7 @@ async function searchLocation(event: Event) {
 
 async function searchEntity(event: Event) {
   event.preventDefault()
-  currentEntitiesResults.value = await state.searchEntities(entitySearch.value)
+  currentEntitiesResults.value = await state.searchEntitiesWithLocations(entitySearch.value)
 }
 
 function locationChosen(result: NominatimResult) {

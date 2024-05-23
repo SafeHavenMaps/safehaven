@@ -55,7 +55,7 @@
     </div>
 
     <div v-else-if="field.field_type == 'DiscreteScore'">
-      <ViewerSidebarScoreJauge
+      <ViewerCommonScoreJauge
         :score="getKeyValue(field.key)"
       />
     </div>

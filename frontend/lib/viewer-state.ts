@@ -172,7 +172,6 @@ export class AppState {
 
     this.tagsData = data.tags
     this.filteringTags = this.tagsData
-      .filter(t => t.is_filter)
       .map((tag) => {
         return {
           ...tag,
@@ -254,8 +253,8 @@ export class AppState {
     this._activeEntity = await this.client.fetchEntity(id)
   }
 
-  async searchEntities(query: string) {
-    return await this.client.searchEntities(
+  async searchEntitiesWithLocations(query: string) {
+    return await this.client.searchEntitiesWithLocations(
       query,
       this.activeFamilyId!,
       this.activeFilteringCategories,
@@ -298,7 +297,7 @@ export class AppState {
     this.viewData.entities.push(
       ...newEntities.map(entity => ({
         ...entity,
-        coordinates: [entity.web_mercator_x, entity.web_mercator_y],
+        coordinates: [entity.web_mercator_x!, entity.web_mercator_y!],
         family: this.familiesLookupTable[entity.family_id],
         category: this.categoriesLookupTable[entity.category_id],
         highlighted: false,

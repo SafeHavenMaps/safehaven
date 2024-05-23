@@ -10,11 +10,12 @@ export type Entity = api.components['schemas']['Entity']
 export type Cluster = api.components['schemas']['Cluster']
 export type CachedEntity = api.components['schemas']['CachedEntity']
 
-export
 export type Family = Omit<api.components['schemas']['Family'], 'entity_form' | 'comment_form'> & {
   entity_form: api.components['schemas']['Form']
   comment_form: api.components['schemas']['Form']
 }
+
+export type PublicComment = api.components['schemas']['PublicComment']
 
 export type Category = api.components['schemas']['Category']
 export type Tag = api.components['schemas']['Tag']
@@ -22,7 +23,14 @@ export type SHComment = api.components['schemas']['Comment']
 
 export type CartographyInitConfig =
   api.components['schemas']['CartographyInitConfig']
+
 export type FetchedEntity = api.components['schemas']['FetchedEntity']
+export type ResolvedFetchedEntity = FetchedEntity & {
+  family: Family
+  category: Category
+  tags: Tag[]
+}
+
 export type ErrorResponse = api.components['schemas']['ErrorResponse']
 
 export type NewCategory = api.components['schemas']['NewCategory']

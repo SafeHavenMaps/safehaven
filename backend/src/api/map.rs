@@ -139,6 +139,7 @@ pub struct SearchRequest {
     active_categories: Vec<Uuid>,
     active_required_tags: Vec<Uuid>,
     active_hidden_tags: Vec<Uuid>,
+    require_locations: bool,
 }
 
 impl Display for SearchRequest {
@@ -185,6 +186,7 @@ async fn viewer_search_request(
         active_categories: request.active_categories,
         active_required_tags: request.active_required_tags,
         active_hidden_tags: request.active_hidden_tags,
+        require_locations: request.require_locations,
     };
 
     Ok(AppJson(

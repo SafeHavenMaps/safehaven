@@ -121,7 +121,9 @@ CREATE OR REPLACE FUNCTION search_entities(
 
     active_categories_ids UUID[],
     required_tags_ids UUID[],
-    exluded_tags_ids UUID[]
+    exluded_tags_ids UUID[],
+
+    require_locations BOOL
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -166,6 +168,8 @@ BEGIN
             AND (active_categories_ids && ec.categories_ids)
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
             AND NOT (ec.tags_ids && exluded_tags_ids)
+            -- If we require locations, we only return entities with locations
+            AND (NOT require_locations OR ec.web_mercator_location IS NOT NULL)
         ORDER BY ts_rank(full_text_search_ts, plainto_tsquery('english', search_query)) DESC
         LIMIT page_size
         OFFSET (current_page - 1) * page_size;

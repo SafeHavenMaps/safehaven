@@ -19,7 +19,32 @@
         @entity-click="(e: DisplayableCachedEntity) => state.selectedCachedEntity(e)"
       />
     </div>
-    <ViewerEntitySidebar :style="fitContainer()" />
+
+    <Sidebar
+      v-model:visible="state.hasActiveEntity"
+      :modal="false"
+      :style="fitContainer()"
+      position="left"
+      class="w-full md:w-20rem lg:w-30rem"
+    >
+      <template #header>
+        <div
+          v-if="state.activeEntity"
+          class="flex align-items-center gap-2"
+        >
+          <ViewerCategoryTag :category="state.activeEntity!.category" />
+          <h3 class="m-0">
+            {{ state.activeEntity!.entity.display_name }}
+          </h3>
+        </div>
+      </template>
+
+      <ViewerCommonEntityDisplayer
+        v-if="state.activeEntity"
+        :entity="state.activeEntity!"
+        :categories="state.categories"
+      />
+    </Sidebar>
   </div>
 </template>
 

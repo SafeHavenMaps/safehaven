@@ -73,6 +73,34 @@ export default function useClient() {
       return data
     },
 
+    async searchEntitiesWithLocations(
+      query: string,
+      familyId: string,
+      activeCategories: string[],
+      activeRequiredTags: string[],
+      activeHiddenTags: string[],
+    ) {
+      const { data, error } = await rawClient.POST('/api/map/search', {
+        body: {
+          search_query: query,
+          family_id: familyId,
+          page: 1,
+          page_size: 5,
+          active_categories: activeCategories,
+          active_required_tags: activeRequiredTags,
+          active_hidden_tags: activeHiddenTags,
+          require_locations: true,
+        },
+      })
+      if (error) throw error
+
+      return data.map(entity => ({
+        ...entity,
+        web_mercator_x: entity.web_mercator_x!,
+        web_mercator_y: entity.web_mercator_y!,
+      }))
+    },
+
     async searchEntities(
       query: string,
       familyId: string,
@@ -89,6 +117,7 @@ export default function useClient() {
           active_categories: activeCategories,
           active_required_tags: activeRequiredTags,
           active_hidden_tags: activeHiddenTags,
+          require_locations: false,
         },
       })
       if (error) throw error

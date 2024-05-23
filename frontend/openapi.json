@@ -2351,8 +2351,6 @@
           "tags_ids",
           "family_id",
           "display_name",
-          "web_mercator_x",
-          "web_mercator_y",
           "plain_text_location"
         ],
         "properties": {
@@ -2403,11 +2401,13 @@
           },
           "web_mercator_x": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "nullable": true
           },
           "web_mercator_y": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "nullable": true
           }
         }
       },
@@ -3381,7 +3381,8 @@
           "page_size",
           "active_categories",
           "active_required_tags",
-          "active_hidden_tags"
+          "active_hidden_tags",
+          "require_locations"
         ],
         "properties": {
           "active_categories": {
@@ -3416,6 +3417,9 @@
           "page_size": {
             "type": "integer",
             "format": "int64"
+          },
+          "require_locations": {
+            "type": "boolean"
           },
           "search_query": {
             "type": "string"
