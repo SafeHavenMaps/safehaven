@@ -5,7 +5,7 @@ export default function createAuthMiddleware(): Middleware {
   return {
     async onResponse(response, _options) {
       if (response.status === 401) {
-        navigateTo('/admin/login')
+        navigateTo('/admin/login?redirect=${encodeURIComponent(currentUrl)}')
       }
       return response
     },

@@ -2,6 +2,7 @@
   <svg
     :style="{ width: props.size ?? '24px', height: props.size ?? '24px' }"
     viewBox="0 0 24 24"
+    :class="{ 'icon-rotate': rotating }"
   >
     <path
       :d="iconDict[props.iconName]"
@@ -16,6 +17,7 @@ import * as mdi from '@mdi/js'
 const props = defineProps<{
   iconName: keyof typeof iconDict
   size?: string
+  rotating?: boolean
 }>()
 
 const iconDict: Record<string, string> = {
@@ -37,11 +39,25 @@ const iconDict: Record<string, string> = {
   delete: mdi.mdiDelete,
   save: mdi.mdiUpload,
   lightDark: mdi.mdiThemeLightDark,
+  loading: mdi.mdiLoading,
 }
 </script>
 
 <style scoped>
 svg path {
   fill: currentColor;
+}
+
+.icon-rotate {
+  animation: spin infinite 1s linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

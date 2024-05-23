@@ -58,6 +58,7 @@ export class AppState {
   async logout(username: string, password: string, remember_me: boolean) {
     await client.login(username, password, remember_me)
     this.user_authentified = true
+    navigateTo('/admin/login?redirect=${encodeURIComponent(currentUrl)}')
   }
 
   async fetchConfig(): Promise<void> {
