@@ -43,6 +43,7 @@
         v-if="state.activeEntity"
         :entity="state.activeEntity!"
         :categories="state.categories"
+        @entity-selected="displayEntityId"
       />
     </Sidebar>
   </div>
@@ -78,6 +79,10 @@ function goToGpsCoordinates(coordinates: Coordinate) {
 
 async function refreshMap() {
   await mapRef.value?.forceRefresh()
+}
+
+async function displayEntityId(entityId: string) {
+  await state.selectEntity(entityId)
 }
 
 async function goToEntity(entity: CachedEntity) {

@@ -30,7 +30,7 @@
           :height="38"
           :fill="entity.category.fill_color"
           :stroke="entity.category.border_color"
-          :highlighted="entity.entity_id === state.activeEntity?.entity.id"
+          :highlighted="isEntityHighlighted(entity)"
           :inside-icon="entity.category.icon"
           @click="handleEntityClick"
         />
@@ -81,6 +81,10 @@ let map: Map | null = null
 onMounted(() => {
   map = mapRef.value!.map
 })
+
+function isEntityHighlighted(entity: DisplayableCachedEntity) {
+  return state.activeEntity?.entity.id === entity.entity_id
+}
 
 async function forceRefresh() {
   const { extent, currentZoom } = getExtentAndZoom()
