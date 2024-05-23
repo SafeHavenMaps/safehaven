@@ -2,15 +2,13 @@
   <Toolbar>
     <template #start>
       <div class="flex align-items-center">
-        <div class="flex-shrink-0">
-          <img
-            height="40"
-            width="40"
-            alt="icon"
-            :src="state.logo ?? defaultLogo"
-          >
-        </div>
-        <div class="flex-grow-1 pl-3">
+        <img
+          height="40"
+          width="40"
+          alt="icon"
+          :src="state.logo ?? defaultLogo"
+        >
+        <div class="pl-3">
           <h3 class="my-0">
             {{ state.title }}
           </h3>
