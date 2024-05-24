@@ -1431,6 +1431,35 @@
       }
     },
     "/api/admin/session": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "operationId": "admin_login_check",
+        "responses": {
+          "200": {
+            "description": "Check login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "default": null,
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "admin"

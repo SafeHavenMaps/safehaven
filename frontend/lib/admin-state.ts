@@ -26,8 +26,6 @@ import type {
 const client = useClient()
 
 export class AppState {
-  public user_authentified = false
-
   private optionsData: SafeHavenOptions | null = null
   private usersData: Family[] | null = null
   private familiesData: Family[] | null = null
@@ -37,28 +35,26 @@ export class AppState {
   private pendingEntitiesData: ListedEntity[] | null = null
   private pendingCommentsData: ListedComment[] | null = null
 
-  get online() {
-    return this.optionsData.status?.status === 'ok'
+  get hasSafeMode() {
+    return !!this.optionsData.safe_mode?.enabled
   }
 
-  // get hasSafeMode() {
-  //   return !!this.status?.safe_mode
-  // }
-
-  // get safeMode() {
-  //   return this.status!.safe_mode
-  // }
+  get safeMode() {
+    return this.optionsData.safe_mode!.enabled
+  }
 
   async login(username: string, password: string, remember_me: boolean) {
     await client.login(username, password, remember_me)
-    this.user_authentified = true
     return true
   }
 
   async logout(username: string, password: string, remember_me: boolean) {
     await client.login(username, password, remember_me)
-    this.user_authentified = true
     navigateTo('/admin/login?redirect=${encodeURIComponent(currentUrl)}')
+  }
+
+  async check_login(): Promise<boolean> {
+    return await client.check_login()
   }
 
   async fetchConfig(): Promise<void> {

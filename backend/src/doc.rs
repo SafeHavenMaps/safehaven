@@ -40,6 +40,7 @@ use utoipa::OpenApi;
         // admin
         admin::admin_login,
         admin::admin_logout,
+        admin::admin_login_check,
         // admin::options
         admin::options::admin_options_get,
         admin::options::admin_options_update,

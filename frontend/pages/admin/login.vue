@@ -76,8 +76,7 @@
 import { useRoute } from 'vue-router'
 import state from '~/lib/admin-state'
 
-// state.check_auth_cookie()
-if (state.user_authentified) {
+if (await state.check_login()) {
   navigateTo('/admin')
 }
 

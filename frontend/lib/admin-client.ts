@@ -55,6 +55,12 @@ export default function useClient() {
       return data
     },
 
+    async check_login() {
+      const { error } = await rawClient.GET('/api/admin/session')
+      if (error) return false
+      return true
+    },
+
     // Options
     async getConfig(): Promise<SafeHavenOptions> {
       const { data, error } = await this.rawClient.GET('/api/admin/options')

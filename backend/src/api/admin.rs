@@ -7,7 +7,7 @@ pub mod options;
 pub mod tags;
 pub mod users;
 
-use crate::api::{AppError, AppState, DbConn};
+use crate::api::{AppError, AppJson, AppState, DbConn};
 use crate::models::user::User;
 use axum::async_trait;
 use axum::extract::{FromRequestParts, Request, State};
@@ -30,10 +30,13 @@ const REFRESH_TOKEN_COOKIE_NAME: &str = "refresh_token";
 
 pub fn routes(state: &AppState) -> Router<AppState> {
     let unauthenticated_router: Router<AppState> = Router::new()
+        // sessions
         .route("/session", post(admin_login))
         .route("/session", delete(admin_logout));
 
     let authenticated_router: Router<AppState> = Router::new()
+        // sessions
+        .route("/session", get(admin_login_check))
         // options
         .route("/options", get(options::admin_options_get))
         .route("/options/:name", put(options::admin_options_update))
@@ -249,6 +252,18 @@ where
     fn into_response(self) -> Response {
         (self.jar, axum::Json(self.body)).into_response()
     }
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/admin/session",
+    responses(
+        (status = 200, description = "Check login", body = ()),
+        (status = 401, description = "Invalid permissions", body = ErrorResponse),
+    )
+)]
+async fn admin_login_check(DbConn(_conn): DbConn) -> Result<AppJson<()>, AppError> {
+    return Ok(AppJson(()));
 }
 
 #[utoipa::path(
