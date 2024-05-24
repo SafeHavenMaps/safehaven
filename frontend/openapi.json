@@ -1513,7 +1513,15 @@
         "operationId": "admin_logout",
         "responses": {
           "200": {
-            "description": "Cookie jar cleaned"
+            "description": "Logout",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "$ref": "#/components/schemas/CookieJar"
+                },
+                "description": "Cookie jar cleaned"
+              }
+            }
           },
           "404": {
             "description": "User or password not found",

@@ -165,13 +165,18 @@ async fn authentication_middleware(
                 &jsonwebtoken::Validation::default(),
             ) {
                 Ok(data) => data.claims,
-                Err(_) => return Err(AppError::Unauthorized),
+                Err(_) => {
+                    let purged_jar = cookies
+                        .remove(TOKEN_COOKIE_NAME)
+                        .remove(REFRESH_TOKEN_COOKIE_NAME);
+                    return Ok((purged_jar, AppError::Unauthorized).into_response());
+                }
             };
 
             let user = User::get(refresh_token_data.admin_id, &mut conn).await?;
-            let new_token = create_user_claim(&user);
+            let new_token_data = create_user_claim(&user);
 
-            (new_token, true)
+            (new_token_data, true)
         }
     };
 
@@ -298,7 +303,7 @@ async fn admin_login(
     delete,
     path = "/api/admin/session",
     responses(
-        (status = 200, description = "Logout", description = "Cookie jar cleaned"),
+        (status = 200, description = "Logout", headers(("Set-Cookie" = CookieJar, description = "Cookie jar cleaned"))),
         (status = 404, description = "User or password not found", body = ErrorResponse),
     )
 )]
