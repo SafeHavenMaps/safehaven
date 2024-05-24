@@ -1,18 +1,21 @@
 <template>
   <div>
     <div>
-      navbar
-    </div>
-    <div>
+      <AdminNavbar />
       <div>
-        <AdminSidebar />
-      </div>
-      <div>
-        mainpanel
-      </div>
-      <div>
-        filterbox
+        <div>
+          <AdminSidebar />
+        </div>
+        <div>
+          mainpanel
+        </div>
+        <div>
+          filterbox
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+</script>
