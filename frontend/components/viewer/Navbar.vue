@@ -149,12 +149,12 @@
             </InputGroup>
           </form>
 
-          <div v-if="currentEntitiesResults.length > 0">
+          <div v-if="currentSearchEntities().length > 0">
             <Divider type="dotted" />
 
             <div style="max-height: 500px; overflow-y: auto;">
               <div
-                v-for="result in currentEntitiesResults"
+                v-for="result in currentSearchEntities()"
                 :key="result.id"
                 class="result mb-2 p-2"
                 @click="entityChosen(result)"
@@ -229,7 +229,7 @@ import state from '~/lib/viewer-state'
 import defaultLogo from '~/assets/logo_square.svg'
 import type { Result as NominatimResult } from '~/lib/nominatim'
 import { freeFormSearch } from '~/lib/nominatim'
-import type { CachedEntity } from '~/lib'
+import type { CachedEntity, PaginatedCachedEntitiesWithLocation } from '~/lib'
 
 const emit = defineEmits<{
   filtersChanged: []
@@ -244,7 +244,11 @@ const placeSearch: Ref<string> = ref('')
 const entitySearch: Ref<string> = ref('')
 
 const currentLocationsResults: Ref<NominatimResult[]> = ref([])
-const currentEntitiesResults: Ref<CachedEntity[]> = ref([])
+const currentEntitiesResults: Ref<PaginatedCachedEntitiesWithLocation | null> = ref(null)
+
+function currentSearchEntities() {
+  return currentEntitiesResults.value?.entities ?? []
+}
 
 function openFilterPanel(event: Event) {
   filterOp!.value!.toggle(event)

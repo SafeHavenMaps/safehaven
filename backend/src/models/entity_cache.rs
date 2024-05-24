@@ -22,6 +22,69 @@ pub struct CachedEntity {
     pub plain_text_location: String,
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+struct PaginatedCachedEntity {
+    pub id: Uuid,
+    pub entity_id: Uuid,
+    pub category_id: Uuid,
+    pub categories_ids: Vec<Uuid>,
+    pub tags_ids: Vec<Uuid>,
+    pub family_id: Uuid,
+    pub display_name: String,
+    pub parent_id: Option<Uuid>,
+    pub parent_display_name: Option<String>,
+    pub web_mercator_x: Option<f64>,
+    pub web_mercator_y: Option<f64>,
+    pub plain_text_location: String,
+    pub total_results: i64,
+    pub total_pages: i64,
+    pub response_current_page: i64,
+}
+
+impl From<Vec<PaginatedCachedEntity>> for CachedEntitiesWithPagination {
+    fn from(paginated_entities: Vec<PaginatedCachedEntity>) -> Self {
+        let mut entities = Vec::new();
+        let total_results = paginated_entities.first().map_or(0, |e| e.total_results);
+        let total_pages = paginated_entities.first().map_or(0, |e| e.total_pages);
+        let response_current_page = paginated_entities
+            .first()
+            .map_or(0, |e| e.response_current_page);
+
+        for paginated_entity in paginated_entities {
+            let entity = CachedEntity {
+                id: paginated_entity.id,
+                entity_id: paginated_entity.entity_id,
+                category_id: paginated_entity.category_id,
+                categories_ids: paginated_entity.categories_ids,
+                tags_ids: paginated_entity.tags_ids,
+                family_id: paginated_entity.family_id,
+                display_name: paginated_entity.display_name,
+                parent_id: paginated_entity.parent_id,
+                parent_display_name: paginated_entity.parent_display_name,
+                web_mercator_x: paginated_entity.web_mercator_x,
+                web_mercator_y: paginated_entity.web_mercator_y,
+                plain_text_location: paginated_entity.plain_text_location,
+            };
+            entities.push(entity);
+        }
+
+        CachedEntitiesWithPagination {
+            entities,
+            total_results,
+            total_pages,
+            response_current_page,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, ToSchema, Debug)]
+pub struct CachedEntitiesWithPagination {
+    pub entities: Vec<CachedEntity>,
+    pub total_results: i64,
+    pub total_pages: i64,
+    pub response_current_page: i64,
+}
+
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct CachedClusteredEntity {
     pub id: Uuid,
@@ -214,13 +277,13 @@ impl CachedEntity {
     pub async fn search_entities(
         request: SearchEntitiesRequest,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Self>, AppError> {
+    ) -> Result<CachedEntitiesWithPagination, AppError> {
         if (request.page_size < 1) || (request.page < 1) {
             return Err(AppError::InvalidPagination);
         }
 
-        query_as!(
-            Self,
+        let results = query_as!(
+            PaginatedCachedEntity,
             r#"
             SELECT 
                 id as "id!",
@@ -234,7 +297,10 @@ impl CachedEntity {
                 parent_display_name,
                 web_mercator_x as "web_mercator_x!",
                 web_mercator_y as "web_mercator_y!",
-                plain_text_location as "plain_text_location!"
+                plain_text_location as "plain_text_location!",
+                total_results as "total_results!",
+                total_pages as "total_pages!",
+                response_current_page as "response_current_page!"
             FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
             "#,
             request.search_query,
@@ -254,6 +320,8 @@ impl CachedEntity {
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::Database)
+        .map_err(AppError::Database)?;
+
+        Ok(results.into())
     }
 }

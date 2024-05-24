@@ -75,3 +75,12 @@ export type DisplayableCachedEntity = CachedEntity &
   CanBeHighlighted
 
 export type DisplayableCluster = Cluster & HasCoordinates
+
+export type PaginatedCachedEntities = api.components['schemas']['CachedEntitiesWithPagination']
+
+export type PaginatedCachedEntitiesWithLocation = PaginatedCachedEntities & {
+  entities: (CachedEntity & {
+    web_mercator_x: number
+    web_mercator_y: number
+  })[]
+}

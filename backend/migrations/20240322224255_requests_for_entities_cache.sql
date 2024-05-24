@@ -136,22 +136,15 @@ CREATE OR REPLACE FUNCTION search_entities(
     parent_display_name TEXT,
     web_mercator_x DOUBLE PRECISION,
     web_mercator_y DOUBLE PRECISION,
-    plain_text_location TEXT
+    plain_text_location TEXT,
+    total_results BIGINT,
+    total_pages BIGINT,
+    response_current_page BIGINT
 ) AS $$
 BEGIN
     RETURN QUERY
-        SELECT ec.id,
-            ec.entity_id,
-            ec.category_id,
-            ec.categories_ids,
-            ec.tags_ids,
-            ec.family_id,
-            ec.display_name,
-            ec.parent_id,
-            ec.parent_display_name,
-            ST_X(ec.web_mercator_location) AS web_mercator_x,
-            ST_Y(ec.web_mercator_location) AS web_mercator_y,
-            ec.plain_text_location
+    WITH filtered_entities AS (
+        SELECT ec.*
         FROM entities_caches ec
         WHERE
             (full_text_search_ts @@ plainto_tsquery('english', search_query))
@@ -168,10 +161,34 @@ BEGIN
             AND (active_categories_ids && ec.categories_ids)
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
             AND NOT (ec.tags_ids && exluded_tags_ids)
-            -- If we require locations, we only return entities with locations
+            -- If we do not require locations, we only return entities with locations
             AND (NOT require_locations OR ec.web_mercator_location IS NOT NULL)
         ORDER BY ts_rank(full_text_search_ts, plainto_tsquery('english', search_query)) DESC
+    ),
+    total_count AS (
+        SELECT COUNT(*) AS total_results FROM filtered_entities
+    ),
+    paginated_results AS (
+        SELECT
+            ec.id,
+            ec.entity_id,
+            ec.category_id,
+            ec.categories_ids,
+            ec.tags_ids,
+            ec.family_id,
+            ec.display_name,
+            ec.parent_id,
+            ec.parent_display_name,
+            ST_X(ec.web_mercator_location) AS web_mercator_x,
+            ST_Y(ec.web_mercator_location) AS web_mercator_y,
+            ec.plain_text_location,
+            tc.total_results,
+            CEIL(tc.total_results / page_size::FLOAT)::BIGINT AS total_pages,
+            current_page as response_current_page
+        FROM filtered_entities ec, total_count tc
         LIMIT page_size
-        OFFSET (current_page - 1) * page_size;
+        OFFSET (current_page - 1) * page_size
+    )
+    SELECT * FROM paginated_results;
 END;
 $$ LANGUAGE plpgsql;

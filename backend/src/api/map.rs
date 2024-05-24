@@ -2,7 +2,8 @@ use crate::api::{AppError, AppJson, AppState, DbConn, MapUserToken};
 use crate::models::comment::{Comment, NewComment, PublicComment};
 use crate::models::entity::{Entity, ListedEntity, NewEntity, PublicEntity};
 use crate::models::entity_cache::{
-    CachedEntity, EntitiesAndClusters, FindEntitiesRequest, SearchEntitiesRequest,
+    CachedEntitiesWithPagination, CachedEntity, EntitiesAndClusters, FindEntitiesRequest,
+    SearchEntitiesRequest,
 };
 use axum::extract::{Path, State};
 use axum::{
@@ -157,7 +158,7 @@ impl Display for SearchRequest {
     path = "/api/map/search",
     request_body = SearchRequest,
     responses(
-        (status = 200, description = "List of entities", body = Vec<CachedEntity>),
+        (status = 200, description = "List of entities", body = CachedEntitiesWithPagination),
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
@@ -165,7 +166,7 @@ async fn viewer_search_request(
     DbConn(mut conn): DbConn,
     MapUserToken(token): MapUserToken,
     Json(request): Json<SearchRequest>,
-) -> Result<AppJson<Vec<CachedEntity>>, AppError> {
+) -> Result<AppJson<CachedEntitiesWithPagination>, AppError> {
     tracing::trace!("Received search request {}", request);
 
     if !is_token_allowed_for_family(&token, &request.family_id) {

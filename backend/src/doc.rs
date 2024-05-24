@@ -14,7 +14,7 @@ use crate::{
         entity::{
             Entity, ListedEntity, NewEntity, PublicEntity, UnprocessedLocation, UpdateEntity,
         },
-        entity_cache::{CachedEntity, Cluster, EntitiesAndClusters},
+        entity_cache::{CachedEntitiesWithPagination, CachedEntity, Cluster, EntitiesAndClusters},
         family::{Family, Field, FieldType, Form, NewOrUpdateFamily},
         options::{
             CartographyClusterConfig, CartographyInitConfig, ConfigurationOption, GeneralOptions,
@@ -125,6 +125,7 @@ use utoipa::OpenApi;
         ListedEntity,
         PublicEntity,
         CachedEntity,
+        CachedEntitiesWithPagination,
         Cluster,
         EntitiesAndClusters,
         UnprocessedLocation,

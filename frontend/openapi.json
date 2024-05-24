@@ -2234,10 +2234,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CachedEntity"
-                  }
+                  "$ref": "#/components/schemas/CachedEntitiesWithPagination"
                 }
               }
             }
@@ -2375,6 +2372,35 @@
             "items": {
               "$ref": "#/components/schemas/Tag"
             }
+          }
+        }
+      },
+      "CachedEntitiesWithPagination": {
+        "type": "object",
+        "required": [
+          "entities",
+          "total_results",
+          "total_pages",
+          "response_current_page"
+        ],
+        "properties": {
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CachedEntity"
+            }
+          },
+          "response_current_page": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_pages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_results": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
