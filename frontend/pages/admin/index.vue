@@ -1,21 +1,18 @@
 <template>
   <div>
     <div>
-      <AdminNavbar />
       <div>
-        <div>
-          <AdminSidebar />
-        </div>
-        <div>
-          mainpanel
-        </div>
-        <div>
-          filterbox
-        </div>
+        mainpanel
+      </div>
+      <div>
+        filterbox
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'admin-ui',
+})
 </script>

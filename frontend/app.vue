@@ -1,9 +1,11 @@
 <template>
-  <NuxtPage v-if="state.loaded" />
-  <NuxtPage v-else>
-    <h1>API is not available</h1>
-    <p>Please try again later</p>
-  </NuxtPage>
+  <NuxtLayout>
+    <NuxtPage v-if="state.loaded" />
+    <NuxtPage v-else>
+      <h1>API is not available</h1>
+      <p>Please try again later</p>
+    </NuxtPage>
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
