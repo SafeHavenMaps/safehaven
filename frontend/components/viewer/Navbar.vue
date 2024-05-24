@@ -45,6 +45,7 @@
           </template>
         </Button>
         <Button
+          v-if="props.showCategorySwitcher"
           label="Filtres"
           class="p-button-help mr-2"
           @click="openFilterPanel"
@@ -57,6 +58,7 @@
           </template>
         </Button>
         <Button
+          v-if="props.showSearch"
           class="p-button-warning mr-2"
           @click="openSearchPanel"
         >
@@ -169,7 +171,7 @@
                 </div>
 
                 <div class="mt-1">
-                  <ViewerCategoryTag :category="state.getCategory(result.category_id)" />
+                  <CategoryTag :category="state.getCategory(result.category_id)" />
                 </div>
               </div>
             </div>
@@ -230,6 +232,16 @@ import defaultLogo from '~/assets/logo_square.svg'
 import type { Result as NominatimResult } from '~/lib/nominatim'
 import { freeFormSearch } from '~/lib/nominatim'
 import type { CachedEntity, PaginatedCachedEntitiesWithLocation } from '~/lib'
+
+export interface Props {
+  showCategorySwitcher?: boolean
+  showSearch?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showCategorySwitcher: true,
+  showSearch: true,
+})
 
 const emit = defineEmits<{
   filtersChanged: []

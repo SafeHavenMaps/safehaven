@@ -25,7 +25,6 @@
       <Button
         label="Logout"
         link
-        @click="(() => { state.logout() })"
       />
     </template>
   </Toolbar>

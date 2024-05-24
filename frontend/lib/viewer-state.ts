@@ -132,42 +132,13 @@ export class AppState {
     this.initConfig = await this.client.checkStatus()
   }
 
-  cleanupSvg(svg: string | null | undefined): string | null {
-    if (!svg || svg.length === 0) {
-      return null
-    }
-
-    const parser = new DOMParser()
-    const svgElement = parser.parseFromString(svg, 'image/svg+xml').querySelector('svg')
-    if (svgElement) {
-      svgElement.removeAttribute('width')
-      svgElement.removeAttribute('height')
-      svgElement.setAttribute('style', 'width: 100%; height: 100%;')
-      return svgElement.outerHTML
-    }
-
-    return null
-  }
-
   async bootstrapWithToken(token: string) {
     const data = await this.client.bootstrap(token)
 
     this.familiesData = data.families
-      .map((f) => {
-        return {
-          ...f,
-          icon: this.cleanupSvg(f.icon),
-        }
-      })
       .sort((a, b) => a.sort_order - b.sort_order)
 
     this.categoriesData = data.categories
-      .map((c) => {
-        return {
-          ...c,
-          icon: this.cleanupSvg(c.icon),
-        }
-      })
       .sort((a, b) => a.title.localeCompare(b.title))
 
     this.tagsData = data.tags
@@ -260,6 +231,18 @@ export class AppState {
       this.activeFilteringCategories,
       this.activeRequiredTags,
       this.activeHiddenTags,
+    )
+  }
+
+  async searchEntities(query: string, page: number, pageSize: number) {
+    return await this.client.searchEntities(
+      query,
+      this.activeFamilyId!,
+      this.activeFilteringCategories,
+      this.activeRequiredTags,
+      this.activeHiddenTags,
+      page,
+      pageSize,
     )
   }
 

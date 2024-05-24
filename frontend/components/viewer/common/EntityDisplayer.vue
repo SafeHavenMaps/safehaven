@@ -16,7 +16,7 @@
 
           <template #content>
             <p class="m-0">
-              <ViewerCategoryTag :category="getCategory(child.category_id)" />
+              <CategoryTag :category="getCategory(child.category_id)" />
             </p>
           </template>
 
@@ -107,7 +107,7 @@
 
           <template #content>
             <p class="m-0">
-              <ViewerCategoryTag :category="getCategory(parent.category_id)" />
+              <CategoryTag :category="getCategory(parent.category_id)" />
             </p>
           </template>
 

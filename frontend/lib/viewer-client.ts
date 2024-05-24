@@ -110,13 +110,15 @@ export default function useClient() {
       activeCategories: string[],
       activeRequiredTags: string[],
       activeHiddenTags: string[],
+      page: number,
+      pageSize: number,
     ): Promise<PaginatedCachedEntities> {
       const { data, error } = await rawClient.POST('/api/map/search', {
         body: {
           search_query: query,
           family_id: familyId,
-          page: 1,
-          page_size: 5,
+          page: page,
+          page_size: pageSize,
           active_categories: activeCategories,
           active_required_tags: activeRequiredTags,
           active_hidden_tags: activeHiddenTags,

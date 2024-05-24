@@ -20,10 +20,12 @@ CREATE TABLE families (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
     icon TEXT,
+    icon_hash TEXT GENERATED ALWAYS AS (md5(icon::text)) STORED,
     entity_form JSONB NOT NULL,
     comment_form JSONB NOT NULL,
     sort_order INT NOT NULL DEFAULT 0
 );
+CREATE INDEX family_icon_hash ON families(icon_hash);
 
 CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -31,12 +33,14 @@ CREATE TABLE categories (
     family_id UUID NOT NULL,
     default_status BOOLEAN NOT NULL DEFAULT TRUE,
     icon TEXT,
+    icon_hash TEXT GENERATED ALWAYS AS (md5(icon::text)) STORED,
     fill_color VARCHAR(7) NOT NULL DEFAULT '#FFFFFF',
     border_color VARCHAR(7) NOT NULL DEFAULT '#000000',
 
     FOREIGN KEY (family_id) REFERENCES families(id) ON DELETE CASCADE
 );
 CREATE INDEX categories_family_id_idx ON categories(family_id);
+CREATE INDEX categories_icon_hash ON categories(icon_hash);
 
 CREATE TABLE tags (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

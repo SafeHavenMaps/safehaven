@@ -304,6 +304,7 @@ FOR EACH ROW EXECUTE FUNCTION insert_entities_entities_trigger_function();
 -- Update the cache for a an entity pair from entities_entities when one is deleted
 CREATE OR REPLACE FUNCTION delete_entities_entities_trigger_function() RETURNS TRIGGER AS $$
 BEGIN
+    DELETE FROM entities_caches WHERE parent_id = OLD.parent_id AND entity_id = OLD.child_id;
     PERFORM refresh_entity_cache(OLD.parent_id, false);
     RETURN OLD;
 END;

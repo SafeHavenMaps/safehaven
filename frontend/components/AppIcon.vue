@@ -40,6 +40,7 @@ const iconDict: Record<string, string> = {
   save: mdi.mdiUpload,
   lightDark: mdi.mdiThemeLightDark,
   loading: mdi.mdiLoading,
+  eye: mdi.mdiEye,
 }
 </script>
 

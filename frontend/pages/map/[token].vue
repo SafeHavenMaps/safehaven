@@ -32,7 +32,7 @@
           v-if="state.activeEntity"
           class="flex align-items-center gap-2"
         >
-          <ViewerCategoryTag :category="state.activeEntity!.category" />
+          <CategoryTag :category="state.activeEntity!.category" />
           <h3 class="m-0">
             {{ state.activeEntity!.entity.display_name }}
           </h3>

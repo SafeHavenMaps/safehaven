@@ -163,10 +163,16 @@ BEGIN
             AND NOT (ec.tags_ids && exluded_tags_ids)
             -- If we do not require locations, we only return entities with locations
             AND (NOT require_locations OR ec.web_mercator_location IS NOT NULL)
-        ORDER BY ts_rank(full_text_search_ts, plainto_tsquery('english', search_query)) DESC
+        ORDER BY
+            (ec.web_mercator_location IS NOT NULL) DESC, -- prioritize entities with locations
+            ts_rank(full_text_search_ts, plainto_tsquery('english', search_query)) DESC
+    ),
+    distinct_entities AS (
+        SELECT DISTINCT ON (ec.entity_id) ec.*
+        FROM filtered_entities ec
     ),
     total_count AS (
-        SELECT COUNT(*) AS total_results FROM filtered_entities
+        SELECT COUNT(*) AS total_results FROM distinct_entities
     ),
     paginated_results AS (
         SELECT
@@ -185,7 +191,7 @@ BEGIN
             tc.total_results,
             CEIL(tc.total_results / page_size::FLOAT)::BIGINT AS total_pages,
             current_page as response_current_page
-        FROM filtered_entities ec, total_count tc
+        FROM distinct_entities ec, total_count tc
         LIMIT page_size
         OFFSET (current_page - 1) * page_size
     )

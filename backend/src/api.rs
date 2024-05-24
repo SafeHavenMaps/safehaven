@@ -1,4 +1,5 @@
 pub mod admin;
+pub mod icons;
 pub mod map;
 pub mod root;
 
