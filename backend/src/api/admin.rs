@@ -166,9 +166,7 @@ async fn authentication_middleware(
             ) {
                 Ok(data) => data.claims,
                 Err(_) => {
-                    let purged_jar = cookies
-                        .remove(TOKEN_COOKIE_NAME)
-                        .remove(REFRESH_TOKEN_COOKIE_NAME);
+                    let purged_jar = expire_cookies(cookies);
                     return Ok((purged_jar, AppError::Unauthorized).into_response());
                 }
             };
@@ -308,10 +306,27 @@ async fn admin_login(
     )
 )]
 async fn admin_logout(cookies: CookieJar) -> Response {
-    let jar = cookies
+    expire_cookies(cookies).into_response()
+}
+
+fn expire_cookies(cookies: CookieJar) -> CookieJar {
+    cookies
         .remove(TOKEN_COOKIE_NAME)
-        .remove(REFRESH_TOKEN_COOKIE_NAME);
-    jar.into_response()
+        .remove(REFRESH_TOKEN_COOKIE_NAME)
+        .add(
+            Cookie::build((TOKEN_COOKIE_NAME, ""))
+                .path("/api/admin/")
+                .http_only(true)
+                .same_site(SameSite::Strict)
+                .removal(),
+        )
+        .add(
+            Cookie::build((REFRESH_TOKEN_COOKIE_NAME, ""))
+                .path("/api/admin/")
+                .http_only(true)
+                .same_site(SameSite::Strict)
+                .removal(),
+        )
 }
 
 fn create_user_claim(user: &User) -> AdminUserTokenClaims {

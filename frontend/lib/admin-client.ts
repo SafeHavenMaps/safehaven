@@ -28,13 +28,20 @@ import type {
 } from '~/lib'
 
 // client as a closure
-export default function useClient() {
+export default function useClient(handle_client_logout: () => Promise<void>) {
   const rawClient = createClient<paths>({ baseUrl: '/',
     credentials: 'include', // Ensures cookies are sent with the request
   })
 
+  // We declare logout first as it used as a callback by the middleware
+  async function logout() {
+    const { error } = await rawClient.DELETE('/api/admin/session')
+    if (error) throw error
+    handle_client_logout()
+  }
+
   // Install auth middleware to the stack.
-  const authMiddleware = createAuthMiddleware()
+  const authMiddleware = createAuthMiddleware(logout)
   rawClient.use(authMiddleware)
 
   return {
@@ -46,14 +53,10 @@ export default function useClient() {
         body: { password: password, username: username, remember_me: remember_me },
       })
       if (error) throw error
-      return data
+      return data.is_admin
     },
 
-    async logout() {
-      const { data, error } = await rawClient.DELETE('/api/admin/session')
-      if (error) throw error
-      return data
-    },
+    logout,
 
     async check_login() {
       const { error } = await rawClient.GET('/api/admin/session')
