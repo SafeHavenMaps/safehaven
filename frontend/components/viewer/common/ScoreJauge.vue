@@ -13,7 +13,7 @@ const props = defineProps<{
 }>()
 
 const style = {
-  left: `calc(${props.score * 10}% - 10px)`,
+  left: `calc(${props.score / 10} * (100% - 20px))`,
 }
 </script>
 
