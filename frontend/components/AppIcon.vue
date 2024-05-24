@@ -21,12 +21,17 @@ const props = defineProps<{
 }>()
 
 const iconDict: Record<string, string> = {
+  home: mdi.mdiHome,
+  config: mdi.mdiCog,
   user: mdi.mdiAccount,
   login: mdi.mdiAccountLockOpen,
   family: mdi.mdiFamilyTree,
   category: mdi.mdiLabel,
   tag: mdi.mdiTagOutline,
-  entity: mdi.mdiTagOutline,
+  entity: mdi.mdiMapMarkerAccount,
+  pendingEntity: mdi.mdiMapMarkerAlert,
+  comment: mdi.mdiCommentOutline,
+  pendingComment: mdi.mdiCommentAlertOutline,
   userGroup: mdi.mdiAccountGroup,
   accessToken: mdi.mdiLock,
   mapSearch: mdi.mdiMapSearch,
