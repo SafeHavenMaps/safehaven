@@ -77,7 +77,7 @@ import { useRoute } from 'vue-router'
 import state from '~/lib/admin-state'
 
 if (await state.check_login()) {
-  navigateTo('/admin')
+  await navigateTo('/admin')
 }
 
 const username: Ref<string> = ref('')
@@ -98,7 +98,7 @@ async function login() {
   console.log('Logging in with', username.value, password.value, 'with remember me set to', remember_me.value)
   try {
     await state.login(username.value, password.value, remember_me.value)
-    navigateTo(redirectUrl)
+    await navigateTo(redirectUrl, { external: true })
   }
   catch (error) {
     failed_attempt.value = true

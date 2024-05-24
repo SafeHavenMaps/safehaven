@@ -52,9 +52,8 @@ export class AppState {
   async handle_client_logout() {
     this.is_admin = null
     this.username = null
-    // const currentUrl = window.location.href
-    navigateTo('/admin/login') // ?redirect=${encodeURIComponent(currentUrl)}')
-    // TODO : properly handle redirection, differentiate 41 and 403 in server
+    const currentUrl = window.location.href
+    await navigateTo(`/admin/login?redirect=${encodeURIComponent(currentUrl)}`)
   }
 
   async check_login(): Promise<boolean> {

@@ -4,7 +4,7 @@ import type { Middleware } from 'openapi-fetch'
 export default function createAuthMiddleware(logout_callback: () => Promise<void>): Middleware {
   return {
     async onResponse(response, _options) {
-      if (response.status === 401) {
+      if (response.status === 401 && response.url.match('/api/admin/session') == null) {
         await logout_callback()
       }
       return response
