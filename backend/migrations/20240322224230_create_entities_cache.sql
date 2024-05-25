@@ -17,8 +17,8 @@ entity_locations AS (
         e.category_id,
         e.display_name,
         c.family_id,
-        location.value,
-        location.ordinality AS index,
+        location.value as location,
+        location.ordinality AS location_index,
         array_remove(array_agg(DISTINCT et.tag_id), NULL) AS tags_ids,
         array_agg(DISTINCT e2.category_id) FILTER (WHERE e2.category_id IS NOT NULL) AS child_categories_ids
     FROM entities e
@@ -29,39 +29,27 @@ entity_locations AS (
     LATERAL jsonb_array_elements(e.locations) WITH ORDINALITY AS location(value, ordinality)
     WHERE e.moderated_at IS NOT NULL AND e.hide_from_map = FALSE
     GROUP BY e.id, c.family_id, e.display_name, e.category_id, location.value, location.ordinality
-),
-locations_expanded AS (
-    SELECT
-        entity_id,
-        category_id,
-        display_name,
-        family_id,
-        value AS location,
-        index AS location_index,
-        tags_ids,
-        child_categories_ids
-    FROM entity_locations
 )
 -- Add the entities with their locations to the materialized view
 SELECT
-    md5(le.entity_id::text || le.location_index::text || 'alone_loc')::uuid AS id,
-    le.entity_id,
-    le.category_id,
-    le.display_name,
-    le.family_id,
-    le.location_index,
-    (le.location ->> 'long')::double precision AS longitude,
-    (le.location ->> 'lat')::double precision AS latitude,
-    ST_Transform(ST_SetSRID(ST_MakePoint((le.location ->> 'long')::double precision, (le.location ->> 'lat')::double precision), 4326), 3857) AS web_mercator_location,
-    le.location ->> 'plain_text' AS plain_text_location,
-    le.tags_ids,
-    array_append(le.child_categories_ids, le.category_id) AS categories_ids,
+    md5(el.entity_id::text || el.location_index::text || 'alone_loc')::uuid AS id,
+    el.entity_id,
+    el.category_id,
+    el.display_name,
+    el.family_id,
+    el.location_index,
+    (el.location ->> 'long')::double precision AS longitude,
+    (el.location ->> 'lat')::double precision AS latitude,
+    ST_Transform(ST_SetSRID(ST_MakePoint((el.location ->> 'long')::double precision, (el.location ->> 'lat')::double precision), 4326), 3857) AS web_mercator_location,
+    el.location ->> 'plain_text' AS plain_text_location,
+    el.tags_ids,
+    array_append(el.child_categories_ids, el.category_id) AS categories_ids,
     NULL AS parent_id,
     NULL AS parent_display_name,
-    to_tsvector('english', le.display_name || ' ' || array_to_string(array(
-        SELECT t.title FROM tags t WHERE t.id = ANY(le.tags_ids) AND t.is_indexed
+    to_tsvector('english', el.display_name || ' ' || array_to_string(array(
+        SELECT t.title FROM tags t WHERE t.id = ANY(el.tags_ids) AND t.is_indexed
     ), ' ')) AS full_text_search_ts
-FROM locations_expanded le
+FROM entity_locations el
 
 UNION
 
@@ -69,23 +57,23 @@ UNION
 SELECT
     md5(pe.child_id::text || pe.parent_id::text || pe.location_index::text || 'with_parent')::uuid AS id,
     pe.child_id AS entity_id,
-    le.category_id,
-    le.display_name,
-    le.family_id,
+    el.category_id,
+    el.display_name,
+    el.family_id,
     pe.location_index,
     (pe.value ->> 'long')::double precision AS longitude,
     (pe.value ->> 'lat')::double precision AS latitude,
     ST_Transform(ST_SetSRID(ST_MakePoint((pe.value ->> 'long')::double precision, (pe.value ->> 'lat')::double precision), 4326), 3857) AS web_mercator_location,
     pe.value ->> 'plain_text' AS plain_text_location,
-    le.tags_ids,
-    array_append(le.child_categories_ids, le.category_id) AS categories_ids,
+    el.tags_ids,
+    array_append(el.child_categories_ids, el.category_id) AS categories_ids,
     pe.parent_id,
     pe.parent_display_name,
-    to_tsvector('english', le.display_name || ' ' || array_to_string(array(
-        SELECT t.title FROM tags t WHERE t.id = ANY(le.tags_ids) AND t.is_indexed
+    to_tsvector('english', el.display_name || ' ' || array_to_string(array(
+        SELECT t.title FROM tags t WHERE t.id = ANY(el.tags_ids) AND t.is_indexed
     ), ' ')) AS full_text_search_ts
 FROM parent_entities pe
-JOIN locations_expanded le ON pe.child_id = le.entity_id
+JOIN entity_locations el ON pe.child_id = el.entity_id
 
 UNION
 
