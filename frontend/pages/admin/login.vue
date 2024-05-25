@@ -86,10 +86,15 @@ const remember_me: Ref<boolean> = ref(false)
 const failed_attempt: Ref<boolean> = ref(false)
 const awaiting_auth_response: Ref<boolean> = ref(false)
 
-const redirect = useRoute().query.redirect
+const redirect_query_param = useRoute().query.redirect
 let redirectUrl = '/admin/'
-if (typeof redirect === 'string') { // type checking of the query parameter to correspond to the signature of navigateTo
-  redirectUrl = redirect
+// type checking of the query parameter to correspond to the signature of navigateTo
+if (typeof redirect_query_param === 'string') {
+  // matching to keep only internal urls
+  const match = redirect_query_param.match('/admin*')
+  if (match) {
+    redirectUrl = match[0]
+  }
 }
 
 async function login() {
@@ -98,7 +103,7 @@ async function login() {
   console.log('Logging in with', username.value, password.value, 'with remember me set to', remember_me.value)
   try {
     await state.login(username.value, password.value, remember_me.value)
-    await navigateTo(redirectUrl, { external: true })
+    await navigateTo(redirectUrl)
   }
   catch (error) {
     failed_attempt.value = true

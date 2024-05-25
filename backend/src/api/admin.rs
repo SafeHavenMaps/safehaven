@@ -197,7 +197,7 @@ async fn authentication_middleware(
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
 pub struct AdminUserTokenClaims {
     pub admin_id: Uuid,
     pub username: String,
@@ -261,12 +261,15 @@ where
     get,
     path = "/api/admin/session",
     responses(
-        (status = 200, description = "Check login", body = ()),
+        (status = 200, description = "Check login", body = AdminUserTokenClaims),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
-async fn admin_login_check(DbConn(_conn): DbConn) -> Result<AppJson<()>, AppError> {
-    return Ok(AppJson(()));
+async fn admin_login_check(
+    token_claims: AdminUserTokenClaims,
+    DbConn(_conn): DbConn,
+) -> Result<AppJson<AdminUserTokenClaims>, AppError> {
+    return Ok(AppJson(token_claims));
 }
 
 #[utoipa::path(

@@ -1,6 +1,6 @@
 use crate::{
     api::{
-        admin::{self, users::ChangePassword, LoginRequest, LoginResponse},
+        admin::{self, users::ChangePassword, AdminUserTokenClaims, LoginRequest, LoginResponse},
         map::{
             self, FetchedEntity, NewCommentRequest, NewEntityRequest, SearchRequest, ViewRequest,
         },
@@ -94,6 +94,8 @@ use utoipa::OpenApi;
     components(schemas(
         // general
         ErrorResponse,
+        //admin
+        AdminUserTokenClaims,
         // root
         StatusResponse,
         SafeMode,

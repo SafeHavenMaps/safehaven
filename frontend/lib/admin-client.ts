@@ -28,7 +28,7 @@ import type {
 } from '~/lib'
 
 // client as a closure
-export default function useClient(handle_client_logout: () => Promise<void>) {
+export default function useClient() {
   const rawClient = createClient<paths>({ baseUrl: '/',
     credentials: 'include', // Ensures cookies are sent with the request
   })
@@ -37,7 +37,8 @@ export default function useClient(handle_client_logout: () => Promise<void>) {
   async function logout() {
     const { error } = await rawClient.DELETE('/api/admin/session')
     if (error) throw error
-    handle_client_logout()
+    const currentUrl = window.location.href
+    await navigateTo(`/admin/login?redirect=${encodeURIComponent(currentUrl)}`)
   }
 
   // Install auth middleware to the stack.
@@ -59,9 +60,10 @@ export default function useClient(handle_client_logout: () => Promise<void>) {
     logout,
 
     async check_login() {
-      const { error } = await rawClient.GET('/api/admin/session')
-      if (error) return false
-      return true
+      const { data, error } = await rawClient.GET('/api/admin/session')
+      console.log('oulala', data, 'oo', error)
+      if (error) return null
+      return data
     },
 
     // Options

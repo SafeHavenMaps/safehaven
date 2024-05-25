@@ -24,10 +24,10 @@ import type {
 } from '~/lib'
 
 export class AppState {
-  private client = useClient(() => this.handle_client_logout())
+  private client = useClient()
 
   private optionsData: SafeHavenOptions | null = null
-  private usersData: Family[] | null = null
+  private usersData: User[] | null = null
   private familiesData: Family[] | null = null
   private categoriesData: Category[] | null = null
   private tagsData: Tag[] | null = null
@@ -49,15 +49,12 @@ export class AppState {
     await this.client.logout()
   }
 
-  async handle_client_logout() {
-    this.is_admin = null
-    this.username = null
-    const currentUrl = window.location.href
-    await navigateTo(`/admin/login?redirect=${encodeURIComponent(currentUrl)}`)
-  }
-
   async check_login(): Promise<boolean> {
-    return await this.client.check_login()
+    const claims = await this.client.check_login()
+    if (claims === null) return false
+    this.is_admin = claims.is_admin
+    this.username = claims.username
+    return true
   }
 
   // Config
@@ -65,8 +62,8 @@ export class AppState {
     this.optionsData = await this.client.getConfig()
   }
 
-  get options(): SafeHavenOptions | null {
-    return this.optionsData
+  get options(): SafeHavenOptions {
+    return this.optionsData!
   }
 
   async updateConfig(name: string, config: ConfigurationOption): Promise<void> {
@@ -75,11 +72,11 @@ export class AppState {
   }
 
   get hasSafeMode() {
-    return !!this.optionsData.safe_mode?.enabled
+    return !!this.optionsData!.safe_mode.enabled
   }
 
   get safeMode() {
-    return this.optionsData.safe_mode!.enabled
+    return this.optionsData!.safe_mode.enabled
   }
 
   // Users

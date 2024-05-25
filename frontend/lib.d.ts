@@ -46,12 +46,12 @@ export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAcces
 export type AccessToken = api.components['schemas']['AccessToken']
 export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily']
 
-export type User = components['schemas']['User']
-export type NewUser = components['schemas']['NewUser']
-export type ChangePassword = components['schemas']['ChangePassword']
-export type SafeHavenOptions = components['schemas']['SafeHavenOptions']
-export type ConfigurationOption = components['schemas']['ConfigurationOption']
-
+export type User = api.components['schemas']['User']
+export type NewUser = api.components['schemas']['NewUser']
+export type ChangePassword = api.components['schemas']['ChangePassword']
+export type SafeHavenOptions = api.components['schemas']['SafeHavenOptions']
+export type ConfigurationOption = api.components['schemas']['ConfigurationOption']
+export type AdminUserTokenClaims = api.components['schemas']['AdminUserTokenClaims']
 export interface CanBeHighlighted {
   highlighted: boolean
 }

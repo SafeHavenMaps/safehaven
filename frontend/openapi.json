@@ -1442,8 +1442,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "default": null,
-                  "nullable": true
+                  "$ref": "#/components/schemas/AdminUserTokenClaims"
                 }
               }
             }
@@ -2335,6 +2334,36 @@
             "$ref": "#/components/schemas/Json"
           },
           "token": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminUserTokenClaims": {
+        "type": "object",
+        "required": [
+          "admin_id",
+          "username",
+          "is_admin",
+          "exp",
+          "iat"
+        ],
+        "properties": {
+          "admin_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exp": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "iat": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_admin": {
+            "type": "boolean"
+          },
+          "username": {
             "type": "string"
           }
         }
