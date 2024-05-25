@@ -30,11 +30,12 @@
               @click="showFamilySwitcher"
             >
               <template #icon>
-                <img
+                <AppIcon
+                  :icon-name="state.activeFamily.icon_hash!"
+                  dynamic-type="families"
                   class="mr-1"
-                  height="20"
-                  :src="`/api/icons/families/${state.activeFamily.icon_hash}`"
-                >
+                  size="20px"
+                />
               </template>
             </Button>
 
@@ -162,10 +163,11 @@
                     borderColor: category.border_color,
                   }"
                 >
-                  <img
-                    height="16"
-                    :src="`/api/icons/categories/${category.icon_hash}`"
-                  >
+                  <AppIcon
+                    :icon-name="category.icon_hash!"
+                    dynamic-type="categories"
+                    size="16px"
+                  />
                 </div>
                 {{ category.title }}
               </div>

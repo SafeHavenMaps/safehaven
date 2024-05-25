@@ -9,15 +9,10 @@
     >
       <template #nodeicon="slotProps">
         <AppIcon
-          v-if="slotProps.node.children == null"
           :icon-name="slotProps.node.icon!"
+          :dynamic-type="slotProps.node.icon_dynamic_type"
           class="mr-2 -ml-2"
         />
-        <img
-          v-else
-          style="height: 20rem; width: 20rem;"
-          :src="imageSrc(slotProps.node.icon_hash)"
-        >
       </template>
     </Tree>
   </div>
@@ -26,10 +21,6 @@
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode'
 import state from '~/lib/admin-state'
-
-function imageSrc(hash: string): string {
-  return `/api/icons/families/${hash}`
-}
 
 await state.fetchFamilies()
 
@@ -47,7 +38,8 @@ function onNodeSelect(node: TreeNode) {
 const family_nodes = state.families.map(item => ({
   label: item.title,
   key: item.id,
-  icon_hash: item.icon_hash,
+  icon: item.icon_hash!,
+  icon_dynamic_type: 'families',
   children: [
     {
       label: 'Categories',

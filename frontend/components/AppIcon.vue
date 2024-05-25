@@ -1,5 +1,12 @@
 <template>
+  <img
+    v-if="props.dynamicType"
+    :style="{ width: props.size ?? '24px', height: props.size ?? '24px' }"
+    :src="imageSrc(props.dynamicType, props.iconName)"
+    :class="{ 'icon-rotate': rotating }"
+  >
   <svg
+    v-else
     :style="{ width: props.size ?? '24px', height: props.size ?? '24px' }"
     viewBox="0 0 24 24"
     :class="{ 'icon-rotate': rotating }"
@@ -18,7 +25,14 @@ const props = defineProps<{
   iconName: keyof typeof iconDict
   size?: string
   rotating?: boolean
+  dynamicType?: DynamicIconTypes
 }>()
+
+export type DynamicIconTypes = 'families' | 'categories'
+
+function imageSrc(dynamic_type: DynamicIconTypes, hash: string): string {
+  return `/api/icons/${dynamic_type}/${hash}`
+}
 
 const iconDict: Record<string, string> = {
   home: mdi.mdiHome,

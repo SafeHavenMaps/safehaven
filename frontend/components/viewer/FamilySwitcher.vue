@@ -7,12 +7,12 @@
   >
     <template #option="slotProps">
       <div class="button-content flex align-items-center justify-between">
-        <img
+        <AppIcon
+          :icon-name="slotProps.option.icon_hash"
+          dynamic-type="families"
           class="mr-2"
-          height="16"
-          width="16"
-          :src="imageSrc(slotProps.option.icon_hash)"
-        >
+          size="16px"
+        />
         <span>{{ slotProps.option.title }}</span>
       </div>
     </template>
@@ -21,10 +21,6 @@
 
 <script setup lang="ts">
 import state from '~/lib/viewer-state'
-
-function imageSrc(hash: string): string {
-  return `/api/icons/families/${hash}`
-}
 </script>
 
 <style scoped>

@@ -9,7 +9,7 @@
             alt="icon"
             :src="safehaven_logo"
           >
-          <div class="pl-3">
+          <div class="pl-3 coco-text">
             <h3 class="my-0">
               Espace d'administration SafeHaven
             </h3>
@@ -24,7 +24,7 @@
 
       <template #end>
         <div class="flex flex-column align-items-center ">
-          <span> {{ state.username }}</span>
+          <span class="coco-text"> Utilisateur⋅ice : {{ state.username }}</span>
           <Button
             class="flex"
             label="Logout"
@@ -42,4 +42,5 @@ import state from '~/lib/admin-state'
 import safehaven_logo from '~/assets/logo_square.svg'
 
 await state.fetchConfig()
+await state.check_login()
 </script>
