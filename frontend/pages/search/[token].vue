@@ -6,7 +6,9 @@
       :show-family-switcher="false"
     />
 
-    <Card class="m-2 p-2">
+    <Card
+      class="m-2 p-2"
+    >
       <template #header>
         <span class="text-2xl font-bold">
           Recherche
@@ -204,9 +206,15 @@
           header="Avancé"
         >
           <div class="filter-settings">
-            <span class="font-medium text-900 block mb-2">Filtres</span>
+            <InputText
+              v-model="tagSearch"
+              class="mb-4 mt-2"
+              placeholder="Rechercher un tag"
+            />
+            <span class="font-medium text-900 block mb-2">Tags</span>
+
             <div
-              v-for="tag in state.filteringTags.filter(t => !t.is_filter)"
+              v-for="tag in shownAdvancedTags()"
               :key="tag.id"
               class="mb-2 p-1"
             >
@@ -256,6 +264,7 @@ await state.bootstrapWithToken(token) // TODO: Redirect to 404 if token is inval
 const query = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
+const tagSearch = ref('')
 
 const showCriterias = ref(false)
 
@@ -294,6 +303,16 @@ async function displayEntityId(entityId: string) {
 
 async function showFamilySwitcher(event: Event) {
   familySwitcher.value!.toggle(event)
+}
+
+function shownAdvancedTags() {
+  const base = state.filteringTags.filter(t => !t.is_filter)
+
+  if (tagSearch.value === '') {
+    return base
+  }
+
+  return base.filter(tag => tag.title.toLowerCase().includes(tagSearch.value.toLowerCase()))
 }
 
 async function showCriteriasModal() {
