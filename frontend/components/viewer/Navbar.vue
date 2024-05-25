@@ -308,7 +308,9 @@ function filtersChanged() {
   border-radius: 50%;
   border-width: 2px;
   border-style: solid;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .result {
