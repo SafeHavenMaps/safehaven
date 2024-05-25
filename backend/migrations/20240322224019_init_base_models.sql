@@ -50,6 +50,7 @@ CREATE TABLE tags (
     filter_description TEXT,
     is_indexed BOOLEAN NOT NULL DEFAULT FALSE
 );
+CREATE INDEX tags_is_indexed_idx ON tags(is_indexed);
 
 CREATE TABLE entities (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -71,6 +72,7 @@ CREATE TABLE entities (
     FOREIGN KEY (last_update_by) REFERENCES users(id) ON DELETE SET NULL
 );
 CREATE INDEX entities_category_id_idx ON entities(category_id);
+CREATE INDEX entities_moderated_at_hide_from_map_idx ON entities(moderated_at, hide_from_map);
 CREATE INDEX entities_full_text_search_idx ON entities USING GIN(full_text_search_ts);
 
 CREATE TABLE entity_tags (
@@ -82,6 +84,9 @@ CREATE TABLE entity_tags (
     FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
+CREATE INDEX entity_tags_entity_id_idx ON entity_tags(entity_id);
+CREATE INDEX entity_tags_tag_id_idx ON entity_tags(tag_id);
+CREATE INDEX entity_tags_entity_tag_idx ON entity_tags(entity_id, tag_id);
 
 CREATE TABLE comments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -128,7 +133,9 @@ CREATE TABLE entities_entities (
     FOREIGN KEY (parent_id) REFERENCES entities(id) ON DELETE CASCADE,
     FOREIGN KEY (child_id) REFERENCES entities(id) ON DELETE CASCADE
 );
-
+CREATE INDEX entities_entities_parent_id_idx ON entities_entities(parent_id);
+CREATE INDEX entities_entities_child_id_idx ON entities_entities(child_id);
+CREATE INDEX entities_entities_parent_child_idx ON entities_entities(parent_id, child_id);
 
 CREATE OR REPLACE FUNCTION prevent_parent_as_child()
 RETURNS TRIGGER AS $$
