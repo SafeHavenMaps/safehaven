@@ -6,3 +6,37 @@ body,
   margin: 0;
   padding: 0;
 }
+
+/* Background Colors */
+.lilac-bg {
+  background-color: #e0a2ff;
+}
+
+.hot-pink-bg {
+  background-color: #e86ba7;
+}
+
+.poudre-bg {
+  background-color: #f7eaff;
+}
+
+.coco-bg {
+  background-color: #ffffff;
+}
+
+/* Text Colors */
+.lilac-text {
+  color: #e0a2ff;
+}
+
+.hot-pink-text {
+  color: #e86ba7;
+}
+
+.poudre-text {
+  color: #f7eaff;
+}
+
+.coco-text {
+  color: #ffffff;
+}

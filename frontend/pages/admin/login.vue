@@ -1,7 +1,7 @@
 <template>
   <form
     method="post"
-    class="flex flex-column justify-content-center align-items-center h-full gap-5 body"
+    class="flex flex-column justify-content-center align-items-center h-full gap-5 hot-pink-bg"
     @submit.prevent="login"
   >
     <img
@@ -112,9 +112,3 @@ async function login() {
   }
 }
 </script>
-
-<style scoped>
-.body {
-  background-color: #E86BA7;
-}
-</style>

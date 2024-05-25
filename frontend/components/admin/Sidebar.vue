@@ -1,9 +1,9 @@
 <template>
-  <div class="body">
+  <div class="poudre-bg">
     <Tree
       v-model:expandedKeys="expandedKeys"
       :value="nodes"
-      class="body"
+      class="poudre-bg"
       selection-mode="single"
       @node-select="onNodeSelect"
     >
@@ -115,8 +115,5 @@ const nodes = [
 <style>
 .p-treenode-content {
   cursor: pointer;
-}
-.body {
-  background-color: rgb(247, 204, 240);
 }
 </style>
