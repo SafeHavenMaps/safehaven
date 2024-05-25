@@ -55,11 +55,13 @@ const iconDict: Record<string, string> = {
   addEntity: mdi.mdiMapMarkerPlus,
   edit: mdi.mdiPencil,
   addComment: mdi.mdiCommentPlus,
+  add: mdi.mdiPlus,
   delete: mdi.mdiDelete,
   save: mdi.mdiUpload,
   lightDark: mdi.mdiThemeLightDark,
   loading: mdi.mdiLoading,
   eye: mdi.mdiEye,
+  warning: mdi.mdiAlert,
 }
 </script>
 
