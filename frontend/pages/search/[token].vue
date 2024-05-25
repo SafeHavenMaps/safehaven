@@ -46,7 +46,7 @@
     >
       <template #header>
         <span class="text-2xl font-bold">
-          Résultats
+          {{ currentEntitiesResults!.total_results }} {{ resultLabel() }}
         </span>
       </template>
 
@@ -71,6 +71,34 @@
         </DataView>
       </template>
     </Card>
+
+    <Dialog
+      v-model:visible="state.hasActiveEntity"
+      maximizable
+      :style="{ width: '50rem' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+      modal
+    >
+      <template #header>
+        <div
+          v-if="
+            state.activeEntity"
+          class="flex align-items-center gap-2"
+        >
+          <CategoryTag :category="state.activeEntity!.category" />
+          <h3 class="m-0">
+            {{ state.activeEntity!.entity.display_name }}
+          </h3>
+        </div>
+      </template>
+
+      <ViewerCommonEntityDisplayer
+        v-if="state.activeEntity"
+        :entity="state.activeEntity!"
+        :categories="state.categories"
+        @entity-selected="displayEntityId"
+      />
+    </Dialog>
   </div>
 </template>
 
@@ -89,6 +117,11 @@ const currentPage = ref(1)
 const pageSize = ref(20)
 
 const currentEntitiesResults: Ref<PaginatedCachedEntities | null> = ref(null)
+
+function resultLabel() {
+  const result = currentEntitiesResults!.value?.total_results ?? 0
+  return result > 1 ? 'résultats' : 'résultat'
+}
 
 async function submitSearch(event: Event) {
   event.preventDefault()
@@ -109,6 +142,10 @@ async function refreshResult() {
     currentPage.value,
     pageSize.value,
   )
+}
+
+async function displayEntityId(entityId: string) {
+  await state.selectEntity(entityId)
 }
 </script>
 

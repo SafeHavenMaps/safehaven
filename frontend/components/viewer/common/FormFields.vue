@@ -137,15 +137,29 @@ function getDataAsEscapedString(key) {
 }
 
 function extractHostnameFromUrl(url) {
-  const u = new URL(url)
-  const hostname = u.hostname
-  return hostname.startsWith('www.') ? hostname.substring(4) : hostname
+  try {
+    const u = new URL(url)
+    const hostname = u.hostname
+    return hostname.startsWith('www.') ? hostname.substring(4) : hostname
+  }
+  catch (e) {
+    return url
+  }
+}
+
+function hasRealValue(value) {
+  const result = value !== undefined && value !== null && value !== ''
+  if (typeof value === 'string') {
+    return result && value.trim() !== ''
+  }
+  return value
 }
 
 function fieldsToDisplay() {
   const fields = props.fields.slice()
     .sort((a, b) => a.display_weight - b.display_weight)
     .filter(f => hasKey(f.key))
+    .filter(f => hasRealValue(getKeyValue(f.key)))
     .filter(f => !(
       f.field_type === 'EnumSingleOption'
       && f.field_type_metadata?.options.find(o => o.value == getKeyValue(f.key))?.hidden),

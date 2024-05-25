@@ -287,6 +287,19 @@ CREATE OR REPLACE TRIGGER after_entities_insert_or_update
 AFTER INSERT OR UPDATE ON entities
 FOR EACH ROW EXECUTE FUNCTION insert_or_update_entity_cache();
 
+-- When an entity is deleted, we should delete the cache entries for that entity
+CREATE OR REPLACE FUNCTION delete_entity_cache()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM entities_caches WHERE entity_id = OLD.id;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER after_entities_delete
+AFTER DELETE ON entities
+FOR EACH ROW EXECUTE FUNCTION delete_entity_cache();
+
 -- ENTITIES_ENTITIES TRIGGERS SECTION --
 
 -- Update the cache for a an entity pair from entities_entities when it is created or updated

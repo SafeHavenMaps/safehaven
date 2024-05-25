@@ -164,8 +164,8 @@ BEGIN
             -- If we do not require locations, we only return entities with locations
             AND (NOT require_locations OR ec.web_mercator_location IS NOT NULL)
         ORDER BY
-            (ec.web_mercator_location IS NOT NULL) DESC, -- prioritize entities with locations
-            ts_rank(full_text_search_ts, plainto_tsquery('english', search_query)) DESC
+            ts_rank(full_text_search_ts, plainto_tsquery('english', search_query)) DESC,
+            (ec.web_mercator_location IS NOT NULL) DESC -- prioritize entities with locations
     ),
     distinct_entities AS (
         SELECT DISTINCT ON (ec.entity_id) ec.*

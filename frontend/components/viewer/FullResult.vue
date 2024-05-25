@@ -76,7 +76,7 @@ const props = defineProps<{
 }>()
 
 function changeActiveEntity(entity: ReceivedEntity) {
-  state.selectEntity(entity.id)
+  state.selectEntity(entity.entity_id)
 }
 </script>
 
