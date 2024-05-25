@@ -2442,8 +2442,7 @@
           "categories_ids",
           "tags_ids",
           "family_id",
-          "display_name",
-          "plain_text_location"
+          "display_name"
         ],
         "properties": {
           "categories_ids": {
@@ -2482,7 +2481,8 @@
             "nullable": true
           },
           "plain_text_location": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "tags_ids": {
             "type": "array",

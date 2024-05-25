@@ -19,7 +19,7 @@ pub struct CachedEntity {
     pub parent_display_name: Option<String>,
     pub web_mercator_x: Option<f64>,
     pub web_mercator_y: Option<f64>,
-    pub plain_text_location: String,
+    pub plain_text_location: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -35,7 +35,7 @@ struct PaginatedCachedEntity {
     pub parent_display_name: Option<String>,
     pub web_mercator_x: Option<f64>,
     pub web_mercator_y: Option<f64>,
-    pub plain_text_location: String,
+    pub plain_text_location: Option<String>,
     pub total_results: i64,
     pub total_pages: i64,
     pub response_current_page: i64,
@@ -242,7 +242,7 @@ impl CachedEntity {
                 parent_display_name: e.parent_display_name.clone(),
                 web_mercator_x: Some(e.web_mercator_x),
                 web_mercator_y: Some(e.web_mercator_y),
-                plain_text_location: e.plain_text_location.clone(),
+                plain_text_location: Some(e.plain_text_location.clone()),
             })
             .collect();
 
@@ -297,7 +297,7 @@ impl CachedEntity {
                 parent_display_name,
                 web_mercator_x as "web_mercator_x",
                 web_mercator_y as "web_mercator_y",
-                plain_text_location as "plain_text_location!",
+                plain_text_location as "plain_text_location",
                 total_results as "total_results!",
                 total_pages as "total_pages!",
                 response_current_page as "response_current_page!"
