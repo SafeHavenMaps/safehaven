@@ -135,7 +135,6 @@ CREATE TABLE entities_entities (
 );
 CREATE INDEX entities_entities_parent_id_idx ON entities_entities(parent_id);
 CREATE INDEX entities_entities_child_id_idx ON entities_entities(child_id);
-CREATE INDEX entities_entities_parent_child_idx ON entities_entities(parent_id, child_id);
 
 CREATE OR REPLACE FUNCTION prevent_parent_as_child()
 RETURNS TRIGGER AS $$
