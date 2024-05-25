@@ -31,7 +31,7 @@
           :fill="entity.category.fill_color"
           :stroke="entity.category.border_color"
           :highlighted="isEntityHighlighted(entity)"
-          :inside-icon="entity.category.icon"
+          :icon-url="`/api/icons/categories/${entity.category.icon_hash}`"
           @click="handleEntityClick"
         />
       </ol-overlay>

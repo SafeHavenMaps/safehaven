@@ -24,7 +24,7 @@ use axum_extra::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, PgConnection, Pool, Postgres};
-use std::{sync::Arc, time::Duration};
+use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::sync::RwLock;
 use utoipa::ToSchema;
 
@@ -35,6 +35,7 @@ pub struct AppState {
     pub config: Arc<SafeHavenConfig>,
     pub dyn_config: DynOptions,
     pub pool: Pool<Postgres>,
+    pub icon_cache: Arc<RwLock<HashMap<String, String>>>,
 }
 
 impl AppState {
@@ -75,6 +76,7 @@ impl AppState {
             config,
             pool,
             dyn_config,
+            icon_cache: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -132,6 +134,7 @@ pub enum AppError {
     TokenValidation,
     BadUsernameOrPassword,
     Unauthorized,
+    NotFound,
     Validation(String),
     Database(sqlx::Error),
     InvalidPagination,
@@ -172,6 +175,7 @@ impl IntoResponse for AppError {
             },
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized", None),
             AppError::InvalidPagination => (StatusCode::BAD_REQUEST, "invalid_pagination", None),
+            AppError::NotFound => (StatusCode::NOT_FOUND, "not_found", None),
         };
 
         let resp = (

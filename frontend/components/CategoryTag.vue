@@ -6,11 +6,11 @@
       color: 'white',
     }"
   >
-    <i
-      style="height: 16px;"
+    <img
+      height="16"
       class="mr-1"
-      v-html="props.category.icon"
-    />
+      :src="imageSrc()"
+    >
     {{ props.category.title }}
   </Tag>
 </template>
@@ -21,4 +21,8 @@ import type { Category } from '~/lib'
 const props = defineProps<{
   category: Category
 }>()
+
+function imageSrc(): string {
+  return `/api/icons/categories/${props.category.icon_hash}`
+}
 </script>

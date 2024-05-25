@@ -21,13 +21,13 @@
         :stroke="props.stroke"
         stroke-width="2.5"
       />
-      <foreignObject
-        v-if="props.insideIcon && props.insideIcon.length > 0"
+      <image
+        v-if="props.iconUrl && props.iconUrl.length > 0"
         x="9"
         y="9"
         width="26"
         height="26"
-        v-html="props.insideIcon"
+        :href="props.iconUrl"
       /></svg>
   </div>
 </template>
@@ -39,7 +39,7 @@ const props = defineProps<{
   fill: string
   stroke: string
   highlighted: boolean
-  insideIcon: string | null | undefined
+  iconUrl: string | null | undefined
   callbackItem: T
 }>()
 

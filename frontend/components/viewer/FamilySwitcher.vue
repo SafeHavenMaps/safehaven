@@ -7,14 +7,12 @@
   >
     <template #option="slotProps">
       <div class="button-content flex align-items-center justify-between">
-        <div
+        <img
           class="mr-2"
-          :style="{
-            width: '16px',
-            height: '16px',
-          }"
-          v-html="slotProps.option.icon"
-        />
+          height="16"
+          width="16"
+          :src="imageSrc(slotProps.option.icon_hash)"
+        >
         <span>{{ slotProps.option.title }}</span>
       </div>
     </template>
@@ -23,6 +21,10 @@
 
 <script setup lang="ts">
 import state from '~/lib/viewer-state'
+
+function imageSrc(hash: string): string {
+  return `/api/icons/families/${hash}`
+}
 </script>
 
 <style scoped>

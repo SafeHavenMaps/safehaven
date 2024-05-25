@@ -2549,7 +2549,7 @@
           "fill_color": {
             "type": "string"
           },
-          "icon": {
+          "icon_hash": {
             "type": "string",
             "nullable": true
           },
@@ -2803,7 +2803,7 @@
           "entity_form": {
             "$ref": "#/components/schemas/Json"
           },
-          "icon": {
+          "icon_hash": {
             "type": "string",
             "nullable": true
           },

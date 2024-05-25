@@ -31,7 +31,7 @@
           :fill="props.entity.category.fill_color"
           :stroke="props.entity.category.border_color"
           :highlighted="false"
-          :inside-icon="props.entity.category.icon"
+          :icon-url="`/api/icons/categories/${props.entity.category.icon_hash}`"
         />
       </ol-overlay>
     </ol-map>
@@ -47,7 +47,7 @@ type EntitySubset = {
   category: {
     fill_color: string
     border_color: string
-    icon: string | null | undefined
+    icon_hash: string | null | undefined
   }
 }
 

@@ -96,6 +96,7 @@ async fn serve(args: &ServeArgs) {
 
     let mut app = Router::new()
         .nest("/api/", api::root::routes())
+        .nest("/api/icons", api::icons::routes())
         .nest("/api/map", api::map::routes())
         .nest("/api/admin", api::admin::routes(&app_state))
         .with_state(app_state)

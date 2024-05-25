@@ -10,11 +10,11 @@
           :icon-name="slotProps.node.icon!"
           class="mr-2 -ml-2"
         />
-        <span
+        <img
           v-else
           style="height: 20rem; width: 20rem;"
-          v-html="slotProps.node.icon"
-        />
+          :src="imageSrc(slotProps.node.icon_hash)"
+        >
       </template>
     </Tree>
   </div>
@@ -22,14 +22,17 @@
 
 <script setup lang="ts">
 import state from '~/lib/admin-state'
-import viewer_state from '~/lib/viewer-state'
+
+function imageSrc(hash: string): string {
+  return `/api/icons/families/${hash}`
+}
 
 // TODO : add proper @nodeSelect="onNodeSelect" to each node to enable functionality
 await state.fetchFamilies()
 const family_nodes = state.families.map(item => ({
   label: item.title,
   key: item.id,
-  icon: viewer_state.cleanupSvg(item.icon!)!,
+  icon_hash: item.icon_hash,
   children: [
     {
       label: 'Entities',

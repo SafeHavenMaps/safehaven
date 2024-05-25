@@ -91,8 +91,12 @@
                 backgroundColor: category.fill_color,
                 borderColor: category.border_color,
               }"
-              v-html="category.icon"
-            />
+            >
+              <img
+                height="16"
+                :src="`/api/icons/categories/${category.icon_hash}`"
+              >
+            </div>
             {{ category.title }}
           </div>
         </div>

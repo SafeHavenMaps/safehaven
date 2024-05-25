@@ -15,7 +15,7 @@
               category: {
                 fill_color: state.getCategory(props.entity.category_id).fill_color,
                 border_color: state.getCategory(props.entity.category_id).border_color,
-                icon: state.getCategory(props.entity.category_id).icon,
+                icon_hash: state.getCategory(props.entity.category_id).icon_hash,
               },
             }"
           />
