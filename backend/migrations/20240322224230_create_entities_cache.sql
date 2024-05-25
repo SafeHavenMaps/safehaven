@@ -29,7 +29,7 @@ entity_locations AS (
 )
 -- Add the entities with their locations to the materialized view
 SELECT
-    md5(el.entity_id::text || (el.location ->> 'long') || (el.location ->> 'lat'))::uuid AS id,
+    md5(el.entity_id::text || (el.location ->> 'long') || (el.location ->> 'lat') || (el.location ->> 'plain_text'))::uuid AS id,
     el.entity_id,
     el.category_id,
     el.display_name,
@@ -52,7 +52,7 @@ UNION ALL
 
 -- Add the entities with their parents locations to the materialized view
 SELECT
-    md5(pe.child_id::text || pe.parent_id::text || (pe.parent_location ->> 'long') || (pe.parent_location ->> 'lat'))::uuid AS id,
+    md5(pe.child_id::text || pe.parent_id::text || (pe.parent_location ->> 'long') || (pe.parent_location ->> 'lat') || (pe.parent_location ->> 'plain_text'))::uuid AS id,
     pe.child_id AS entity_id,
     el.category_id,
     el.display_name,
@@ -113,3 +113,98 @@ BEGIN
     REFRESH MATERIALIZED VIEW entities_caches;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Trigger to refresh the materialized view
+CREATE OR REPLACE FUNCTION trigger_refresh_entities_caches()
+RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM refresh_entities_caches();
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- `entities` table triggers
+CREATE TRIGGER refresh_entities_caches_on_insert
+AFTER INSERT ON entities
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_update
+AFTER UPDATE ON entities
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_delete
+AFTER DELETE ON entities
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+-- `tags` table triggers
+CREATE TRIGGER refresh_entities_caches_on_tags_insert
+AFTER INSERT ON tags
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_tags_update
+AFTER UPDATE ON tags
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_tags_delete
+AFTER DELETE ON tags
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+-- `families` table triggers
+CREATE TRIGGER refresh_entities_caches_on_families_insert
+AFTER INSERT ON families
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_families_update
+AFTER UPDATE ON families
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_families_delete
+AFTER DELETE ON families
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+-- `categories` table triggers
+CREATE TRIGGER refresh_entities_caches_on_categories_insert
+AFTER INSERT ON categories
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_categories_update
+AFTER UPDATE ON categories
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_categories_delete
+AFTER DELETE ON categories
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+-- `entity_tags` table triggers
+CREATE TRIGGER refresh_entities_caches_on_entity_tags_insert
+AFTER INSERT ON entity_tags
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_entity_tags_delete
+AFTER DELETE ON entity_tags
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+-- `entities_entities` table triggers
+CREATE TRIGGER refresh_entities_caches_on_entities_entities_insert
+AFTER INSERT ON entities_entities
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
+
+CREATE TRIGGER refresh_entities_caches_on_entities_entities_delete
+AFTER DELETE ON entities_entities
+FOR EACH STATEMENT
+EXECUTE FUNCTION trigger_refresh_entities_caches();
