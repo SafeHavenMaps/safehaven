@@ -20,7 +20,7 @@
     </template>
 
     <template #center>
-      <ViewerFamilySwitcher />
+      <ViewerFamilySwitcher v-if="props.showFamilySwitcher" />
     </template>
 
     <template #end>
@@ -240,11 +240,13 @@ import type { CachedEntity, PaginatedCachedEntitiesWithLocation } from '~/lib'
 export interface Props {
   showCategorySwitcher?: boolean
   showSearch?: boolean
+  showFamilySwitcher?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showCategorySwitcher: true,
   showSearch: true,
+  showFamilySwitcher: true,
 })
 
 const emit = defineEmits<{

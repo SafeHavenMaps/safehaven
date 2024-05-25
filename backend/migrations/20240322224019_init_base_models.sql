@@ -46,7 +46,7 @@ CREATE TABLE tags (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
     is_filter BOOLEAN NOT NULL DEFAULT FALSE,
-    default_filter_status BOOLEAN NOT NULL DEFAULT FALSE,
+    default_filter_status BOOLEAN NOT NULL DEFAULT TRUE,
     filter_description TEXT,
     is_indexed BOOLEAN NOT NULL DEFAULT FALSE
 );
