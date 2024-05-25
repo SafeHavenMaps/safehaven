@@ -147,7 +147,11 @@ BEGIN
         SELECT ec.*
         FROM entities_caches ec
         WHERE
-            (full_text_search_ts @@ plainto_tsquery('english', search_query))
+            (
+                search_query IS NULL
+                OR search_query = ''
+                OR (full_text_search_ts @@ plainto_tsquery('english', search_query))
+            )
             AND ec.family_id = input_family_id
             -- Categories
             AND
