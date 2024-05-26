@@ -72,6 +72,33 @@
     <TabPanel
       header="Avancé"
     >
+      <span class="font-medium text-900 block mb-2">Tags</span>
+      <InputGroup
+        class="mb-4 mt-2"
+      >
+        <InputText
+          v-model="tagSearch"
+          placeholder="Rechercher un tag"
+        />
+        <Button
+          v-tooltip.bottom="'Retirer la recherche'"
+          severity="warning"
+          @click="tagSearch = ''"
+        >
+          <template #icon>
+            <AppIcon icon-name="clear" />
+          </template>
+        </Button>
+        <Button
+          v-tooltip.bottom="'Retirer tous les filtres'"
+          severity="danger"
+          @click="resetFilters()"
+        >
+          <template #icon>
+            <AppIcon icon-name="filterOff" />
+          </template>
+        </Button>
+      </InputGroup>
       <div
         class="filter-settings"
         :style="{
@@ -79,13 +106,6 @@
           overflowY: 'auto',
         }"
       >
-        <InputText
-          v-model="tagSearch"
-          class="mb-4 mt-2"
-          placeholder="Rechercher un tag"
-        />
-        <span class="font-medium text-900 block mb-2">Tags</span>
-
         <div
           v-for="tag in shownAdvancedTags()"
           :key="tag.id"
@@ -152,10 +172,27 @@ function shownAdvancedTags() {
 function filtersChanged() {
   emit('filtersChanged')
 }
+
+function resetFilters() {
+  state.filteringTags.filter(t => !t.is_filter).forEach(t => t.active = null)
+
+  filtersChanged()
+}
 </script>
 
 <style>
 .filter-settings .button-content {
   z-index: 9;
+}
+
+.round {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border-width: 2px;
+  border-style: solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

@@ -245,17 +245,6 @@ function filtersChanged() {
 </script>
 
 <style scoped>
-.round {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  border-width: 2px;
-  border-style: solid;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .result {
   cursor: pointer;
   transition: background-color 0.2s;

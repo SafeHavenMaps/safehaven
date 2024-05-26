@@ -208,19 +208,4 @@ async function showCriteriasModal() {
 html, body {
   background-color: #f7f7f7;
 }
-
-.round {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  border-width: 2px;
-  border-style: solid;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.filter-settings .button-content {
-  z-index: 9;
-}
 </style>

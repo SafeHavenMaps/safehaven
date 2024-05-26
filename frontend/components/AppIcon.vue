@@ -62,6 +62,8 @@ const iconDict: Record<string, string> = {
   loading: mdi.mdiLoading,
   eye: mdi.mdiEye,
   warning: mdi.mdiAlert,
+  clear: mdi.mdiEraser,
+  filterOff: mdi.mdiFilterOff,
 }
 </script>
 
