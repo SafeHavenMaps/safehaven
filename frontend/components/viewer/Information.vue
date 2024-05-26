@@ -3,9 +3,8 @@
     <TabPanel
       :header="state.title"
     >
-      <div
-        v-html="siteInfo"
-      />
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <div v-html="siteInfo" />
     </TabPanel>
     <TabPanel header="SafeHaven">
       <div class="flex align-items-center justify-content-center">

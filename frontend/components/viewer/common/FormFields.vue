@@ -15,6 +15,7 @@
         </a>
       </div>
 
+      <!-- eslint-disable vue/no-v-html -->
       <p
         v-else
         v-html="getDataAsEscapedString(field.key)"

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE tags\n            SET title = $2, is_filter = $3, filter_description = $4\n            WHERE id = $1\n            RETURNING id, title, is_filter, filter_description\n            ",
+  "query": "\n            SELECT id, title, is_filter, filter_description, default_filter_status\n            FROM tags\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -22,22 +22,25 @@
         "ordinal": 3,
         "name": "filter_description",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "default_filter_status",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Varchar",
-        "Bool",
-        "Text"
+        "Uuid"
       ]
     },
     "nullable": [
       false,
       false,
       false,
-      true
+      true,
+      false
     ]
   },
-  "hash": "66a55bb835c3172ed0b01af6c8d1f94e069a362810453ef208e27a75728893e1"
+  "hash": "d19baf70e40e13c9647a8f0ef1f80e056f8dfc07d8a78d7d7a6a7c9bd1364354"
 }

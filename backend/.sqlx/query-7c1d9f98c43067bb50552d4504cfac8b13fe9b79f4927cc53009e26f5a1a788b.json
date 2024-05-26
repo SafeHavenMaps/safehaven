@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO families (title, entity_form, comment_form, icon, sort_order)\n            VALUES ($1, $2, $3, $4, $5)\n            RETURNING \n                id,\n                title,\n                icon_hash,\n                entity_form as \"entity_form: Json<Form>\",\n                comment_form as \"comment_form: Json<Form>\",\n                sort_order\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "icon_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "entity_form: Json<Form>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "comment_form: Json<Form>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "sort_order",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Jsonb",
+        "Jsonb",
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7c1d9f98c43067bb50552d4504cfac8b13fe9b79f4927cc53009e26f5a1a788b"
+}

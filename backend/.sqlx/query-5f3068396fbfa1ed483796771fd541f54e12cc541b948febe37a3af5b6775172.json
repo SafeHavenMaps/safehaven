@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, title, \n                entity_form as \"entity_form: Json<Form>\", \n                comment_form as \"comment_form: Json<Form>\"\n            FROM families\n            ",
+  "query": "\n            SELECT id, title, is_filter, filter_description, default_filter_status\n            FROM tags\n            ",
   "describe": {
     "columns": [
       {
@@ -15,13 +15,18 @@
       },
       {
         "ordinal": 2,
-        "name": "entity_form: Json<Form>",
-        "type_info": "Jsonb"
+        "name": "is_filter",
+        "type_info": "Bool"
       },
       {
         "ordinal": 3,
-        "name": "comment_form: Json<Form>",
-        "type_info": "Jsonb"
+        "name": "filter_description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "default_filter_status",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -31,8 +36,9 @@
       false,
       false,
       false,
+      true,
       false
     ]
   },
-  "hash": "8a69f9424f29c13d3a6d5831f457138c097e74d06aafec809d957aa72bbd9852"
+  "hash": "5f3068396fbfa1ed483796771fd541f54e12cc541b948febe37a3af5b6775172"
 }

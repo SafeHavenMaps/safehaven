@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, title, \n                entity_form as \"entity_form: Json<Form>\", \n                comment_form as \"comment_form: Json<Form>\"\n            FROM families\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT id, title, icon_hash, \n                entity_form as \"entity_form: Json<Form>\", \n                comment_form as \"comment_form: Json<Form>\",\n                sort_order\n            FROM families\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -15,13 +15,23 @@
       },
       {
         "ordinal": 2,
+        "name": "icon_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
         "name": "entity_form: Json<Form>",
         "type_info": "Jsonb"
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "comment_form: Json<Form>",
         "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "sort_order",
+        "type_info": "Int4"
       }
     ],
     "parameters": {
@@ -32,9 +42,11 @@
     "nullable": [
       false,
       false,
+      true,
+      false,
       false,
       false
     ]
   },
-  "hash": "a52fcb210b42db7470c6d1faa1e6225e071f7dbcf2c7432edd7b3e43f847dcd7"
+  "hash": "8e8542b647488a6ca40d3b570ef5460847123d3a6ab1d752535da49507ab9f0f"
 }

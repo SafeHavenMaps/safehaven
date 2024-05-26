@@ -136,6 +136,7 @@
             :key="comment.id"
             :header="commentDisplayTitle(comment)"
           >
+            <!-- eslint-disable vue/no-v-html -->
             <p
               style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;"
               v-html="commentWithBreaks(comment.text)"

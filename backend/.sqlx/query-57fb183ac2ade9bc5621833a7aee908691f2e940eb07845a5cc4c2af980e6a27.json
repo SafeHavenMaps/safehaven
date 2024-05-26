@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT families.id, families.title, families.icon_hash,\n                families.entity_form as \"entity_form: Json<Form>\", \n                families.comment_form as \"comment_form: Json<Form>\",\n                families.sort_order\n            FROM families\n            JOIN categories ON families.id = categories.family_id\n            WHERE categories.id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "icon_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "entity_form: Json<Form>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "comment_form: Json<Form>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "sort_order",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "57fb183ac2ade9bc5621833a7aee908691f2e940eb07845a5cc4c2af980e6a27"
+}

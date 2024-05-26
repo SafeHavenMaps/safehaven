@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, title, family_id, default_status, icon, fill_color, border_color\n            FROM categories\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT id, title, family_id, default_status, icon_hash, fill_color, border_color\n            FROM categories\n            WHERE id = ANY($1) AND family_id = ANY($2)\n            ",
   "describe": {
     "columns": [
       {
@@ -25,7 +25,7 @@
       },
       {
         "ordinal": 4,
-        "name": "icon",
+        "name": "icon_hash",
         "type_info": "Text"
       },
       {
@@ -41,7 +41,8 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "UuidArray",
+        "UuidArray"
       ]
     },
     "nullable": [
@@ -54,5 +55,5 @@
       false
     ]
   },
-  "hash": "e4495825dd3f532ba8a9b10bd96e17d6d18760d7f8c4d8376e10f2f93536eb13"
+  "hash": "3a863ed7b6cb0c99ffec0f28a1f103ffea6a88b89e685acb85c2b305a6f06ad9"
 }

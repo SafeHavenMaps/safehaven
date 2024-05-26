@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                categories_ids as \"categories_ids!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                web_mercator_x as \"web_mercator_x!\",\n                web_mercator_y as \"web_mercator_y!\",\n                plain_text_location as \"plain_text_location!\",\n                cluster_id,\n                cluster_center_x,\n                cluster_center_y\n            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)\n            ",
+  "query": "\n            SELECT\n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                categories_ids as \"categories_ids!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                parent_id,\n                parent_display_name,\n                web_mercator_x as \"web_mercator_x!\",\n                web_mercator_y as \"web_mercator_y!\",\n                plain_text_location as \"plain_text_location!\",\n                cluster_id,\n                cluster_center_x,\n                cluster_center_y\n            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)\n            ",
   "describe": {
     "columns": [
       {
@@ -40,31 +40,41 @@
       },
       {
         "ordinal": 7,
+        "name": "parent_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 8,
+        "name": "parent_display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
         "name": "web_mercator_x!",
         "type_info": "Float8"
       },
       {
-        "ordinal": 8,
+        "ordinal": 10,
         "name": "web_mercator_y!",
         "type_info": "Float8"
       },
       {
-        "ordinal": 9,
+        "ordinal": 11,
         "name": "plain_text_location!",
         "type_info": "Text"
       },
       {
-        "ordinal": 10,
+        "ordinal": 12,
         "name": "cluster_id",
         "type_info": "Int4"
       },
       {
-        "ordinal": 11,
+        "ordinal": 13,
         "name": "cluster_center_x",
         "type_info": "Float8"
       },
       {
-        "ordinal": 12,
+        "ordinal": 14,
         "name": "cluster_center_y",
         "type_info": "Float8"
       }
@@ -83,7 +93,10 @@
         "UuidArray",
         "UuidArray",
         "Float8",
-        "Int4"
+        "Int4",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray"
       ]
     },
     "nullable": [
@@ -99,8 +112,10 @@
       null,
       null,
       null,
+      null,
+      null,
       null
     ]
   },
-  "hash": "9f9a4e8690fb605c2990ec87e0320136c13497206f289938bf28e5c9fefd7b29"
+  "hash": "f27cf81c3b852b0c59c1ca393e695963e10c6803188429344e44560eda3974c9"
 }
