@@ -46,9 +46,7 @@ SELECT
     array_append(el.child_categories_ids, el.category_id) AS categories_ids,
     NULL AS parent_id,
     NULL AS parent_display_name,
-    to_tsvector('english', el.display_name || ' ' || array_to_string(array(
-        SELECT t.title FROM tags t WHERE t.id = ANY(el.tags_ids) AND t.is_indexed
-    ), ' ')) AS full_text_search_ts
+    to_tsvector('english', el.display_name) AS full_text_search_ts
 FROM entity_locations el
 
 UNION
@@ -69,9 +67,7 @@ SELECT
     array_append(el.child_categories_ids, el.category_id) AS categories_ids,
     pe.parent_id,
     pe.parent_display_name,
-    to_tsvector('english', el.display_name || ' ' || array_to_string(array(
-        SELECT t.title FROM tags t WHERE t.id = ANY(el.tags_ids) AND t.is_indexed
-    ), ' ')) AS full_text_search_ts
+    to_tsvector('english', el.display_name) AS full_text_search_ts
 FROM parent_entities pe
 JOIN entity_locations el ON pe.child_id = el.entity_id
 
@@ -93,9 +89,7 @@ SELECT
     array_append(array_agg(DISTINCT e2.category_id) FILTER (WHERE e2.category_id IS NOT NULL), e.category_id) AS categories_ids,
     NULL AS parent_id,
     NULL AS parent_display_name,
-    to_tsvector('english', e.display_name || ' ' || array_to_string(array(
-        SELECT t.title FROM tags t WHERE t.id = ANY(array_remove(array_agg(et.tag_id), NULL)) AND t.is_indexed
-    ), ' ')) AS full_text_search_ts
+    to_tsvector('english', e.display_name) AS full_text_search_ts
 FROM entities e
 JOIN categories c ON e.category_id = c.id
 LEFT JOIN entity_tags et ON e.id = et.entity_id

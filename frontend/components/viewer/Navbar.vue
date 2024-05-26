@@ -71,67 +71,10 @@
   </Toolbar>
 
   <OverlayPanel ref="filterOp">
-    <div class="flex flex-column gap-3 w-25rem">
-      <div>
-        <span class="font-medium text-900 block mb-2">Catégories</span>
-
-        <div style="max-height: 500px; overflow-y: auto;">
-          <div
-            v-for="category in state.filteringCategories"
-            :key="category.id"
-            class="flex align-items-center justify-between mb-2"
-          >
-            <InputSwitch
-              v-model="category.active"
-              @change="filtersChanged"
-            />
-            <div
-              class="round ml-2 mr-2"
-              :style="{
-                backgroundColor: category.fill_color,
-                borderColor: category.border_color,
-              }"
-            >
-              <img
-                height="16"
-                :src="`/api/icons/categories/${category.icon_hash}`"
-              >
-            </div>
-            {{ category.title }}
-          </div>
-        </div>
-      </div>
-      <div class="filter-settings">
-        <span class="font-medium text-900 block mb-2">Filtres</span>
-        <div
-          v-for="tag in state.filteringTags.filter(t => t.is_filter)"
-          :key="tag.id"
-          class="mb-2 p-1"
-        >
-          <div class="text-800 mb-1">
-            {{ tag.filter_description }}
-          </div>
-
-          <SelectButton
-            v-model="tag.active"
-            :options="[true, null, false]"
-            option-label="title"
-            aria-labelledby="custom"
-            @change="filtersChanged"
-          >
-            <template #option="slotProps">
-              <div class="button-content">
-                <span>{{
-                  slotProps.option === false ? 'Caché'
-                  : slotProps.option === null
-                    ? 'Affiché' : 'Requis'
-                }}</span>
-              </div>
-            </template>
-          </SelectButton>
-        </div>
-      </div>
-    </div>
+    <ViewerFilterConfig
+      class="w-25rem"
+      @filters-changed="filtersChanged"
+    />
   </OverlayPanel>
 
   <OverlayPanel ref="searchOp">
@@ -321,9 +264,5 @@ function filtersChanged() {
 
 .result:hover {
   background-color: #f0f0f0;
-}
-
-.filter-settings .button-content {
-  z-index: 9;
 }
 </style>

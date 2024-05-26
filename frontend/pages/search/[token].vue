@@ -140,114 +140,7 @@
         </h3>
       </template>
 
-      <TabView>
-        <TabPanel
-          header="Général"
-        >
-          <div>
-            <span class="font-medium text-900 block mb-2">Catégories</span>
-
-            <div>
-              <div
-                v-for="category in state.filteringCategories"
-                :key="category.id"
-                class="flex align-items-center justify-between mb-2"
-              >
-                <InputSwitch
-                  v-model="category.active"
-                />
-                <div
-                  class="round ml-2 mr-2"
-                  :style="{
-                    backgroundColor: category.fill_color,
-                    borderColor: category.border_color,
-                  }"
-                >
-                  <AppIcon
-                    :icon-name="category.icon_hash!"
-                    dynamic-type="categories"
-                    size="16px"
-                  />
-                </div>
-                {{ category.title }}
-              </div>
-            </div>
-          </div>
-          <div class="filter-settings">
-            <span class="font-medium text-900 block mb-2">Filtres</span>
-            <div
-              v-for="tag in state.filteringTags.filter(t => t.is_filter)"
-              :key="tag.id"
-              class="mb-2 p-1"
-            >
-              <div class="text-800 mb-1">
-                {{ tag.filter_description }}
-              </div>
-
-              <SelectButton
-                v-model="tag.active"
-                :options="[true, null, false]"
-                option-label="title"
-                aria-labelledby="custom"
-              >
-                <template #option="slotProps">
-                  <div class="button-content">
-                    <span>{{
-                      slotProps.option === false ? 'Caché'
-                      : slotProps.option === null
-                        ? 'Affiché' : 'Requis'
-                    }}</span>
-                  </div>
-                </template>
-              </SelectButton>
-            </div>
-          </div>
-        </TabPanel>
-
-        <TabPanel
-          header="Avancé"
-        >
-          <div class="filter-settings">
-            <InputText
-              v-model="tagSearch"
-              class="mb-4 mt-2"
-              placeholder="Rechercher un tag"
-            />
-            <span class="font-medium text-900 block mb-2">Tags</span>
-
-            <div
-              v-for="tag in shownAdvancedTags()"
-              :key="tag.id"
-              class="mb-2 p-1"
-            >
-              <div class="mb-1">
-                <Tag
-                  class="mr-1 mb-1"
-                >
-                  {{ tag.title }}
-                </Tag>
-              </div>
-
-              <SelectButton
-                v-model="tag.active"
-                :options="[true, null, false]"
-                option-label="title"
-                aria-labelledby="custom"
-              >
-                <template #option="slotProps">
-                  <div class="button-content">
-                    <span>{{
-                      slotProps.option === false ? 'Caché'
-                      : slotProps.option === null
-                        ? 'Affiché' : 'Requis'
-                    }}</span>
-                  </div>
-                </template>
-              </SelectButton>
-            </div>
-          </div>
-        </TabPanel>
-      </TabView>
+      <ViewerFilterConfig />
     </Dialog>
   </div>
 </template>
@@ -266,7 +159,6 @@ await state.bootstrapWithToken(token) // TODO: Redirect to 404 if token is inval
 const query = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
-const tagSearch = ref('')
 
 const showCriterias = ref(false)
 
@@ -305,16 +197,6 @@ async function displayEntityId(entityId: string) {
 
 async function showFamilySwitcher(event: Event) {
   familySwitcher.value!.toggle(event)
-}
-
-function shownAdvancedTags() {
-  const base = state.filteringTags.filter(t => !t.is_filter)
-
-  if (tagSearch.value === '') {
-    return base
-  }
-
-  return base.filter(tag => tag.title.toLowerCase().includes(tagSearch.value.toLowerCase()))
 }
 
 async function showCriteriasModal() {
