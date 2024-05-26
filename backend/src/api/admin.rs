@@ -269,7 +269,7 @@ async fn admin_login_check(
     token_claims: AdminUserTokenClaims,
     DbConn(_conn): DbConn,
 ) -> Result<AppJson<AdminUserTokenClaims>, AppError> {
-    return Ok(AppJson(token_claims));
+    Ok(AppJson(token_claims))
 }
 
 #[utoipa::path(
