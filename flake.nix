@@ -30,7 +30,7 @@
         };
 
         # NodeJS environment
-        fixedNode = pkgs.nodejs_18;
+        fixedNode = pkgs.nodejs_20;
         fixedNodePackages = pkgs.nodePackages.override {
           nodejs = fixedNode;
         };
