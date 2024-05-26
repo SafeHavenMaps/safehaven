@@ -190,7 +190,7 @@
 
           # When modifying cargo dependencies, replace the hash with pkgs.lib.fakeSha256
           # then run `nix build .#frontend`. Use the hash in the error to replace the value.
-          npmDepsHash = "sha256-b1EAiRyukgRXyVGiZ/75ff3JEDQGSKg6Rvio41SA3TQ=";
+          npmDepsHash = "sha256-ATlC4sFmoGeKdEp7aff824oaLqXJEKswtL3Kl1tjBio=";
 
           installPhase = ''
             runHook preInstall
