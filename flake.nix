@@ -177,7 +177,7 @@
 
             # When modifying cargo dependencies, replace the hash with pkgs.lib.fakeSha256
             # then run `nix build .#backend`. Use the hash in the error to replace the value.
-            cargoSha256 = "sha256-ek5gQ0QKA+GLHvNPlo4eW+qylMLon3bSAZmX8jWp2oA=";
+            cargoSha256 = "sha256-nUspB1gci7kwn5luWCtP0fAqYZfTVl+lS/hatVJP2FQ=";
           };
 
         # Frontend derivation
