@@ -21,7 +21,7 @@
             outlined
             rounded
             severity="success"
-            @click="navigateTo('/admin/users/add')"
+            @click="navigateTo('/admin/user/add')"
           >
             <template #icon>
               <AppIcon icon-name="add" />
@@ -60,7 +60,7 @@
             rounded
             class="mx-2"
             severity="warning"
-            @click="() => navigateTo(`/admin/users/edit/${slotProps.data.id}`)"
+            @click="() => navigateTo(`/admin/user/${slotProps.data.id}`)"
           >
             <template #icon>
               <AppIcon icon-name="edit" />

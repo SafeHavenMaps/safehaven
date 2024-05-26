@@ -44,8 +44,8 @@
           />
           <span>
             <Checkbox
-              id="remember_me"
               v-model="remember_me"
+              input-id="remember_me"
               :binary="true"
             />
             <label

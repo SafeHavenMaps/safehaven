@@ -8,7 +8,7 @@ CREATE TABLE users (
     password TEXT NOT NULL,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
-CREATE INDEX users_name_idx ON users(name);
+CREATE UNIQUE INDEX users_name_idx ON users(name);
 
 CREATE TABLE options (
     name VARCHAR(255) NOT NULL,
