@@ -21,17 +21,13 @@ const props = withDefaults(defineProps<{
   icon?: string
   rejectLabel?: string
   acceptLabel?: string
-  onAccept: () => void
-  onReject: () => void
 }>(),
 {
   message: 'Confirmer la suppression de ',
-  objectDescriptor: '',
+  messageObjectDescriptor: '',
   icon: 'warning',
   rejectLabel: 'Annuler',
   acceptLabel: 'Confirmer',
-  onAccept: () => {},
-  onReject: () => {},
 })
 
 const confirm = useConfirm()
@@ -39,20 +35,20 @@ interface ExtendedConfirmationOptions extends ConfirmationOptions {
   objectId?: string
 }
 
-function displayDialog(event: Event, objectId: string) {
+function displayDialog(event: Event, messageObjectId: string, onAccept?: () => void, onReject?: () => void) {
   // if id==
   const options: ExtendedConfirmationOptions = {
     target: event.currentTarget as HTMLElement,
     group: 'delete',
-    message: `${props.message}${props.objectDescriptor}`,
-    objectId: objectId,
+    message: `${props.message}${props.messageObjectDescriptor}`,
+    objectId: messageObjectId,
     icon: props.icon,
     rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
     acceptClass: 'p-button-sm',
     rejectLabel: props.rejectLabel,
     acceptLabel: props.acceptLabel,
-    reject: props.onReject,
-    accept: props.onAccept,
+    reject: onReject,
+    accept: onAccept,
   }
   confirm.require(options)
 }

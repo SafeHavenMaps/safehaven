@@ -35,6 +35,8 @@ export class AppState {
   private pendingEntitiesData: ListedEntity[] | null = null
   private pendingCommentsData: ListedComment[] | null = null
 
+  public userAdminCount: number | null = null
+
   public is_admin: boolean | null = null
   public username: string | null = null
 
@@ -82,6 +84,7 @@ export class AppState {
   // Users
   async fetchUsers(): Promise<void> {
     this.usersData = await this.client.listUsers()
+    this.userAdminCount = state.users.filter(user => user.is_admin).length
   }
 
   get users(): User[] {

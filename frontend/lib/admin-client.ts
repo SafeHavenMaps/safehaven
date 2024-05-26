@@ -61,7 +61,6 @@ export default function useClient() {
 
     async check_login() {
       const { data, error } = await rawClient.GET('/api/admin/session')
-      console.log('oulala', data, 'oo', error)
       if (error) return null
       return data
     },

@@ -67,15 +67,11 @@
             </template>
           </Button>
 
-          <ConfirmationDialog
-            ref="confirmationDialogRef"
-            object-descriptor="l'utilisateur⋅ice"
-          />
-
           <Button
             outlined
             rounded
             severity="danger"
+            :disabled="state.username==slotProps.data.name"
             @click="onDelete($event as Event, slotProps.data)"
           >
             <template #icon>
@@ -85,6 +81,11 @@
         </template>
       </Column>
     </DataTable>
+
+    <ConfirmationDialog
+      ref="confirmationDialogRef"
+      message-object-descriptor="l'utilisateur⋅ice"
+    />
   </div>
 </template>
 
@@ -96,24 +97,16 @@ import state from '~/lib/admin-state'
 definePageMeta({
   layout: 'admin-ui',
 })
-state.fetchUsers()
+await state.fetchUsers()
 
-const confirmationDialogRef: Ref<typeof ConfirmationDialog | null> = ref(null)
+const confirmationDialogRef: Ref<InstanceType<typeof ConfirmationDialog> | null> = ref(null)
 
 function onDelete(event: Event, user: User) {
-  // if id==
-  console.log(confirmationDialogRef.value)
-  console.log(confirmationDialogRef.value!.displayDialog)
-  confirmationDialogRef.value!.displayDialog(event, user.name)
+  confirmationDialogRef.value!.displayDialog(event, user.name, async () => await state.deleteUser(user.id))
 }
-
 // async createUser(newUser: NewUser): Promise<void>
 
 // async getUser(id: string): Promise<User> {
 
 // async updateUserPassword(id: string, newPasswordDetails: ChangePassword): Promise<void> {
-
-// async updateSelfPassword(newPasswordDetails: ChangePassword): Promise<void> {
-
-// async deleteUser(id: string): Promise<void> {
 </script>
