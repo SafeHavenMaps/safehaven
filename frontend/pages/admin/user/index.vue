@@ -21,7 +21,7 @@
             outlined
             rounded
             severity="success"
-            @click="navigateTo('/admin/user/add')"
+            @click="navigateTo('/admin/user/new')"
           >
             <template #icon>
               <AppIcon icon-name="add" />
