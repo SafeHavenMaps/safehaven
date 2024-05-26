@@ -48,10 +48,7 @@ pub fn routes(state: &AppState) -> Router<AppState> {
             "/users/self/password",
             put(users::admin_user_change_self_password),
         )
-        .route(
-            "/users/:id/password",
-            put(users::admin_user_change_password),
-        )
+        .route("/users/:id/password", put(users::admin_user_update))
         .route("/users/:id", delete(users::admin_user_delete))
         // access_tokens
         .route(

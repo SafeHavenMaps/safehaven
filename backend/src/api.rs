@@ -8,7 +8,7 @@ use crate::{
     models::{
         access_token::Permissions,
         options::SafeHavenOptions,
-        user::{NewUser, User},
+        user::{NewOrUpdatedUser, User},
     },
 };
 use axum::{
@@ -57,9 +57,10 @@ impl AppState {
         {
             tracing::info!("No users found, creating admin user");
 
-            let admin = NewUser {
+            let admin = NewOrUpdatedUser {
                 name: "admin".to_string(),
-                password: "safehaven".to_string(),
+                password: Some("safehaven".to_string()),
+                is_admin: true,
             };
 
             User::new(admin, &mut conn)

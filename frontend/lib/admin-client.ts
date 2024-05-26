@@ -21,8 +21,7 @@ import type {
   NewOrUpdateFamily,
   SHComment,
   User,
-  NewUser,
-  ChangePassword,
+  NewOrUpdatedUser,
   SafeHavenOptions,
   ConfigurationOption,
 } from '~/lib'
@@ -88,7 +87,7 @@ export default function useClient() {
       return data
     },
 
-    async createUser(newUser: NewUser): Promise<User> {
+    async createUser(newUser: NewOrUpdatedUser): Promise<User> {
       const { data, error } = await this.rawClient.POST('/api/admin/users', {
         body: newUser,
       })
@@ -105,18 +104,18 @@ export default function useClient() {
       return data
     },
 
-    async changeSelfPassword(changePassword: ChangePassword): Promise<User> {
+    async changeSelfPassword(updatedUser: NewOrUpdatedUser): Promise<User> {
       const { data, error } = await this.rawClient.PUT('/api/admin/users/self/password', {
-        body: changePassword,
+        body: updatedUser,
       })
       if (error) throw error
       return data
     },
 
-    async changeUserPassword(id: string, changePassword: ChangePassword): Promise<User> {
-      const { data, error } = await this.rawClient.PUT(`/api/admin/users/{id}/password`, {
+    async updateUser(id: string, updatedUser: NewOrUpdatedUser): Promise<User> {
+      const { data, error } = await this.rawClient.PUT(`/api/admin/users/{id}`, {
         params: { path: { id } },
-        body: changePassword,
+        body: updatedUser,
       })
       if (error) throw error
       return data

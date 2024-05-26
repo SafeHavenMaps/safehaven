@@ -9,9 +9,10 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
-pub struct NewUser {
+pub struct NewOrUpdatedUser {
     pub name: String,
-    pub password: String,
+    pub password: Option<String>,
+    pub is_admin: bool,
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -48,54 +49,78 @@ impl User {
         Ok(count)
     }
 
-    pub async fn new(user: NewUser, conn: &mut PgConnection) -> Result<User, AppError> {
-        if user.password.is_empty() {
+    pub async fn new(user: NewOrUpdatedUser, conn: &mut PgConnection) -> Result<User, AppError> {
+        let new_password = user.password.ok_or(AppError::Validation(
+            "Password for new users is required".to_string(),
+        ))?;
+        if new_password.is_empty() {
             return Err(AppError::Validation("Password cannot be empty".to_string()));
         }
 
-        let salt = SaltString::generate(&mut OsRng);
-        let password_hash = Scrypt
-            .hash_password(user.password.as_bytes(), &salt)
-            .map_err(|_| AppError::Validation("Error hashing password".to_string()))?
-            .to_string();
-
-        let new_user = NewUser {
-            name: user.name.to_string(),
-            password: password_hash,
-        };
-
-        sqlx::query_as!(
-            User,
-            r#"INSERT INTO users (name, password) VALUES ($1, $2) RETURNING id, name, is_admin"#,
-            new_user.name,
-            new_user.password
-        )
-        .fetch_one(conn)
-        .await
-        .map_err(AppError::Database)
-    }
-
-    pub async fn change_password(
-        given_id: Uuid,
-        new_password: String,
-        conn: &mut PgConnection,
-    ) -> Result<(), AppError> {
         let salt = SaltString::generate(&mut OsRng);
         let password_hash = Scrypt
             .hash_password(new_password.as_bytes(), &salt)
             .map_err(|_| AppError::Validation("Error hashing password".to_string()))?
             .to_string();
 
-        sqlx::query!(
-            r#"UPDATE users SET password = $1 WHERE id = $2"#,
+        sqlx::query_as!(
+            User,
+            r#"INSERT INTO users (name, password, is_admin) VALUES ($1, $2, $3) RETURNING id, name, is_admin"#,
+            user.name,
             password_hash,
-            given_id
+            user.is_admin,
         )
-        .execute(conn)
+        .fetch_one(conn)
         .await
-        .map_err(AppError::Database)?;
+        .map_err(AppError::Database)
+    }
 
-        Ok(())
+    pub async fn update_user(
+        given_id: Uuid,
+        updated_user: NewOrUpdatedUser,
+        conn: &mut PgConnection,
+    ) -> Result<User, AppError> {
+        match updated_user.password {
+            Some(password) => {
+                let salt = SaltString::generate(&mut OsRng);
+                let password_hash = Scrypt
+                    .hash_password(password.as_bytes(), &salt)
+                    .map_err(|_| AppError::Validation("Error hashing password".to_string()))?
+                    .to_string();
+
+                sqlx::query_as!(
+                    User,
+                    r#"
+                    UPDATE users 
+                    SET name = $2, password = $3, is_admin = $4 
+                    WHERE id = $1
+                    RETURNING id, name, is_admin
+                    "#,
+                    given_id,
+                    updated_user.name,
+                    password_hash,
+                    updated_user.is_admin,
+                )
+                .fetch_one(conn)
+                .await
+                .map_err(AppError::Database)
+            }
+            None => sqlx::query_as!(
+                User,
+                r#"
+                    UPDATE users 
+                    SET name = $2, is_admin = $3 
+                    WHERE id = $1
+                    RETURNING id, name, is_admin
+                    "#,
+                given_id,
+                updated_user.name,
+                updated_user.is_admin,
+            )
+            .fetch_one(conn)
+            .await
+            .map_err(AppError::Database),
+        }
     }
 
     // We do not want the password hash to be optimized out, so we do not use map

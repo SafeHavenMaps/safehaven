@@ -1,11 +1,9 @@
 use axum::{extract::Path, Json};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::{
     api::{AppError, AppJson, DbConn},
-    models::user::{NewUser, User},
+    models::user::{NewOrUpdatedUser, User},
 };
 
 use super::AdminUserTokenClaims;
@@ -41,7 +39,7 @@ pub async fn admin_users_list(
 pub async fn admin_user_new(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
-    Json(new_user): Json<NewUser>,
+    Json(new_user): Json<NewOrUpdatedUser>,
 ) -> Result<AppJson<User>, AppError> {
     if !token.is_admin {
         return Err(AppError::Unauthorized);
@@ -74,15 +72,10 @@ pub async fn admin_user_get(
     Ok(AppJson(User::get(id, &mut conn).await?))
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct ChangePassword {
-    pub password: String,
-}
-
 #[utoipa::path(
     put,
     path = "/api/admin/users/self/password",
-    request_body = ChangePassword,
+    request_body = NewOrUpdatedUser,
     responses(
         (status = 200, description = "User", body = User),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
@@ -92,17 +85,22 @@ pub struct ChangePassword {
 pub async fn admin_user_change_self_password(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
-    Json(change_password): Json<ChangePassword>,
-) -> Result<AppJson<()>, AppError> {
+    Json(user_with_changed_password): Json<NewOrUpdatedUser>,
+) -> Result<AppJson<User>, AppError> {
+    if user_with_changed_password.name != token.username
+        || user_with_changed_password.is_admin != token.is_admin
+    {
+        return Err(AppError::Unauthorized);
+    }
     Ok(AppJson(
-        User::change_password(token.admin_id, change_password.password, &mut conn).await?,
+        User::update_user(token.admin_id, user_with_changed_password, &mut conn).await?,
     ))
 }
 
 #[utoipa::path(
     put,
-    path = "/api/admin/users/{id}/password",
-    request_body = ChangePassword,
+    path = "/api/admin/users/{id}",
+    request_body = NewOrUpdatedUser,
     params(
         ("id" = Uuid, Path, description = "User identifier")
     ),
@@ -112,18 +110,18 @@ pub async fn admin_user_change_self_password(
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
-pub async fn admin_user_change_password(
+pub async fn admin_user_update(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-    Json(change_password): Json<ChangePassword>,
-) -> Result<AppJson<()>, AppError> {
+    Json(updated_user): Json<NewOrUpdatedUser>,
+) -> Result<AppJson<User>, AppError> {
     if !token.is_admin {
         return Err(AppError::Unauthorized);
     }
 
     Ok(AppJson(
-        User::change_password(id, change_password.password, &mut conn).await?,
+        User::update_user(id, updated_user, &mut conn).await?,
     ))
 }
 

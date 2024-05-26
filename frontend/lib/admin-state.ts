@@ -19,8 +19,7 @@ import type {
   SafeHavenOptions,
   ConfigurationOption,
   User,
-  NewUser,
-  ChangePassword,
+  NewOrUpdatedUser,
 } from '~/lib'
 
 export class AppState {
@@ -91,7 +90,7 @@ export class AppState {
     return this.usersData!
   }
 
-  async createUser(newUser: NewUser): Promise<void> {
+  async createUser(newUser: NewOrUpdatedUser): Promise<void> {
     const createdUser = await this.client.createUser(newUser)
     this.usersData!.push(createdUser)
   }
@@ -100,19 +99,20 @@ export class AppState {
     return await this.client.getUser(id)
   }
 
-  async updateUserPassword(id: string, newPasswordDetails: ChangePassword): Promise<void> {
-    const updatedUser = await this.client.changeUserPassword(id, newPasswordDetails)
+  async updateUser(id: string, updatedUser: NewOrUpdatedUser): Promise<void> {
+    const returnedUser = await this.client.updateUser(id, updatedUser)
     const index = this.usersData!.findIndex(u => u.id === id)
     if (index !== -1) {
-      this.usersData![index] = updatedUser
+      this.usersData![index] = returnedUser
     }
   }
 
-  async updateSelfPassword(newPasswordDetails: ChangePassword): Promise<void> {
-    const updatedUser = await this.client.changeSelfPassword(newPasswordDetails)
-    const selfIndex = this.usersData!.findIndex(u => u.id === updatedUser.id)
+  async updateSelfPassword(newPasswordDetails: string): Promise<void> {
+    const updatedUSer = { name: state.username!, password: newPasswordDetails, is_admin: state.is_admin! }
+    const returnedUser = await this.client.changeSelfPassword(updatedUSer)
+    const selfIndex = this.usersData!.findIndex(u => u.id === returnedUser.id)
     if (selfIndex !== -1) {
-      this.usersData![selfIndex] = updatedUser
+      this.usersData![selfIndex] = returnedUser
     }
   }
 

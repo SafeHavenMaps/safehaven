@@ -1,6 +1,6 @@
 use crate::{
     api::{
-        admin::{self, users::ChangePassword, AdminUserTokenClaims, LoginRequest, LoginResponse},
+        admin::{self, AdminUserTokenClaims, LoginRequest, LoginResponse},
         map::{
             self, FetchedEntity, NewCommentRequest, NewEntityRequest, SearchRequest, ViewRequest,
         },
@@ -21,7 +21,7 @@ use crate::{
             SafeHavenOptions, SafeModeConfig,
         },
         tag::{NewOrUpdateTag, Tag},
-        user::{NewUser, User},
+        user::{NewOrUpdatedUser, User},
     },
 };
 use utoipa::OpenApi;
@@ -49,7 +49,7 @@ use utoipa::OpenApi;
         admin::users::admin_user_new,
         admin::users::admin_user_get,
         admin::users::admin_user_change_self_password,
-        admin::users::admin_user_change_password,
+        admin::users::admin_user_update,
         admin::users::admin_user_delete,
         // admin::access_tokens
         admin::access_tokens::admin_access_tokens_list,
@@ -143,9 +143,8 @@ use utoipa::OpenApi;
         Permissions,
         PermissionPolicy,
         // users
-        NewUser,
+        NewOrUpdatedUser,
         User,
-        ChangePassword,
         LoginRequest,
         LoginResponse,
         // map

@@ -1842,7 +1842,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePassword"
+                "$ref": "#/components/schemas/NewOrUpdatedUser"
               }
             }
           },
@@ -1933,11 +1933,11 @@
           }
         }
       },
-      "delete": {
+      "put": {
         "tags": [
           "admin::users"
         ],
-        "operationId": "admin_user_delete",
+        "operationId": "admin_user_update",
         "parameters": [
           {
             "name": "id",
@@ -1950,9 +1950,26 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewOrUpdatedUser"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
-            "description": "Deletion successful"
+            "description": "User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           },
           "401": {
             "description": "Invalid permissions",
@@ -1975,14 +1992,12 @@
             }
           }
         }
-      }
-    },
-    "/api/admin/users/{id}/password": {
-      "put": {
+      },
+      "delete": {
         "tags": [
           "admin::users"
         ],
-        "operationId": "admin_user_change_password",
+        "operationId": "admin_user_delete",
         "parameters": [
           {
             "name": "id",
@@ -1995,26 +2010,9 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePassword"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
-            "description": "User",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
+            "description": "Deletion successful"
           },
           "401": {
             "description": "Invalid permissions",
@@ -2587,17 +2585,6 @@
             "format": "uuid"
           },
           "title": {
-            "type": "string"
-          }
-        }
-      },
-      "ChangePassword": {
-        "type": "object",
-        "required": [
-          "password"
-        ],
-        "properties": {
-          "password": {
             "type": "string"
           }
         }
@@ -3243,18 +3230,22 @@
           }
         }
       },
-      "NewUser": {
+      "NewOrUpdatedUser": {
         "type": "object",
         "required": [
           "name",
-          "password"
+          "is_admin"
         ],
         "properties": {
+          "is_admin": {
+            "type": "boolean"
+          },
           "name": {
             "type": "string"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         }
       },
