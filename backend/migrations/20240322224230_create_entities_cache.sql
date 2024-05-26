@@ -19,13 +19,14 @@ entity_locations AS (
         c.family_id,
         location.value as location,
         location.ordinality AS location_index,
-        array_remove(array_agg(DISTINCT et.tag_id), NULL) AS tags_ids,
+        array_remove(array_agg(DISTINCT et.tag_id) || array_agg(DISTINCT cet.tag_id), NULL) AS tags_ids,
         array_agg(DISTINCT e2.category_id) FILTER (WHERE e2.category_id IS NOT NULL) AS child_categories_ids
     FROM entities e
     JOIN categories c ON e.category_id = c.id
     LEFT JOIN entity_tags et ON e.id = et.entity_id
     LEFT JOIN entities_entities ee ON e.id = ee.parent_id
-    LEFT JOIN entities e2 ON ee.child_id = e2.id,
+    LEFT JOIN entities e2 ON ee.child_id = e2.id
+    LEFT JOIN entity_tags cet ON ee.child_id = cet.entity_id,
     LATERAL jsonb_array_elements(e.locations) WITH ORDINALITY AS location(value, ordinality)
     WHERE e.moderated_at IS NOT NULL AND e.hide_from_map = FALSE
     GROUP BY e.id, c.family_id, e.display_name, e.category_id, location.value, location.ordinality
@@ -85,7 +86,7 @@ SELECT
     NULL AS latitude,
     NULL AS web_mercator_location,
     NULL AS plain_text_location,
-    array_remove(array_agg(DISTINCT et.tag_id), NULL) AS tags_ids,
+    array_remove(array_agg(DISTINCT et.tag_id) || array_agg(DISTINCT cet.tag_id), NULL) AS tags_ids,
     array_append(array_agg(DISTINCT e2.category_id) FILTER (WHERE e2.category_id IS NOT NULL), e.category_id) AS categories_ids,
     NULL AS parent_id,
     NULL AS parent_display_name,
@@ -95,6 +96,7 @@ JOIN categories c ON e.category_id = c.id
 LEFT JOIN entity_tags et ON e.id = et.entity_id
 LEFT JOIN entities_entities ee ON e.id = ee.parent_id
 LEFT JOIN entities e2 ON ee.child_id = e2.id
+LEFT JOIN entity_tags cet ON ee.child_id = cet.entity_id
 WHERE e.moderated_at IS NOT NULL AND e.hide_from_map = FALSE AND jsonb_array_length(e.locations) = 0
 GROUP BY e.id, c.family_id, e.display_name, e.category_id;
 
