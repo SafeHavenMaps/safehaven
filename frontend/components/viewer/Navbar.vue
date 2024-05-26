@@ -28,6 +28,7 @@
         <Button
           label="Informations"
           class="p-button-text mr-2"
+          @click="showInformation = true"
         >
           <template #icon>
             <AppIcon icon-name="information" />
@@ -169,6 +170,17 @@
       </TabView>
     </div>
   </OverlayPanel>
+
+  <Dialog
+    v-model:visible="showInformation"
+    maximizable
+    :style="{ width: '50rem' }"
+    :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+    header="Informations"
+    modal
+  >
+    <ViewerInformation />
+  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -203,6 +215,7 @@ const searchOp = ref<OverlayPanel>()
 
 const placeSearch: Ref<string> = ref('')
 const entitySearch: Ref<string> = ref('')
+const showInformation = ref(false)
 
 const currentLocationsResults: Ref<NominatimResult[]> = ref([])
 const currentEntitiesResults: Ref<PaginatedCachedEntitiesWithLocation | null> = ref(null)

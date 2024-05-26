@@ -41,6 +41,7 @@ pub struct GeneralOptions {
     pub title: String,
     pub subtitle: Option<String>,
     pub logo_url: Option<String>,
+    pub information: Option<String>,
 }
 
 impl OptionConfig for GeneralOptions {
@@ -55,6 +56,7 @@ impl Default for GeneralOptions {
             title: "SafeHaven".to_string(),
             subtitle: Some("Carte associative".to_string()),
             logo_url: None,
+            information: None,
         }
     }
 }

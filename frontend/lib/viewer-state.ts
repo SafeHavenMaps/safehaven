@@ -1,6 +1,8 @@
 import { reactive } from 'vue'
 import { transform } from 'ol/proj.js'
 import type { Extent } from 'ol/extent'
+import DOMPurify from 'dompurify'
+import { marked } from 'marked'
 import useClient from '~/lib/viewer-client'
 import type {
   CartographyInitConfig,
@@ -125,6 +127,16 @@ export class AppState {
 
   get loaded() {
     return this.initConfig !== null
+  }
+
+  async getSanitizedInformation() {
+    if (!this.initConfig?.general.information) {
+      return null
+    }
+
+    return DOMPurify.sanitize(
+      await marked.parse(this.initConfig!.general.information!),
+    )
   }
 
   async init() {

@@ -9,6 +9,7 @@
         <a
           :href="getKeyValue(field.key)"
           target="_blank"
+          rel="noopener noreferrer"
         >
           {{ extractHostnameFromUrl(getKeyValue(field.key)) }}
         </a>

@@ -64,6 +64,7 @@ const iconDict: Record<string, string> = {
   warning: mdi.mdiAlert,
   clear: mdi.mdiEraser,
   filterOff: mdi.mdiFilterOff,
+  github: mdi.mdiGithub,
 }
 </script>
 

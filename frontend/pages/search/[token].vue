@@ -42,7 +42,7 @@
             <Button
               type="button"
               severity="warning"
-              label="Critères avancés"
+              label="Filtres"
               @click="showCriteriasModal()"
             >
               <template #icon>
@@ -136,7 +136,7 @@
     >
       <template #header>
         <h3 class="m-0">
-          Critères avancés
+          Filtres
         </h3>
       </template>
 
