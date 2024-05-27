@@ -131,6 +131,7 @@ async fn boostrap(
 
     // Register visit in background to avoid blocking the response
     task::spawn(async move {
+        tracing::trace!("Registering visit");
         if let Err(e) =
             AccessToken::register_visit(access_token.id, query.referrer, &mut conn).await
         {

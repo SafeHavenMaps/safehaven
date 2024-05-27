@@ -22,6 +22,7 @@ pub struct PermissionPolicy {
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct NewOrUpdateAccessToken {
+    pub title: String,
     pub token: String,
     pub permissions: Json<Permissions>,
     pub active: bool,
@@ -30,8 +31,10 @@ pub struct NewOrUpdateAccessToken {
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct AccessToken {
     pub id: Uuid,
+    pub title: String,
     pub token: String,
     pub permissions: Json<Permissions>,
+    pub last_week_visits: i64,
     pub active: bool,
 }
 
@@ -46,14 +49,17 @@ impl AccessToken {
         sqlx::query_as!(
             AccessToken,
             r#"
-            INSERT INTO access_tokens (token, permissions, active)
-            VALUES ($1, $2, $3)
+            INSERT INTO access_tokens (title, token, permissions, active)
+            VALUES ($1, $2, $3, $4)
             RETURNING 
-                id, 
+                id,
+                title,
                 token, 
                 permissions as "permissions: Json<Permissions>",
-                active
+                active,
+                0 as "last_week_visits!"
             "#,
+            access_token.title,
             access_token.token,
             permission_value,
             access_token.active
@@ -75,15 +81,18 @@ impl AccessToken {
             AccessToken,
             r#"
             UPDATE access_tokens
-            SET token = $2, permissions = $3, active = $4
+            SET title = $2, token = $3, permissions = $4, active = $5
             WHERE id = $1
             RETURNING 
-                id, 
-                token, 
+                id,
+                title,
+                token,
                 permissions as "permissions: Json<Permissions>",
-                active
+                active,
+                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') as "last_week_visits!"
             "#,
             given_id,
+            update.title,
             update.token,
             permission_value,
             update.active
@@ -111,10 +120,17 @@ impl AccessToken {
         given_token: String,
         conn: &mut PgConnection,
     ) -> Result<AccessToken, AppError> {
+        // We don't need to count the visits here
         sqlx::query_as!(
             AccessToken,
             r#"
-            SELECT id, token, permissions as "permissions: Json<Permissions>", active
+            SELECT
+                id,
+                title,
+                token,
+                permissions as "permissions: Json<Permissions>",
+                active,
+                0 as "last_week_visits!"
             FROM access_tokens
             WHERE token = $1
             "#,
@@ -132,7 +148,13 @@ impl AccessToken {
         sqlx::query_as!(
             AccessToken,
             r#"
-            SELECT id, token, permissions as "permissions: Json<Permissions>", active
+            SELECT 
+                id,
+                title,
+                token,
+                permissions as "permissions: Json<Permissions>",
+                active,
+                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') as "last_week_visits!"
             FROM access_tokens
             WHERE id = $1
             "#,
@@ -147,7 +169,13 @@ impl AccessToken {
         sqlx::query_as!(
             AccessToken,
             r#"
-            SELECT id, token, permissions as "permissions: Json<Permissions>", active
+            SELECT
+                id,
+                title,
+                token,
+                permissions as "permissions: Json<Permissions>",
+                active,
+                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') as "last_week_visits!"
             FROM access_tokens
             "#
         )

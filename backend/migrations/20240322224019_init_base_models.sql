@@ -105,6 +105,7 @@ CREATE INDEX comments_entity_id_idx ON comments(entity_id);
 
 CREATE TABLE access_tokens (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title TEXT NOT NULL,
     token VARCHAR(64) NOT NULL,
     permissions JSONB NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE
