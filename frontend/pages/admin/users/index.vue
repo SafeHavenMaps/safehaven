@@ -40,7 +40,7 @@
           <AdminEditDeleteButtons
             :id="slotProps.data.id"
             model-name="l'utilisateur⋅ice"
-            :name="slotProps.data.id"
+            :name="slotProps.data.name"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/users/${id}`)"
           />

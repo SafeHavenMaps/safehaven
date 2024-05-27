@@ -49,7 +49,7 @@ function onDelete(event: Event) {
     target: event.currentTarget as HTMLElement,
     group: 'delete',
     message: `Confirmer la suppression de ${props.modelName}`,
-    objectId: props.id,
+    objectId: props.name,
     icon: 'warning',
     rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
     acceptClass: 'p-button-sm',

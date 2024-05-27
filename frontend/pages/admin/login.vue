@@ -87,7 +87,7 @@ const failed_attempt: Ref<boolean> = ref(false)
 const awaiting_auth_response: Ref<boolean> = ref(false)
 
 const redirect_query_param = useRoute().query.redirect
-let redirectUrl = '/admin/'
+let redirectUrl = '/admin/home'
 // type checking of the query parameter to correspond to the signature of navigateTo
 if (typeof redirect_query_param === 'string') {
   // matching to keep only internal urls

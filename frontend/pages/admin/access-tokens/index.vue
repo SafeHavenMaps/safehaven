@@ -34,7 +34,7 @@
           <EditDeleteButtons
             :id="slotProps.data.id"
             model-name="le jeton d'accès"
-            :name="slotProps.data.id"
+            :name="slotProps.data.token"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/access-tokens/${id}`)"
           />
