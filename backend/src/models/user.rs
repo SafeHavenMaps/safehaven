@@ -1,4 +1,5 @@
 use crate::api::AppError;
+use chrono::NaiveDateTime;
 use scrypt::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Scrypt,
@@ -20,6 +21,7 @@ pub struct User {
     pub id: Uuid,
     pub name: String,
     pub is_admin: bool,
+    pub last_login: Option<NaiveDateTime>,
 }
 
 #[derive(FromRow, Deserialize, Serialize, Debug)]
@@ -28,6 +30,7 @@ pub struct AuthenticableUser {
     pub name: String,
     pub password: String,
     pub is_admin: bool,
+    pub last_login: Option<NaiveDateTime>,
 }
 
 impl From<AuthenticableUser> for User {
@@ -36,6 +39,7 @@ impl From<AuthenticableUser> for User {
             id: val.id,
             name: val.name,
             is_admin: val.is_admin,
+            last_login: val.last_login,
         }
     }
 }
@@ -65,7 +69,15 @@ impl User {
 
         sqlx::query_as!(
             User,
-            r#"INSERT INTO users (name, password, is_admin) VALUES ($1, $2, $3) RETURNING id, name, is_admin"#,
+            r#"
+            INSERT INTO users (name, password, is_admin) 
+            VALUES ($1, $2, $3) 
+            RETURNING
+                id,
+                name, 
+                is_admin,
+                last_login
+            "#,
             user.name,
             password_hash,
             user.is_admin,
@@ -94,7 +106,11 @@ impl User {
                     UPDATE users 
                     SET name = $2, password = $3, is_admin = $4 
                     WHERE id = $1
-                    RETURNING id, name, is_admin
+                    RETURNING
+                        id,
+                        name,
+                        is_admin,
+                        last_login
                     "#,
                     given_id,
                     updated_user.name,
@@ -111,7 +127,11 @@ impl User {
                     UPDATE users 
                     SET name = $2, is_admin = $3 
                     WHERE id = $1
-                    RETURNING id, name, is_admin
+                    RETURNING
+                        id,
+                        name,
+                        is_admin,
+                        last_login
                     "#,
                 given_id,
                 updated_user.name,
@@ -132,10 +152,10 @@ impl User {
     ) -> Result<User, AppError> {
         let user_result: Result<AuthenticableUser, AppError> = sqlx::query_as!(
             AuthenticableUser,
-            r#"SELECT id, name, password, is_admin FROM users WHERE name = $1"#,
+            r#"SELECT id, name, password, is_admin, last_login FROM users WHERE name = $1"#,
             given_name
         )
-        .fetch_one(conn)
+        .fetch_one(&mut *conn)
         .await
         .map_err(|_| AppError::BadUsernameOrPassword);
 
@@ -146,6 +166,14 @@ impl User {
                 Scrypt
                     .verify_password(given_password.as_bytes(), &password_hash)
                     .map_err(|_| AppError::BadUsernameOrPassword)?;
+
+                sqlx::query!(
+                    r#"UPDATE users SET last_login = NOW() WHERE id = $1"#,
+                    user.id
+                )
+                .execute(&mut *conn)
+                .await
+                .map_err(AppError::Database)?;
 
                 Ok(user.into())
             }
@@ -170,7 +198,7 @@ impl User {
     }
 
     pub async fn list(conn: &mut PgConnection) -> Result<Vec<User>, AppError> {
-        sqlx::query_as!(User, r#"SELECT id, name, is_admin FROM users"#)
+        sqlx::query_as!(User, r#"SELECT id, name, is_admin, last_login FROM users"#)
             .fetch_all(conn)
             .await
             .map_err(AppError::Database)
@@ -187,7 +215,7 @@ impl User {
     pub async fn get(given_id: Uuid, conn: &mut PgConnection) -> Result<User, AppError> {
         sqlx::query_as!(
             User,
-            r#"SELECT id, name, is_admin FROM users WHERE id = $1"#,
+            r#"SELECT id, name, is_admin, last_login FROM users WHERE id = $1"#,
             given_id
         )
         .fetch_one(conn)

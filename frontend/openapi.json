@@ -3692,6 +3692,11 @@
           "is_admin": {
             "type": "boolean"
           },
+          "last_login": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "name": {
             "type": "string"
           }

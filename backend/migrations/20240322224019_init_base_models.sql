@@ -6,7 +6,8 @@ CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    is_admin BOOLEAN NOT NULL DEFAULT FALSE
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    last_login TIMESTAMP
 );
 CREATE UNIQUE INDEX users_name_idx ON users(name);
 

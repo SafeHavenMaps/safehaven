@@ -27,9 +27,13 @@
       </Column>
 
       <Column
-        field="id"
-        header="Id"
-      />
+        field="last_login"
+        header="Dernière connexion"
+      >
+        <template #body="slotProps">
+          {{ new Date(slotProps.data.last_login).toLocaleString() }}
+        </template>
+      </Column>
 
       <Column>
         <template #body="slotProps">
