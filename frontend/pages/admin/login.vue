@@ -77,7 +77,7 @@ import { useRoute } from 'vue-router'
 import state from '~/lib/admin-state'
 
 if (await state.check_login()) {
-  await navigateTo('/admin')
+  await navigateTo('/admin/home')
 }
 
 const username: Ref<string> = ref('')

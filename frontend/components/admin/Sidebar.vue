@@ -1,111 +1,212 @@
 <template>
-  <div class="poudre-bg">
-    <Tree
-      v-model:expandedKeys="expandedKeys"
-      :value="nodes"
-      class="poudre-bg"
-      selection-mode="single"
-      @node-select="onNodeSelect"
-    >
-      <template #nodeicon="slotProps">
+  <PanelMenu
+    :model="getMenuItems()"
+    class="navigation-tree mt-4"
+    style="width: 17rem;"
+  >
+    <template #item="{ item }">
+      <NuxtLink
+        v-if="item.route"
+        v-slot="{ href, navigate }"
+        :to="`/admin/${item.route}`"
+        custom
+      >
+        <a
+          :class="classForLink(item.active!)"
+          :href="href"
+          @click="navigate"
+        >
+          <AppIcon
+            size="18px"
+            :icon-name="item.icon!"
+            :dynamic-type="item.icon_dytpe"
+          />
+          <span
+            class="ml-2 flex-grow-1 text-link"
+          >{{ item.label }}</span>
+
+          <AppIcon
+            class="active-arrow"
+            size="16px"
+            icon-name="activePage"
+          />
+        </a>
+      </NuxtLink>
+
+      <a
+        v-else
+        :class="classForLink(item.active!)"
+        :href="item.url"
+        :target="item.target"
+      >
         <AppIcon
-          :icon-name="slotProps.node.icon!"
-          :dynamic-type="slotProps.node.icon_dynamic_type"
-          class="mr-2 -ml-2"
+          size="18px"
+          :icon-name="item.icon!"
+          :dynamic-type="item.icon_dytpe"
         />
-      </template>
-    </Tree>
-  </div>
+
+        <span
+          class="ml-2 flex-grow-1 text-link"
+        >{{ item.label }}</span>
+
+        <AppIcon
+          v-if="item.items"
+          class="arrow-icon"
+          size="16px"
+          icon-name="chevronDown"
+        />
+      </a>
+    </template>
+  </PanelMenu>
 </template>
 
 <script setup lang="ts">
-import type { TreeNode } from 'primevue/treenode'
 import state from '~/lib/admin-state'
 
 await state.fetchFamilies()
 
-const expandedKeys = ref<Record<string, boolean>>({})
+function getMenuItems() {
+  const currentRoute = useRoute().fullPath
 
-function onNodeSelect(node: TreeNode) {
-  if (node.children !== undefined) {
-    expandedKeys.value[node.key!] = !expandedKeys.value[node.key!]
-  }
-  else if (node.data !== undefined) {
-    navigateTo('/admin/' + node.data)
-  }
+  return nodes.map((node) => {
+    node.active = (!!node.route && currentRoute.startsWith(`/admin/${node.route}`))
+
+    return node
+  })
 }
 
-const family_nodes = state.families.map(item => ({
-  label: item.title,
-  key: item.id,
-  icon: item.icon_hash!,
-  icon_dynamic_type: 'families',
-  children: [
-    {
-      label: 'Categories',
-      icon: 'category',
-      data: item.id + '/categories',
-    },
-    {
-      label: 'Entities',
-      icon: 'entity',
-      data: item.id + '/entities',
-    },
-    {
-      label: 'Comments',
-      icon: 'comment',
-      data: item.id + '/comments',
-    },
-    {
-      label: 'Pending Entities',
-      icon: 'pendingEntity',
-      data: item.id + '/pending-entities',
-    },
-    {
-      label: 'Pending Comments',
-      icon: 'pendingComment',
-      data: item.id + '/pending-categories',
-    },
-  ],
-}))
+function classForLink(active: boolean) {
+  const classes = ['flex', 'align-items-center', 'cursor-pointer', 'text-color', 'px-3', 'py-2']
+
+  if (active) {
+    classes.push('active-link')
+  }
+
+  return classes
+}
+
+const familyNodes = [{
+  label: 'Configuration',
+  icon: 'config',
+  route: 'families',
+  active: false,
+}].concat(
+  state.families.map(item => ({
+    label: item.title,
+    key: item.id,
+    icon: item.icon_hash!,
+    icon_dytpe: 'families',
+    route: '',
+    active: false,
+    items: [
+      {
+        label: 'Catégories',
+        icon: 'categories',
+        route: item.id + '/categories',
+      },
+      {
+        label: 'Entités',
+        icon: 'entities',
+        route: item.id + '/entities',
+      },
+      {
+        label: 'Commentaires',
+        icon: 'comments',
+        route: item.id + '/comments',
+      },
+      {
+        label: 'Entités en attente',
+        icon: 'pendingEntity',
+        route: item.id + '/pending-entities',
+      },
+      {
+        label: 'Commentaires en attente',
+        icon: 'pendingComment',
+        route: item.id + '/pending-categories',
+      },
+    ],
+  })),
+)
 
 const nodes = [
   {
     label: 'Accueil',
     icon: 'home',
-    data: '',
+    route: 'home',
+    active: false,
   },
   {
-    label: 'General Config',
+    label: 'Configuration',
     icon: 'config',
-    data: 'config',
+    route: 'config',
+    active: false,
   },
   {
-    label: 'Users',
+    label: 'Utilisateur⋅ices',
     icon: 'user',
-    data: 'user',
+    route: 'users',
+    active: false,
   },
   {
-    label: 'Access Tokens',
+    label: 'Jetons d\'accès',
     icon: 'accessToken',
-    data: 'access-token',
+    route: 'access-tokens',
+    active: false,
   },
   {
-    label: 'Families & Forms',
+    label: 'Familles',
     icon: 'family',
-    data: 'family',
+    items: familyNodes,
+    active: false,
   },
-  ...family_nodes,
   {
     label: 'Tags',
     icon: 'tag',
-    data: 'tag',
+    route: 'tag',
+    active: false,
   },
 ]
 </script>
 
 <style>
-.p-treenode-content {
+.active-arrow {
+  display: none;
+}
+
+.active-link .active-arrow {
+  display: block;
+}
+
+.p-panelmenu-panel {
+  border-width: 0;
+}
+
+.p-panelmenu-header-content {
   cursor: pointer;
+  background-color: transparent;
+}
+
+.p-panelmenu-content {
+  background-color: transparent;
+}
+
+.arrow-icon {
+  transform: rotate(0deg);
+  transition: all 0.2s ease-in-out;
+
+}
+
+div[aria-expanded="true"] .arrow-icon,
+li[aria-expanded="true"] .arrow-icon {
+  transform: rotate(-180deg);
+  transition: all 0.2s ease-in-out;
+}
+
+a {
+  text-decoration: none;
+}
+
+.navigation-tree {
+  background-color: transparent;
 }
 </style>

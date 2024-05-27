@@ -74,7 +74,7 @@
 
       <span class="flex gap-1 justify-content-end   ">
         <NuxtLink
-          to="/admin/user"
+          to="/admin/users"
         >
           <Button
             label="Annuler"
@@ -93,12 +93,9 @@
 </template>
 
 <script setup lang="ts">
+import type { SetBreadcrumbFunction } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdatedUser } from '~/lib'
 import state from '~/lib/admin-state'
-
-definePageMeta({
-  layout: 'admin-ui',
-})
 
 const userId = useRoute().params.id as string
 
@@ -109,6 +106,18 @@ const editPassword = ref(false)
 const newPassword = ref('')
 const newPasswordConfirm = ref('')
 const processingRequest = ref(false)
+
+definePageMeta({
+  layout: 'admin-ui',
+  cardTitle: 'Édition de l\'utilisateur⋅ice',
+  cardIcon: 'user',
+})
+
+const setBreadcrumb = inject<SetBreadcrumbFunction>('setBreadcrumb')!
+setBreadcrumb(
+  { label: 'Utilisateur⋅ices', url: '/admin/users' },
+  { label: `Edition de ${name}`, url: `/admin/users/${userId}` },
+)
 
 async function onSave() {
   processingRequest.value = true
@@ -122,6 +131,6 @@ async function onSave() {
   if (state.username == name) {
     state.logout()
   }
-  navigateTo('/admin/user')
+  navigateTo('/admin/users')
 }
 </script>

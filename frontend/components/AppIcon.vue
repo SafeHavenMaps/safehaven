@@ -25,6 +25,7 @@ const props = defineProps<{
   iconName: keyof typeof iconDict
   size?: string
   rotating?: boolean
+  color?: string
   dynamicType?: DynamicIconTypes
 }>()
 
@@ -65,6 +66,8 @@ const iconDict: Record<string, string> = {
   clear: mdi.mdiEraser,
   filterOff: mdi.mdiFilterOff,
   github: mdi.mdiGithub,
+  chevronDown: mdi.mdiChevronDown,
+  activePage: mdi.mdiMenuRight,
 }
 </script>
 

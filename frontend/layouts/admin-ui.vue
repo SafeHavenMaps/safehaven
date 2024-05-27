@@ -1,18 +1,59 @@
 <template>
-  <div class="h-full">
+  <div class="flex flex-column h-full w-full logoized">
     <AdminNavbar />
-    <div
-      class="h-full flex"
-    >
-      <div
-        class="h-full flex"
-      >
-        <AdminSidebar />
-      </div>
-      <div
-        class="h-full flex"
-      >
-        <slot />
+
+    <div class="flex w-full flex-grow-1">
+      <div class="flex w-full">
+        <div class="m-3 mt-1 p-2">
+          <div
+            class="sidebar-title mb-1"
+          >
+            Navigation
+          </div>
+
+          <AdminSidebar />
+        </div>
+
+        <div class="flex flex-column w-full">
+          <Breadcrumb
+            :home="cardHomeBreadcrumb()"
+            :model="cardItemsBreadcrumb()"
+            class="breadcrumb p-1"
+          >
+            <template #item="{ item, props }">
+              <NuxtLink
+                v-slot="{ href, navigate }"
+                :to="item.url"
+                custom
+              >
+                <a
+                  :href="href"
+                  v-bind="props.action"
+                  @click="navigate"
+                >
+                  <span class="text-primary font-semibold">
+                    {{ item.label }}
+                  </span>
+                </a>
+              </NuxtLink>
+            </template>
+          </Breadcrumb>
+
+          <Card class="m-3 ml-0 mt-1 flex-grow-1 w-full">
+            <template #title>
+              <div class="flex">
+                <AppIcon
+                  :icon-name="cardIconName()"
+                  class="mr-2"
+                />
+                {{ cardTitle() }}
+              </div>
+            </template>
+            <template #content>
+              <slot />
+            </template>
+          </Card>
+        </div>
       </div>
     </div>
     <ConfirmPopup group="delete">
@@ -34,4 +75,50 @@ import type { ConfirmationOptions } from 'primevue/confirmationoptions'
 interface ExtendedConfirmationOptions extends ConfirmationOptions {
   objectId?: string
 }
+
+function cardIconName() {
+  return useRoute().meta.cardIcon as string
+}
+
+function cardTitle() {
+  return useRoute().meta.cardTitle ?? 'Contenu'
+}
+
+const currentBreadcrumbs = ref<BreadcrumbItem[]>([])
+
+type BreadcrumbItem = {
+  label: string
+  url: string
+}
+
+function cardHomeBreadcrumb() {
+  return currentBreadcrumbs.value[0]!
+}
+
+function cardItemsBreadcrumb() {
+  return currentBreadcrumbs.value.slice(1)
+}
+
+function setBreadcrumb(...value: BreadcrumbItem[]) {
+  console.log('setBreadcrumb', value)
+  currentBreadcrumbs.value = value
+}
+
+export type SetBreadcrumbFunction = (...value: BreadcrumbItem[]) => void
+
+provide('setBreadcrumb', setBreadcrumb)
 </script>
+
+<style>
+html, body {
+  background-color: #f7f7f7;
+}
+.breadcrumb {
+  background-color: transparent;
+}
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgb(51, 65, 85);
+}
+</style>

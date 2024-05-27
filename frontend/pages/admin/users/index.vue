@@ -9,7 +9,7 @@
       removable-sort
     >
       <template #header>
-        <TableHeaders
+        <AdminTableHeaders
           model-display-name="Utilisateur⋅ice"
           model-name="user"
           model-icon="user"
@@ -41,7 +41,7 @@
 
       <Column>
         <template #body="slotProps">
-          <EditDeleteButtons
+          <AdminEditDeleteButtons
             :id="slotProps.data.id"
             model-name="l'utilisateur⋅ice"
             :name="slotProps.data.id"
@@ -55,13 +55,20 @@
 </template>
 
 <script setup lang="ts">
-import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
-import TableHeaders from '~/components/admin/TableHeaders.vue'
+import type { SetBreadcrumbFunction } from '~/layouts/admin-ui.vue'
 import state from '~/lib/admin-state'
 
 definePageMeta({
   layout: 'admin-ui',
+  cardTitle: 'Utilisateur⋅ices',
+  cardIcon: 'user',
 })
+
+const setBreadcrumb = inject<SetBreadcrumbFunction>('setBreadcrumb')!
+setBreadcrumb(
+  { label: 'Utilisateur⋅ices', url: '/admin/users' },
+)
+
 await state.fetchUsers()
 
 async function onDelete(user_id: string) {
