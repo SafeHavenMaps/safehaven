@@ -43,9 +43,11 @@ export type UpdateEntity = api.components['schemas']['UpdateEntity']
 export type ListedEntity = api.components['schemas']['ListedEntity']
 export type ListedComment = api.components['schemas']['ListedComment']
 export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAccessToken']
-export type AccessToken = api.components['schemas']['AccessToken']
-export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily']
+// export type PermissionPolicy = api.components['schemas']['PermissionPolicy']
+export type Permissions = api.components['schemas']['Permissions']
+export type AccessToken = api.components['schemas']['AccessToken'] & { permissions: Permissions }
 
+export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily']
 export type User = api.components['schemas']['User']
 export type NewOrUpdatedUser = api.components['schemas']['NewOrUpdatedUser']
 export type SafeHavenOptions = api.components['schemas']['SafeHavenOptions']
