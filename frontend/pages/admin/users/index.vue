@@ -38,7 +38,7 @@
             model-name="l'utilisateur⋅ice"
             :name="slotProps.data.id"
             @delete="onDelete"
-            @edit="id => navigateTo(`/admin/user/${id}`)"
+            @edit="id => navigateTo(`/admin/users/${id}`)"
           />
         </template>
       </Column>
@@ -52,15 +52,16 @@ import state from '~/lib/admin-state'
 
 definePageMeta({
   layout: 'admin-ui',
-  cardTitle: 'Utilisateur⋅ices',
-  cardIcon: 'user',
 })
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
+  'Utilisateur⋅ices',
+  'user',
   [
     {
       icon: 'add',
+      label: 'Ajouter un⋅e utilisateur⋅ice',
       severity: 'success',
       url: `/admin/users/new`,
     },

@@ -41,19 +41,20 @@
 
           <Card class="m-3 ml-0 mt-1 flex-grow-1 w-full">
             <template #title>
-              <div class="flex">
+              <div class="flex align-items-end">
                 <AppIcon
-                  :icon-name="cardIconName()"
+                  :icon-name="cardIconName"
                   class="mr-2"
                 />
-                {{ cardTitle() }}
+                {{ cardTitle }}
                 <div
                   v-for="(action, index) in currentActions"
                   :key="index"
                 >
                   <Button
                     outlined
-                    rounded
+                    class="ml-2 py-0 px-1"
+                    :label="action.label"
                     :severity="action.severity"
                     @click="navigateTo(action.url)"
                   >
@@ -96,11 +97,14 @@ type BreadcrumbItem = {
 
 type ActionItem = {
   icon: string
+  label: string
   severity: string
   url: string
 }
 
 export type InitAdminLayout = (
+  newCardTitle: string,
+  newCardIconName: string,
   actions: ActionItem[],
   breadcrumb: BreadcrumbItem[]
 ) => void
@@ -111,14 +115,8 @@ interface ExtendedConfirmationOptions extends ConfirmationOptions {
 
 const currentBreadcrumbs = ref<BreadcrumbItem[]>([])
 const currentActions = ref<ActionItem[]>([])
-
-function cardIconName() {
-  return useRoute().meta.cardIcon as string
-}
-
-function cardTitle() {
-  return useRoute().meta.cardTitle ?? 'Contenu'
-}
+const cardTitle = ref('')
+const cardIconName = ref('')
 
 function cardHomeBreadcrumb() {
   return currentBreadcrumbs.value[0]!
@@ -128,7 +126,14 @@ function cardItemsBreadcrumb() {
   return currentBreadcrumbs.value.slice(1)
 }
 
-function initAdminLayout(actions: ActionItem[], breadcrumb: BreadcrumbItem[]) {
+function initAdminLayout(
+  newCardTitle: string,
+  newCardIconName: string,
+  actions: ActionItem[],
+  breadcrumb: BreadcrumbItem[],
+) {
+  cardTitle.value = newCardTitle
+  cardIconName.value = newCardIconName
   currentActions.value = actions
   currentBreadcrumbs.value = breadcrumb
 }

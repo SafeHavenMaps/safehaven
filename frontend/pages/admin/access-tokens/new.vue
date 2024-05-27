@@ -77,12 +77,24 @@
 </template>
 
 <script setup lang="ts">
+import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdatedUser } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
   layout: 'admin-ui',
 })
+
+const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
+initAdminLayout(
+  `Édition du jeton d'accès`,
+  'accessToken',
+  [],
+  [
+    { label: 'Jeton d\'accès', url: '/admin/access-tokens' },
+    { label: `Nouveau jeton`, url: '/admin/access-tokens/new' },
+  ],
+)
 
 const userIsAdmin = ref(false)
 const userName = ref('')

@@ -51,15 +51,16 @@ import state from '~/lib/admin-state'
 
 definePageMeta({
   layout: 'admin-ui',
-  cardTitle: 'Jeton d\'accès',
-  cardIcon: 'accessToken',
 })
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
+  'Jeton d\'accès',
+  'accessToken',
   [
     {
       icon: 'add',
+      label: 'Nouveau jeton d\'accès',
       severity: 'success',
       url: `/admin/access-tokens/new`,
     },

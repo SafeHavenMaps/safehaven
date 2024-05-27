@@ -83,12 +83,12 @@ import state from '~/lib/admin-state'
 
 definePageMeta({
   layout: 'admin-ui',
-  cardTitle: 'Nouvel \'utilisateur⋅ice',
-  cardIcon: 'user',
 })
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
+  'Nouvel \'utilisateur⋅ice',
+  'user',
   [],
   [
     { label: 'Utilisateur⋅ices', url: '/admin/users' },

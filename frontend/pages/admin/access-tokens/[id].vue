@@ -99,8 +99,6 @@ import state from '~/lib/admin-state'
 
 definePageMeta({
   layout: 'admin-ui',
-  cardTitle: `Édition du jeton d'accès`,
-  cardIcon: 'accessToken',
 })
 
 const accessTokenId = useRoute().params.id as string
@@ -115,13 +113,9 @@ const processingRequest = ref(false)
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  [
-    {
-      icon: 'add',
-      severity: 'success',
-      url: `/admin/access-tokens/new`,
-    },
-  ],
+  `Édition du jeton d'accès`,
+  'accessToken',
+  [],
   [
     { label: 'Jeton d\'accès', url: '/admin/access-tokens' },
     { label: `Édition du jeton ${accessTokenId}`, url: '/admin/access-tokens/' },

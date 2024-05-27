@@ -16,12 +16,12 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 
 definePageMeta({
   layout: 'admin-ui',
-  cardTitle: 'Accueil',
-  cardIcon: 'home',
 })
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
+  'Accueil',
+  'home',
   [],
   [
     { label: 'Accueil', url: '/admin/home' },

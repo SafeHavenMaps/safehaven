@@ -109,12 +109,12 @@ const processingRequest = ref(false)
 
 definePageMeta({
   layout: 'admin-ui',
-  cardTitle: 'Édition de l\'utilisateur⋅ice',
-  cardIcon: 'user',
 })
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
+  'Édition de l\'utilisateur⋅ice',
+  'user',
   [],
   [
     { label: 'Utilisateur⋅ices', url: '/admin/users' },
