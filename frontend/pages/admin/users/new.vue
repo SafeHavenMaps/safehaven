@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import type { SetBreadcrumbFunction } from '~/layouts/admin-ui.vue'
+import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdatedUser } from '~/lib'
 import state from '~/lib/admin-state'
 
@@ -87,10 +87,13 @@ definePageMeta({
   cardIcon: 'user',
 })
 
-const setBreadcrumb = inject<SetBreadcrumbFunction>('setBreadcrumb')!
-setBreadcrumb (
-  { label: 'Utilisateur⋅ices', url: '/admin/users' },
-  { label: 'Nouvel utilisateur⋅ice', url: '/admin/users/new' },
+const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
+initAdminLayout(
+  [],
+  [
+    { label: 'Utilisateur⋅ices', url: '/admin/users' },
+    { label: 'Nouvel utilisateur⋅ice', url: '/admin/users/new' },
+  ],
 )
 
 const userIsAdmin = ref(false)

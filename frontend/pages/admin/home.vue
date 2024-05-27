@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import type { SetBreadcrumbFunction } from '~/layouts/admin-ui.vue'
+import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 
 definePageMeta({
   layout: 'admin-ui',
@@ -20,8 +20,11 @@ definePageMeta({
   cardIcon: 'home',
 })
 
-const setBreadcrumb = inject<SetBreadcrumbFunction>('setBreadcrumb')!
-setBreadcrumb(
-  { label: 'Accueil', url: '/admin/home' },
+const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
+initAdminLayout(
+  [],
+  [
+    { label: 'Accueil', url: '/admin/home' },
+  ],
 )
 </script>

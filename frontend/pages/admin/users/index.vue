@@ -8,14 +8,6 @@
       :rows-per-page-options="[10, 20, 50]"
       removable-sort
     >
-      <template #header>
-        <AdminTableHeaders
-          model-display-name="Utilisateur⋅ice"
-          model-name="user"
-          model-icon="user"
-        />
-      </template>
-
       <Column
         field="name"
         header="Nom"
@@ -55,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import type { SetBreadcrumbFunction } from '~/layouts/admin-ui.vue'
+import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import state from '~/lib/admin-state'
 
 definePageMeta({
@@ -64,9 +56,18 @@ definePageMeta({
   cardIcon: 'user',
 })
 
-const setBreadcrumb = inject<SetBreadcrumbFunction>('setBreadcrumb')!
-setBreadcrumb(
-  { label: 'Utilisateur⋅ices', url: '/admin/users' },
+const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
+initAdminLayout(
+  [
+    {
+      icon: 'add',
+      severity: 'success',
+      url: `/admin/users/new`,
+    },
+  ],
+  [
+    { label: 'Utilisateur⋅ices', url: '/admin/users' },
+  ],
 )
 
 await state.fetchUsers()

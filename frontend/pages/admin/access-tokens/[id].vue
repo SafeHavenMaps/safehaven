@@ -1,7 +1,7 @@
 <template>
   <div class="mx-4">
     <h4>
-      Édition de l'utilisateur⋅ice {{ userId }}
+      Édition de l'utilisateur⋅ice {{ accessTokenId }}
     </h4>
 
     <form
@@ -93,22 +93,40 @@
 </template>
 
 <script setup lang="ts">
+import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdatedUser } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
   layout: 'admin-ui',
+  cardTitle: `Édition du jeton d'accès`,
+  cardIcon: 'accessToken',
 })
 
-const userId = useRoute().params.id as string
+const accessTokenId = useRoute().params.id as string
 
-const { is_admin, name } = await state.getUser(userId)
+const { is_admin, name } = await state.getUser(accessTokenId)
 const userIsAdmin = ref(is_admin)
 const userName = ref(name)
 const editPassword = ref(false)
 const newPassword = ref('')
 const newPasswordConfirm = ref('')
 const processingRequest = ref(false)
+
+const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
+initAdminLayout(
+  [
+    {
+      icon: 'add',
+      severity: 'success',
+      url: `/admin/access-tokens/new`,
+    },
+  ],
+  [
+    { label: 'Jeton d\'accès', url: '/admin/access-tokens' },
+    { label: `Édition du jeton ${accessTokenId}`, url: '/admin/access-tokens/' },
+  ],
+)
 
 async function onSave() {
   processingRequest.value = true
@@ -118,7 +136,7 @@ async function onSave() {
       throw new Error('Empty or non-matching password')
     newUser['password'] = newPassword.value
   }
-  await state.updateUser(userId, newUser)
+  await state.updateUser(accessTokenId, newUser)
   if (state.username == name) {
     state.logout()
   }

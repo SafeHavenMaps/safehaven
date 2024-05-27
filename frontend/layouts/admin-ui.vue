@@ -47,8 +47,24 @@
                   class="mr-2"
                 />
                 {{ cardTitle() }}
+                <div
+                  v-for="(action, index) in currentActions"
+                  :key="index"
+                >
+                  <Button
+                    outlined
+                    rounded
+                    :severity="action.severity"
+                    @click="navigateTo(action.url)"
+                  >
+                    <template #icon>
+                      <AppIcon :icon-name="action.icon" />
+                    </template>
+                  </Button>
+                </div>
               </div>
             </template>
+
             <template #content>
               <slot />
             </template>
@@ -56,6 +72,7 @@
         </div>
       </div>
     </div>
+
     <ConfirmPopup group="delete">
       <template #message="slotProps">
         <div class="flex flex-row align-items-center w-full gap-2 p-3 mb-2 pb-0">
@@ -72,9 +89,28 @@
 <script setup lang="ts">
 import type { ConfirmationOptions } from 'primevue/confirmationoptions'
 
+type BreadcrumbItem = {
+  label: string
+  url: string
+}
+
+type ActionItem = {
+  icon: string
+  severity: string
+  url: string
+}
+
+export type InitAdminLayout = (
+  actions: ActionItem[],
+  breadcrumb: BreadcrumbItem[]
+) => void
+
 interface ExtendedConfirmationOptions extends ConfirmationOptions {
   objectId?: string
 }
+
+const currentBreadcrumbs = ref<BreadcrumbItem[]>([])
+const currentActions = ref<ActionItem[]>([])
 
 function cardIconName() {
   return useRoute().meta.cardIcon as string
@@ -82,13 +118,6 @@ function cardIconName() {
 
 function cardTitle() {
   return useRoute().meta.cardTitle ?? 'Contenu'
-}
-
-const currentBreadcrumbs = ref<BreadcrumbItem[]>([])
-
-type BreadcrumbItem = {
-  label: string
-  url: string
 }
 
 function cardHomeBreadcrumb() {
@@ -99,14 +128,12 @@ function cardItemsBreadcrumb() {
   return currentBreadcrumbs.value.slice(1)
 }
 
-function setBreadcrumb(...value: BreadcrumbItem[]) {
-  console.log('setBreadcrumb', value)
-  currentBreadcrumbs.value = value
+function initAdminLayout(actions: ActionItem[], breadcrumb: BreadcrumbItem[]) {
+  currentActions.value = actions
+  currentBreadcrumbs.value = breadcrumb
 }
 
-export type SetBreadcrumbFunction = (...value: BreadcrumbItem[]) => void
-
-provide('setBreadcrumb', setBreadcrumb)
+provide('initAdminLayout', initAdminLayout)
 </script>
 
 <style>

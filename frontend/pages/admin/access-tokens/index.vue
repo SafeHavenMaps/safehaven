@@ -8,13 +8,6 @@
       :rows-per-page-options="[10, 20, 50]"
       removable-sort
     >
-      <template #header>
-        <TableHeaders
-          model-display-name="Jeton d'accès"
-          model-name="access-token"
-          model-icon="accessToken"
-        />
-      </template>
       <Column
         field="token"
         header="Jeton"
@@ -43,7 +36,7 @@
             model-name="le jeton d'accès"
             :name="slotProps.data.id"
             @delete="onDelete"
-            @edit="id => navigateTo(`/admin/access-token/${id}`)"
+            @edit="id => navigateTo(`/admin/access-tokens/${id}`)"
           />
         </template>
       </Column>
@@ -53,13 +46,29 @@
 
 <script setup lang="ts">
 import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
-import TableHeaders from '~/components/admin/TableHeaders.vue'
-// import type { AccessToken } from '~/lib'
+import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import state from '~/lib/admin-state'
 
 definePageMeta({
   layout: 'admin-ui',
+  cardTitle: 'Jeton d\'accès',
+  cardIcon: 'accessToken',
 })
+
+const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
+initAdminLayout(
+  [
+    {
+      icon: 'add',
+      severity: 'success',
+      url: `/admin/access-tokens/new`,
+    },
+  ],
+  [
+    { label: 'Jeton d\'accès', url: '/admin/access-tokens' },
+  ],
+)
+
 await state.fetchAccessTokens()
 
 async function onDelete(access_token_id: string) {
