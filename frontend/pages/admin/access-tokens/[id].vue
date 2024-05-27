@@ -113,7 +113,7 @@ const processingRequest = ref(false)
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  `Édition du jeton d'accès`,
+  `Édition du jeton ${accessTokenId}`,
   'accessToken',
   [],
   [

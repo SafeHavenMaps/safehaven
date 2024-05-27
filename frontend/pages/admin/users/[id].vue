@@ -113,7 +113,7 @@ definePageMeta({
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  'Édition de l\'utilisateur⋅ice',
+  `Edition de ${name}`,
   'user',
   [],
   [
