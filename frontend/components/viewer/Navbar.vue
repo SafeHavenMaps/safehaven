@@ -82,7 +82,7 @@
     <div class="flex flex-column gap-3 w-25rem">
       <TabView>
         <TabPanel header="Chercher un point">
-          <form @submit="searchEntity">
+          <form @submit.prevent="searchEntity">
             <label for="placeSearch">
               Recherche d'un point sur la carte
             </label>
@@ -127,7 +127,7 @@
         </TabPanel>
 
         <TabPanel header="Chercher un lieu">
-          <form @submit="searchLocation">
+          <form @submit.prevent="searchLocation">
             <label for="placeSearch">
               Recherche d'une ville, d'un lieu, d'une adresse
             </label>
@@ -232,13 +232,11 @@ function openSearchPanel(event: Event) {
   searchOp!.value!.toggle(event)
 }
 
-async function searchLocation(event: Event) {
-  event.preventDefault()
+async function searchLocation() {
   currentLocationsResults.value = await freeFormSearch(placeSearch.value)
 }
 
-async function searchEntity(event: Event) {
-  event.preventDefault()
+async function searchEntity() {
   currentEntitiesResults.value = await state.searchEntitiesWithLocations(entitySearch.value)
 }
 

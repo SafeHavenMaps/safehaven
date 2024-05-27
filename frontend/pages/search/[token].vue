@@ -16,7 +16,7 @@
       </template>
 
       <template #content>
-        <form @submit="submitSearch">
+        <form @submit.prevent="submitSearch">
           <InputGroup>
             <InputText
               v-model="query"
@@ -170,8 +170,7 @@ function resultLabel() {
   return result > 1 ? 'résultats' : 'résultat'
 }
 
-async function submitSearch(event: Event) {
-  event.preventDefault()
+async function submitSearch() {
   currentPage.value = 1
   pageSize.value = 20
   await refreshResult()
