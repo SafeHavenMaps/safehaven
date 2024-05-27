@@ -12,46 +12,5 @@
 </template>
 
 <script setup lang="ts">
-import type { ConfirmationOptions } from 'primevue/confirmationoptions'
-import AppIcon from '~/components/AppIcon.vue'
 
-const props = withDefaults(defineProps<{
-  message?: string
-  objectDescriptor?: string
-  icon?: string
-  rejectLabel?: string
-  acceptLabel?: string
-}>(),
-{
-  message: 'Confirmer la suppression de ',
-  messageObjectDescriptor: '',
-  icon: 'warning',
-  rejectLabel: 'Annuler',
-  acceptLabel: 'Confirmer',
-})
-
-const confirm = useConfirm()
-interface ExtendedConfirmationOptions extends ConfirmationOptions {
-  objectId?: string
-}
-
-function displayDialog(event: Event, messageObjectId: string, onAccept?: () => void, onReject?: () => void) {
-  // if id==
-  const options: ExtendedConfirmationOptions = {
-    target: event.currentTarget as HTMLElement,
-    group: 'delete',
-    message: `${props.message}${props.messageObjectDescriptor}`,
-    objectId: messageObjectId,
-    icon: props.icon,
-    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-    acceptClass: 'p-button-sm',
-    rejectLabel: props.rejectLabel,
-    acceptLabel: props.acceptLabel,
-    reject: onReject,
-    accept: onAccept,
-  }
-  confirm.require(options)
-}
-
-defineExpose({ displayDialog })
 </script>
