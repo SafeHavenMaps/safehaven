@@ -113,12 +113,12 @@ definePageMeta({
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  `Edition de ${name}`,
+  `Édition de ${name}`,
   'user',
   [],
   [
     { label: 'Utilisateur⋅ices', url: '/admin/users' },
-    { label: `Edition de ${name}`, url: `/admin/users/${userId}` },
+    { label: `Édition de ${name}`, url: `/admin/users/${userId}` },
   ],
 )
 

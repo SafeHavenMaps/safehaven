@@ -118,7 +118,7 @@ initAdminLayout(
   [],
   [
     { label: 'Jeton d\'accès', url: '/admin/access-tokens' },
-    { label: `Édition du jeton ${accessTokenId}`, url: '/admin/access-tokens/' },
+    { label: `Édition du jeton ${accessTokenId}`, url: `/admin/access-tokens/${accessTokenId}` },
   ],
 )
 

@@ -87,12 +87,12 @@ definePageMeta({
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  'Nouvel \'utilisateur⋅ice',
+  'Nouvel⋅le utilisateur⋅ice',
   'user',
   [],
   [
     { label: 'Utilisateur⋅ices', url: '/admin/users' },
-    { label: 'Nouvel utilisateur⋅ice', url: '/admin/users/new' },
+    { label: 'Nouvel⋅le utilisateur⋅ice', url: '/admin/users/new' },
   ],
 )
 

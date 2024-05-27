@@ -90,13 +90,13 @@ export class AppState {
     return this.usersData!
   }
 
+  async getUser(id: string): Promise<User> {
+    return await this.client.getUser(id)
+  }
+
   async createUser(newUser: NewOrUpdatedUser): Promise<void> {
     const createdUser = await this.client.createUser(newUser)
     this.usersData!.push(createdUser)
-  }
-
-  async getUser(id: string): Promise<User> {
-    return await this.client.getUser(id)
   }
 
   async updateUser(id: string, updatedUser: NewOrUpdatedUser): Promise<void> {
@@ -130,6 +130,10 @@ export class AppState {
     return this.familiesData!
   }
 
+  async fetchFamily(id: string) {
+    return await this.client.getFamily(id)
+  }
+
   async createFamily(family: NewOrUpdateFamily) {
     const newFamily = await this.client.createFamily(family)
     this.familiesData!.push(newFamily)
@@ -155,6 +159,10 @@ export class AppState {
 
   get categories(): Category[] {
     return this.categoriesData!
+  }
+
+  async fetchCategory(id: string) {
+    return await this.client.getCategory(id)
   }
 
   async createCategory(category: NewCategory) {
@@ -184,6 +192,10 @@ export class AppState {
     return this.tagsData!
   }
 
+  async fetchTag(id: string) {
+    return await this.client.getTag(id)
+  }
+
   async createTag(tag: NewOrUpdateTag) {
     const newTag = await this.client.createTag(tag)
     this.tagsData!.push(newTag)
@@ -209,6 +221,10 @@ export class AppState {
 
   get accessTokens(): AccessToken[] {
     return this.accessTokensData!
+  }
+
+  async fetchAccessToken(id: string) {
+    return await this.client.getAccessToken(id)
   }
 
   async createAccessToken(token: NewOrUpdateAccessToken) {

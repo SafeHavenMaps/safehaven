@@ -10,6 +10,10 @@
     >
       <Column
         field="token"
+        header="Titre"
+      />
+      <Column
+        field="token"
         header="Jeton"
       />
       <Column
@@ -20,7 +24,59 @@
         <template #body="slotProps">
           <Tag
             :value="slotProps.data.active ? 'Oui' : 'Non'"
-            :severity="slotProps.data.active ? 'success' : 'warning'"
+            :severity="slotProps.data.active ? 'success' : 'danger'"
+          />
+        </template>
+      </Column>
+
+      <Column
+        header="Familles"
+        field="permissions"
+        sortable
+      >
+        <template #body="slotProps">
+          <Tag
+            :value="all_included(slotProps.data.permissions.families_policy) ? 'Toutes' : 'Partiel'"
+            :severity="all_included(slotProps.data.permissions.families_policy) ? 'success' : 'warning'"
+          />
+        </template>
+      </Column>
+
+      <Column
+        header="Catégories"
+        field="permissions"
+        sortable
+      >
+        <template #body="slotProps">
+          <Tag
+            :value="all_included(slotProps.data.permissions.categories_policy) ? 'Toutes' : 'Partiel'"
+            :severity="all_included(slotProps.data.permissions.categories_policy) ? 'success' : 'warning'"
+          />
+        </template>
+      </Column>
+
+      <Column
+        header="Tags"
+        field="permissions"
+        sortable
+      >
+        <template #body="slotProps">
+          <Tag
+            :value="all_included(slotProps.data.permissions.tags_policy) ? 'Toutes' : 'Partiel'"
+            :severity="all_included(slotProps.data.permissions.tags_policy) ? 'success' : 'warning'"
+          />
+        </template>
+      </Column>
+
+      <Column
+        header="Commentaires"
+        field="permissions"
+        sortable
+      >
+        <template #body="slotProps">
+          <Tag
+            :value="slotProps.data.permissions.can_access_comments ? 'Oui' : 'Non'"
+            :severity="slotProps.data.permissions.can_access_comments ? 'success' : 'danger'"
           />
         </template>
       </Column>
@@ -47,7 +103,12 @@
 <script setup lang="ts">
 import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
+import type { PermissionPolicy } from '~/lib'
 import state from '~/lib/admin-state'
+
+function all_included(permissionPolicy: PermissionPolicy) {
+  return permissionPolicy.allow_all && !permissionPolicy.force_exclude.length
+}
 
 definePageMeta({
   layout: 'admin-ui',

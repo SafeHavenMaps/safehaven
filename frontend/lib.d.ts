@@ -43,7 +43,7 @@ export type UpdateEntity = api.components['schemas']['UpdateEntity']
 export type ListedEntity = api.components['schemas']['ListedEntity']
 export type ListedComment = api.components['schemas']['ListedComment']
 export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAccessToken']
-// export type PermissionPolicy = api.components['schemas']['PermissionPolicy']
+export type PermissionPolicy = api.components['schemas']['PermissionPolicy']
 export type Permissions = api.components['schemas']['Permissions']
 export type AccessToken = api.components['schemas']['AccessToken'] & { permissions: Permissions }
 
