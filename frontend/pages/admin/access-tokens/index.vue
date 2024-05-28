@@ -1,18 +1,46 @@
 <template>
   <div>
+    <span class="flex gap-3">
+      <IconField
+        icon-position="left"
+      >
+        <InputIcon><AppIcon
+          icon-name="search"
+          class="-mt-1"
+        /></InputIcon>
+        <InputText
+          v-model="filters['global'].value"
+          placeholder="Recherche"
+        />
+      </IconField>
+      <MultiSelect
+        v-model="selectedColumns"
+        :options="optionalColumns"
+
+        display="chip"
+        placeholder="Sélectionner des colonnes"
+        class="w-full md:w-20rem"
+      />
+    </span>
     <DataTable
+      v-model:filters="filters"
+      paginator
       :value="state.accessTokens"
       striped-rows
       :table-style="{ 'min-width': '42rem' }"
       :rows="10"
-      :rows-per-page-options="[10, 20, 50]"
+      :rows-per-page-options="[5, 10, 20, 50]"
       removable-sort
+      :global-filter-fields="['title', 'token']"
+      class=" "
     >
       <Column
-        field="token"
+        field="title"
         header="Titre"
+        sortable
       />
       <Column
+        v-if="selectedColumns.includes('Jeton')"
         field="token"
         header="Jeton"
       />
@@ -30,8 +58,17 @@
       </Column>
 
       <Column
+        v-if="selectedColumns.includes('Visites')"
+        field="last_week_visits"
+        header="Visites (7 derniers jours)"
+        class="max-w-8rem "
+        sortable
+      />
+
+      <Column
+        v-if="selectedColumns.includes('Familles')"
         header="Familles"
-        field="permissions"
+        :field="data => all_included(data.permissions.families_policy).toString()"
         sortable
       >
         <template #body="slotProps">
@@ -43,8 +80,9 @@
       </Column>
 
       <Column
+        v-if="selectedColumns.includes('Catégories')"
         header="Catégories"
-        field="permissions"
+        :field="data => all_included(data.permissions.categories_policy).toString()"
         sortable
       >
         <template #body="slotProps">
@@ -56,8 +94,9 @@
       </Column>
 
       <Column
+        v-if="selectedColumns.includes('Tags')"
         header="Tags"
-        field="permissions"
+        field="data => all_included(data.permissions.tags_policy).toString()"
         sortable
       >
         <template #body="slotProps">
@@ -69,8 +108,9 @@
       </Column>
 
       <Column
+        v-if="selectedColumns.includes('Commentaires')"
         header="Commentaires"
-        field="permissions"
+        field="permissions.can_access_comments"
         sortable
       >
         <template #body="slotProps">
@@ -81,11 +121,7 @@
         </template>
       </Column>
 
-      <Column
-        header="Actif"
-        field="active"
-        sortable
-      >
+      <Column>
         <template #body="slotProps">
           <EditDeleteButtons
             :id="slotProps.data.id"
@@ -101,10 +137,18 @@
 </template>
 
 <script setup lang="ts">
+import { FilterMatchMode } from 'primevue/api'
 import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { PermissionPolicy } from '~/lib'
 import state from '~/lib/admin-state'
+
+const optionalColumns = ref(['Jeton', 'Visites', 'Familles', 'Catégories', 'Tags', 'Commentaires'])
+const selectedColumns = ref(['Visites'])
+
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+})
 
 function all_included(permissionPolicy: PermissionPolicy) {
   return permissionPolicy.allow_all && !permissionPolicy.force_exclude.length
@@ -131,7 +175,7 @@ initAdminLayout(
   ],
 )
 
-await state.fetchAccessTokens()
+state.fetchAccessTokens()
 
 async function onDelete(access_token_id: string) {
   await state.deleteAccessToken(access_token_id)
