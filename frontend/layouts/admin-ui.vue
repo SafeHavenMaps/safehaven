@@ -31,7 +31,7 @@
                   v-bind="props.action"
                   @click="navigate"
                 >
-                  <span class="text-primary font-semibold">
+                  <span class="breadcrumb-text">
                     {{ item.label }}
                   </span>
                 </a>
@@ -145,9 +145,15 @@ provide('initAdminLayout', initAdminLayout)
 html, body {
   background-color: #f7f7f7;
 }
+
 .breadcrumb {
   background-color: transparent;
 }
+
+.breadcrumb-text {
+  color: #666;
+}
+
 .sidebar-title {
   font-size: 1.25rem;
   font-weight: 600;

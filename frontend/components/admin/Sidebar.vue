@@ -24,12 +24,6 @@
           <span
             class="ml-2 flex-grow-1 text-link"
           >{{ item.label }}</span>
-
-          <AppIcon
-            class="active-arrow"
-            size="16px"
-            icon-name="activePage"
-          />
         </a>
       </NuxtLink>
 
@@ -169,12 +163,8 @@ const nodes = [
 </script>
 
 <style>
-.active-arrow {
-  display: none;
-}
-
-.active-link .active-arrow {
-  display: block;
+.active-link {
+  color: #e86ba7 !important;
 }
 
 .p-panelmenu-panel {
