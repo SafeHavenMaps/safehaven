@@ -95,17 +95,17 @@ const familyNodes = [{
     items: [
       {
         label: 'Catégories',
-        icon: 'categories',
+        icon: 'category',
         route: item.id + '/categories',
       },
       {
         label: 'Entités',
-        icon: 'entities',
+        icon: 'entity',
         route: item.id + '/entities',
       },
       {
         label: 'Commentaires',
-        icon: 'comments',
+        icon: 'comment',
         route: item.id + '/comments',
       },
       {

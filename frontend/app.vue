@@ -1,4 +1,5 @@
 <template>
+  <NuxtLoadingIndicator />
   <NuxtLayout>
     <NuxtPage v-if="state.loaded" />
     <NuxtPage v-else>

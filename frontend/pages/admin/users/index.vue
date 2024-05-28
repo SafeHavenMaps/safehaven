@@ -83,6 +83,6 @@ const users: Ref<User[]> = ref([]);
 })()
 
 async function onDelete(user_id: string) {
-  await state.deleteUser(user_id)
+  await state.client.deleteUser(user_id)
 }
 </script>

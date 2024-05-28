@@ -5,8 +5,6 @@ import type {
   NewOrUpdateFamily,
   SafeHavenOptions,
   ConfigurationOption,
-  User,
-  NewOrUpdatedUser,
 } from '~/lib'
 
 export class AppState {
@@ -14,7 +12,6 @@ export class AppState {
   // For categories, users, tags, access tokens, entities and comments the admin client shall be used directly
 
   private optionsData: SafeHavenOptions | null = null
-  private usersData: User[] | null = null
   private familiesData: Family[] | null = null
 
   public userAdminCount: number | null = null
@@ -61,47 +58,6 @@ export class AppState {
 
   get safeMode() {
     return this.optionsData!.safe_mode.enabled
-  }
-
-  // Users
-  async fetchUsers(): Promise<void> {
-    this.usersData = await this.client.listUsers()
-    this.userAdminCount = state.users.filter(user => user.is_admin).length
-  }
-
-  get users(): User[] {
-    return this.usersData!
-  }
-
-  async getUser(id: string): Promise<User> {
-    return await this.client.getUser(id)
-  }
-
-  async createUser(newUser: NewOrUpdatedUser): Promise<void> {
-    const createdUser = await this.client.createUser(newUser)
-    this.usersData!.push(createdUser)
-  }
-
-  async updateUser(id: string, updatedUser: NewOrUpdatedUser): Promise<void> {
-    const returnedUser = await this.client.updateUser(id, updatedUser)
-    const index = this.usersData!.findIndex(u => u.id === id)
-    if (index !== -1) {
-      this.usersData![index] = returnedUser
-    }
-  }
-
-  async updateSelfPassword(newPasswordDetails: string): Promise<void> {
-    const updatedUSer = { name: state.username!, password: newPasswordDetails, is_admin: state.is_admin! }
-    const returnedUser = await this.client.changeSelfPassword(updatedUSer)
-    const selfIndex = this.usersData!.findIndex(u => u.id === returnedUser.id)
-    if (selfIndex !== -1) {
-      this.usersData![selfIndex] = returnedUser
-    }
-  }
-
-  async deleteUser(id: string): Promise<void> {
-    await this.client.deleteUser(id)
-    this.usersData = this.usersData!.filter(u => u.id !== id)
   }
 
   // Families

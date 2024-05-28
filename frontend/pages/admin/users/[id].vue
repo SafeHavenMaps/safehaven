@@ -99,7 +99,7 @@ import state from '~/lib/admin-state'
 
 const userId = useRoute().params.id as string
 
-const { is_admin, name } = await state.getUser(userId)
+const { is_admin, name } = await state.client.getUser(userId)
 const userIsAdmin = ref(is_admin)
 const userName = ref(name)
 const editPassword = ref(false)
@@ -130,7 +130,7 @@ async function onSave() {
       throw new Error('Empty or non-matching password')
     newUser['password'] = newPassword.value
   }
-  await state.updateUser(userId, newUser)
+  await state.client.updateUser(userId, newUser)
   if (state.username == name) {
     state.logout()
   }

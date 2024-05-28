@@ -106,7 +106,7 @@ const processingRequest = ref(false)
 async function onSave() {
   processingRequest.value = true
   const newUser: NewOrUpdatedUser = { is_admin: userIsAdmin.value, name: userName.value, password: newPassword.value }
-  state.createUser(newUser)
+  state.client.createUser(newUser)
   navigateTo('/admin/user')
 }
 </script>
