@@ -1,21 +1,8 @@
 import { reactive } from 'vue'
 import useClient from '~/lib/admin-client'
 import type {
-  Category,
   Family,
-  Tag,
   NewOrUpdateFamily,
-  NewCategory,
-  UpdateCategory,
-  NewOrUpdateTag,
-  NewComment,
-  UpdateComment,
-  NewEntity,
-  UpdateEntity,
-  AccessToken,
-  NewOrUpdateAccessToken,
-  ListedEntity,
-  ListedComment,
   SafeHavenOptions,
   ConfigurationOption,
   User,
@@ -23,16 +10,12 @@ import type {
 } from '~/lib'
 
 export class AppState {
-  private client = useClient()
+  public client = useClient()
+  // For categories, users, tags, access tokens, entities and comments the admin client shall be used directly
 
   private optionsData: SafeHavenOptions | null = null
   private usersData: User[] | null = null
   private familiesData: Family[] | null = null
-  private categoriesData: Category[] | null = null
-  private tagsData: Tag[] | null = null
-  private accessTokensData: AccessToken[] | null = null
-  private pendingEntitiesData: ListedEntity[] | null = null
-  private pendingCommentsData: ListedComment[] | null = null
 
   public userAdminCount: number | null = null
 
@@ -122,7 +105,7 @@ export class AppState {
   }
 
   // Families
-  async fetchFamilies() {
+  async fetchFamilies(): Promise<void> {
     this.familiesData = await this.client.listFamilies()
   }
 
@@ -150,157 +133,6 @@ export class AppState {
   async deleteFamily(id: string) {
     await this.client.deleteFamily(id)
     this.familiesData = this.familiesData!.filter(f => f.id !== id)
-  }
-
-  // Categories
-  async fetchCategories() {
-    this.categoriesData = await this.client.listCategories()
-  }
-
-  get categories(): Category[] {
-    return this.categoriesData!
-  }
-
-  async fetchCategory(id: string) {
-    return await this.client.getCategory(id)
-  }
-
-  async createCategory(category: NewCategory) {
-    const newCategory = await this.client.createCategory(category)
-    this.categoriesData!.push(newCategory)
-  }
-
-  async updateCategory(id: string, category: UpdateCategory) {
-    const updatedCategory = await this.client.updateCategory(id, category)
-    const index = this.categoriesData!.findIndex(c => c.id === id)
-    if (index !== -1) {
-      this.categoriesData![index] = updatedCategory
-    }
-  }
-
-  async deleteCategory(id: string) {
-    await this.client.deleteCategory(id)
-    this.categoriesData = this.categoriesData!.filter(c => c.id !== id)
-  }
-
-  // Tags
-  async fetchTags() {
-    this.tagsData = await this.client.listTags()
-  }
-
-  get tags(): Tag[] {
-    return this.tagsData!
-  }
-
-  async fetchTag(id: string) {
-    return await this.client.getTag(id)
-  }
-
-  async createTag(tag: NewOrUpdateTag) {
-    const newTag = await this.client.createTag(tag)
-    this.tagsData!.push(newTag)
-  }
-
-  async updateTag(id: string, tag: NewOrUpdateTag) {
-    const updatedTag = await this.client.updateTag(id, tag)
-    const index = this.tagsData!.findIndex(t => t.id === id)
-    if (index !== -1) {
-      this.tagsData![index] = updatedTag
-    }
-  }
-
-  async deleteTag(id: string) {
-    await this.client.deleteTag(id)
-    this.tagsData = this.tagsData!.filter(t => t.id !== id)
-  }
-
-  // Access Tokens
-  async fetchAccessTokens() {
-    this.accessTokensData = await this.client.listAccessTokens()
-  }
-
-  get accessTokens(): AccessToken[] {
-    return this.accessTokensData!
-  }
-
-  async fetchAccessToken(id: string) {
-    return await this.client.getAccessToken(id)
-  }
-
-  async createAccessToken(token: NewOrUpdateAccessToken) {
-    const newToken = await this.client.createAccessToken(token)
-    this.accessTokensData!.push(newToken)
-  }
-
-  async updateAccessToken(id: string, token: NewOrUpdateAccessToken) {
-    const updatedToken = await this.client.updateAccessToken(id, token)
-    const index = this.accessTokensData!.findIndex(t => t.id === id)
-    if (index !== -1) {
-      this.accessTokensData![index] = updatedToken
-    }
-  }
-
-  async deleteAccessToken(id: string) {
-    await this.client.deleteAccessToken(id)
-    this.accessTokensData = this.accessTokensData!.filter(t => t.id !== id)
-  }
-
-  // Entities
-  async fetchEntities() {
-    this.pendingEntitiesData = await this.client.listPendingEntities()
-  }
-
-  get entities(): ListedEntity[] {
-    return this.pendingEntitiesData!
-  }
-
-  async getEntity(id: string) {
-    return await this.client.getEntity(id)
-  }
-
-  async createEntity(entity: NewEntity) {
-    return await this.client.createEntity(entity)
-  }
-
-  async updateEntity(id: string, entity: UpdateEntity) {
-    return await this.client.updateEntity(id, entity)
-  }
-
-  async deleteEntity(id: string) {
-    return await this.client.deleteEntity(id)
-  }
-
-  // Comments
-  async fetchEntityComments(id: string) {
-    return await this.client.listEntityComments(id)
-  }
-
-  get pendingComments(): ListedComment[] {
-    return this.pendingCommentsData!
-  }
-
-  async getComment(id: string) {
-    return await this.client.getComment(id)
-  }
-
-  async createComment(comment: NewComment) {
-    return await this.client.createComment(comment)
-  }
-
-  async updateComment(id: string, comment: UpdateComment) {
-    return await this.client.updateComment(id, comment)
-  }
-
-  async deleteComment(id: string) {
-    return await this.client.deleteComment(id)
-  }
-
-  async registerEntityParent(parentId: string, childId: string): Promise<void> {
-    await this.client.registerEntityParent(parentId, childId)
-  }
-
-  async removeEntityParent(parentId: string, childId: string): Promise<void> {
-    await this.client.removeEntityParent(parentId, childId)
   }
 }
 

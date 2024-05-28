@@ -25,7 +25,7 @@
     <DataTable
       v-model:filters="filters"
       paginator
-      :value="state.accessTokens"
+      :value="accessTokens"
       striped-rows
       :table-style="{ 'min-width': '42rem' }"
       :rows="10"
@@ -140,7 +140,7 @@
 import { FilterMatchMode } from 'primevue/api'
 import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { PermissionPolicy } from '~/lib'
+import type { AccessToken, PermissionPolicy } from '~/lib'
 import state from '~/lib/admin-state'
 
 const optionalColumns = ref(['Jeton', 'Visites', 'Familles', 'Catégories', 'Tags', 'Commentaires'])
@@ -171,13 +171,17 @@ initAdminLayout(
     },
   ],
   [
-    { label: 'Jeton d\'accès', url: '/admin/access-tokens' },
+    { label: 'Jetons d\'accès', url: '/admin/access-tokens' },
   ],
 )
 
-state.fetchAccessTokens()
+// Initialize the ref with an empty array, then fetch to update access tokens asynchronously
+const accessTokens: Ref<AccessToken[]> = ref([]);
+(async () => {
+  accessTokens.value = await state.client.listAccessTokens()
+})()
 
 async function onDelete(access_token_id: string) {
-  await state.deleteAccessToken(access_token_id)
+  await state.client.deleteAccessToken(access_token_id)
 }
 </script>

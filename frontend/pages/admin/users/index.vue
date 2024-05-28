@@ -1,7 +1,7 @@
 <template>
   <div>
     <DataTable
-      :value="state.users"
+      :value="users"
       striped-rows
       :table-style="{ 'min-width': '42rem' }"
       :rows="10"
@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
+import type { User } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
@@ -75,7 +76,11 @@ initAdminLayout(
   ],
 )
 
-await state.fetchUsers()
+// Initialize the ref with an empty array, then fetch to update access tokens asynchronously
+const users: Ref<User[]> = ref([]);
+(async () => {
+  users.value = await state.client.listUsers()
+})()
 
 async function onDelete(user_id: string) {
   await state.deleteUser(user_id)
