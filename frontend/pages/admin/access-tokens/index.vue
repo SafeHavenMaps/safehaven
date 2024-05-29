@@ -159,7 +159,7 @@ definePageMeta({
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  'Jeton d\'accès',
+  'Jetons d\'accès',
   'accessToken',
   [
     {

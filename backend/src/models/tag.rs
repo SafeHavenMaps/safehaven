@@ -49,14 +49,15 @@ impl Tag {
             Tag,
             r#"
             UPDATE tags
-            SET title = $2, is_filter = $3, filter_description = $4
+            SET title = $2, is_filter = $3, filter_description = $4, default_filter_status = $5
             WHERE id = $1
             RETURNING id, title, is_filter, filter_description, default_filter_status
             "#,
             given_id,
             update.title,
             update.is_filter,
-            update.filter_description
+            update.filter_description,
+            update.default_filter_status
         )
         .fetch_one(conn)
         .await

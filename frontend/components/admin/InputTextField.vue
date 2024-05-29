@@ -18,7 +18,7 @@ import { defineProps, defineEmits } from 'vue'
 const props = defineProps<{
   id: string
   label: string
-  modelValue: string
+  modelValue: string | undefined | null
   variant?: boolean
   invalid: boolean
   helperText?: string

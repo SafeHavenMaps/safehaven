@@ -156,7 +156,7 @@ const nodes = [
   {
     label: 'Tags',
     icon: 'tag',
-    route: 'tag',
+    route: 'tags',
     active: false,
   },
 ]
