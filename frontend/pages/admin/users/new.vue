@@ -1,79 +1,65 @@
 <template>
-  <div class="mx-4">
-    <h4>
-      Nouvel⋅le utilisateur⋅ice
-    </h4>
+  <form
+    class="flex flex-column gap-3 mx-4"
+    @submit.prevent="onSave"
+  >
+    <AdminInputTextField
+      id="username"
+      v-model="userName"
+      label="Nom d'utilisateur⋅ice"
+      :invalid="!userName"
+    />
 
-    <form
+    <AdminInputSwitchField
+      id="userIsAdmin"
+      v-model="userIsAdmin"
+      label="Droits d'administration"
+    />
+
+    <div
       class="flex flex-column gap-3"
-      @submit.prevent="onSave"
     >
-      <label for="username">
-        Nom d'utilisateur⋅ice
+      <label for="password">
+        Nouveau mot de passe :
       </label>
-      <InputText
-        id="username"
-        v-model="userName"
-        class="-mt-2"
-        :invalid="!userName"
+      <Password
+        id="password"
+        v-model="newPassword"
+        toggle-mask
+        class=" -mt-2"
+        input-class="w-full"
+        :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
       />
+      <label for="password">
+        Confirmer le nouveau mot de passe :
+      </label>
+      <Password
+        id="passwordConfirm"
+        v-model="newPasswordConfirm"
+        toggle-mask
+        class="-mt-2"
+        input-class="w-full"
+        :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
+      />
+    </div>
 
-      <span class="flex align-items-center gap-2">
-
-        <InputSwitch
-          v-model="userIsAdmin"
-          input-id="userIsAdmin"
-        />
-        <label for="userIsAdmin">
-          Droits d'administration
-        </label>
-      </span>
-
-      <div
-        class="flex flex-column gap-3"
+    <span class="flex gap-1 justify-content-end   ">
+      <NuxtLink
+        to="/admin/user"
       >
-        <label for="password">
-          Nouveau mot de passe :
-        </label>
-        <Password
-          id="password"
-          v-model="newPassword"
-          toggle-mask
-          class=" -mt-2"
-          input-class="w-full"
-          :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
-        />
-        <label for="password">
-          Confirmer le nouveau mot de passe :
-        </label>
-        <Password
-          id="passwordConfirm"
-          v-model="newPasswordConfirm"
-          toggle-mask
-          class="-mt-2"
-          input-class="w-full"
-          :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
-        />
-      </div>
-
-      <span class="flex gap-1 justify-content-end   ">
-        <NuxtLink
-          to="/admin/user"
-        >
-          <Button
-            label="Annuler"
-            severity="secondary"
-            :disabled="processingRequest"
-          />
-        </NuxtLink>
         <Button
-          label="Sauvegarder"
-          type="submit"
-          :disabled="processingRequest || editPassword && (newPassword!=newPasswordConfirm || !newPassword) || !userName"
+          label="Annuler"
+          severity="secondary"
+          :disabled="processingRequest"
         />
-      </span>
-    </form>
-  </div>
+      </NuxtLink>
+      <Button
+        label="Sauvegarder"
+        type="submit"
+        :disabled="processingRequest || editPassword && (newPassword!=newPasswordConfirm || !newPassword) || !userName"
+      />
+    </span>
+  </form>
 </template>
 
 <script setup lang="ts">

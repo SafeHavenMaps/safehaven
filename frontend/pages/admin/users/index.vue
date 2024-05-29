@@ -1,12 +1,28 @@
 <template>
   <div>
+    <span class="flex gap-3">
+      <IconField
+        icon-position="left"
+      >
+        <InputIcon><AppIcon
+          icon-name="search"
+          class="-mt-1"
+        /></InputIcon>
+        <InputText
+          v-model="filters['global'].value"
+          placeholder="Recherche"
+        />
+      </IconField>
+    </span>
     <DataTable
+      v-model:filters="filters"
+      paginator
       :value="users"
       striped-rows
-      :table-style="{ 'min-width': '42rem' }"
       :rows="10"
       :rows-per-page-options="[10, 20, 50]"
       removable-sort
+      :global-filter-fields="['name', 'id']"
     >
       <Column
         field="name"
@@ -51,9 +67,12 @@
 </template>
 
 <script setup lang="ts">
+import { FilterMatchMode } from 'primevue/api'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { User } from '~/lib'
 import state from '~/lib/admin-state'
+
+const filters = ref({ global: { value: null, matchMode: FilterMatchMode.CONTAINS } })
 
 definePageMeta({
   layout: 'admin-ui',

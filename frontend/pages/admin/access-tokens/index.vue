@@ -27,7 +27,6 @@
       paginator
       :value="accessTokens"
       striped-rows
-      :table-style="{ 'min-width': '42rem' }"
       :rows="10"
       :rows-per-page-options="[5, 10, 20, 50]"
       removable-sort
