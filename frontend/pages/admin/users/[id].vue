@@ -1,95 +1,79 @@
 <template>
-  <div class="mx-4">
-    <h4>
-      Édition de l'utilisateur⋅ice {{ userId }}
-    </h4>
+  <form
+    class="flex flex-column gap-3 max-w-30rem mx-4"
+    @submit.prevent="onSave"
+  >
+    <label for="username" />
 
-    <form
-      class="flex flex-column gap-3"
-      @submit.prevent="onSave"
+    <AdminInputTextField
+      id="username"
+      v-model="userName"
+      label="Nom d'utilisateur⋅ice"
+      :variant="userName == name"
+      :invalid="!userName"
+    />
+
+    <AdminInputSwitchField
+      id="userIsAdmin"
+      v-model="userIsAdmin"
+      label="Droits d'administration"
+      :disabled="state.username == name"
+    />
+
+    <AdminInputSwitchField
+      id="editPassword"
+      v-model="editPassword"
+      label="Écraser l'ancien mot de passe"
+    />
+
+    <div
+      :hidden="!editPassword"
+      class="flex-column gap-3"
+      :class="{ flex: editPassword }"
     >
-      <label for="username">
-        Nom d'utilisateur⋅ice
+      <label for="password">
+        Nouveau mot de passe :
       </label>
-      <InputText
-        id="username"
-        v-model="userName"
-        class="-mt-2"
-        :variant="userName == name ? 'outlined' : 'filled'"
-        :invalid="!userName"
+      <Password
+        id="password"
+        v-model="newPassword"
+        :disabled="!editPassword"
+        toggle-mask
+        class=" -mt-2"
+        input-class="w-full"
+        :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
       />
+      <label for="password">
+        Confirmer le nouveau mot de passe :
+      </label>
+      <Password
+        id="passwordConfirm"
+        v-model="newPasswordConfirm"
+        :disabled="!editPassword"
+        toggle-mask
+        class="-mt-2"
+        input-class="w-full"
+        :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
+      />
+    </div>
 
-      <span class="flex align-items-center gap-2">
-
-        <InputSwitch
-          v-model="userIsAdmin"
-          input-id="userIsAdmin"
-          :disabled="state.username == name"
-        />
-        <label for="userIsAdmin">
-          Droits d'administration
-        </label>
-      </span>
-
-      <span class="flex align-items-center gap-2">
-        <InputSwitch
-          v-model="editPassword"
-          input-id="editPassword"
-        />
-        <label for="editPassword">
-          Écraser l'ancien mot de passe
-        </label>
-      </span>
-
-      <div
-        :hidden="!editPassword"
-        class="flex-column gap-3"
-        :class="{ flex: editPassword }"
+    <span class="flex gap-1 justify-content-end   ">
+      <NuxtLink
+        to="/admin/users"
       >
-        <label for="password">
-          Nouveau mot de passe :
-        </label>
-        <Password
-          id="password"
-          v-model="newPassword"
-          :disabled="!editPassword"
-          toggle-mask
-          class=" -mt-2"
-          input-class="w-full"
-          :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
-        />
-        <label for="password">
-          Confirmer le nouveau mot de passe :
-        </label>
-        <Password
-          id="passwordConfirm"
-          v-model="newPasswordConfirm"
-          :disabled="!editPassword"
-          toggle-mask
-          class="-mt-2"
-          input-class="w-full"
-          :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
-        />
-      </div>
-
-      <span class="flex gap-1 justify-content-end   ">
-        <NuxtLink
-          to="/admin/users"
-        >
-          <Button
-            label="Annuler"
-            severity="secondary"
-            :disabled="processingRequest"
-          />
-        </NuxtLink>
         <Button
-          label="Sauvegarder"
-          type="submit"
-          :disabled="processingRequest || editPassword && (newPassword!=newPasswordConfirm || !newPassword) || !userName"
+          label="Annuler"
+          severity="secondary"
+          :disabled="processingRequest"
         />
-      </span>
-    </form>
-  </div>
+      </NuxtLink>
+      <Button
+        label="Sauvegarder"
+        type="submit"
+        :disabled="processingRequest || editPassword && (newPassword!=newPasswordConfirm || !newPassword) || !userName"
+      />
+    </span>
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -113,12 +97,12 @@ definePageMeta({
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  `Édition de ${name}`,
+  `Édition de l'utilisateur⋅ice ${name}`,
   'user',
   [],
   [
     { label: 'Utilisateur⋅ices', url: '/admin/users' },
-    { label: `Édition de ${name}`, url: `/admin/users/${userId}` },
+    { label: `Édition de l'utilisateur⋅ice ${name}`, url: `/admin/users/${userId}` },
   ],
 )
 
