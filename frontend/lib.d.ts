@@ -85,3 +85,5 @@ export type PaginatedCachedEntitiesWithLocation = PaginatedCachedEntities & {
     web_mercator_y: number
   })[]
 }
+
+declare module 'uuid'
