@@ -22,11 +22,32 @@ impl Icon {
         Ok(icon)
     }
 
-    pub async fn delete(id: Uuid, conn: &mut PgConnection) -> Result<(), AppError> {
-        sqlx::query!(r#"DELETE FROM icons WHERE id = $1"#, id)
-            .execute(conn)
-            .await
-            .map_err(AppError::Database)?;
+    pub async fn delete_for_family(
+        family_id: Uuid,
+        conn: &mut PgConnection,
+    ) -> Result<(), AppError> {
+        sqlx::query!(
+            r#"DELETE FROM icons WHERE id = (SELECT icon_id FROM families WHERE id = $1)"#,
+            family_id
+        )
+        .execute(conn)
+        .await
+        .map_err(AppError::Database)?;
+
+        Ok(())
+    }
+
+    pub async fn delete_for_category(
+        category_id: Uuid,
+        conn: &mut PgConnection,
+    ) -> Result<(), AppError> {
+        sqlx::query!(
+            r#"DELETE FROM icons WHERE id = (SELECT icon_id FROM categories WHERE id = $1)"#,
+            category_id
+        )
+        .execute(conn)
+        .await
+        .map_err(AppError::Database)?;
 
         Ok(())
     }
