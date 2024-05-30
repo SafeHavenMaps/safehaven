@@ -3,7 +3,10 @@ use uuid::Uuid;
 
 use crate::{
     api::{AppError, AppJson, DbConn},
-    models::family::{Family, NewOrUpdateFamily},
+    models::{
+        family::{Family, NewOrUpdateFamily},
+        icon::Icon,
+    },
 };
 
 #[utoipa::path(
@@ -77,6 +80,29 @@ pub async fn admin_family_update(
 }
 
 #[utoipa::path(
+    put,
+    path = "/api/admin/families/:id/icon",
+    request_body = Icon,
+    params(
+        ("id" = Uuid, Path, description = "Family identifier")
+    ),
+    responses(
+        (status = 200, description = "Family icon updated"),
+        (status = 401, description = "Invalid permissions", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+    )
+)]
+pub async fn admin_family_update_icon(
+    DbConn(mut conn): DbConn,
+    Path(id): Path<Uuid>,
+    Json(icon): Json<Icon>,
+) -> Result<(), AppError> {
+    Ok(AppJson(
+        Icon::upsert_family(id, icon.data, icon.http_mime_type, &mut conn).await?,
+    ))
+}
+
+#[utoipa::path(
     delete,
     path = "/api/admin/families/{id}",
     params(
@@ -93,5 +119,25 @@ pub async fn admin_family_delete(
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
     Family::delete(id, &mut conn).await?;
+    Ok(AppJson(()))
+}
+
+#[utoipa::path(
+    delete,
+    path = "/api/admin/families/:id/icon",
+    params(
+        ("id" = Uuid, Path, description = "Family identifier")
+    ),
+    responses(
+        (status = 200, description = "Family icon deletion successful"),
+        (status = 401, description = "Invalid permissions", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+    )
+)]
+pub async fn admin_family_delete_icon(
+    DbConn(mut conn): DbConn,
+    Path(id): Path<Uuid>,
+) -> Result<AppJson<()>, AppError> {
+    Icon::delete_for_family(id, &mut conn).await?;
     Ok(AppJson(()))
 }

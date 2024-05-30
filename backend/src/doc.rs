@@ -63,12 +63,16 @@ use utoipa::OpenApi;
         admin::families::admin_family_get,
         admin::families::admin_family_update,
         admin::families::admin_family_delete,
+        admin::families::admin_family_update_icon,
+        admin::families::admin_family_delete_icon,
         // admin::categories
         admin::categories::admin_categories_list,
         admin::categories::admin_category_new,
         admin::categories::admin_category_get,
         admin::categories::admin_category_update,
         admin::categories::admin_category_delete,
+        admin::categories::admin_category_update_icon,
+        admin::categories::admin_category_delete_icon,
         // admin::tags
         admin::tags::admin_tags_list,
         admin::tags::admin_tag_new,

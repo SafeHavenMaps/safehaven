@@ -3,7 +3,10 @@ use uuid::Uuid;
 
 use crate::{
     api::{AppError, AppJson, DbConn},
-    models::category::{Category, NewOrUpdateCategory},
+    models::{
+        category::{Category, NewOrUpdateCategory},
+        icon::Icon,
+    },
 };
 
 #[utoipa::path(
@@ -79,6 +82,29 @@ pub async fn admin_category_update(
 }
 
 #[utoipa::path(
+    put,
+    path = "/api/admin/categories/:id/icon",
+    request_body = Icon,
+    params(
+        ("id" = Uuid, Path, description = "Category identifier")
+    ),
+    responses(
+        (status = 200, description = "Category icon updated"),
+        (status = 401, description = "Invalid permissions", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+    )
+)]
+pub async fn admin_category_update_icon(
+    DbConn(mut conn): DbConn,
+    Path(id): Path<Uuid>,
+    Json(icon): Json<Icon>,
+) -> Result<(), AppError> {
+    Ok(AppJson(
+        Icon::upsert_category(id, icon.data, icon.http_mime_type, &mut conn).await?,
+    ))
+}
+
+#[utoipa::path(
     delete,
     path = "/api/admin/categories/{id}",
     params(
@@ -95,5 +121,25 @@ pub async fn admin_category_delete(
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
     Category::delete(id, &mut conn).await?;
+    Ok(AppJson(()))
+}
+
+#[utoipa::path(
+    delete,
+    path = "/api/admin/categories/:id/icon",
+    params(
+        ("id" = Uuid, Path, description = "Category identifier")
+    ),
+    responses(
+        (status = 200, description = "Category icon deletion successful"),
+        (status = 401, description = "Invalid permissions", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+    )
+)]
+pub async fn admin_category_delete_icon(
+    DbConn(mut conn): DbConn,
+    Path(id): Path<Uuid>,
+) -> Result<AppJson<()>, AppError> {
+    Icon::delete_for_category(id, &mut conn).await?;
     Ok(AppJson(()))
 }

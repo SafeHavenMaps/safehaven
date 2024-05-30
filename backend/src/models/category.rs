@@ -9,7 +9,6 @@ pub struct NewOrUpdateCategory {
     pub title: String,
     pub family_id: Uuid,
     pub default_status: bool,
-    pub icon: Option<String>,
     pub fill_color: String,
     pub border_color: String,
 }
