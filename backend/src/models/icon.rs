@@ -59,7 +59,7 @@ impl Icon {
         conn: &mut PgConnection,
     ) -> Result<(), AppError> {
         sqlx::query!(
-            r#"SELECT upsert_entity_icon($1, $2, $3, 'families')"#,
+            r#"SELECT upsert_row_icon($1, $2, $3, 'families')"#,
             family_id,
             data,
             http_mime_type
@@ -78,7 +78,7 @@ impl Icon {
         conn: &mut PgConnection,
     ) -> Result<(), AppError> {
         sqlx::query!(
-            r#"SELECT upsert_entity_icon($1, $2, $3, 'categories')"#,
+            r#"SELECT upsert_row_icon($1, $2, $3, 'categories')"#,
             category_id,
             data,
             http_mime_type

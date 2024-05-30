@@ -1,4 +1,7 @@
-use axum::{extract::Path, Json};
+use axum::{
+    extract::{Multipart, Path},
+    Json,
+};
 use uuid::Uuid;
 
 use crate::{
@@ -95,11 +98,27 @@ pub async fn admin_family_update(
 pub async fn admin_family_update_icon(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-    Json(icon): Json<Icon>,
+    mut multipart: Multipart,
 ) -> Result<(), AppError> {
-    Ok(AppJson(
-        Icon::upsert_family(id, icon.data, icon.http_mime_type, &mut conn).await?,
-    ))
+    let field = multipart
+        .next_field()
+        .await
+        .map_err(|_| AppError::Validation("icon malformed".to_string()))?
+        .ok_or(AppError::Validation("icon missing".to_string()))?;
+
+    let mime = field
+        .content_type()
+        .ok_or(AppError::Validation("icon missing".to_string()))?
+        .to_string();
+
+    let data = field
+        .bytes()
+        .await
+        .map_err(|_| AppError::Validation("icon missing".to_string()))?
+        .to_vec();
+
+    Icon::upsert_family(id, data, mime.to_string(), &mut conn).await?;
+    Ok(())
 }
 
 #[utoipa::path(

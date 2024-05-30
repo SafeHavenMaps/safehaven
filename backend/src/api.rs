@@ -29,13 +29,14 @@ use tokio::sync::RwLock;
 use utoipa::ToSchema;
 
 pub type DynOptions = Arc<RwLock<SafeHavenOptions>>;
+pub type IconCache = Arc<RwLock<HashMap<String, (Vec<u8>, String)>>>;
 
 #[derive(Clone)]
 pub struct AppState {
     pub config: Arc<SafeHavenConfig>,
     pub dyn_config: DynOptions,
     pub pool: Pool<Postgres>,
-    pub icon_cache: Arc<RwLock<HashMap<String, (Vec<u8>, String)>>>,
+    pub icon_cache: IconCache,
 }
 
 impl AppState {
@@ -135,7 +136,6 @@ pub enum AppError {
     TokenValidation,
     BadUsernameOrPassword,
     Unauthorized,
-    NotFound,
     Validation(String),
     Database(sqlx::Error),
     InvalidPagination,
@@ -176,7 +176,6 @@ impl IntoResponse for AppError {
             },
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized", None),
             AppError::InvalidPagination => (StatusCode::BAD_REQUEST, "invalid_pagination", None),
-            AppError::NotFound => (StatusCode::NOT_FOUND, "not_found", None),
         };
 
         let resp = (

@@ -19,7 +19,7 @@ serde_with = "3.8"
 uuid = { version = "1.8", features = ["serde", "v4"] }
 scrypt = "0.11"
 chrono = { version = "0.4", features = ["serde"] }
-axum = { version = "0.7", features = ["macros"] }
+axum = { version = "0.7", features = ["macros", "multipart"] }
 axum-extra = { version = "0.9", features = ["typed-header", "cookie"] }
 tokio = { version = "1.36", features = ["full"] }
 figment = { version = "0.10", features = ["toml", "env"] }
@@ -32,3 +32,4 @@ clap = { version = "4", features = ["derive"] }
 clap_derive = { version = "4" }
 number_range = "0.3.2"
 crc32fast = "1.4.0"
+tree_magic = "0.2.3"

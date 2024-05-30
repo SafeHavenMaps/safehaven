@@ -32,8 +32,8 @@ impl Category {
         sqlx::query_as!(
             Category,
             r#"
-            INSERT INTO categories (title, family_id, default_status, icon, fill_color, border_color)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO categories (title, family_id, default_status, fill_color, border_color)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING
                 id,
                 title,
@@ -46,7 +46,6 @@ impl Category {
             category.title,
             category.family_id,
             category.default_status,
-            category.icon,
             category.fill_color,
             category.border_color
         )

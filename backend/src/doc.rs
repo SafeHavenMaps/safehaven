@@ -94,7 +94,8 @@ use utoipa::OpenApi;
         admin::comments::admin_comment_new,
         admin::comments::admin_comment_get,
         admin::comments::admin_comment_update,
-        admin::comments::admin_comment_delete,    ),
+        admin::comments::admin_comment_delete,
+    ),
     components(schemas(
         // general
         ErrorResponse,
@@ -119,7 +120,6 @@ use utoipa::OpenApi;
         FieldType,
         // categories
         Category,
-        NewOrUpdateCategory,
         NewOrUpdateCategory,
         // tags
         Tag,
