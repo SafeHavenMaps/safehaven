@@ -9,8 +9,7 @@ import type {
   FetchedEntity,
   ListedEntity,
   ListedComment,
-  NewCategory,
-  UpdateCategory,
+  NewOrUpdateCategory,
   NewOrUpdateTag,
   NewComment,
   UpdateComment,
@@ -219,13 +218,13 @@ export default function useClient() {
       return data
     },
 
-    async createCategory(category: NewCategory): Promise<Category> {
+    async createCategory(category: NewOrUpdateCategory): Promise<Category> {
       const { data, error } = await this.rawClient.POST('/api/admin/categories', { body: category })
       if (error) throw error
       return data
     },
 
-    async updateCategory(id: string, category: UpdateCategory): Promise<Category> {
+    async updateCategory(id: string, category: NewOrUpdateCategory): Promise<Category> {
       const { data, error } = await this.rawClient.PUT('/api/admin/categories/{id}', {
         body: category,
         params: { path: { id } },

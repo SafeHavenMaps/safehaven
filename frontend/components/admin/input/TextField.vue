@@ -3,18 +3,16 @@
     <label :for="id">{{ label }}</label>
     <InputText
       :id="props.id"
-      :value="props.modelValue"
+      :model-value="props.modelValue"
       :variant="props.variant ? 'filled': 'outlined'"
       :invalid="props.invalid"
-      @input="updateValue"
+      @update:model-value="updateValue"
     />
     <small v-if="props.helperText">{{ props.helperText }}</small>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
-
 const props = defineProps<{
   id: string
   label: string
@@ -26,7 +24,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
-function updateValue(event: Event) {
-  emit('update:modelValue', (event.target as HTMLInputElement).value)
+function updateValue(value: undefined | string) {
+  emit('update:modelValue', value)
 }
 </script>

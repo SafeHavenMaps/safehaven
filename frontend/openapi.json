@@ -276,7 +276,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewCategory"
+                "$ref": "#/components/schemas/NewOrUpdateCategory"
               }
             }
           },
@@ -378,7 +378,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateCategory"
+                "$ref": "#/components/schemas/NewOrUpdateCategory"
               }
             }
           },
@@ -3086,22 +3086,6 @@
           }
         }
       },
-      "NewCategory": {
-        "type": "object",
-        "required": [
-          "title",
-          "family_id"
-        ],
-        "properties": {
-          "family_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "title": {
-            "type": "string"
-          }
-        }
-      },
       "NewComment": {
         "type": "object",
         "required": [
@@ -3188,6 +3172,38 @@
             "type": "string"
           },
           "token": {
+            "type": "string"
+          }
+        }
+      },
+      "NewOrUpdateCategory": {
+        "type": "object",
+        "required": [
+          "title",
+          "family_id",
+          "default_status",
+          "fill_color",
+          "border_color"
+        ],
+        "properties": {
+          "border_color": {
+            "type": "string"
+          },
+          "default_status": {
+            "type": "boolean"
+          },
+          "family_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fill_color": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
             "type": "string"
           }
         }
@@ -3595,38 +3611,6 @@
             "format": "double"
           },
           "plain_text": {
-            "type": "string"
-          }
-        }
-      },
-      "UpdateCategory": {
-        "type": "object",
-        "required": [
-          "title",
-          "family_id",
-          "default_status",
-          "fill_color",
-          "border_color"
-        ],
-        "properties": {
-          "border_color": {
-            "type": "string"
-          },
-          "default_status": {
-            "type": "boolean"
-          },
-          "family_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "fill_color": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
             "type": "string"
           }
         }

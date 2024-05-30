@@ -22,7 +22,7 @@
       id="default_filter_status"
       v-model="editedTag.default_filter_status"
       label="Inclus par défaut"
-      helper-text="(si décoché, toutes les entités portant ce tag seront exclus des résultats par défaut)"
+      helper-text="(si décoché, toutes les entités portant ce tag seront exclues des résultats par défaut)"
     />
 
     <AdminInputTextField

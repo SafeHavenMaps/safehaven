@@ -31,7 +31,7 @@
 
     <Divider />
 
-    <AdminPolicyPermissionField
+    <AdminInputPolicyPermissionField
       v-model="editedAccessToken.permissions.families_policy"
       :policy-name="'families_policy'"
       :label="'familles'"
@@ -40,7 +40,7 @@
 
     <Divider />
 
-    <AdminPolicyPermissionField
+    <AdminInputPolicyPermissionField
       v-model="editedAccessToken.permissions.categories_policy"
       :policy-name="'categories_policy'"
       :label="'catégories'"
@@ -49,7 +49,7 @@
 
     <Divider />
 
-    <AdminPolicyPermissionField
+    <AdminInputPolicyPermissionField
       v-model="editedAccessToken.permissions.tags_policy"
       :policy-name="'tags_policy'"
       :label="'tags'"

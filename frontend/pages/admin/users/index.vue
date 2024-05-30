@@ -96,12 +96,14 @@ initAdminLayout(
 )
 
 // Initialize the ref with an empty array, then fetch to update access tokens asynchronously
-const users: Ref<User[]> = ref([]);
-(async () => {
+const users: Ref<User[]> = ref([])
+async function refreshTable() {
   users.value = await state.client.listUsers()
-})()
+}
+refreshTable()
 
 async function onDelete(user_id: string) {
   await state.client.deleteUser(user_id)
+  refreshTable()
 }
 </script>

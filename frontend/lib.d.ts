@@ -33,8 +33,7 @@ export type ResolvedFetchedEntity = FetchedEntity & {
 
 export type ErrorResponse = api.components['schemas']['ErrorResponse']
 
-export type NewCategory = api.components['schemas']['NewCategory']
-export type UpdateCategory = api.components['schemas']['UpdateCategory']
+export type NewOrUpdateCategory = api.components['schemas']['NewOrUpdateCategory']
 export type NewOrUpdateTag = api.components['schemas']['NewOrUpdateTag']
 export type NewComment = api.components['schemas']['NewComment']
 export type UpdateComment = api.components['schemas']['UpdateComment']
