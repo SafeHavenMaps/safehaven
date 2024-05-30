@@ -9,7 +9,7 @@ use crate::{
     },
     models::{
         access_token::{AccessToken, NewOrUpdateAccessToken, PermissionPolicy, Permissions},
-        category::{Category, NewCategory, UpdateCategory},
+        category::{Category, NewOrUpdateCategory},
         comment::{Comment, ListedComment, NewComment, PublicComment, UpdateComment},
         entity::{
             Entity, ListedEntity, NewEntity, PublicEntity, UnprocessedLocation, UpdateEntity,
@@ -115,8 +115,8 @@ use utoipa::OpenApi;
         FieldType,
         // categories
         Category,
-        NewCategory,
-        UpdateCategory,
+        NewOrUpdateCategory,
+        NewOrUpdateCategory,
         // tags
         Tag,
         NewOrUpdateTag,

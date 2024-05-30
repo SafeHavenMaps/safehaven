@@ -5,13 +5,7 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
-pub struct NewCategory {
-    pub title: String,
-    pub family_id: Uuid,
-}
-
-#[derive(Deserialize, Serialize, ToSchema, Debug)]
-pub struct UpdateCategory {
+pub struct NewOrUpdateCategory {
     pub title: String,
     pub family_id: Uuid,
     pub default_status: bool,
@@ -32,12 +26,15 @@ pub struct Category {
 }
 
 impl Category {
-    pub async fn new(category: NewCategory, conn: &mut PgConnection) -> Result<Category, AppError> {
+    pub async fn new(
+        category: NewOrUpdateCategory,
+        conn: &mut PgConnection,
+    ) -> Result<Category, AppError> {
         sqlx::query_as!(
             Category,
             r#"
-            INSERT INTO categories (title, family_id)
-            VALUES ($1, $2)
+            INSERT INTO categories (title, family_id, default_status, icon, fill_color, border_color)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING
                 id,
                 title,
@@ -48,7 +45,11 @@ impl Category {
                 border_color
             "#,
             category.title,
-            category.family_id
+            category.family_id,
+            category.default_status,
+            category.icon,
+            category.fill_color,
+            category.border_color
         )
         .fetch_one(conn)
         .await
@@ -79,7 +80,7 @@ impl Category {
 
     pub async fn update(
         id: Uuid,
-        update: UpdateCategory,
+        update: NewOrUpdateCategory,
         conn: &mut PgConnection,
     ) -> Result<Category, AppError> {
         sqlx::query_as!(

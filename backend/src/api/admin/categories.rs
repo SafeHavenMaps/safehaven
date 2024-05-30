@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use crate::{
     api::{AppError, AppJson, DbConn},
-    models::category::{Category, NewCategory, UpdateCategory},
+    models::category::{Category, NewOrUpdateCategory},
 };
 
 #[utoipa::path(
@@ -23,7 +23,7 @@ pub async fn admin_categories_list(
 #[utoipa::path(
     post,
     path = "/api/admin/categories",
-    request_body = NewCategory,
+    request_body = NewOrUpdateCategory,
     responses(
         (status = 200, description = "Category created", body = Category),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
@@ -31,7 +31,7 @@ pub async fn admin_categories_list(
 )]
 pub async fn admin_category_new(
     DbConn(mut conn): DbConn,
-    Json(new_category): Json<NewCategory>,
+    Json(new_category): Json<NewOrUpdateCategory>,
 ) -> Result<AppJson<Category>, AppError> {
     Ok(AppJson(Category::new(new_category, &mut conn).await?))
 }
@@ -58,7 +58,7 @@ pub async fn admin_category_get(
 #[utoipa::path(
     put,
     path = "/api/admin/categories/{id}",
-    request_body = UpdateCategory,
+    request_body = NewOrUpdateCategory,
     params(
         ("id" = Uuid, Path, description = "Category identifier")
     ),
@@ -71,7 +71,7 @@ pub async fn admin_category_get(
 pub async fn admin_category_update(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-    Json(update_category): Json<UpdateCategory>,
+    Json(update_category): Json<NewOrUpdateCategory>,
 ) -> Result<AppJson<Category>, AppError> {
     Ok(AppJson(
         Category::update(id, update_category, &mut conn).await?,
