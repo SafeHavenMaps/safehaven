@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT families.id, families.title, families.icon_hash,\n                families.entity_form as \"entity_form: Json<Form>\", \n                families.comment_form as \"comment_form: Json<Form>\",\n                families.sort_order\n            FROM families\n            JOIN categories ON families.id = categories.family_id\n            JOIN entities ON categories.id = entities.category_id\n            WHERE entities.id = $1\n            ",
+  "query": "\n            INSERT INTO families (title, entity_form, comment_form, sort_order)\n            VALUES ($1, $2, $3, $4)\n            RETURNING \n                id,\n                title,\n                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,\n                entity_form as \"entity_form: Json<Form>\",\n                comment_form as \"comment_form: Json<Form>\",\n                sort_order\n            ",
   "describe": {
     "columns": [
       {
@@ -16,7 +16,7 @@
       {
         "ordinal": 2,
         "name": "icon_hash",
-        "type_info": "Text"
+        "type_info": "Bpchar"
       },
       {
         "ordinal": 3,
@@ -36,17 +36,20 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Varchar",
+        "Jsonb",
+        "Jsonb",
+        "Int4"
       ]
     },
     "nullable": [
       false,
       false,
-      true,
+      null,
       false,
       false,
       false
     ]
   },
-  "hash": "e6e9a2abcfb44a97909245c6f0000b362960936fbb043a0b0d2c9a2375018279"
+  "hash": "e443314ff0518a62d7cc20de7304fde758d69960e284f0333f52675972e0eed7"
 }

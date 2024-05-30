@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, name, is_admin FROM users WHERE id = $1",
+  "query": "SELECT id, name, password, is_admin, last_login FROM users WHERE name = $1",
   "describe": {
     "columns": [
       {
@@ -15,20 +15,32 @@
       },
       {
         "ordinal": 2,
+        "name": "password",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
         "name": "is_admin",
         "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "last_login",
+        "type_info": "Timestamp"
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Text"
       ]
     },
     "nullable": [
       false,
       false,
-      false
+      false,
+      false,
+      true
     ]
   },
-  "hash": "2f003b882a2ad645bb287fe3fef0f5b323a01fd5792e021ba0bd816cdcabe0f0"
+  "hash": "3c85c684a162418d90961456e5231bca0002f4e80da2bfcf62c4318c20be8f7f"
 }

@@ -78,7 +78,6 @@ pub struct NewOrUpdateFamily {
     pub title: String,
     pub entity_form: Form,
     pub comment_form: Form,
-    pub icon: Option<String>,
     pub sort_order: i32,
 }
 
@@ -151,12 +150,12 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            INSERT INTO families (title, entity_form, comment_form, icon, sort_order)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO families (title, entity_form, comment_form, sort_order)
+            VALUES ($1, $2, $3, $4)
             RETURNING 
                 id,
                 title,
-                icon_hash,
+                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 entity_form as "entity_form: Json<Form>",
                 comment_form as "comment_form: Json<Form>",
                 sort_order
@@ -164,7 +163,6 @@ impl Family {
             family.title,
             entity_form,
             comment_form,
-            family.icon,
             family.sort_order
         )
         .fetch_one(conn)
@@ -187,12 +185,12 @@ impl Family {
             Family,
             r#"
             UPDATE families
-            SET title = $2, entity_form = $3, comment_form = $4, icon = $5, sort_order = $6
+            SET title = $2, entity_form = $3, comment_form = $4, sort_order = $5
             WHERE id = $1
             RETURNING 
                 id,
                 title,
-                icon_hash,
+                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 entity_form as "entity_form: Json<Form>",
                 comment_form as "comment_form: Json<Form>",
                 sort_order
@@ -201,7 +199,6 @@ impl Family {
             update.title,
             entity_form,
             comment_form,
-            update.icon,
             update.sort_order
         )
         .fetch_one(conn)
@@ -228,7 +225,7 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT id, title, icon_hash, 
+            SELECT id, title, (SELECT hash FROM icons WHERE id = icon_id) as icon_hash, 
                 entity_form as "entity_form: Json<Form>", 
                 comment_form as "comment_form: Json<Form>",
                 sort_order
@@ -246,7 +243,7 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT id, title, icon_hash,
+            SELECT id, title, (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 entity_form as "entity_form: Json<Form>", 
                 comment_form as "comment_form: Json<Form>",
                 sort_order
@@ -265,7 +262,7 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT id, title, icon_hash,
+            SELECT id, title, (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 entity_form as "entity_form: Json<Form>", 
                 comment_form as "comment_form: Json<Form>",
                 sort_order
@@ -286,7 +283,7 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT families.id, families.title, families.icon_hash,
+            SELECT families.id, families.title, (SELECT hash FROM icons WHERE id = families.icon_id) as icon_hash,
                 families.entity_form as "entity_form: Json<Form>", 
                 families.comment_form as "comment_form: Json<Form>",
                 families.sort_order
@@ -308,7 +305,7 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT families.id, families.title, families.icon_hash,
+            SELECT families.id, families.title, (SELECT hash FROM icons WHERE id = families.icon_id) as icon_hash,
                 families.entity_form as "entity_form: Json<Form>", 
                 families.comment_form as "comment_form: Json<Form>",
                 families.sort_order
@@ -322,25 +319,5 @@ impl Family {
         .fetch_one(conn)
         .await
         .map_err(AppError::Database)
-    }
-
-    pub async fn get_icon_content(
-        family_icon_hash: String,
-        conn: &mut PgConnection,
-    ) -> Result<String, AppError> {
-        let row: Option<String> = sqlx::query_scalar!(
-            r#"
-            SELECT icon
-            FROM families
-            WHERE icon_hash = $1
-            LIMIT 1
-            "#,
-            family_icon_hash,
-        )
-        .fetch_one(conn)
-        .await
-        .map_err(AppError::Database)?;
-
-        row.ok_or(AppError::NotFound)
     }
 }

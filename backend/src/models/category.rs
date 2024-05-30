@@ -38,7 +38,14 @@ impl Category {
             r#"
             INSERT INTO categories (title, family_id)
             VALUES ($1, $2)
-            RETURNING id, title, family_id, default_status, icon_hash, fill_color, border_color
+            RETURNING
+                id,
+                title,
+                family_id,
+                default_status,
+                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                fill_color,
+                border_color
             "#,
             category.title,
             category.family_id
@@ -52,7 +59,14 @@ impl Category {
         sqlx::query_as!(
             Category,
             r#"
-            SELECT id, title, family_id, default_status, icon_hash, fill_color, border_color
+            SELECT
+                id,
+                title,
+                family_id,
+                default_status,
+                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                fill_color,
+                border_color
             FROM categories
             WHERE id = $1
             "#,
@@ -72,15 +86,21 @@ impl Category {
             Category,
             r#"
             UPDATE categories
-            SET title = $2, family_id = $3, default_status = $4, icon = $5, fill_color = $6, border_color = $7
+            SET title = $2, family_id = $3, default_status = $4, fill_color = $5, border_color = $6
             WHERE id = $1
-            RETURNING id, title, family_id, default_status, icon_hash, fill_color, border_color
+            RETURNING
+                id,
+                title,
+                family_id,
+                default_status,
+                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                fill_color,
+                border_color
             "#,
             id,
             update.title,
             update.family_id,
             update.default_status,
-            update.icon,
             update.fill_color,
             update.border_color
         )
@@ -108,7 +128,14 @@ impl Category {
         sqlx::query_as!(
             Category,
             r#"
-            SELECT id, title, family_id, default_status, icon_hash, fill_color, border_color
+            SELECT
+                id,
+                title,
+                family_id,
+                default_status,
+                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                fill_color,
+                border_color
             FROM categories
             "#
         )
@@ -124,7 +151,14 @@ impl Category {
         sqlx::query_as!(
             Category,
             r#"
-            SELECT id, title, family_id, default_status, icon_hash, fill_color, border_color
+            SELECT
+                id,
+                title,
+                family_id,
+                default_status,
+                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                fill_color,
+                border_color
             FROM categories
             WHERE family_id = ANY($1)
             "#,
@@ -143,7 +177,14 @@ impl Category {
         sqlx::query_as!(
             Category,
             r#"
-            SELECT id, title, family_id, default_status, icon_hash, fill_color, border_color
+            SELECT
+                id,
+                title,
+                family_id,
+                default_status,
+                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                fill_color,
+                border_color
             FROM categories
             WHERE id = ANY($1) AND family_id = ANY($2)
             "#,
@@ -153,25 +194,5 @@ impl Category {
         .fetch_all(conn)
         .await
         .map_err(AppError::Database)
-    }
-
-    pub async fn get_icon_content(
-        category_icon_hash: String,
-        conn: &mut PgConnection,
-    ) -> Result<String, AppError> {
-        let row: Option<String> = sqlx::query_scalar!(
-            r#"
-            SELECT icon
-            FROM categories
-            WHERE icon_hash = $1
-            LIMIT 1
-            "#,
-            category_icon_hash,
-        )
-        .fetch_one(conn)
-        .await
-        .map_err(AppError::Database)?;
-
-        row.ok_or(AppError::NotFound)
     }
 }

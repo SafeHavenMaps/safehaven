@@ -2,6 +2,46 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "postgis";
 
+-- Icons management
+CREATE TABLE icons (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    data BYTEA NOT NULL,
+    hash CHAR(32) GENERATED ALWAYS AS (md5(data)) STORED,
+    http_mime_type TEXT NOT NULL
+);
+CREATE INDEX icons_hash ON icons(hash);
+
+-- Icons upsert function
+CREATE OR REPLACE FUNCTION upsert_entity_icon(
+    p_entity_id UUID,
+    p_data BYTEA,
+    p_http_mime_type TEXT,
+    p_table_name TEXT
+) RETURNS VOID AS $$
+DECLARE
+    v_icon_id UUID;
+    v_query TEXT;
+BEGIN
+    -- Check if the entity already has an icon
+    EXECUTE format('SELECT icon_id FROM %I WHERE id = $1', p_table_name) INTO v_icon_id USING p_entity_id;
+
+    IF v_icon_id IS NOT NULL THEN
+        -- Update the existing icon
+        UPDATE icons
+        SET data = p_data, http_mime_type = p_http_mime_type
+        WHERE id = v_icon_id;
+    ELSE
+        -- Insert a new icon
+        INSERT INTO icons (data, http_mime_type)
+        VALUES (p_data, p_http_mime_type)
+        RETURNING id INTO v_icon_id;
+
+        -- Update the entity with the new icon_id
+        EXECUTE format('UPDATE %I SET icon_id = $1 WHERE id = $2', p_table_name) USING v_icon_id, p_entity_id;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL UNIQUE,
@@ -20,28 +60,27 @@ CREATE UNIQUE INDEX options_name_uindex ON options (name);
 CREATE TABLE families (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
-    icon TEXT,
-    icon_hash TEXT GENERATED ALWAYS AS (md5(icon::text)) STORED,
+    icon_id UUID,
     entity_form JSONB NOT NULL,
     comment_form JSONB NOT NULL,
-    sort_order INT NOT NULL DEFAULT 0
+    sort_order INT NOT NULL DEFAULT 0,
+
+    FOREIGN KEY (icon_id) REFERENCES icons(id) ON DELETE SET NULL
 );
-CREATE INDEX family_icon_hash ON families(icon_hash);
 
 CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
     family_id UUID NOT NULL,
     default_status BOOLEAN NOT NULL DEFAULT TRUE,
-    icon TEXT,
-    icon_hash TEXT GENERATED ALWAYS AS (md5(icon::text)) STORED,
+    icon_id UUID,
     fill_color VARCHAR(7) NOT NULL DEFAULT '#FFFFFF',
     border_color VARCHAR(7) NOT NULL DEFAULT '#000000',
 
-    FOREIGN KEY (family_id) REFERENCES families(id) ON DELETE CASCADE
+    FOREIGN KEY (family_id) REFERENCES families(id) ON DELETE CASCADE,
+    FOREIGN KEY (icon_id) REFERENCES icons(id) ON DELETE SET NULL
 );
 CREATE INDEX categories_family_id_idx ON categories(family_id);
-CREATE INDEX categories_icon_hash ON categories(icon_hash);
 
 CREATE TABLE tags (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

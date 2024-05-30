@@ -35,7 +35,7 @@ pub struct AppState {
     pub config: Arc<SafeHavenConfig>,
     pub dyn_config: DynOptions,
     pub pool: Pool<Postgres>,
-    pub icon_cache: Arc<RwLock<HashMap<String, String>>>,
+    pub icon_cache: Arc<RwLock<HashMap<String, (Vec<u8>, String)>>>,
 }
 
 impl AppState {

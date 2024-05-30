@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, title, icon_hash,\n                entity_form as \"entity_form: Json<Form>\", \n                comment_form as \"comment_form: Json<Form>\",\n                sort_order\n            FROM families\n            WHERE id = ANY($1)\n            ",
+  "query": "\n            SELECT families.id, families.title, (SELECT hash FROM icons WHERE id = families.icon_id) as icon_hash,\n                families.entity_form as \"entity_form: Json<Form>\", \n                families.comment_form as \"comment_form: Json<Form>\",\n                families.sort_order\n            FROM families\n            JOIN categories ON families.id = categories.family_id\n            JOIN entities ON categories.id = entities.category_id\n            WHERE entities.id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -16,7 +16,7 @@
       {
         "ordinal": 2,
         "name": "icon_hash",
-        "type_info": "Text"
+        "type_info": "Bpchar"
       },
       {
         "ordinal": 3,
@@ -36,17 +36,17 @@
     ],
     "parameters": {
       "Left": [
-        "UuidArray"
+        "Uuid"
       ]
     },
     "nullable": [
       false,
       false,
-      true,
+      null,
       false,
       false,
       false
     ]
   },
-  "hash": "f88b1ba1b946495c934361f0c31e18d71cfaa29defba7f3e66c3d97783e70203"
+  "hash": "fa851f587e25637129632826f14e7bba5cd7f8ec423510068b9a76b537263010"
 }

@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT upsert_entity_icon($1, $2, $3, 'categories')",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "upsert_entity_icon",
+        "type_info": "Void"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Bytea",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "0fa426219025d3aba0440683203907c3f73421a155552ecac45046929f7c39a0"
+}
