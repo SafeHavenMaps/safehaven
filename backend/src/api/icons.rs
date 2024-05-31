@@ -11,7 +11,7 @@ use serde_json::json;
 use super::DbConn;
 
 pub fn routes() -> Router<AppState> {
-    Router::new().route("/icon/:hash", get(get_icon))
+    Router::new().route("/:hash", get(get_icon))
 }
 
 async fn get_icon(
@@ -19,7 +19,7 @@ async fn get_icon(
     DbConn(mut conn): DbConn,
     Path(hash): Path<String>,
 ) -> Response {
-    // Check cache first
+    // Check cache firsts
     if let Some(icon) = state.icon_cache.read().await.get(&hash) {
         return (
             StatusCode::OK,

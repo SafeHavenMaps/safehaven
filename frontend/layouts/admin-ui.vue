@@ -74,6 +74,8 @@
       </div>
     </div>
 
+    <Toast />
+
     <ConfirmPopup group="delete">
       <template #message="slotProps">
         <div class="flex flex-row align-items-center w-full gap-2 p-3 mb-2 pb-0">

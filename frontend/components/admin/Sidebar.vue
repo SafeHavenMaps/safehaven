@@ -19,7 +19,7 @@
           <AppIcon
             size="18px"
             :icon-name="item.icon!"
-            :dynamic-type="item.icon_dytpe"
+            :dynamic="item.iconDynamic"
           />
           <span
             class="ml-2 flex-grow-1 text-link"
@@ -36,7 +36,7 @@
         <AppIcon
           size="18px"
           :icon-name="item.icon!"
-          :dynamic-type="item.icon_dytpe"
+          :dynamic="item.iconDynamic"
         />
 
         <span
@@ -89,7 +89,7 @@ const familyNodes = [{
     label: item.title,
     key: item.id,
     icon: item.icon_hash!,
-    icon_dytpe: 'families',
+    iconDynamic: true,
     route: '',
     active: false,
     items: [

@@ -32,7 +32,7 @@
               <template #icon>
                 <AppIcon
                   :icon-name="state.activeFamily.icon_hash!"
-                  dynamic-type="families"
+                  dynamic
                   class="mr-1"
                   size="20px"
                 />

@@ -9,7 +9,7 @@
       <div class="button-content flex align-items-center justify-between">
         <AppIcon
           :icon-name="slotProps.option.icon_hash"
-          dynamic-type="families"
+          dynamic
           class="mr-2"
           size="16px"
         />

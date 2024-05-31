@@ -32,6 +32,9 @@
       v-model="editedCategory.icon_hash"
       label="Hash de l'icône"
     /> -->
+    <Divider />
+    <AdminInputIconUpload />
+    <Divider />
     <AdminInputSwitchField
       id="default_status"
       v-model="editedCategory.default_status"
@@ -86,7 +89,6 @@ initAdminLayout(
 )
 
 function hasBeenEdited(field: keyof NewOrUpdateCategory) {
-  if (field == 'icon') return false
   return editedCategory.value[field] !== fetchedCategory[field]
 }
 
