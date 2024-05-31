@@ -6,11 +6,12 @@
       color: 'white',
     }"
   >
-    <img
-      height="16"
+    <AppIcon
       class="mr-1"
-      :src="imageSrc()"
-    >
+      size="16px"
+      dynamic
+      :icon-name="props.category.icon_hash!"
+    />
     {{ props.category.title }}
   </Tag>
 </template>
@@ -21,8 +22,4 @@ import type { Category } from '~/lib'
 const props = defineProps<{
   category: Category
 }>()
-
-function imageSrc(): string {
-  return `/api/icons/categories/${props.category.icon_hash}`
-}
 </script>

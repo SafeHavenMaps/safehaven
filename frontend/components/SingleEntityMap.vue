@@ -31,7 +31,7 @@
           :fill="props.entity.category.fill_color"
           :stroke="props.entity.category.border_color"
           :highlighted="false"
-          :icon-url="`/api/icons/categories/${props.entity.category.icon_hash}`"
+          :icon-url="`/api/icons/${props.entity.category.icon_hash}`"
         />
       </ol-overlay>
     </ol-map>

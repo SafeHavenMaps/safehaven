@@ -11,6 +11,13 @@
       :invalid="!editedCategory.title"
     />
 
+    <AdminInputSwitchField
+      id="default_status"
+      v-model="editedCategory.default_status"
+      label="Inclus par défaut"
+      helper-text="(si décoché, toutes les entités appartenant à cette catégorie seront exclues des résultats par défaut)"
+    />
+
     <AdminInputColorField
       id="border_color"
       v-model="editedCategory.border_color"
@@ -27,19 +34,9 @@
       :variant="hasBeenEdited('fill_color')"
     />
 
-    <!-- <AdminInputTextField
-      id="icon_hash"
-      v-model="editedCategory.icon_hash"
-      label="Hash de l'icône"
-    /> -->
-    <Divider />
-    <AdminInputIconUpload />
-    <Divider />
-    <AdminInputSwitchField
-      id="default_status"
-      v-model="editedCategory.default_status"
-      label="Inclus par défaut"
-      helper-text="(si décoché, toutes les entités appartenant à cette catégorie seront exclues des résultats par défaut)"
+    <AdminInputIconUpload
+      :object-id="categoryId"
+      object-type="categories"
     />
     <span class="flex gap-1 justify-content-end">
       <NuxtLink :to="`/admin/${familyId}/categories`">
