@@ -79,7 +79,7 @@ pub fn routes(state: &AppState) -> Router<AppState> {
         .route("/families/:id", delete(families::admin_family_delete))
         .route(
             "/families/:id/icon",
-            put(families::admin_family_update_icon),
+            post(families::admin_family_update_icon),
         )
         .route(
             "/families/:id/icon",
@@ -93,7 +93,7 @@ pub fn routes(state: &AppState) -> Router<AppState> {
         .route("/categories/:id", delete(categories::admin_category_delete))
         .route(
             "/categories/:id/icon",
-            put(categories::admin_category_update_icon),
+            post(categories::admin_category_update_icon),
         )
         .route(
             "/categories/:id/icon",
