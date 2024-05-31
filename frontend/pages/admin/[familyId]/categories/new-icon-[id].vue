@@ -1,0 +1,43 @@
+<template>
+  <form
+    class="flex flex-column gap-3 max-w-30rem mx-4"
+  >
+    <AdminInputIconUpload
+      :object-id="categoryId"
+      object-type="categories"
+    />
+    <span class="flex gap-1 justify-content-end">
+      <NuxtLink :to="`/admin/${familyId}/categories`">
+        <Button
+          label="Retour à la liste"
+          severity="secondary"
+        />
+      </NuxtLink>
+    </span>
+  </form>
+</template>
+
+<script setup lang="ts">
+import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
+import state from '~/lib/admin-state'
+
+definePageMeta({
+  layout: 'admin-ui',
+})
+
+const familyId = useRoute().params.familyId as string
+const categoryId = useRoute().params.id as string
+
+const fetchedCategory = await state.client.getCategory(categoryId)
+
+const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
+initAdminLayout(
+      `Édition de l'icône de la catégorie ${fetchedCategory.title}`,
+      'category',
+      [],
+      [
+        { label: 'Catégories', url: '/admin/categories' },
+        { label: `Édition de l'icône de la catégorie ${fetchedCategory.title}`, url: `/admin/categories/${categoryId}` },
+      ],
+)
+</script>

@@ -102,7 +102,7 @@ initAdminLayout(
       icon: 'add',
       label: 'Nouvelle catégorie',
       severity: 'success',
-      url: `/admin/categories/new`,
+      url: `/admin/${familyId}/categories/new`,
     },
   ],
   [

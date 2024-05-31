@@ -7,7 +7,6 @@
       id="title"
       v-model="editedCategory.title"
       label="Titre"
-      :variant="hasBeenEdited('title')"
       :invalid="!editedCategory.title"
     />
 
@@ -23,7 +22,6 @@
       v-model="editedCategory.border_color"
       v-model:invalid="color_picker_1_invalid"
       label="Couleur de bordure"
-      :variant="hasBeenEdited('border_color')"
     />
 
     <AdminInputColorField
@@ -31,12 +29,6 @@
       v-model="editedCategory.fill_color"
       v-model:invalid="color_picker_2_invalid"
       label="Couleur de remplissage"
-      :variant="hasBeenEdited('fill_color')"
-    />
-
-    <AdminInputIconUpload
-      :object-id="categoryId"
-      object-type="categories"
     />
     <span class="flex gap-1 justify-content-end">
       <NuxtLink :to="`/admin/${familyId}/categories`">
@@ -65,10 +57,14 @@ definePageMeta({
 })
 
 const familyId = useRoute().params.familyId as string
-const categoryId = useRoute().params.id as string
 
-const fetchedCategory = await state.client.getCategory(categoryId)
-const editedCategory: Ref<NewOrUpdateCategory> = ref(JSON.parse(JSON.stringify(fetchedCategory))) // deep copy
+const editedCategory: Ref<NewOrUpdateCategory> = ref({
+  border_color: '#FFFFFF',
+  default_status: true,
+  family_id: familyId,
+  fill_color: '#000000',
+  title: '',
+})
 
 const processingRequest = ref(false)
 const color_picker_1_invalid = ref(false)
@@ -76,18 +72,14 @@ const color_picker_2_invalid = ref(false)
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-    `Édition de la catégorie ${fetchedCategory.title}`,
-    'category',
-    [],
-    [
-      { label: 'Catégories', url: '/admin/categories' },
-      { label: `Édition de la catégorie ${fetchedCategory.title}`, url: `/admin/categories/${categoryId}` },
-    ],
+      `Nouvelle catégorie`,
+      'category',
+      [],
+      [
+        { label: 'Catégories', url: '/admin/categories' },
+        { label: `Édition d'une nouvelle catégorie`, url: `/admin/categories/new` },
+      ],
 )
-
-function hasBeenEdited(field: keyof NewOrUpdateCategory) {
-  return editedCategory.value[field] !== fetchedCategory[field]
-}
 
 async function onSave() {
   processingRequest.value = true
@@ -97,7 +89,7 @@ async function onSave() {
   if (editedCategory.value.fill_color.length == 6) {
     editedCategory.value.fill_color = `#${editedCategory.value.fill_color}`
   }
-  await state.client.updateCategory(categoryId, editedCategory.value)
-  navigateTo(`/admin/${familyId}/categories`)
+  const { id } = await state.client.createCategory(editedCategory.value)
+  navigateTo(`/admin/${familyId}/categories/new-icon-${id}`)
 }
 </script>

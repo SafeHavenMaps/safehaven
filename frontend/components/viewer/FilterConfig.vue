@@ -26,10 +26,11 @@
                 borderColor: category.border_color,
               }"
             >
-              <img
-                height="16"
-                :src="`/api/icons/categories/${category.icon_hash}`"
-              >
+              <AppIcon
+                size="16px"
+                dynamic
+                :icon-name="category.icon_hash!"
+              />
             </div>
             {{ category.title }}
           </div>
