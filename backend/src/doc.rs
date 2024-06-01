@@ -44,6 +44,7 @@ use utoipa::OpenApi;
         // admin::options
         admin::options::admin_options_get,
         admin::options::admin_options_update,
+        admin::options::admin_options_delete,
         // admin::users
         admin::users::admin_users_list,
         admin::users::admin_user_new,

@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 
 use crate::api::AppError;
 
-#[derive(Deserialize, Serialize, Clone, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
 pub struct SafeHavenOptions {
     pub general: GeneralOptions,
     pub safe_mode: SafeModeConfig,
@@ -12,7 +12,8 @@ pub struct SafeHavenOptions {
     pub cartography_cluster: CartographyClusterConfig,
 }
 
-#[derive(Deserialize, Serialize, Clone, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
+#[serde(untagged)]
 pub enum ConfigurationOption {
     General(GeneralOptions),
     SafeMode(SafeModeConfig),
@@ -35,7 +36,7 @@ trait OptionConfig {
     fn option_name() -> &'static str;
 }
 
-#[derive(Deserialize, Serialize, Clone, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
 #[serde(default)]
 pub struct GeneralOptions {
     pub title: String,
@@ -61,7 +62,7 @@ impl Default for GeneralOptions {
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
 #[serde(default)]
 /// Safe mode configuration, when enabled, the application will require recaptcha validation for
 /// almost every action making it harder to spam the application or dump the database content
@@ -99,7 +100,8 @@ impl Default for SafeModeConfig {
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
+#[serde(default)]
 /// Displayed map initialization parameters
 pub struct CartographyInitConfig {
     /// Latitude of the map center (WGS84)
@@ -126,7 +128,7 @@ impl Default for CartographyInitConfig {
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
 #[serde(default)]
 /// Entity clusterization parameters
 pub struct CartographyClusterConfig {
@@ -173,6 +175,22 @@ impl SafeHavenOptions {
         .execute(conn)
         .await
         .expect("Failed to insert or update option");
+    }
+
+    pub async fn delete(conn: &mut PgConnection, to_delete: String) -> Result<(), AppError> {
+        let db_option_name = to_delete;
+        sqlx::query!(
+            r#"
+            DELETE FROM options
+            WHERE name = $1
+            "#,
+            db_option_name
+        )
+        .execute(conn)
+        .await
+        .map_err(AppError::Database)?;
+
+        Ok(())
     }
 
     async fn fetch_option<T>(conn: &mut PgConnection) -> Result<T, AppError>

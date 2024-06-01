@@ -40,6 +40,7 @@ pub fn routes(state: &AppState) -> Router<AppState> {
         // options
         .route("/options", get(options::admin_options_get))
         .route("/options/:name", put(options::admin_options_update))
+        .route("/options/:name", delete(options::admin_options_delete))
         // users
         .route("/users", get(users::admin_users_list))
         .route("/users", post(users::admin_user_new))

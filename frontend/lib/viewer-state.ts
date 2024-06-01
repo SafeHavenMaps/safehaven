@@ -216,8 +216,8 @@ export class AppState {
     // We need to transform the coordinates
     return transform(
       [
-        state.cartographyInitConfig.center_lng,
-        state.cartographyInitConfig.center_lat,
+        state.cartographyInitConfig.center_lng!,
+        state.cartographyInitConfig.center_lat!,
       ],
       'EPSG:4326', // WGS84
       'EPSG:3857', // Web Mercator

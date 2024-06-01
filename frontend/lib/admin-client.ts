@@ -79,6 +79,14 @@ export default function useClient() {
       return data
     },
 
+    async deleteConfig(name: string): Promise<SafeHavenOptions> {
+      const { data, error } = await this.rawClient.DELETE(`/api/admin/options/{name}`, {
+        params: { path: { name } },
+      })
+      if (error) throw error
+      return data
+    },
+
     // Users
     async listUsers(): Promise<User[]> {
       const { data, error } = await this.rawClient.GET('/api/admin/users')

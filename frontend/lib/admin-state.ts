@@ -52,6 +52,11 @@ export class AppState {
     this.optionsData = updatedConfig
   }
 
+  async deleteConfig(name: string) {
+    const updatedConfig = await this.client.deleteConfig(name)
+    this.optionsData = updatedConfig
+  }
+
   get hasSafeMode() {
     return !!this.optionsData!.safe_mode.enabled
   }

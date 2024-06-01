@@ -13,7 +13,7 @@
         ref="mapRef"
         class="h-full"
         :center="state.startCenter()"
-        :zoom="state.startZoom()"
+        :zoom="state.startZoom()!"
         :entities="state.entities"
         :clusters="state.clusters"
         @entity-click="(e: DisplayableCachedEntity) => state.selectedCachedEntity(e)"
