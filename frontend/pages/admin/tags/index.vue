@@ -9,12 +9,12 @@
           class="-mt-1"
         /></InputIcon>
         <InputText
-          v-model="filters['global'].value"
+          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
           placeholder="Recherche"
         />
       </IconField>
       <MultiSelect
-        v-model="selectedColumns"
+        v-model="state.tablesSelectedColumns[table_key]"
         :options="optionalColumns"
 
         display="chip"
@@ -23,7 +23,10 @@
       />
     </span>
     <DataTable
-      v-model:filters="filters"
+      v-model:filters="state.tablesFilters[table_key]"
+      state-storage="session"
+      :state-key="table_key"
+      data-key="id"
       paginator
       :value="tags"
       striped-rows
@@ -39,7 +42,7 @@
         sortable
       />
       <Column
-        v-if="selectedColumns.includes('Filtrage')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Filtrage')"
         field="is_filter"
         header="Filtrage"
         sortable
@@ -53,7 +56,7 @@
       </Column>
 
       <Column
-        v-if="selectedColumns.includes('Valeur de filtre par défaut')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Valeur de filtre par défaut')"
         header="Valeur de filtre par défaut"
         field="default_filter_status"
         sortable
@@ -67,7 +70,7 @@
       </Column>
 
       <Column
-        v-if="selectedColumns.includes('Description de filtre')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Description de filtre')"
         header="Description de filtre"
         field="filter_description"
         sortable
@@ -91,17 +94,22 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api'
+import type { DataTableFilterMetaData } from 'primevue/datatable'
 import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Tag } from '~/lib'
 import state from '~/lib/admin-state'
 
 const optionalColumns = ref(['Filtrage', 'Valeur de filtre par défaut', 'Description de filtre'])
-const selectedColumns = ref(['Filtrage', 'Valeur de filtre par défaut'])
-
-const filters = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-})
+const table_key = `dt-state-tags`
+if (!(table_key in state.tablesSelectedColumns)) {
+  state.tablesSelectedColumns[table_key] = ['Filtrage', 'Valeur de filtre par défaut']
+}
+if (!(table_key in state.tablesFilters)) {
+  state.tablesFilters[table_key] = {
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  }
+}
 
 definePageMeta({
   layout: 'admin-ui',

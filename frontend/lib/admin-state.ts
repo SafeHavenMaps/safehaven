@@ -1,4 +1,5 @@
 import { reactive } from 'vue'
+import type { DataTableFilterMeta } from 'primevue/datatable'
 import { purify_lenient } from './dompurify'
 import useClient from '~/lib/admin-client'
 import type {
@@ -19,6 +20,9 @@ export class AppState {
 
   public is_admin: boolean | null = null
   public username: string | null = null
+
+  public tablesSelectedColumns: Record<string, string[]> = {}
+  public tablesFilters: Record<string, DataTableFilterMeta> = {}
 
   // Auth
   async login(username: string, password: string, remember_me: boolean) {

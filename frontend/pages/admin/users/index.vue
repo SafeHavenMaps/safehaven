@@ -9,16 +9,19 @@
           class="-mt-1"
         /></InputIcon>
         <InputText
-          v-model="filters['global'].value"
+          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
           placeholder="Recherche"
         />
       </IconField>
     </span>
     <DataTable
-      v-model:filters="filters"
+      v-model="state.tablesSelectedColumns[table_key]"
       paginator
       :value="users"
       striped-rows
+      state-storage="session"
+      :state-key="table_key"
+      data-key="id"
       :rows="10"
       :rows-per-page-options="[10, 20, 50]"
       removable-sort
@@ -70,11 +73,20 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api'
+import type { DataTableFilterMetaData } from 'primevue/datatable'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { User } from '~/lib'
 import state from '~/lib/admin-state'
 
-const filters = ref({ global: { value: null, matchMode: FilterMatchMode.CONTAINS } })
+const table_key = `dt-users`
+if (!(table_key in state.tablesSelectedColumns)) {
+  state.tablesSelectedColumns[table_key] = []
+}
+if (!(table_key in state.tablesFilters)) {
+  state.tablesFilters[table_key] = {
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  }
+}
 
 definePageMeta({
   layout: 'admin-ui',

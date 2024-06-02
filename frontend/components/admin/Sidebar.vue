@@ -80,8 +80,8 @@ function classForLink(active: boolean) {
 }
 
 const familyNodes = [{
-  label: 'Configuration',
-  icon: 'config',
+  label: 'Gestion',
+  icon: 'listEdit',
   route: 'families',
   active: false,
 }].concat(

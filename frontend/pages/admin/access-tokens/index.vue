@@ -9,12 +9,12 @@
           class="-mt-1"
         /></InputIcon>
         <InputText
-          v-model="filters['global'].value"
+          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
           placeholder="Recherche"
         />
       </IconField>
       <MultiSelect
-        v-model="selectedColumns"
+        v-model="state.tablesSelectedColumns[table_key]"
         :options="optionalColumns"
 
         display="chip"
@@ -23,7 +23,10 @@
       />
     </span>
     <DataTable
-      v-model:filters="filters"
+      v-model:filters="state.tablesFilters[table_key]"
+      state-storage="session"
+      :state-key="table_key"
+      data-key="id"
       paginator
       :value="accessTokens"
       striped-rows
@@ -39,7 +42,7 @@
         sortable
       />
       <Column
-        v-if="selectedColumns.includes('Jeton')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Jeton')"
         field="token"
         header="Jeton"
       />
@@ -57,7 +60,7 @@
       </Column>
 
       <Column
-        v-if="selectedColumns.includes('Visites')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Visites')"
         field="last_week_visits"
         header="Visites (7 derniers jours)"
         class="max-w-8rem "
@@ -65,7 +68,7 @@
       />
 
       <Column
-        v-if="selectedColumns.includes('Familles')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Familles')"
         header="Familles"
         :field="data => all_included(data.permissions.families_policy).toString()"
         sortable
@@ -79,7 +82,7 @@
       </Column>
 
       <Column
-        v-if="selectedColumns.includes('Catégories')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Catégories')"
         header="Catégories"
         :field="data => all_included(data.permissions.categories_policy).toString()"
         sortable
@@ -93,7 +96,7 @@
       </Column>
 
       <Column
-        v-if="selectedColumns.includes('Tags')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Tags')"
         header="Tags"
         field="data => all_included(data.permissions.tags_policy).toString()"
         sortable
@@ -107,7 +110,7 @@
       </Column>
 
       <Column
-        v-if="selectedColumns.includes('Commentaires')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Commentaires')"
         header="Commentaires"
         field="permissions.can_access_comments"
         sortable
@@ -138,17 +141,23 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api'
+import type { DataTableFilterMetaData } from 'primevue/datatable'
 import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { AccessToken, PermissionPolicy } from '~/lib'
 import state from '~/lib/admin-state'
 
 const optionalColumns = ref(['Jeton', 'Visites', 'Familles', 'Catégories', 'Tags', 'Commentaires'])
-const selectedColumns = ref(['Visites'])
 
-const filters = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-})
+const table_key = `dt-state-access-tokens`
+if (!(table_key in state.tablesSelectedColumns)) {
+  state.tablesSelectedColumns[table_key] = ['Visites']
+}
+if (!(table_key in state.tablesFilters)) {
+  state.tablesFilters[table_key] = {
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  }
+}
 
 function all_included(permissionPolicy: PermissionPolicy) {
   return permissionPolicy.allow_all && !permissionPolicy.force_exclude.length

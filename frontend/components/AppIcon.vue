@@ -67,6 +67,7 @@ const iconDict: Record<string, string> = {
   github: mdi.mdiGithub,
   chevronDown: mdi.mdiChevronDown,
   activePage: mdi.mdiMenuRight,
+  listEdit: mdi.mdiPlaylistEdit,
 }
 </script>
 
