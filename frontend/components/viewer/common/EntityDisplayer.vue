@@ -154,7 +154,7 @@
 </template>
 
 <script setup lang="ts">
-import DOMPurify from 'dompurify'
+import { purify_strict } from '~/lib/dompurify'
 import type { Category, PublicComment, ResolvedFetchedEntity } from '~/lib'
 
 const props = defineProps<{
@@ -175,7 +175,7 @@ function commentDisplayTitle(comment: PublicComment) {
 }
 
 function commentWithBreaks(txt: string) {
-  return DOMPurify.sanitize(txt).replaceAll('\n', '<br />')
+  return purify_strict(txt)
 }
 
 function discreteScoreAveragesOnComments() {

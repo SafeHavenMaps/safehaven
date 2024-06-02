@@ -1,4 +1,5 @@
 import { reactive } from 'vue'
+import { purify_lenient } from './dompurify'
 import useClient from '~/lib/admin-client'
 import type {
   Family,
@@ -44,7 +45,10 @@ export class AppState {
   }
 
   get options(): SafeHavenOptions {
-    return this.optionsData!
+    const raw_options = this.optionsData!
+    if (raw_options.general.information != undefined)
+      raw_options.general.information = purify_lenient(raw_options.general.information)
+    return raw_options
   }
 
   async updateConfig(name: string, config: ConfigurationOption): Promise<void> {

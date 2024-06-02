@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import DOMPurify from 'dompurify'
+import { purify_strict } from '~/lib/dompurify'
 
 // eslint-disable-next-line vue/require-prop-types
 const props = defineProps(['fields', 'data'])
@@ -135,7 +135,7 @@ function isUrlField(key) {
 
 function getDataAsEscapedString(key) {
   const txt = props.data[key] ?? ''
-  return DOMPurify.sanitize(txt).replaceAll('\n', '<br />')
+  return purify_strict(txt)
 }
 
 function extractHostnameFromUrl(url) {
