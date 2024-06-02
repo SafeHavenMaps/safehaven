@@ -1,7 +1,4 @@
-use axum::{
-    extract::{Path, State},
-    Json,
-};
+use axum::extract::{Path, State};
 
 use crate::{
     api::{AppError, AppJson, AppState, DbConn},
@@ -31,6 +28,13 @@ pub async fn admin_options_get(
     Ok(AppJson(dyn_config))
 }
 
+fn deserialize_option<T>(value: serde_json::Value) -> Result<T, AppError>
+where
+    T: serde::de::DeserializeOwned,
+{
+    serde_json::from_value(value).map_err(|_| AppError::Validation("Bad request".to_owned()))
+}
+
 #[utoipa::path(
     put,
     path = "/api/admin/options/{name}",
@@ -48,8 +52,28 @@ pub async fn admin_options_update(
     token: AdminUserTokenClaims,
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
-    Json(config): Json<ConfigurationOption>,
+    raw_body: axum::body::Bytes,
 ) -> Result<AppJson<SafeHavenOptions>, AppError> {
+    // Deserialize raw_body into a serde_json::Value first
+    let value: serde_json::Value = serde_json::from_slice(&raw_body)
+        .map_err(|_| AppError::Validation("Bad request".to_owned()))?;
+
+    // Use the name parameter to determine the correct variant
+    let config: ConfigurationOption = match name.as_str() {
+        "general" => ConfigurationOption::General(deserialize_option(value)?),
+        "safe_mode" => ConfigurationOption::SafeMode(deserialize_option(value)?),
+        "cartography_init" => ConfigurationOption::CartographyInit(deserialize_option(value)?),
+        "cartography_cluster" => {
+            ConfigurationOption::CartographyCluster(deserialize_option(value)?)
+        }
+        _ => {
+            return Err(AppError::Validation(format!(
+                "Unknown configuration option: {}",
+                name
+            )));
+        }
+    };
+
     if !token.is_admin {
         return Err(AppError::Unauthorized);
     }
