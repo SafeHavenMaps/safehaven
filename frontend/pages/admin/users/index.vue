@@ -55,8 +55,10 @@
         <template #body="slotProps">
           <AdminEditDeleteButtons
             :id="slotProps.data.id"
-            model-name="l'utilisateur⋅ice"
+            model-name="de l'utilisateur⋅ice"
             :name="slotProps.data.name"
+            :loading="processingRequest[slotProps.data.id]"
+            :prevent-delete="state.username == slotProps.data.name"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/users/${id}`)"
           />
@@ -102,8 +104,17 @@ async function refreshTable() {
 }
 refreshTable()
 
-async function onDelete(user_id: string) {
-  await state.client.deleteUser(user_id)
-  refreshTable()
+const processingRequest: Ref<Record<string, boolean>> = ref({})
+const toast = useToast()
+
+async function onDelete(user_id: string, user_name: string) {
+  try {
+    await state.client.deleteUser(user_id)
+    toast.add({ severity: 'success', summary: 'Succès', detail: `Utilisateur ${user_name} supprimé avec succès`, life: 3000 })
+    refreshTable()
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression de l'utilisateur ${user_name}`, life: 3000 })
+  }
 }
 </script>

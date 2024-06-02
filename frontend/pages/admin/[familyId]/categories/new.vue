@@ -7,7 +7,6 @@
       id="title"
       v-model="editedCategory.title"
       label="Titre"
-      :invalid="!editedCategory.title"
     />
 
     <AdminInputSwitchField
@@ -57,6 +56,7 @@ definePageMeta({
 })
 
 const familyId = useRoute().params.familyId as string
+const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 
 const editedCategory: Ref<NewOrUpdateCategory> = ref({
   border_color: '#FFFFFF',
@@ -67,6 +67,7 @@ const editedCategory: Ref<NewOrUpdateCategory> = ref({
 })
 
 const processingRequest = ref(false)
+const toast = useToast()
 const color_picker_1_invalid = ref(false)
 const color_picker_2_invalid = ref(false)
 
@@ -76,20 +77,28 @@ initAdminLayout(
       'category',
       [],
       [
-        { label: 'Catégories', url: '/admin/categories' },
-        { label: `Édition d'une nouvelle catégorie`, url: `/admin/categories/new` },
+        { label: `${familyTitle}`, url: '/admin/families' },
+        { label: 'Catégories', url: `/admin/${familyId}/categories` },
+        { label: `Édition d'une nouvelle catégorie`, url: `/admin/${familyId}/categories/new` },
       ],
 )
 
 async function onSave() {
   processingRequest.value = true
-  if (editedCategory.value.border_color.length == 6) {
-    editedCategory.value.border_color = `#${editedCategory.value.border_color}`
+  try {
+    if (editedCategory.value.border_color.length == 6) {
+      editedCategory.value.border_color = `#${editedCategory.value.border_color}`
+    }
+    if (editedCategory.value.fill_color.length == 6) {
+      editedCategory.value.fill_color = `#${editedCategory.value.fill_color}`
+    }
+    const { id } = await state.client.createCategory(editedCategory.value)
+    navigateTo(`/admin/${familyId}/categories/new-icon-${id}`)
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Catégorie créée avec succès', life: 3000 })
   }
-  if (editedCategory.value.fill_color.length == 6) {
-    editedCategory.value.fill_color = `#${editedCategory.value.fill_color}`
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de création de la catégorie', life: 3000 })
   }
-  const { id } = await state.client.createCategory(editedCategory.value)
-  navigateTo(`/admin/${familyId}/categories/new-icon-${id}`)
+  processingRequest.value = false
 }
 </script>

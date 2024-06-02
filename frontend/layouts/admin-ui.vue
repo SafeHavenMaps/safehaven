@@ -16,12 +16,13 @@
 
         <div class="flex flex-column w-full">
           <Breadcrumb
-            :home="cardHomeBreadcrumb()"
-            :model="cardItemsBreadcrumb()"
+            :home=" { label: '', url: '' }"
+            :model="currentBreadcrumbs"
             class="breadcrumb p-1"
           >
             <template #item="{ item, props }">
               <NuxtLink
+                v-if="item.label"
                 v-slot="{ href, navigate }"
                 :to="item.url"
                 custom
@@ -119,14 +120,6 @@ const currentBreadcrumbs = ref<BreadcrumbItem[]>([])
 const currentActions = ref<ActionItem[]>([])
 const cardTitle = ref('')
 const cardIconName = ref('')
-
-function cardHomeBreadcrumb() {
-  return currentBreadcrumbs.value[0]!
-}
-
-function cardItemsBreadcrumb() {
-  return currentBreadcrumbs.value.slice(1)
-}
 
 function initAdminLayout(
   newCardTitle: string,

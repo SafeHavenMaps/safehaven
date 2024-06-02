@@ -10,7 +10,6 @@
       v-model="userName"
       label="Nom d'utilisateur⋅ice"
       :variant="userName == name"
-      :invalid="!userName"
     />
 
     <AdminInputSwitchField
@@ -89,7 +88,9 @@ const userName = ref(name)
 const editPassword = ref(false)
 const newPassword = ref('')
 const newPasswordConfirm = ref('')
+
 const processingRequest = ref(false)
+const toast = useToast()
 
 definePageMeta({
   layout: 'admin-ui',
@@ -108,16 +109,23 @@ initAdminLayout(
 
 async function onSave() {
   processingRequest.value = true
-  const newUser: NewOrUpdatedUser = { is_admin: userIsAdmin.value, name: userName.value }
-  if (editPassword.value) {
-    if ((newPassword.value != newPasswordConfirm.value || !newPassword.value))
-      throw new Error('Empty or non-matching password')
-    newUser['password'] = newPassword.value
+  try {
+    const newUser: NewOrUpdatedUser = { is_admin: userIsAdmin.value, name: userName.value }
+    if (editPassword.value) {
+      if ((newPassword.value != newPasswordConfirm.value || !newPassword.value))
+        throw new Error('Empty or non-matching password')
+      newUser['password'] = newPassword.value
+    }
+    await state.client.updateUser(userId, newUser)
+    if (state.username == name) {
+      state.logout()
+    }
+    navigateTo('/admin/users')
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Utilisateur⋅ice modifié⋅e avec succès', life: 3000 })
   }
-  await state.client.updateUser(userId, newUser)
-  if (state.username == name) {
-    state.logout()
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification de l\'utilisateur⋅ice', life: 3000 })
   }
-  navigateTo('/admin/users')
+  processingRequest.value = false
 }
 </script>

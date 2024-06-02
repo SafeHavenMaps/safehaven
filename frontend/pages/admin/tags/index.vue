@@ -77,8 +77,9 @@
         <template #body="slotProps">
           <EditDeleteButtons
             :id="slotProps.data.id"
-            model-name="le tag"
-            :name="slotProps.data.token"
+            model-name="du tag"
+            :name="slotProps.data.title"
+            :loading="processingRequest[slotProps.data.id]"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/tags/${id}`)"
           />
@@ -130,8 +131,17 @@ async function refreshTable() {
 }
 refreshTable()
 
-async function onDelete(tag_id: string) {
-  await state.client.deleteTag(tag_id)
-  refreshTable()
+const processingRequest: Ref<Record<string, boolean>> = ref({})
+const toast = useToast()
+
+async function onDelete(tag_id: string, tag_name: string) {
+  try {
+    await state.client.deleteTag(tag_id)
+    toast.add({ severity: 'success', summary: 'Succès', detail: `Tag ${tag_name} supprimé avec succès`, life: 3000 })
+    refreshTable()
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression du tag ${tag_name}`, life: 3000 })
+  }
 }
 </script>

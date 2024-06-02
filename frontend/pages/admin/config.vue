@@ -208,6 +208,7 @@ let fetchedConfig = state.options
 const editedConfig: Ref<SafeHavenOptions> = ref(JSON.parse(JSON.stringify(fetchedConfig))) // deep copy
 
 const processingRequest = ref(false)
+const toast = useToast()
 
 function hasBeenEdited<T extends keyof SafeHavenOptions>(field: T, subField?: keyof SafeHavenOptions[T]) {
   if (subField) {
@@ -232,16 +233,28 @@ initAdminLayout(
 
 async function onSave(name: keyof SafeHavenOptions, config: ConfigurationOption) {
   processingRequest.value = true
-  await state.client.updateConfig(name, config)
-  fetchedConfig = await state.options
+  try {
+    await state.client.updateConfig(name, config)
+    fetchedConfig = state.options
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Groupe d\'options sauvegardé avec succès', life: 3000 })
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de sauvegarde du groupe d\'options', life: 3000 })
+  }
   processingRequest.value = false
 }
 
 async function onDelete(name: keyof SafeHavenOptions) {
   processingRequest.value = true
-  await state.client.deleteConfig(name)
-  fetchedConfig = await state.options
-  editedConfig.value[name] = JSON.parse(JSON.stringify(fetchedConfig))[name]
+  try {
+    await state.client.deleteConfig(name)
+    fetchedConfig = state.options
+    editedConfig.value[name] = JSON.parse(JSON.stringify(fetchedConfig))[name]
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Groupe d\'options réinitialisé avec succès', life: 3000 })
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de réinitialisation du groupe d\'options', life: 3000 })
+  }
   processingRequest.value = false
 }
 

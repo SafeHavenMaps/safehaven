@@ -124,8 +124,9 @@
         <template #body="slotProps">
           <EditDeleteButtons
             :id="slotProps.data.id"
-            model-name="le jeton d'accès"
-            :name="slotProps.data.token"
+            model-name="du jeton d'accès"
+            :name="slotProps.data.title"
+            :loading="processingRequest[slotProps.data.id]"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/access-tokens/${id}`)"
           />
@@ -181,8 +182,17 @@ async function refreshTable() {
 }
 refreshTable()
 
-async function onDelete(access_token_id: string) {
-  await state.client.deleteAccessToken(access_token_id)
-  refreshTable()
+const processingRequest: Ref<Record<string, boolean>> = ref({})
+const toast = useToast()
+
+async function onDelete(access_token_id: string, access_token_name: string) {
+  try {
+    await state.client.deleteAccessToken(access_token_id)
+    toast.add({ severity: 'success', summary: 'Succès', detail: `Jeton ${access_token_name} supprimée avec succès`, life: 3000 })
+    refreshTable()
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression du jeton ${access_token_name}`, life: 3000 })
+  }
 }
 </script>

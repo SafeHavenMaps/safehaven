@@ -19,7 +19,10 @@
     @click="onDelete"
   >
     <template #icon>
-      <AppIcon icon-name="delete" />
+      <AppIcon
+        :icon-name="props.loading ? 'loading' : 'delete'"
+        :rotating="props.loading"
+      />
     </template>
   </Button>
 </template>
@@ -33,10 +36,12 @@ const props = defineProps<{
   preventDelete?: boolean
   id: string
   name: string
+  loading: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'delete' | 'edit', id: string): void
+  (e: 'edit', id: string): void
+  (e: 'delete', id: string, name: string): void
 }>()
 
 const confirm = useConfirm()
@@ -56,7 +61,7 @@ function onDelete(event: Event) {
     rejectLabel: 'Annuler',
     acceptLabel: 'Confirmer',
     reject: () => {},
-    accept: () => emit('delete', props.id),
+    accept: () => emit('delete', props.id, props.name),
   }
   confirm.require(options)
 }

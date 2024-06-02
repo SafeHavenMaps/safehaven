@@ -8,7 +8,6 @@
       v-model="editedTag.title"
       label="Titre"
       :variant="hasBeenEdited('title')"
-      :invalid="!editedTag.title"
     />
 
     <AdminInputSwitchField
@@ -31,7 +30,6 @@
       v-model="editedTag.filter_description"
       label="Description du filtre"
       :variant="hasBeenEdited('filter_description')"
-      :invalid="!editedTag.filter_description"
       helper-text="(description exposée aux utilisateurices)"
     />
 
@@ -67,6 +65,7 @@ const fetchedTag = await state.client.getTag(tagId)
 const editedTag: Ref<NewOrUpdateTag> = ref(JSON.parse(JSON.stringify(fetchedTag))) // deep copy
 
 const processingRequest = ref(false)
+const toast = useToast()
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
@@ -84,8 +83,15 @@ function hasBeenEdited(field: keyof NewOrUpdateTag) {
 }
 
 async function onSave() {
-  processingRequest.value = true
-  await state.client.updateTag(tagId, editedTag.value)
-  navigateTo('/admin/tags')
+  try {
+    processingRequest.value = true
+    await state.client.updateTag(tagId, editedTag.value)
+    navigateTo('/admin/tags')
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Tag modifié avec succès', life: 3000 })
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification du tag', life: 3000 })
+  }
+  processingRequest.value = false
 }
 </script>

@@ -54,8 +54,9 @@
         <template #body="slotProps">
           <EditDeleteButtons
             :id="slotProps.data.id"
-            model-name="la catégorie"
+            model-name="de la catégorie"
             :name="slotProps.data.title"
+            :loading="processingRequest[slotProps.data.id]"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/${familyId}/categories/${id}`)"
           />
@@ -73,6 +74,7 @@ import type { Category } from '~/lib'
 import state from '~/lib/admin-state'
 
 const familyId = useRoute().params.familyId as string
+const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 
 // Initialize the ref with an empty array, then fetch to update categories asynchronously
 const categories: Ref<Category[]> = ref([])
@@ -106,12 +108,22 @@ initAdminLayout(
     },
   ],
   [
-    { label: 'Catégories', url: '/admin/categories' },
+    { label: `${familyTitle}`, url: '/admin/families' },
+    { label: 'Catégories', url: `/admin/${familyId}/categories` },
   ],
 )
 
-async function onDelete(category_id: string) {
-  await state.client.deleteCategory(category_id)
-  refreshTable()
+const processingRequest: Ref<Record<string, boolean>> = ref({})
+const toast = useToast()
+
+async function onDelete(category_id: string, category_name: string) {
+  try {
+    await state.client.deleteCategory(category_id)
+    toast.add({ severity: 'success', summary: 'Succès', detail: `Catégorie ${category_name} supprimée avec succès`, life: 3000 })
+    refreshTable()
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression de la catégorie ${category_name}`, life: 3000 })
+  }
 }
 </script>

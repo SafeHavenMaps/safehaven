@@ -7,7 +7,6 @@
       id="username"
       v-model="userName"
       label="Nom d'utilisateur⋅ice"
-      :invalid="!userName"
     />
 
     <AdminInputSwitchField
@@ -87,12 +86,21 @@ const userName = ref('')
 const editPassword = ref(true)
 const newPassword = ref('')
 const newPasswordConfirm = ref('')
+
 const processingRequest = ref(false)
+const toast = useToast()
 
 async function onSave() {
   processingRequest.value = true
-  const newUser: NewOrUpdatedUser = { is_admin: userIsAdmin.value, name: userName.value, password: newPassword.value }
-  state.client.createUser(newUser)
-  navigateTo('/admin/user')
+  try {
+    const newUser: NewOrUpdatedUser = { is_admin: userIsAdmin.value, name: userName.value, password: newPassword.value }
+    state.client.createUser(newUser)
+    navigateTo('/admin/user')
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Utilisateur⋅ice modifié⋅e avec succès', life: 3000 })
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification de l\'utilisateur⋅ice', life: 3000 })
+  }
+  processingRequest.value = false
 }
 </script>

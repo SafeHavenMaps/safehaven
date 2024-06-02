@@ -8,14 +8,12 @@
       v-model="editedAccessToken.title"
       label="Titre"
       :variant="hasBeenEdited('title')"
-      :invalid="!editedAccessToken.title"
     />
     <AdminInputTextField
       id="token"
       v-model="editedAccessToken.token"
       label="Jeton"
       :variant="hasBeenEdited('token')"
-      :invalid="!editedAccessToken.token"
       helper-text="(utilisé dans l'url d'accès après /map/ ou /search/)"
     />
 
@@ -94,6 +92,7 @@ const categories = await state.client.listCategories()
 const tags = await state.client.listTags()
 
 const processingRequest = ref(false)
+const toast = useToast()
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
@@ -112,9 +111,16 @@ function hasBeenEdited(field: keyof NewOrUpdateAccessToken) {
 
 async function onSave() {
   processingRequest.value = true
-  updatePolicies(editedAccessToken.value.permissions)
-  await state.client.updateAccessToken(accessTokenId, editedAccessToken.value)
-  navigateTo('/admin/access-tokens')
+  try {
+    updatePolicies(editedAccessToken.value.permissions)
+    await state.client.updateAccessToken(accessTokenId, editedAccessToken.value)
+    navigateTo('/admin/access-tokens')
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Jeton modifié avec succès', life: 3000 })
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification du jeton', life: 3000 })
+  }
+  processingRequest.value = false
 }
 
 function updatePolicies(permissions: Permissions) {

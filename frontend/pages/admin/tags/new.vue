@@ -7,7 +7,6 @@
       id="title"
       v-model="editedTag.title"
       label="Titre"
-      :invalid="!editedTag.title"
     />
 
     <AdminInputSwitchField
@@ -29,7 +28,6 @@
       id="filter_description"
       v-model="editedTag.filter_description"
       label="Description du filtre"
-      :invalid="!editedTag.filter_description"
       helper-text="(description exposée aux utilisateurices)"
     />
 
@@ -67,6 +65,7 @@ const editedTag: Ref<NewOrUpdateTag> = ref({
 })
 
 const processingRequest = ref(false)
+const toast = useToast()
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
@@ -81,7 +80,14 @@ initAdminLayout(
 
 async function onSave() {
   processingRequest.value = true
-  await state.client.createTag(editedTag.value)
-  navigateTo('/admin/tags')
+  try {
+    await state.client.createTag(editedTag.value)
+    navigateTo('/admin/tags')
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Tag créé avec succès', life: 3000 })
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de création du tag', life: 3000 })
+  }
+  processingRequest.value = false
 }
 </script>

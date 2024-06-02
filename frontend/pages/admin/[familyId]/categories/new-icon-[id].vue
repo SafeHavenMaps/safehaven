@@ -26,6 +26,7 @@ definePageMeta({
 })
 
 const familyId = useRoute().params.familyId as string
+const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 const categoryId = useRoute().params.id as string
 
 const fetchedCategory = await state.client.getCategory(categoryId)
@@ -36,8 +37,9 @@ initAdminLayout(
       'category',
       [],
       [
-        { label: 'Catégories', url: '/admin/categories' },
-        { label: `Édition de l'icône de la catégorie ${fetchedCategory.title}`, url: `/admin/categories/${categoryId}` },
+        { label: `${familyTitle}`, url: '/admin/families' },
+        { label: 'Catégories', url: `/admin/${familyId}/categories` },
+        { label: `Édition de l'icône de la catégorie ${fetchedCategory.title}`, url: `/admin/${familyId}/categories/${categoryId}` },
       ],
 )
 </script>

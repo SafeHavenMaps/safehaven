@@ -8,7 +8,6 @@
       v-model="editedCategory.title"
       label="Titre"
       :variant="hasBeenEdited('title')"
-      :invalid="!editedCategory.title"
     />
 
     <AdminInputSwitchField
@@ -65,12 +64,14 @@ definePageMeta({
 })
 
 const familyId = useRoute().params.familyId as string
+const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 const categoryId = useRoute().params.id as string
 
 const fetchedCategory = await state.client.getCategory(categoryId)
 const editedCategory: Ref<NewOrUpdateCategory> = ref(JSON.parse(JSON.stringify(fetchedCategory))) // deep copy
 
 const processingRequest = ref(false)
+const toast = useToast()
 const color_picker_1_invalid = ref(false)
 const color_picker_2_invalid = ref(false)
 
@@ -80,8 +81,9 @@ initAdminLayout(
     'category',
     [],
     [
-      { label: 'Catégories', url: '/admin/categories' },
-      { label: `Édition de la catégorie ${fetchedCategory.title}`, url: `/admin/categories/${categoryId}` },
+      { label: `${familyTitle}`, url: '/admin/families' },
+      { label: 'Catégories', url: `/admin/${familyId}/categories` },
+      { label: `Édition de la catégorie ${fetchedCategory.title}`, url: `/admin/${familyId}/categories/${categoryId}` },
     ],
 )
 
@@ -91,13 +93,20 @@ function hasBeenEdited(field: keyof NewOrUpdateCategory) {
 
 async function onSave() {
   processingRequest.value = true
-  if (editedCategory.value.border_color.length == 6) {
-    editedCategory.value.border_color = `#${editedCategory.value.border_color}`
+  try {
+    if (editedCategory.value.border_color.length == 6) {
+      editedCategory.value.border_color = `#${editedCategory.value.border_color}`
+    }
+    if (editedCategory.value.fill_color.length == 6) {
+      editedCategory.value.fill_color = `#${editedCategory.value.fill_color}`
+    }
+    await state.client.updateCategory(categoryId, editedCategory.value)
+    navigateTo(`/admin/${familyId}/categories`)
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Catégorie modifiée avec succès', life: 3000 })
   }
-  if (editedCategory.value.fill_color.length == 6) {
-    editedCategory.value.fill_color = `#${editedCategory.value.fill_color}`
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification de la catégorie', life: 3000 })
   }
-  await state.client.updateCategory(categoryId, editedCategory.value)
-  navigateTo(`/admin/${familyId}/categories`)
+  processingRequest.value = false
 }
 </script>
