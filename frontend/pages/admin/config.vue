@@ -10,7 +10,6 @@
           v-model="editedConfig.general.title"
           label="Titre"
           :variant="hasBeenEdited('general', 'title')"
-          :invalid="!editedConfig.general.title"
         />
 
         <AdminInputTextField
@@ -18,7 +17,6 @@
           v-model="editedConfig.general.subtitle"
           label="Sous-titre"
           :variant="hasBeenEdited('general', 'subtitle')"
-          :invalid="!editedConfig.general.subtitle"
         />
 
         <AdminInputTextField
@@ -26,7 +24,7 @@
           v-model="editedConfig.general.information"
           label="Information"
           :variant="hasBeenEdited('general', 'information')"
-          :invalid="!editedConfig.general.information"
+          text-length="editor"
         />
 
         <AdminInputTextField
@@ -38,17 +36,63 @@
         />
 
         <span class="flex gap-1 justify-content-end">
-          <NuxtLink to="/admin/tags">
-            <Button
-              label="Annuler"
-              severity="secondary"
-              :disabled="processingRequest"
-            />
-          </NuxtLink>
+          <Button
+            label="Annuler"
+            severity="secondary"
+            :disabled="processingRequest"
+            @click="onCancel('general')"
+          />
           <Button
             label="Réinitialiser"
             :disabled="processingRequest"
             @click="onDelete('general')"
+          />
+          <Button
+            label="Sauvegarder"
+            type="submit"
+            :disabled="processingRequest"
+          />
+        </span>
+      </form>
+    </TabPanel>
+
+    <TabPanel header="Cartographie - Initialisation">
+      <form
+        class="flex flex-column gap-3 max-w-30rem mx-4"
+        @submit.prevent="onSave('cartography_init', editedConfig.cartography_init)"
+      >
+        <AdminInputNumberField
+          id="center_lat"
+          v-model="editedConfig.cartography_init.center_lat"
+          label="Latitude du Centre"
+          :variant="hasBeenEdited('cartography_init', 'center_lat')"
+        />
+
+        <AdminInputNumberField
+          id="center_lng"
+          v-model="editedConfig.cartography_init.center_lng"
+          label="Longitude du Centre"
+          :variant="hasBeenEdited('cartography_init', 'center_lng')"
+        />
+
+        <AdminInputNumberField
+          id="zoom"
+          v-model="editedConfig.cartography_init.zoom"
+          label="Niveau de Zoom"
+          :variant="hasBeenEdited('cartography_init', 'zoom')"
+        />
+
+        <span class="flex gap-1 justify-content-end">
+          <Button
+            label="Annuler"
+            severity="secondary"
+            :disabled="processingRequest"
+            @click="onCancel('cartography_init')"
+          />
+          <Button
+            label="Réinitialiser"
+            :disabled="processingRequest"
+            @click="onDelete('cartography_init')"
           />
           <Button
             label="Sauvegarder"
@@ -68,7 +112,6 @@
           v-model="editedConfig.cartography_cluster.characteristic_distance"
           label="Distance Caractéristique"
           :variant="hasBeenEdited('cartography_cluster', 'characteristic_distance')"
-          :invalid="!editedConfig.cartography_cluster.characteristic_distance"
         />
 
         <AdminInputNumberField
@@ -76,7 +119,6 @@
           v-model="editedConfig.cartography_cluster.declustering_speed"
           label="Vitesse de Dégroupement"
           :variant="hasBeenEdited('cartography_cluster', 'declustering_speed')"
-          :invalid="!editedConfig.cartography_cluster.declustering_speed"
         />
 
         <AdminInputNumberField
@@ -84,71 +126,19 @@
           v-model="editedConfig.cartography_cluster.minimal_cluster_size"
           label="Taille Minimale du Cluster"
           :variant="hasBeenEdited('cartography_cluster', 'minimal_cluster_size')"
-          :invalid="!editedConfig.cartography_cluster.minimal_cluster_size"
         />
 
         <span class="flex gap-1 justify-content-end">
-          <NuxtLink to="/admin/tags">
-            <Button
-              label="Annuler"
-              severity="secondary"
-              :disabled="processingRequest"
-            />
-          </NuxtLink>
+          <Button
+            label="Annuler"
+            severity="secondary"
+            :disabled="processingRequest"
+            @click="onCancel('cartography_cluster')"
+          />
           <Button
             label="Réinitialiser"
             :disabled="processingRequest"
             @click="onDelete('cartography_cluster')"
-          />
-          <Button
-            label="Sauvegarder"
-            type="submit"
-            :disabled="processingRequest"
-          />
-        </span>
-      </form>
-    </TabPanel>
-    <TabPanel header="Cartographie - Initialisation">
-      <form
-        class="flex flex-column gap-3 max-w-30rem mx-4"
-        @submit.prevent="onSave('cartography_init', editedConfig.cartography_init)"
-      >
-        <AdminInputNumberField
-          id="center_lat"
-          v-model="editedConfig.cartography_init.center_lat"
-          label="Latitude du Centre"
-          :variant="hasBeenEdited('cartography_init', 'center_lat')"
-          :invalid="!editedConfig.cartography_init.center_lat"
-        />
-
-        <AdminInputNumberField
-          id="center_lng"
-          v-model="editedConfig.cartography_init.center_lng"
-          label="Longitude du Centre"
-          :variant="hasBeenEdited('cartography_init', 'center_lng')"
-          :invalid="!editedConfig.cartography_init.center_lng"
-        />
-
-        <AdminInputNumberField
-          id="zoom"
-          v-model="editedConfig.cartography_init.zoom"
-          label="Niveau de Zoom"
-          :variant="hasBeenEdited('cartography_init', 'zoom')"
-          :invalid="!editedConfig.cartography_init.zoom"
-        />
-
-        <span class="flex gap-1 justify-content-end">
-          <NuxtLink to="/admin/tags">
-            <Button
-              label="Annuler"
-              severity="secondary"
-              :disabled="processingRequest"
-            />
-          </NuxtLink>
-          <Button
-            label="Réinitialiser"
-            :disabled="processingRequest"
-            @click="onDelete('cartography_init')"
           />
           <Button
             label="Sauvegarder"
@@ -168,7 +158,6 @@
           v-model="editedConfig.safe_mode.popup_message"
           label="Message Pop-up"
           :variant="hasBeenEdited('safe_mode', 'popup_message')"
-          :invalid="!editedConfig.safe_mode.popup_message"
         />
 
         <AdminInputTextField
@@ -176,7 +165,6 @@
           v-model="editedConfig.safe_mode.popup_title"
           label="Titre Pop-up"
           :variant="hasBeenEdited('safe_mode', 'popup_title')"
-          :invalid="!editedConfig.safe_mode.popup_title"
         />
 
         <AdminInputTextField
@@ -184,17 +172,15 @@
           v-model="editedConfig.safe_mode.recaptcha_v3_sitekey"
           label="Clé de Site Recaptcha v3"
           :variant="hasBeenEdited('safe_mode', 'recaptcha_v3_sitekey')"
-          :invalid="!editedConfig.safe_mode.recaptcha_v3_sitekey"
         />
 
         <span class="flex gap-1 justify-content-end">
-          <NuxtLink to="/admin/tags">
-            <Button
-              label="Annuler"
-              severity="secondary"
-              :disabled="processingRequest"
-            />
-          </NuxtLink>
+          <Button
+            label="Annuler"
+            severity="secondary"
+            :disabled="processingRequest"
+            @click="onCancel('safe_mode')"
+          />
           <Button
             label="Réinitialiser"
             :disabled="processingRequest"
@@ -246,19 +232,20 @@ initAdminLayout(
 
 async function onSave(name: keyof SafeHavenOptions, config: ConfigurationOption) {
   processingRequest.value = true
-  console.log(name, config)
   await state.client.updateConfig(name, config)
   fetchedConfig = await state.options
-  console.log(name, fetchedConfig)
   processingRequest.value = false
 }
 
 async function onDelete(name: keyof SafeHavenOptions) {
   processingRequest.value = true
-  console.log(name)
   await state.client.deleteConfig(name)
   fetchedConfig = await state.options
-  console.log(name, fetchedConfig)
+  editedConfig.value[name] = JSON.parse(JSON.stringify(fetchedConfig))[name]
   processingRequest.value = false
+}
+
+async function onCancel(name: keyof SafeHavenOptions) {
+  editedConfig.value[name] = JSON.parse(JSON.stringify(fetchedConfig))[name]
 }
 </script>

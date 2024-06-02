@@ -2,10 +2,26 @@
   <div class="flex flex-column gap-2">
     <label :for="id">{{ label }}</label>
     <InputText
+      v-if="textLength==undefined || textLength=='short'"
       :id="props.id"
       :model-value="props.modelValue"
       :variant="props.variant ? 'filled': 'outlined'"
-      :invalid="props.invalid"
+      :invalid="!props.modelValue || props.invalid"
+      @update:model-value="updateValue"
+    />
+    <Textarea
+      v-if="textLength=='long'"
+      :id="props.id"
+      :model-value="props.modelValue"
+      :variant="props.variant ? 'filled': 'outlined'"
+      :invalid="!props.modelValue || props.invalid"
+      @update:model-value="updateValue"
+    />
+    <Editor
+      v-if="textLength=='editor'"
+      :id="props.id"
+      :model-value="props.modelValue!"
+      editor-style="height:320px"
       @update:model-value="updateValue"
     />
     <small v-if="props.helperText">{{ props.helperText }}</small>
@@ -13,13 +29,16 @@
 </template>
 
 <script setup lang="ts">
+import Editor from 'primevue/editor'
+
 const props = defineProps<{
   id: string
   label: string
   modelValue: string | undefined | null
   variant?: boolean
-  invalid: boolean
+  invalid?: boolean
   helperText?: string
+  textLength?: 'short' | 'long' | 'editor'
 }>()
 
 const emit = defineEmits(['update:modelValue'])
