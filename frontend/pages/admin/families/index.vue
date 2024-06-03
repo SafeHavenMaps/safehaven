@@ -48,17 +48,49 @@
       />
       <Column>
         <template #body="slotProps">
-          <EditDeleteButtons
-            :id="slotProps.data.id"
-            model-name="de la famille"
-            :name="slotProps.data.title"
-            :loading="processingRequest[slotProps.data.id]"
-            secure-delete
-            :secure-delete-entity-count="slotProps.data.entity_count"
-            edit-absent
-            @delete="onDelete"
-            @edit="id => navigateTo(`/admin/families/${id}`)"
-          />
+          <div class="flex gap-2 justify-content-center">
+            <Button
+              outlined
+              rounded
+              severity="warning"
+              @click="navigateTo(`/admin/families/${slotProps.data.id}/general`)"
+            >
+              <template #icon>
+                <AppIcon icon-name="familyGeneralEdit" />
+              </template>
+            </Button>
+            <Button
+              outlined
+              rounded
+              severity="warning"
+              @click="navigateTo(`/admin/families/${slotProps.data.id}/entities`)"
+            >
+              <template #icon>
+                <AppIcon icon-name="entityFormEdit" />
+              </template>
+            </Button>
+            <Button
+              outlined
+              rounded
+              severity="warning"
+              @click="navigateTo(`/admin/families/${slotProps.data.id}/comments`)"
+            >
+              <template #icon>
+                <AppIcon icon-name="commentFormEdit" />
+              </template>
+            </Button>
+            <EditDeleteButtons
+              :id="slotProps.data.id"
+              model-name="de la famille"
+              :name="slotProps.data.title"
+              :loading="processingRequest[slotProps.data.id]"
+              secure-delete
+              :secure-delete-entity-count="slotProps.data.entity_count"
+              edit-absent
+              @delete="onDelete"
+              @edit="id => navigateTo(`/admin/families/${id}`)"
+            />
+          </div>
         </template>
       </Column>
     </DataTable>

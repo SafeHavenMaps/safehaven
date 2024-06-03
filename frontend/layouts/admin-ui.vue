@@ -32,7 +32,7 @@
                   v-bind="props.action"
                   @click="navigate"
                 >
-                  <span class="breadcrumb-text">
+                  <span class="p-text-secondary">
                     {{ item.label }}
                   </span>
                 </a>
@@ -143,10 +143,6 @@ html, body {
 
 .breadcrumb {
   background-color: transparent;
-}
-
-.breadcrumb-text {
-  color: #666;
 }
 
 .sidebar-title {
