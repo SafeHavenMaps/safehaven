@@ -16,7 +16,8 @@ export class AppState {
   private optionsData: SafeHavenOptions | null = null
   private familiesData: Family[] | null = null
 
-  public userAdminCount: number | null = null
+  private countsByFamilyData: Record<string, number[]> = {}
+  private countsByCategoryData: Record<string, number[]> = {}
 
   public is_admin: boolean | null = null
   public username: string | null = null
@@ -102,6 +103,21 @@ export class AppState {
   async deleteFamily(id: string) {
     await this.client.deleteFamily(id)
     this.familiesData = this.familiesData!.filter(f => f.id !== id)
+  }
+
+  // Stats
+  async getEntitiesCommentsCounts() {
+    const [countsByFamily, countsByCategory] = await this.client.getEntitiesCommentsCounts()
+    this.countsByFamilyData = countsByFamily
+    this.countsByCategoryData = countsByCategory
+  }
+
+  get countsByFamily() {
+    return this.countsByFamilyData
+  }
+
+  get countsByCategory() {
+    return this.countsByCategoryData
   }
 }
 

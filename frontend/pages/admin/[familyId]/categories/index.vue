@@ -53,6 +53,12 @@
           />
         </template>
       </Column>
+      <Column
+        v-if="state.tablesSelectedColumns[table_key].includes('Entités')"
+        field="entity_count"
+        header="Entités"
+        sortable
+      />
       <Column>
         <template #body="slotProps">
           <EditDeleteButtons
@@ -82,15 +88,22 @@ if (state.families == null)
   await state.fetchFamilies()
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 
+interface CategoryWCount extends Category { entity_count?: number }
+
 // Initialize the ref with an empty array, then fetch to update categories asynchronously
-const categories: Ref<Category[]> = ref([])
+const categories: Ref<CategoryWCount[]> = ref([])
 async function refreshTable() {
   categories.value = await state.client.listCategories()
   categories.value = categories.value.filter(category => category.family_id == familyId)
+  await state.getEntitiesCommentsCounts()
+  categories.value.forEach((category) => {
+    const counts = state.countsByCategory[category.id]
+    category.entity_count = counts ? counts[0] : 0 // Set to 0 if cat not in count list
+  })
 }
 refreshTable()
 
-const optionalColumns = ref(['Affichage par défaut'])
+const optionalColumns = ref(['Affichage par défaut', 'Entités'])
 const table_key = `dt-state-categories-${familyId}`
 if (!(table_key in state.tablesSelectedColumns)) {
   state.tablesSelectedColumns[table_key] = ['Affichage par défaut']

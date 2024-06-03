@@ -389,5 +389,11 @@ export default function useClient() {
       if (error) throw error
       return data
     },
+
+    async getEntitiesCommentsCounts() {
+      const { data, error } = await this.rawClient.GET('/api/admin/stats/count-comments-entities')
+      if (error) throw error
+      return data
+    },
   }
 }

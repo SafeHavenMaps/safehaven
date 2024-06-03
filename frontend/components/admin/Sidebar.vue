@@ -21,8 +21,13 @@
             :icon-name="item.icon!"
             :dynamic="item.iconDynamic"
           />
+          <Badge
+            v-if="item.pending_count"
+            :value="item.pending_count"
+            severity="danger"
+          />
           <span
-            class="ml-2 flex-grow-1 text-link"
+            class="flex-grow-1 text-link"
           >{{ item.label }}</span>
         </a>
       </NuxtLink>
@@ -38,10 +43,16 @@
           :icon-name="item.icon!"
           :dynamic="item.iconDynamic"
         />
-
+        <Badge
+          v-if="item.pending_count"
+          :value="item.pending_count"
+          severity="danger"
+        />
         <span
-          class="ml-2 flex-grow-1 text-link"
-        >{{ item.label }}</span>
+          class="flex-grow-1 text-link"
+        >
+          {{ item.label }}
+        </span>
 
         <AppIcon
           v-if="item.items"
@@ -49,6 +60,7 @@
           size="16px"
           icon-name="chevronDown"
         />
+
       </a>
     </template>
   </PanelMenu>
@@ -58,6 +70,7 @@
 import state from '~/lib/admin-state'
 
 await state.fetchFamilies()
+await state.getEntitiesCommentsCounts()
 
 function getMenuItems() {
   const currentRoute = useRoute().fullPath
@@ -70,7 +83,7 @@ function getMenuItems() {
 }
 
 function classForLink(active: boolean) {
-  const classes = ['flex', 'align-items-center', 'cursor-pointer', 'text-color', 'px-3', 'py-2']
+  const classes = ['flex', 'align-items-center', 'cursor-pointer', 'text-color', 'px-3', 'py-2', 'gap-2']
 
   if (active) {
     classes.push('active-link')
@@ -89,6 +102,7 @@ const familyNodes = [{
     label: item.title,
     key: item.id,
     icon: item.icon_hash!,
+    pending_count: state.countsByFamily[item.id][1] + state.countsByFamily[item.id][3],
     iconDynamic: true,
     route: '',
     active: false,
@@ -111,11 +125,13 @@ const familyNodes = [{
       {
         label: 'Entités en attente',
         icon: 'pendingEntity',
+        pending_count: state.countsByFamily[item.id][1],
         route: item.id + '/pending-entities',
       },
       {
         label: 'Commentaires en attente',
         icon: 'pendingComment',
+        pending_count: state.countsByFamily[item.id][3],
         route: item.id + '/pending-categories',
       },
     ],
@@ -150,6 +166,7 @@ const nodes = [
   {
     label: 'Familles',
     icon: 'family',
+    pending_count: Object.values(state.countsByFamily).reduce((summed_count, counts) => summed_count + counts[1] + counts[3], 0),
     items: familyNodes,
     active: false,
   },

@@ -4,6 +4,7 @@ pub mod comments;
 pub mod entities;
 pub mod families;
 pub mod options;
+pub mod statistics;
 pub mod tags;
 pub mod users;
 
@@ -131,6 +132,11 @@ pub fn routes(state: &AppState) -> Router<AppState> {
         .route("/comments/:id", get(comments::admin_comment_get))
         .route("/comments/:id", put(comments::admin_comment_update))
         .route("/comments/:id", delete(comments::admin_comment_delete))
+        // stats
+        .route(
+            "/stats/count-comments-entities",
+            get(statistics::admin_count_comments_entities),
+        )
         .route_layer(middleware::from_fn_with_state(
             state.clone(),
             authentication_middleware,

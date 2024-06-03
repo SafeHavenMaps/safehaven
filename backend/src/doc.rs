@@ -96,6 +96,8 @@ use utoipa::OpenApi;
         admin::comments::admin_comment_get,
         admin::comments::admin_comment_update,
         admin::comments::admin_comment_delete,
+        // admin::statistics
+        admin::statistics::admin_count_comments_entities
     ),
     components(schemas(
         // general

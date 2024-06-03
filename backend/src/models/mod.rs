@@ -6,5 +6,6 @@ pub mod entity_cache;
 pub mod family;
 pub mod icon;
 pub mod options;
+pub mod statistics;
 pub mod tag;
 pub mod user;

@@ -1771,6 +1771,36 @@
         }
       }
     },
+    "/api/admin/stats/count-comments-entities": {
+      "get": {
+        "tags": [
+          "admin::statistics"
+        ],
+        "operationId": "admin_count_comments_entities",
+        "responses": {
+          "200": {
+            "description": "Dicts of entities and comments counts by family and category id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/tags": {
       "get": {
         "tags": [

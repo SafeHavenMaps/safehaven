@@ -40,6 +40,12 @@
         header="Titre"
         sortable
       />
+      <Column
+        v-if="state.tablesSelectedColumns[table_key].includes('Entités')"
+        field="entity_count"
+        header="Entités"
+        sortable
+      />
       <Column>
         <template #body="slotProps">
           <EditDeleteButtons
@@ -64,7 +70,7 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Family } from '~/lib'
 import state from '~/lib/admin-state'
 
-const optionalColumns = ref([])
+const optionalColumns = ref(['Entités'])
 
 const table_key = `dt-state-families`
 if (!(table_key in state.tablesSelectedColumns)) {
@@ -97,9 +103,16 @@ initAdminLayout(
   ],
 )
 
-const families: Ref<Family[]> = ref([])
+interface FamilyWCount extends Family { entity_count?: number }
+
+const families: Ref<FamilyWCount[]> = ref([])
 async function refreshTable() {
   families.value = await state.client.listFamilies()
+  await state.getEntitiesCommentsCounts()
+  families.value.forEach((family) => {
+    const counts = state.countsByFamily[family.id]
+    family.entity_count = counts ? counts[0] : 0 // As family not in count list if no entities attached
+  })
 }
 refreshTable()
 
