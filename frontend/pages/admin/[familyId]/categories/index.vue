@@ -66,6 +66,8 @@
             model-name="de la catégorie"
             :name="slotProps.data.title"
             :loading="processingRequest[slotProps.data.id]"
+            secure-delete
+            :secure-delete-entity-count="slotProps.data.entity_count"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/${familyId}/categories/${id}`)"
           />

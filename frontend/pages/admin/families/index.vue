@@ -53,6 +53,9 @@
             model-name="de la famille"
             :name="slotProps.data.title"
             :loading="processingRequest[slotProps.data.id]"
+            secure-delete
+            :secure-delete-entity-count="slotProps.data.entity_count"
+            edit-absent
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/families/${id}`)"
           />
