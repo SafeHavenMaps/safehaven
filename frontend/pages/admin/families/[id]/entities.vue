@@ -5,49 +5,62 @@
     @submit.prevent="onSave"
   >
     <Fieldset
-      v-for="i in [1, 2]"
+      v-for="i in [0, 1, 2]"
       :key="`Page ${i}`"
       :legend="`Page ${i}`"
       :toggleable="true"
+      style="background-color: #F8E8FF;"
+      :pt="{
+        legend: {
+          class: 'border-1 surface-border',
+        },
+      }"
+      @dragover.prevent
+      @drop="onDropPage($event, i)"
     >
       <Fieldset
-        v-for="(field, index) in editedFamily.entity_form.fields"
+        v-for="(field, index) in getFieldsForPage(i)"
         :key="field.key"
-        :toggleable="true"
         :draggable="true"
+        class="draggable-item mb-2"
         :legend="field.display_name"
+        :toggleable="true"
+        :pt="{
+          legend: {
+            class: 'border-1 surface-border',
+          },
+        }"
+        @dragstart="onDragStart($event, field)"
+        @dragover.prevent
+        @drop="onDropField($event, index, i)"
       >
-        <div class="flex gap-5 ">
-          <div class="flex flex-column gap-3 w-28rem">
-            <AdminInputTextField
-              :id="'display_name_' + index"
-              v-model="field.display_name"
-              label="Titre"
-              :variant="hasFieldBeenEdited(index, 'display_name')"
-            />
+        <div class="flex flex-column gap-3 ml-1 mr-5">
+          <div class="flex gap-5">
+            <div class="flex flex-column gap-3 w-28rem">
+              <span class="flex align-items-center gap-2">
+                <label :for="'display_name_' + index">Titre :</label>
+                <InputText
+                  :id="'display_name_' + index"
+                  v-model="field.display_name"
+                  :variant="hasFieldBeenEdited(index, 'display_name') ? 'filled': 'outlined'"
+                  :invalid="!field.display_name"
+                />
+              </span>
 
-            <span class="flex align-items-center gap-2">
-              <Dropdown
-                :id="'field_type' + index"
-                v-model="field.field_type_metadata"
-              />
-              <label :for="'field_type' + index"> Type </label>
-            </span>
+              <span class="flex align-items-center gap-2">
+                <label :for="'field_type_' + index"> Type : </label>
+                <Dropdown
+                  :id="'field_type_' + index"
+                  v-model="field.field_type"
+                />
+                <Button
+                  :id="'field_type_metadata_' + index"
+                  v-model="field.field_type_metadata"
+                  label="Options"
+                  severity="secondary"
+                />
+              </span>
 
-            <span class="flex align-items-center gap-2">
-              <Dropdown
-                :id="'field_type_metadata_' + index"
-                v-model="field.field_type_metadata"
-              />
-              <label :for="'field_type_metadata_' + index"> Options </label>
-            </span>
-
-            <AdminInputTextField
-              :id="'help_' + index"
-              v-model="field.help"
-              label="Help Text"
-              :variant="hasFieldBeenEdited(index, 'help')"
-            />
             <!-- <AdminInputNumberField
                   :id="'form_page_' + index"
                   v-model="field.form_page"
@@ -61,38 +74,44 @@
                   label="Form Weight"
                   :variant="hasFieldBeenEdited(index, 'form_weight')"
                 /> -->
+            </div>
+
+            <div class="flex flex-column gap-3 w-28rem">
+              <span class="flex align-items-center gap-2">
+                <label :for="'display_weight_' + index"> Ordre d'affichage : </label>
+                <Dropdown
+                  :id="'display_weight_' + index"
+                  v-model="field.display_weight"
+                  :options="['Non-affiché publiquement', ...Array.from({ length: 5 }, (v, k) => k + 1)]"
+                /> <!--  field.user_facing -->
+              </span>
+              <span class="flex align-items-center gap-5">
+                <AdminInputSwitchField
+                  :id="'mandatory_' + index"
+                  v-model="field.mandatory"
+                  label="Requis"
+                  :variant="hasFieldBeenEdited(index, 'mandatory')"
+                />
+
+                <AdminInputSwitchField
+                  :id="'indexed_' + index"
+                  v-model="field.indexed"
+                  label="Recherchable"
+                  :variant="hasFieldBeenEdited(index, 'indexed')"
+                />
+              </span>
+            </div>
           </div>
 
-          <div class="flex flex-column gap-3 w-28rem">
-            <span class="flex align-items-center gap-2">
-              <label :for="'display_weight_' + index"> Ordre d'affichage : </label>
-              <Dropdown
-                :id="'display_weight_' + index"
-                v-model="field.display_weight"
-                :options="['Non-affiché publiquement', ...Array.from({ length: 5 }, (v, k) => k+1)]"
-              />
-            </span>
-            <AdminInputSwitchField
-              :id="'mandatory_' + index"
-              v-model="field.mandatory"
-              label="Requis"
-              :variant="hasFieldBeenEdited(index, 'mandatory')"
+          <span class="flex align-items-center gap-2">
+            <label :for="'help_' + index">Texte d'aide :</label>
+            <InputText
+              :id="'help_' + index"
+              v-model="field.help"
+              class="flex flex-grow-1"
+              :variant="hasFieldBeenEdited(index, 'help') ? 'filled': 'outlined'"
             />
-
-            <AdminInputSwitchField
-              :id="'user_facing_' + index"
-              v-model="field.user_facing"
-              label="Affiché publiquement"
-              :variant="hasFieldBeenEdited(index, 'user_facing')"
-            />
-
-            <AdminInputSwitchField
-              :id="'indexed_' + index"
-              v-model="field.indexed"
-              label="Recherchable"
-              :variant="hasFieldBeenEdited(index, 'indexed')"
-            />
-          </div>
+          </span>
         </div>
       </Fieldset>
     </Fieldset>
@@ -123,6 +142,8 @@ definePageMeta({
   layout: 'admin-ui',
 })
 
+type FormField = NewOrUpdateFamily['entity_form']['fields'][number]
+
 const id = useRoute().params.id as string
 
 const fetchedFamily = await state.client.getFamily(id)
@@ -142,8 +163,35 @@ initAdminLayout(
   ],
 )
 
-function hasFieldBeenEdited(index: number, field: keyof NewOrUpdateFamily['entity_form']['fields'][number]) {
+function hasFieldBeenEdited(index: number, field: keyof FormField) {
   return editedFamily.value.entity_form.fields[index][field] !== fetchedFamily.entity_form.fields[index][field]
+}
+
+function getFieldsForPage(pageNumber: number) {
+  return editedFamily.value.entity_form.fields.filter(field => field.form_page === pageNumber)
+}
+
+function onDragStart(event: DragEvent, field: FormField) {
+  event.dataTransfer?.setData('application/json', JSON.stringify({ field }))
+  event.dataTransfer!.effectAllowed = 'move'
+}
+
+function onDropField(event: DragEvent, index: number, page: number) {
+  const droppedField: FormField = JSON.parse(event.dataTransfer!.getData('application/json')).field!
+  const fields = getFieldsForPage(page)
+  const draggedOverField = fields[index]
+  if (droppedField !== draggedOverField) {
+    const draggedIndex = editedFamily.value.entity_form.fields.findIndex(f => f.key === droppedField!.key)
+    editedFamily.value.entity_form.fields.splice(draggedIndex, 1).splice(index, 0, droppedField)
+  }
+}
+
+function onDropPage(event: DragEvent, page: number) {
+  const droppedField: FormField = JSON.parse(event.dataTransfer!.getData('application/json')).field!
+  const fieldIndex = editedFamily.value.entity_form.fields.findIndex(f => f.key === droppedField.key)
+  if (fieldIndex !== -1) {
+    editedFamily.value.entity_form.fields[fieldIndex].form_page = page
+  }
 }
 
 async function onSave() {
@@ -159,3 +207,12 @@ async function onSave() {
   processingRequest.value = false
 }
 </script>
+
+<style scoped>
+.draggable-item {
+  cursor: grab;
+}
+.draggable-item:active {
+  cursor: grabbing;
+}
+</style>
