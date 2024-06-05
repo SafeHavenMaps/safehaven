@@ -1,7 +1,7 @@
 <template>
   <form
     class="flex flex-column gap-3 mx-4"
-    style="width:64rem;"
+    style="width:70rem;"
     @submit.prevent="onSave"
   >
     <Fieldset
@@ -13,6 +13,9 @@
       :pt="{
         legend: {
           class: 'border-1 surface-border',
+        },
+        content: {
+          class: 'flex flex-column align-items-stretch',
         },
       }"
       @dragover.prevent
@@ -30,51 +33,71 @@
           legend: {
             class: 'border-1 surface-border',
           },
+          content: {
+            class: 'flex flex-column gap-3 ml-1 ',
+          },
         }"
         @dragstart="onDragStart($event, field as FormField)"
         @dragover.prevent
         @drop="onDropField($event, index, i)"
       >
-        <div class="flex flex-column gap-3 ml-1 mr-5">
-          <div class="flex gap-5">
-            <div class="flex flex-column gap-3 w-28rem">
-              <span class="flex align-items-center gap-2">
-                <label :for="'display_name_' + index">Titre :</label>
-                <InputText
-                  :id="'display_name_' + index"
-                  v-model="field.display_name"
-                  :variant="hasFieldBeenEdited(index, 'display_name') ? 'filled': 'outlined'"
-                  :invalid="!field.display_name"
-                />
-              </span>
+        <span class="flex gap-5">
+          <div class="flex flex-column gap-3 ">
+            <span class="flex align-items-center gap-2 flex-grow-1">
 
-              <span class="flex align-items-center gap-2">
-                <label :for="'field_type_' + index"> Type : </label>
-                <Dropdown
-                  :id="'field_type_' + index"
-                  v-model="field.field_type"
-                  :options="fieldTypeOptions"
-                  option-label="label"
-                  option-value="value"
-                />
+              <label :for="'display_name_' + index">Titre :</label>
+              <InputText
+                :id="'display_name_' + index"
+                v-model="field.display_name"
+                :variant="hasFieldBeenEdited(index, 'display_name') ? 'filled': 'outlined'"
+                :invalid="!field.display_name"
+                class="mr-4"
+              />
+              <label :for="'key_' + index">Clé :</label>
+              <InputText
+                :id="'key_' + index"
+                v-model="field.key"
+                :variant="hasFieldBeenEdited(index, 'key') ? 'filled': 'outlined'"
+                :invalid="!field.key"
+                class="w-12rem"
+              />
+              <Badge
+                v-tooltip.bottom="`Clé unique d'identification du champ.
+                  Si modifiée, les anciennes entités ayant l'ancienne clé ne pourront plus afficher ce champ,
+                  sauf si un champ du formulaire vient à porter de nouveau l'ancienne clé.`"
+                value="!"
+                severity="secondary"
+                class="mr-2 border-1 border-black-alpha-10"
+              />
+            </span>
 
-                <Dropdown
-                  v-if="['SingleLineText'].includes(field.field_type)"
-                  :id="'field_type_' + index"
-                  v-model="(field.field_type_metadata as StringFieldTypeMetadata).format"
-                  :options="fieldStringTypeOptions"
-                  option-label="label"
-                  option-value="value"
-                />
-                <Button
-                  v-if="['EnumSingleOption', 'EnumMultiOption'].includes(field.field_type)"
-                  :id="'field_type_metadata_' + index"
-                  v-model="field.field_type_metadata"
-                  label="Options"
-                  class="border-1 border-black-alpha-10"
-                  severity="secondary"
-                />
-              </span>
+            <span class="flex align-items-center gap-2">
+              <label :for="'field_type_' + index"> Type : </label>
+              <Dropdown
+                :id="'field_type_' + index"
+                v-model="field.field_type"
+                :options="fieldTypeOptions"
+                option-label="label"
+                option-value="value"
+              />
+
+              <Dropdown
+                v-if="['SingleLineText'].includes(field.field_type)"
+                :id="'field_type_' + index"
+                v-model="(field.field_type_metadata as StringFieldTypeMetadata).format"
+                :options="fieldStringTypeOptions"
+                option-label="label"
+                option-value="value"
+              />
+              <Button
+                v-if="['EnumSingleOption', 'EnumMultiOption'].includes(field.field_type)"
+                :id="'field_type_metadata_' + index"
+                v-model="field.field_type_metadata"
+                label="Options"
+                class="border-1 border-black-alpha-10"
+                severity="secondary"
+              />
+            </span>
 
             <!-- <AdminInputNumberField
                   :id="'form_page_' + index"
@@ -89,46 +112,75 @@
                   label="Form Weight"
                   :variant="hasFieldBeenEdited(index, 'form_weight')"
                 /> -->
-            </div>
-
-            <div class="flex flex-column gap-3 w-28rem">
-              <span class="flex align-items-center gap-2">
-                <label :for="'display_weight_' + index"> Ordre d'affichage : </label>
-                <Dropdown
-                  :id="'display_weight_' + index"
-                  v-model="field.display_weight"
-                  :options="['Non-affiché publiquement', ...Array.from({ length: 5 }, (v, k) => k + 1)]"
-                /> <!--  field.user_facing -->
-              </span>
-              <span class="flex align-items-center gap-5">
-                <AdminInputSwitchField
-                  :id="'mandatory_' + index"
-                  v-model="field.mandatory"
-                  label="Requis"
-                  :variant="hasFieldBeenEdited(index, 'mandatory')"
-                />
-
-                <AdminInputSwitchField
-                  :id="'indexed_' + index"
-                  v-model="field.indexed"
-                  label="Recherchable"
-                  :variant="hasFieldBeenEdited(index, 'indexed')"
-                />
-              </span>
-            </div>
           </div>
 
-          <span class="flex align-items-center gap-2">
-            <label :for="'help_' + index">Texte d'aide :</label>
-            <InputText
-              :id="'help_' + index"
-              v-model="field.help"
-              class="flex flex-grow-1"
-              :variant="hasFieldBeenEdited(index, 'help') ? 'filled': 'outlined'"
-            />
-          </span>
-        </div>
+          <div class="flex flex-column gap-3 w-20rem">
+            <span class="flex align-items-center gap-2">
+              <label :for="'display_weight_' + index"> Ordre d'affichage : </label>
+              <Dropdown
+                :id="'display_weight_' + index"
+                :model-value="display_indexes[field.key]"
+                option-label="label"
+                option-value="value"
+                :options="[{ value: 'notDisplayed',
+                             label: 'Non-affiché publiquement' }, ...Array.from({ length: max_display_index }, (_, i) => ({ value: i + 1, label: i + 1 }))]"
+                @update:model-value="(new_index : 'notDisplayed' | number) => onDisplayIndexChange(field.key, new_index) "
+              /> <!--  field.user_facing -->
+            </span>
+            <span class="flex align-items-center gap-5">
+              <AdminInputSwitchField
+                :id="'mandatory_' + index"
+                v-model="field.mandatory"
+                label="Requis"
+                :variant="hasFieldBeenEdited(index, 'mandatory')"
+              />
+
+              <AdminInputSwitchField
+                :id="'indexed_' + index"
+                v-model="field.indexed"
+                label="Recherchable"
+                :variant="hasFieldBeenEdited(index, 'indexed')"
+              />
+            </span>
+          </div>
+          <Button
+            outlined
+            rounded
+            severity="primary"
+          >
+            <template #icon>
+              <AppIcon
+                icon-name="delete"
+              />
+            </template>
+          </Button>
+        </span>
+
+        <span class="flex align-items-center gap-2 mr-3">
+          <label :for="'help_' + index">Texte d'aide :</label>
+          <InputText
+            :id="'help_' + index"
+            v-model="field.help"
+            class="flex flex-grow-1"
+            :variant="hasFieldBeenEdited(index, 'help') ? 'filled': 'outlined'"
+          />
+        </span>
       </Fieldset>
+      <div class="flex justify-content-center">
+        <Button
+          outlined
+          rounded
+          severity="primary"
+          label="Nouveau champ"
+        >
+          <template #icon>
+            <AppIcon
+              icon-name="add"
+              class="mr-2"
+            />
+          </template>
+        </Button>
+      </div>
     </Fieldset>
 
     <span class="flex gap-1 justify-content-end">
@@ -167,6 +219,21 @@ const editedFamily: Ref<NewOrUpdateFamily> = ref(JSON.parse(JSON.stringify(fetch
 const processingRequest = ref(false)
 const toast = useToast()
 
+const page_count = ref(1 + Math.max(...editedFamily.value.entity_form.fields.map(field => field.form_page)))
+const display_indexes: Ref<Record<string, 'notDisplayed' | number>> = ref({})
+const max_display_index = ref(0)
+
+// Initialize display_indexes and max_display_index
+editedFamily.value.entity_form.fields.forEach((field) => {
+  if (field.user_facing) {
+    display_indexes.value[field.key] = field.display_weight
+    max_display_index.value = Math.max(max_display_index.value, field.display_weight)
+  }
+  else {
+    display_indexes.value[field.key] = 'notDisplayed'
+  }
+})
+
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
   `Édition du formulaire d'ajout d'entités de la famille ${fetchedFamily.title}`,
@@ -181,8 +248,6 @@ initAdminLayout(
 function hasFieldBeenEdited(index: number, field: keyof FormField) {
   return editedFamily.value.entity_form.fields[index][field] !== fetchedFamily.entity_form.fields[index][field]
 }
-
-const page_count = ref(1 + Math.max(...editedFamily.value.entity_form.fields.map(field => field.form_page)))
 
 function getFieldsForPage(pageNumber: number) {
   return editedFamily.value.entity_form.fields.filter(field => field.form_page === pageNumber)
@@ -236,6 +301,62 @@ function onDropPage(event: DragEvent, page: number) {
   if (fieldIndex !== -1) {
     editedFamily.value.entity_form.fields[fieldIndex].form_page = page
   }
+  updatePageCount()
+}
+
+function onKeyChange(old_key: string, new_key: string) {
+  editedFamily.value.entity_form.fields.forEach((field) => {
+    if (field.key == new_key) {
+      toast.add({ severity: 'error', summary: 'Erreur', detail: 'Clé déjà actuellement utilisée par un autre champ', life: 3000 })
+      return
+    }
+  })
+  editedFamily.value.entity_form.fields.forEach((field) => {
+    if (field.key == old_key) {
+      field.key = new_key
+      toast.add({ severity: 'error', summary: 'Erreur', detail: 'Clé déjà actuellement utilisée par un autre champ', life: 3000 })
+      return
+    }
+  })
+  const display_index = display_indexes.value[old_key]
+  // risk of deleting hidden key of the record, such as __data, but this issue is present as soon as such a key is set
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  delete display_indexes.value[old_key]
+  display_indexes.value[new_key] = display_index
+}
+
+function onDisplayIndexChange(key: string, new_display_index: 'notDisplayed' | number) {
+  const old_display_index = display_indexes.value[key]
+  if (old_display_index === new_display_index) return
+  if (old_display_index === 'notDisplayed') {
+    max_display_index.value += 1
+  }
+  else {
+    // Decrement indexes greater than the old display index
+    Object.entries(display_indexes.value).forEach(([key_i, display_index_i]) => {
+      if (display_index_i !== 'notDisplayed' && display_index_i > old_display_index) {
+        display_indexes.value[key_i] = display_index_i - 1
+      }
+    })
+  }
+  if (new_display_index === 'notDisplayed') {
+    max_display_index.value -= 1
+  }
+  else {
+    // Increment indexes greater than or equal to the new display index
+    Object.entries(display_indexes.value).forEach(([key_i, display_index_i]) => {
+      if (display_index_i !== 'notDisplayed' && display_index_i >= new_display_index) {
+        display_indexes.value[key_i] = display_index_i + 1
+      }
+    })
+  }
+  display_indexes.value[key] = new_display_index
+}
+
+function onDelete(key: string, index: number) {
+  editedFamily.value.entity_form.fields.splice(index, 1)
+  if (display_indexes.value[key] != 'notDisplayed')
+    max_display_index.value -= 1
   updatePageCount()
 }
 
