@@ -14,14 +14,14 @@
       id="entity_form_title"
       v-model="editedFamily.entity_form.title"
       label="Titre du formulaire d'ajout d'entité"
-      :variant="hasBeenEdited('entity_form')"
+      :variant="editedFamily.entity_form.title !== fetchedFamily.entity_form.title"
     />
 
     <AdminInputTextField
       id="comment_form_title"
       v-model="editedFamily.comment_form.title"
       label="Titre du formulaire d'ajout de commentaire"
-      :variant="hasBeenEdited('comment_form')"
+      :variant="editedFamily.comment_form.title !== fetchedFamily.comment_form.title"
     />
 
     <span class="flex align-items-center gap-2">
@@ -79,7 +79,7 @@ initAdminLayout(
   [],
   [
     { label: 'Familles', url: '/admin/families' },
-    { label: `Édition de la famille ${fetchedFamily.title}`, url: `/admin/families/${id}` },
+    { label: `Édition de l'affichage de la famille ${fetchedFamily.title}`, url: `/admin/families/${id}` },
   ],
 )
 

@@ -46,7 +46,6 @@ export type PermissionPolicy = api.components['schemas']['PermissionPolicy']
 export type Permissions = api.components['schemas']['Permissions']
 export type AccessToken = api.components['schemas']['AccessToken'] & { permissions: Permissions }
 
-export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily']
 export type User = api.components['schemas']['User']
 export type NewOrUpdatedUser = api.components['schemas']['NewOrUpdatedUser']
 export type SafeHavenOptions = api.components['schemas']['SafeHavenOptions']
@@ -85,4 +84,45 @@ export type PaginatedCachedEntitiesWithLocation = PaginatedCachedEntities & {
   })[]
 }
 
-declare module 'uuid'
+export type StringFieldTypeMetadata = {
+  format: string
+}
+
+export type OptionsFieldTypeMetadata = {
+  options: {
+    value: number
+    label: string
+    hidden: boolean
+  }[]
+}
+
+export type EventsFieldTypeMetadata = {
+  event_types: {
+    value: number
+    label: string
+    color: string
+  }[]
+}
+
+export type FieldTypeMetadataEnum = {
+  field_type: 'SingleLineText'
+  field_type_metadata: StringFieldTypeMetadata
+} | {
+  field_type: 'EnumSingleOption' | 'EnumMultiOption'
+  field_type_metadata: OptionsFieldTypeMetadata
+} | {
+  field_type: 'EventList'
+  field_type_metadata: EventsFieldTypeMetadata
+} | {
+  field_type_metadata?: null
+}
+
+export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily'] & {
+  comment_form: {
+    fields: FieldTypeMetadataEnum[]
+  }
+} & {
+  entity_form: {
+    fields: FieldTypeMetadataEnum[]
+  }
+}

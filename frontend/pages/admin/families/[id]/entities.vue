@@ -5,11 +5,11 @@
     @submit.prevent="onSave"
   >
     <Fieldset
-      v-for="i in [0, 1, 2]"
+      v-for="i in Array.from({ length: page_count }, (_, i) => i + 1)"
       :key="`Page ${i}`"
-      :legend="`Page ${i}`"
+      :legend="i==page_count ? 'Nouvelle page' : `Page ${i}`"
       :toggleable="true"
-      style="background-color: #F8E8FF;"
+      style="background-color: #FAF8FF;"
       :pt="{
         legend: {
           class: 'border-1 surface-border',
@@ -25,12 +25,13 @@
         class="draggable-item mb-2"
         :legend="field.display_name"
         :toggleable="true"
+        style="background-color: #FAEFFF;"
         :pt="{
           legend: {
             class: 'border-1 surface-border',
           },
         }"
-        @dragstart="onDragStart($event, field)"
+        @dragstart="onDragStart($event, field as FormField)"
         @dragover.prevent
         @drop="onDropField($event, index, i)"
       >
@@ -52,11 +53,25 @@
                 <Dropdown
                   :id="'field_type_' + index"
                   v-model="field.field_type"
+                  :options="fieldTypeOptions"
+                  option-label="label"
+                  option-value="value"
+                />
+
+                <Dropdown
+                  v-if="['SingleLineText'].includes(field.field_type)"
+                  :id="'field_type_' + index"
+                  v-model="(field.field_type_metadata as StringFieldTypeMetadata).format"
+                  :options="fieldStringTypeOptions"
+                  option-label="label"
+                  option-value="value"
                 />
                 <Button
+                  v-if="['EnumSingleOption', 'EnumMultiOption'].includes(field.field_type)"
                   :id="'field_type_metadata_' + index"
                   v-model="field.field_type_metadata"
                   label="Options"
+                  class="border-1 border-black-alpha-10"
                   severity="secondary"
                 />
               </span>
@@ -135,7 +150,7 @@
 
 <script setup lang="ts">
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { NewOrUpdateFamily } from '~/lib'
+import type { NewOrUpdateFamily, StringFieldTypeMetadata } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
@@ -154,7 +169,7 @@ const toast = useToast()
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  `Édition de la famille ${fetchedFamily.title}`,
+  `Édition du formulaire d'ajout d'entités de la famille ${fetchedFamily.title}`,
   'family',
   [],
   [
@@ -167,8 +182,36 @@ function hasFieldBeenEdited(index: number, field: keyof FormField) {
   return editedFamily.value.entity_form.fields[index][field] !== fetchedFamily.entity_form.fields[index][field]
 }
 
+const page_count = ref(1 + Math.max(...editedFamily.value.entity_form.fields.map(field => field.form_page)))
+
 function getFieldsForPage(pageNumber: number) {
   return editedFamily.value.entity_form.fields.filter(field => field.form_page === pageNumber)
+}
+
+function updatePageCount() {
+  // Remove empty pages (except for the very last page)
+  const deletedPages: number[] = []
+  for (let i = 1; i < page_count.value; i++) {
+    if (!getFieldsForPage(i).length) {
+      page_count.value -= 1
+      deletedPages.push(i)
+    }
+  }
+  editedFamily.value.entity_form.fields.forEach(
+    (field) => {
+      let page_displacement_count = 0
+      deletedPages.forEach(
+        (deleted_page) => {
+          if (field.form_page >= deleted_page) page_displacement_count += 1
+        },
+      )
+      field.form_page -= page_displacement_count
+    },
+  )
+  // Add an empty page at the end if not already present
+  if (getFieldsForPage(page_count.value).length) {
+    page_count.value += 1
+  }
 }
 
 function onDragStart(event: DragEvent, field: FormField) {
@@ -182,7 +225,8 @@ function onDropField(event: DragEvent, index: number, page: number) {
   const draggedOverField = fields[index]
   if (droppedField !== draggedOverField) {
     const draggedIndex = editedFamily.value.entity_form.fields.findIndex(f => f.key === droppedField!.key)
-    editedFamily.value.entity_form.fields.splice(draggedIndex, 1).splice(index, 0, droppedField)
+    editedFamily.value.entity_form.fields.splice(draggedIndex, 1)
+    editedFamily.value.entity_form.fields.splice(index, 0, droppedField)
   }
 }
 
@@ -192,6 +236,7 @@ function onDropPage(event: DragEvent, page: number) {
   if (fieldIndex !== -1) {
     editedFamily.value.entity_form.fields[fieldIndex].form_page = page
   }
+  updatePageCount()
 }
 
 async function onSave() {
@@ -206,6 +251,25 @@ async function onSave() {
   }
   processingRequest.value = false
 }
+
+const fieldTypeOptions = [
+  { label: 'Texte court', value: 'SingleLineText' },
+  { label: 'Texte long', value: 'MultiLineText' },
+  { label: 'Éditeur riche', value: 'EditorText' },
+  { label: 'Vrai / Faux', value: 'Boolean' },
+  { label: 'Nombre', value: 'Number' },
+  { label: 'Score', value: 'DiscreteScore' },
+  { label: 'Date', value: 'Date' },
+  { label: 'Choix Unique', value: 'EnumSingleOption' },
+  { label: 'Choix Multiples', value: 'EnumMultiOption' },
+  { label: 'Liste d\'événements', value: 'EventList' },
+]
+
+const fieldStringTypeOptions = [
+  { label: 'URL', value: 'url' },
+  { label: 'Téléphone', value: 'phone-number' },
+  { label: 'E-mail', value: 'e-mail' },
+]
 </script>
 
 <style scoped>
