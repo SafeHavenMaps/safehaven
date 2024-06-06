@@ -46,7 +46,7 @@
         header="Entités"
         sortable
       />
-      <Column>
+      <Column v-if="state.is_admin">
         <template #body="slotProps">
           <div class="flex gap-2 justify-content-center">
             <Button

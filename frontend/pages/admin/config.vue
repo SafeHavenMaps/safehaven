@@ -43,11 +43,13 @@
             @click="onCancel('general')"
           />
           <Button
+            v-if="state.is_admin"
             label="Réinitialiser"
             :disabled="processingRequest"
             @click="onDelete('general')"
           />
           <Button
+            v-if="state.is_admin"
             label="Sauvegarder"
             type="submit"
             :disabled="processingRequest"
@@ -90,11 +92,13 @@
             @click="onCancel('cartography_init')"
           />
           <Button
+            v-if="state.is_admin"
             label="Réinitialiser"
             :disabled="processingRequest"
             @click="onDelete('cartography_init')"
           />
           <Button
+            v-if="state.is_admin"
             label="Sauvegarder"
             type="submit"
             :disabled="processingRequest"
@@ -136,11 +140,13 @@
             @click="onCancel('cartography_cluster')"
           />
           <Button
+            v-if="state.is_admin"
             label="Réinitialiser"
             :disabled="processingRequest"
             @click="onDelete('cartography_cluster')"
           />
           <Button
+            v-if="state.is_admin"
             label="Sauvegarder"
             type="submit"
             :disabled="processingRequest"
@@ -182,11 +188,13 @@
             @click="onCancel('safe_mode')"
           />
           <Button
+            v-if="state.is_admin"
             label="Réinitialiser"
             :disabled="processingRequest"
             @click="onDelete('safe_mode')"
           />
           <Button
+            v-if="state.is_admin"
             label="Sauvegarder"
             type="submit"
             :disabled="processingRequest"

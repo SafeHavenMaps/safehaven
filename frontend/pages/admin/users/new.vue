@@ -97,7 +97,7 @@ async function onSave() {
   try {
     const newUser: NewOrUpdatedUser = { is_admin: userIsAdmin.value, name: userName.value, password: newPassword.value }
     state.client.createUser(newUser)
-    navigateTo('/admin/user')
+    navigateTo('/admin/users')
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Utilisateur⋅ice modifié⋅e avec succès', life: 3000 })
   }
   catch {

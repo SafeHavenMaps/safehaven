@@ -16,13 +16,8 @@ use super::AdminUserTokenClaims;
     )
 )]
 pub async fn admin_options_get(
-    token: AdminUserTokenClaims,
     State(app_state): State<AppState>,
 ) -> Result<AppJson<SafeHavenOptions>, AppError> {
-    if !token.is_admin {
-        return Err(AppError::Unauthorized);
-    }
-
     let dyn_config = app_state.dyn_config.read().await.clone();
 
     Ok(AppJson(dyn_config))

@@ -155,6 +155,7 @@ const nodes = [
     label: 'Utilisateur⋅ices',
     icon: 'user',
     route: 'users',
+    admin_only: true,
     active: false,
   },
   {
@@ -176,7 +177,7 @@ const nodes = [
     route: 'tags',
     active: false,
   },
-]
+].filter(node => !node.admin_only || state.is_admin)
 </script>
 
 <style>

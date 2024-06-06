@@ -12,6 +12,8 @@ use crate::{
     },
 };
 
+use super::AdminUserTokenClaims;
+
 #[utoipa::path(
     get,
     path = "/api/admin/families",
@@ -36,9 +38,14 @@ pub async fn admin_families_list(
     )
 )]
 pub async fn admin_family_new(
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Json(new_family): Json<NewOrUpdateFamily>,
 ) -> Result<AppJson<Family>, AppError> {
+    if !token.is_admin {
+        return Err(AppError::Unauthorized);
+    }
+
     Ok(AppJson(Family::new(new_family, &mut conn).await?))
 }
 
@@ -75,10 +82,15 @@ pub async fn admin_family_get(
     )
 )]
 pub async fn admin_family_update(
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(new_family): Json<NewOrUpdateFamily>,
 ) -> Result<AppJson<Family>, AppError> {
+    if !token.is_admin {
+        return Err(AppError::Unauthorized);
+    }
+
     Ok(AppJson(Family::update(id, new_family, &mut conn).await?))
 }
 
@@ -96,10 +108,15 @@ pub async fn admin_family_update(
     )
 )]
 pub async fn admin_family_update_icon(
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     mut multipart: Multipart,
 ) -> Result<(), AppError> {
+    if !token.is_admin {
+        return Err(AppError::Unauthorized);
+    }
+
     let field = multipart
         .next_field()
         .await
@@ -134,9 +151,14 @@ pub async fn admin_family_update_icon(
     )
 )]
 pub async fn admin_family_delete(
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
+    if !token.is_admin {
+        return Err(AppError::Unauthorized);
+    }
+
     Family::delete(id, &mut conn).await?;
     Ok(AppJson(()))
 }
@@ -154,9 +176,14 @@ pub async fn admin_family_delete(
     )
 )]
 pub async fn admin_family_delete_icon(
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
+    if !token.is_admin {
+        return Err(AppError::Unauthorized);
+    }
+
     Icon::delete_for_family(id, &mut conn).await?;
     Ok(AppJson(()))
 }
