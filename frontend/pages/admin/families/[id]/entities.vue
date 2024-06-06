@@ -2,7 +2,7 @@
   <div>
     <form
       class="flex flex-column gap-3 mx-4"
-      style="width:70rem;"
+      style="width:68rem;"
       @submit.prevent="onSave"
     >
       <Fieldset
@@ -42,8 +42,40 @@
           @dragover.prevent
           @drop="onDropField($event, index, page)"
         >
+          <template #legend>
+            {{ field.display_name }}
+            <Button
+              v-tooltip.top="`Ce champ ne sera plus visible sur les entités le comportant déjà
+                tant que la clé n'est pas réutilisée, mais les informations resteront en base de donnée.`"
+              text
+              class="m-0 p-0 ml-2"
+              severity="primary"
+              @click=" (event: Event) => confirm.require({
+                target: event.currentTarget as HTMLElement,
+                group: 'delete',
+                message: `Confirmer la suppression du champ`,
+                objectId: `${field.display_name}`,
+                icon: 'warning',
+                rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+                acceptClass: 'p-button-sm',
+                rejectLabel: 'Annuler',
+                acceptLabel: 'Confirmer',
+                reject: () => {},
+                accept: () => onFieldDelete(field.key),
+              } as ExtendedConfirmationOptions)"
+            >
+              <template #default>
+                <AppIcon
+                  icon-name="delete"
+                />
+              </template>
+            </Button>
+          </template>
           <span class="flex gap-5">
-            <div class="flex flex-column gap-3 ">
+            <div
+              class="flex flex-column gap-3 mr-5"
+              style="min-width: 50%;"
+            >
               <span class="flex align-items-center gap-2 flex-grow-1">
 
                 <label :for="'display_name_' + index">Titre :</label>
@@ -52,23 +84,16 @@
                   v-model="field.display_name"
                   :variant="hasFieldAttributeBeenEdited(index, 'display_name') ? 'filled': 'outlined'"
                   :invalid="!field.display_name"
-                  class="mr-4"
+                  class="mr-4 flex-grow-1"
                 />
-                <label :for="'key_' + index">Clé :</label>
-                <InputText
-                  :id="'key_' + index"
-                  v-model="field.key"
-                  :variant="hasFieldAttributeBeenEdited(index, 'key') ? 'filled': 'outlined'"
-                  :invalid="!field.key"
-                  class="w-12rem"
-                />
-                <Badge
-                  v-tooltip.bottom="`Clé unique d'identification du champ.
-                  Si modifiée, les anciennes entités ayant l'ancienne clé ne pourront plus afficher ce champ,
-                  sauf si un champ du formulaire vient à porter de nouveau l'ancienne clé.`"
-                  value="!"
-                  severity="secondary"
-                  class="mr-2 border-1 border-black-alpha-10"
+                <Button
+                  label="Modifier la clé"
+                  outlined
+                  @click="() => {
+                    editKeyField = field as FormField
+                    editKeyKey = field.key
+                    editKeyVisible = true
+                  }"
                 />
               </span>
 
@@ -99,28 +124,10 @@
                   class="border-1 border-black-alpha-10"
                   severity="secondary"
                 />
-                <Button
-                  label="erw"
-                  @click="() => console.log(field.field_type_metadata)"
-                />
               </span>
-
-            <!-- <AdminInputNumberField
-                  :id="'form_page_' + index"
-                  v-model="field.form_page"
-                  label="Form Page"
-                  :variant="hasFieldBeenEdited(index, 'form_page')"
-                />
-
-                <AdminInputNumberField
-                  :id="'form_weight_' + index"
-                  v-model="field.form_weight"
-                  label="Form Weight"
-                  :variant="hasFieldBeenEdited(index, 'form_weight')"
-                /> -->
             </div>
 
-            <div class="flex flex-column gap-3 w-20rem">
+            <div class="flex flex-column gap-3">
               <span class="flex align-items-center gap-2">
                 <label :for="'display_weight_' + index"> Ordre d'affichage : </label>
                 <Dropdown
@@ -149,17 +156,7 @@
                 />
               </span>
             </div>
-            <Button
-              outlined
-              rounded
-              severity="primary"
-            >
-              <template #icon>
-                <AppIcon
-                  icon-name="delete"
-                />
-              </template>
-            </Button>
+
           </span>
 
           <span class="flex align-items-center gap-2 mr-3">
@@ -212,57 +209,112 @@
     </form>
 
     <Dialog
+      v-if="editKeyVisible"
+      v-model:visible="editKeyVisible"
+      modal
+      dismissable-mask
+      :closable="false"
+      :header="`Édition de la clé du champ ${editKeyField!.display_name}`"
+    >
+      <div
+        class="flex flex-column gap-3"
+      >
+        <span class="flex align-items-center gap-2">
+          <label for="display_name_add">Titre :</label>
+          <InputText
+            id="display_name_add"
+            v-model="editKeyField!.display_name"
+            :invalid="!editKeyField!.display_name"
+            placeholder="Adresse du coiffeur"
+          />
+        </span>
+        <span class="flex align-items-center gap-2 ml-2">
+          <label for="key_add">Clé :</label>
+          <InputText
+            id="key_add"
+            v-model="editKeyKey"
+            :invalid="!editKeyKey"
+            placeholder="hairdresser_adress"
+          />
+          <Badge
+            v-tooltip.bottom="`Clé unique d'identification du champ.
+          Si modifiée, les anciennes entités ayant l'ancienne clé ne pourront plus afficher ce champ,
+          sauf si un champ du formulaire avec un type compatible vient à porter de nouveau l'ancienne clé.`"
+            value="!"
+          />
+        </span>
+        <div class="flex justify-content-end gap-2">
+          <Button
+            type="button"
+            label="Annuler"
+            severity="secondary"
+            @click="editKeyVisible = false"
+          />
+          <Button
+            :disabled="!editKeyKey || !editKeyField"
+            type="button"
+            label="Confirmer"
+            @click="() => onKeyChange(editKeyField as FormField, editKeyKey)"
+          />
+        </div>
+      </div>
+    </Dialog>
+
+    <Dialog
       v-model:visible="addFieldVisible"
       modal
       dismissable-mask
       :closable="false"
       header="Ajout d'un nouveau champ"
-      :style="{ width: '25rem' }"
     >
-      <span class="flex align-items-center gap-2 flex-grow-1">
-
-        <label for="display_name_add">Titre :</label>
-        <InputText
-          id="display_name_add"
-          v-model="addFieldTitle"
-          :invalid="!addFieldTitle"
-          placeholder="Adresse du coiffeur"
-        />
-        <label for="key_add">Clé :</label>
-        <InputText
-          id="key_add"
-          v-model="addFieldKey"
-          :invalid="!addFieldKey"
-          placeholder="hairdresser_adress"
-        />
-        <Badge
-          v-tooltip.bottom="`Clé unique d'identification du champ.
+      <div
+        class="flex flex-column gap-3"
+      >
+        <span class="flex align-items-center gap-2">
+          <label for="display_name_add">Titre :</label>
+          <InputText
+            id="display_name_add"
+            v-model="addFieldTitle"
+            :invalid="!addFieldTitle"
+            placeholder="Adresse du coiffeur"
+          />
+        </span>
+        <span class="flex align-items-center gap-2 ml-2">
+          <label for="key_add">Clé :</label>
+          <InputText
+            id="key_add"
+            v-model="addFieldKey"
+            :invalid="!addFieldKey"
+            placeholder="hairdresser_adress"
+          />
+          <Badge
+            v-tooltip.bottom="`Clé unique d'identification du champ.
           Si modifiée, les anciennes entités ayant l'ancienne clé ne pourront plus afficher ce champ,
-          sauf si un champ du formulaire vient à porter de nouveau l'ancienne clé.`"
-          value="!"
-          severity="secondary"
-          class="mr-2 border-1 border-black-alpha-10"
-        />
-      </span>
-      <div class="flex justify-content-end gap-2">
-        <Button
-          type="button"
-          label="Annuler"
-          severity="secondary"
-          @click="addFieldVisible = false"
-        />
-        <Button
-          :disabled="!addFieldKey || !addFieldTitle"
-          type="button"
-          label="Confirmer"
-          @click="() => onFieldAdd(addFieldKey, addFieldTitle, addFieldFormPage)"
-        />
+          sauf si un champ du formulaire avec un type compatible vient à porter de nouveau l'ancienne clé.`"
+            value="!"
+          />
+        </span>
+        <div class="flex justify-content-end gap-2">
+          <Button
+            type="button"
+            label="Annuler"
+            severity="secondary"
+            @click="addFieldVisible = false"
+          />
+          <Button
+            :disabled="!addFieldKey || !addFieldTitle"
+            type="button"
+            label="Confirmer"
+            @click="() => onFieldAdd(addFieldKey, addFieldTitle, addFieldFormPage)"
+          />
+        </div>
       </div>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { ConfirmationOptions } from 'primevue/confirmationoptions'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdateFamily, StringFieldTypeMetadata } from '~/lib'
 import state from '~/lib/admin-state'
@@ -280,11 +332,20 @@ const editedFamily: Ref<NewOrUpdateFamily> = ref(JSON.parse(JSON.stringify(fetch
 
 const processingRequest = ref(false)
 const toast = useToast()
+const confirm = useConfirm()
+
+interface ExtendedConfirmationOptions extends ConfirmationOptions {
+  objectId?: string
+}
 
 const addFieldVisible = ref(false)
 const addFieldTitle = ref('')
 const addFieldKey = ref('')
 const addFieldFormPage = ref(0)
+
+const editKeyVisible = ref(false)
+const editKeyField: Ref<FormField | null> = ref(null)
+const editKeyKey = ref('')
 
 const page_count = ref(1 + Math.max(...editedFamily.value.entity_form.fields.map(field => field.form_page)))
 const display_indexes: Ref<Record<string, 'notDisplayed' | number>> = ref({})
@@ -372,18 +433,20 @@ function onDropPage(event: DragEvent, page: number) {
   updatePageCount()
 }
 
-function onKeyChange(old_key: string, new_key: string) {
-  editedFamily.value.entity_form.fields.forEach((field) => {
+function onKeyChange(field_to_modify: FormField, new_key: string) {
+  const old_key = field_to_modify.key
+  if (old_key == new_key) {
+    editKeyVisible.value = false
+    return
+  }
+  for (const field of editedFamily.value.entity_form.fields) {
     if (field.key == new_key) {
       toast.add({ severity: 'error', summary: 'Erreur', detail: 'Clé déjà actuellement utilisée par un autre champ', life: 3000 })
       return
     }
-  })
-  editedFamily.value.entity_form.fields.forEach((field) => {
-    if (field.key == old_key) {
-      field.key = new_key
-    }
-  })
+  }
+  editKeyVisible.value = false
+  field_to_modify.key = new_key
   const display_index = display_indexes.value[old_key]
   // risk of deleting hidden key of the record, such as __data, but this issue is present as soon as such a key is set
   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -391,7 +454,7 @@ function onKeyChange(old_key: string, new_key: string) {
   display_indexes.value[new_key] = display_index
 }
 
-function onDisplayIndexChange(key: string, new_display_index: 'notDisplayed' | number) {
+function onDisplayIndexChange(key: string, new_display_index: 'notDisplayed' | number | null) {
   const old_display_index = display_indexes.value[key]
   if (old_display_index === new_display_index) return
   if (old_display_index === 'notDisplayed') {
@@ -405,7 +468,7 @@ function onDisplayIndexChange(key: string, new_display_index: 'notDisplayed' | n
       }
     })
   }
-  if (new_display_index === 'notDisplayed') {
+  if (new_display_index === 'notDisplayed' || new_display_index === null) {
     max_display_index.value -= 1
   }
   else {
@@ -416,7 +479,11 @@ function onDisplayIndexChange(key: string, new_display_index: 'notDisplayed' | n
       }
     })
   }
-  display_indexes.value[key] = new_display_index
+  if (new_display_index === null)
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete display_indexes.value[key]
+  else
+    display_indexes.value[key] = new_display_index
 }
 
 function onFieldTypeChange(field: FormField) {
@@ -443,22 +510,20 @@ function onFieldTypeChange(field: FormField) {
   }
 }
 
-function onFieldDelete(key: string, index: number) {
+function onFieldDelete(key: string) {
+  const index = editedFamily.value.entity_form.fields.findIndex(field => field.key === key)
   editedFamily.value.entity_form.fields.splice(index, 1)
-  if (display_indexes.value[key] != 'notDisplayed')
-    max_display_index.value -= 1
+  onDisplayIndexChange(key, 'notDisplayed')
   updatePageCount()
 }
 
 function onFieldAdd(key: string, title: string, form_page: number) {
-  console.log('tghest')
   editedFamily.value.entity_form.fields.forEach((field) => {
     if (field.key == key) {
       toast.add({ severity: 'error', summary: 'Erreur', detail: 'Clé déjà actuellement utilisée par un autre champ', life: 3000 })
       return
     }
   })
-  console.log('tewqest')
   const new_field: FormField = {
     display_name: title,
     key: key,
@@ -473,11 +538,9 @@ function onFieldAdd(key: string, title: string, form_page: number) {
   }
   editedFamily.value.entity_form.fields.push(new_field)
   max_display_index.value += 1
-  console.log('tedfst')
   display_indexes.value[key] = max_display_index.value
   updatePageCount()
   addFieldVisible.value = false
-  console.log('teerst', addFieldVisible.value)
 }
 
 async function onSave() {
