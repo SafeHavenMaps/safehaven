@@ -1,103 +1,109 @@
 <template>
-  <form
-    class="flex flex-column gap-3 mx-4"
-    style="width:70rem;"
-    @submit.prevent="onSave"
-  >
-    <Fieldset
-      v-for="i in Array.from({ length: page_count }, (_, i) => i + 1)"
-      :key="`Page ${i}`"
-      :legend="i==page_count ? 'Nouvelle page' : `Page ${i}`"
-      :toggleable="true"
-      style="background-color: #FAF8FF;"
-      :pt="{
-        legend: {
-          class: 'border-1 surface-border',
-        },
-        content: {
-          class: 'flex flex-column align-items-stretch',
-        },
-      }"
-      @dragover.prevent
-      @drop="onDropPage($event, i)"
+  <div>
+    <form
+      class="flex flex-column gap-3 mx-4"
+      style="width:70rem;"
+      @submit.prevent="onSave"
     >
       <Fieldset
-        v-for="(field, index) in getFieldsForPage(i)"
-        :key="field.key"
-        :draggable="true"
-        class="draggable-item mb-2"
-        :legend="field.display_name"
+        v-for="page in Array.from({ length: page_count }, (_, i) => i + 1)"
+        :key="`Page ${page}`"
+        :legend="page==page_count ? 'Nouvelle page' : `Page ${page}`"
         :toggleable="true"
-        style="background-color: #FAEFFF;"
+        style="background-color: #FAF8FF;"
         :pt="{
           legend: {
             class: 'border-1 surface-border',
           },
           content: {
-            class: 'flex flex-column gap-3 ml-1 ',
+            class: 'flex flex-column align-items-stretch',
           },
         }"
-        @dragstart="onDragStart($event, field as FormField)"
         @dragover.prevent
-        @drop="onDropField($event, index, i)"
+        @drop="onDropPage($event, page)"
       >
-        <span class="flex gap-5">
-          <div class="flex flex-column gap-3 ">
-            <span class="flex align-items-center gap-2 flex-grow-1">
+        <Fieldset
+          v-for="(field, index) in getFieldsForPage(page)"
+          :key="field.key"
+          :draggable="true"
+          class="draggable-item mb-2"
+          :legend="field.display_name"
+          :toggleable="true"
+          style="background-color: #FAEFFF;"
+          :pt="{
+            legend: {
+              class: 'border-1 surface-border',
+            },
+            content: {
+              class: 'flex flex-column gap-3 ml-1 ',
+            },
+          }"
+          @dragstart="onDragStart($event, field as FormField)"
+          @dragover.prevent
+          @drop="onDropField($event, index, page)"
+        >
+          <span class="flex gap-5">
+            <div class="flex flex-column gap-3 ">
+              <span class="flex align-items-center gap-2 flex-grow-1">
 
-              <label :for="'display_name_' + index">Titre :</label>
-              <InputText
-                :id="'display_name_' + index"
-                v-model="field.display_name"
-                :variant="hasFieldBeenEdited(index, 'display_name') ? 'filled': 'outlined'"
-                :invalid="!field.display_name"
-                class="mr-4"
-              />
-              <label :for="'key_' + index">Clé :</label>
-              <InputText
-                :id="'key_' + index"
-                v-model="field.key"
-                :variant="hasFieldBeenEdited(index, 'key') ? 'filled': 'outlined'"
-                :invalid="!field.key"
-                class="w-12rem"
-              />
-              <Badge
-                v-tooltip.bottom="`Clé unique d'identification du champ.
+                <label :for="'display_name_' + index">Titre :</label>
+                <InputText
+                  :id="'display_name_' + index"
+                  v-model="field.display_name"
+                  :variant="hasFieldAttributeBeenEdited(index, 'display_name') ? 'filled': 'outlined'"
+                  :invalid="!field.display_name"
+                  class="mr-4"
+                />
+                <label :for="'key_' + index">Clé :</label>
+                <InputText
+                  :id="'key_' + index"
+                  v-model="field.key"
+                  :variant="hasFieldAttributeBeenEdited(index, 'key') ? 'filled': 'outlined'"
+                  :invalid="!field.key"
+                  class="w-12rem"
+                />
+                <Badge
+                  v-tooltip.bottom="`Clé unique d'identification du champ.
                   Si modifiée, les anciennes entités ayant l'ancienne clé ne pourront plus afficher ce champ,
                   sauf si un champ du formulaire vient à porter de nouveau l'ancienne clé.`"
-                value="!"
-                severity="secondary"
-                class="mr-2 border-1 border-black-alpha-10"
-              />
-            </span>
+                  value="!"
+                  severity="secondary"
+                  class="mr-2 border-1 border-black-alpha-10"
+                />
+              </span>
 
-            <span class="flex align-items-center gap-2">
-              <label :for="'field_type_' + index"> Type : </label>
-              <Dropdown
-                :id="'field_type_' + index"
-                v-model="field.field_type"
-                :options="fieldTypeOptions"
-                option-label="label"
-                option-value="value"
-              />
+              <span class="flex align-items-center gap-2">
+                <label :for="'field_type_' + index"> Type : </label>
+                <Dropdown
+                  :id="'field_type_' + index"
+                  v-model="field.field_type"
+                  :options="fieldTypeOptions"
+                  option-label="label"
+                  option-value="value"
+                  @update:model-value="() => onFieldTypeChange(field as FormField)"
+                />
 
-              <Dropdown
-                v-if="['SingleLineText'].includes(field.field_type)"
-                :id="'field_type_' + index"
-                v-model="(field.field_type_metadata as StringFieldTypeMetadata).format"
-                :options="fieldStringTypeOptions"
-                option-label="label"
-                option-value="value"
-              />
-              <Button
-                v-if="['EnumSingleOption', 'EnumMultiOption'].includes(field.field_type)"
-                :id="'field_type_metadata_' + index"
-                v-model="field.field_type_metadata"
-                label="Options"
-                class="border-1 border-black-alpha-10"
-                severity="secondary"
-              />
-            </span>
+                <Dropdown
+                  v-if="['SingleLineText'].includes(field.field_type)"
+                  :id="'field_type_' + index"
+                  v-model="(field.field_type_metadata as StringFieldTypeMetadata).format"
+                  :options="fieldStringTypeOptions"
+                  option-label="label"
+                  option-value="value"
+                />
+                <Button
+                  v-if="['EnumSingleOption', 'EnumMultiOption'].includes(field.field_type)"
+                  :id="'field_type_metadata_' + index"
+                  v-model="field.field_type_metadata"
+                  label="Options"
+                  class="border-1 border-black-alpha-10"
+                  severity="secondary"
+                />
+                <Button
+                  label="erw"
+                  @click="() => console.log(field.field_type_metadata)"
+                />
+              </span>
 
             <!-- <AdminInputNumberField
                   :id="'form_page_' + index"
@@ -112,92 +118,148 @@
                   label="Form Weight"
                   :variant="hasFieldBeenEdited(index, 'form_weight')"
                 /> -->
-          </div>
+            </div>
 
-          <div class="flex flex-column gap-3 w-20rem">
-            <span class="flex align-items-center gap-2">
-              <label :for="'display_weight_' + index"> Ordre d'affichage : </label>
-              <Dropdown
-                :id="'display_weight_' + index"
-                :model-value="display_indexes[field.key]"
-                option-label="label"
-                option-value="value"
-                :options="[{ value: 'notDisplayed',
-                             label: 'Non-affiché publiquement' }, ...Array.from({ length: max_display_index }, (_, i) => ({ value: i + 1, label: i + 1 }))]"
-                @update:model-value="(new_index : 'notDisplayed' | number) => onDisplayIndexChange(field.key, new_index) "
-              /> <!--  field.user_facing -->
-            </span>
-            <span class="flex align-items-center gap-5">
-              <AdminInputSwitchField
-                :id="'mandatory_' + index"
-                v-model="field.mandatory"
-                label="Requis"
-                :variant="hasFieldBeenEdited(index, 'mandatory')"
-              />
+            <div class="flex flex-column gap-3 w-20rem">
+              <span class="flex align-items-center gap-2">
+                <label :for="'display_weight_' + index"> Ordre d'affichage : </label>
+                <Dropdown
+                  :id="'display_weight_' + index"
+                  :model-value="display_indexes[field.key]"
+                  option-label="label"
+                  option-value="value"
+                  :options="[{ value: 'notDisplayed',
+                               label: 'Non-affiché publiquement' }, ...Array.from({ length: max_display_index }, (_, i) => ({ value: i + 1, label: i + 1 }))]"
+                  @update:model-value="(new_index : 'notDisplayed' | number) => onDisplayIndexChange(field.key, new_index) "
+                /> <!--  field.user_facing -->
+              </span>
+              <span class="flex align-items-center gap-5">
+                <AdminInputSwitchField
+                  :id="'mandatory_' + index"
+                  v-model="field.mandatory"
+                  label="Requis"
+                  :variant="hasFieldAttributeBeenEdited(index, 'mandatory')"
+                />
 
-              <AdminInputSwitchField
-                :id="'indexed_' + index"
-                v-model="field.indexed"
-                label="Recherchable"
-                :variant="hasFieldBeenEdited(index, 'indexed')"
-              />
-            </span>
-          </div>
+                <AdminInputSwitchField
+                  :id="'indexed_' + index"
+                  v-model="field.indexed"
+                  label="Recherchable"
+                  :variant="hasFieldAttributeBeenEdited(index, 'indexed')"
+                />
+              </span>
+            </div>
+            <Button
+              outlined
+              rounded
+              severity="primary"
+            >
+              <template #icon>
+                <AppIcon
+                  icon-name="delete"
+                />
+              </template>
+            </Button>
+          </span>
+
+          <span class="flex align-items-center gap-2 mr-3">
+            <label :for="'help_' + index">Texte d'aide :</label>
+            <InputText
+              :id="'help_' + index"
+              v-model="field.help"
+              class="flex flex-grow-1"
+              :variant="hasFieldAttributeBeenEdited(index, 'help') ? 'filled': 'outlined'"
+            />
+          </span>
+        </Fieldset>
+        <div class="flex justify-content-center">
           <Button
             outlined
             rounded
             severity="primary"
+            label="Nouveau champ"
+            @click="() => {
+              addFieldFormPage = page
+              addFieldVisible = true
+              addFieldKey = ''
+              addFieldTitle = ''
+            }"
           >
             <template #icon>
               <AppIcon
-                icon-name="delete"
+                icon-name="add"
+                class="mr-2"
               />
             </template>
           </Button>
-        </span>
-
-        <span class="flex align-items-center gap-2 mr-3">
-          <label :for="'help_' + index">Texte d'aide :</label>
-          <InputText
-            :id="'help_' + index"
-            v-model="field.help"
-            class="flex flex-grow-1"
-            :variant="hasFieldBeenEdited(index, 'help') ? 'filled': 'outlined'"
-          />
-        </span>
+        </div>
       </Fieldset>
-      <div class="flex justify-content-center">
-        <Button
-          outlined
-          rounded
-          severity="primary"
-          label="Nouveau champ"
-        >
-          <template #icon>
-            <AppIcon
-              icon-name="add"
-              class="mr-2"
-            />
-          </template>
-        </Button>
-      </div>
-    </Fieldset>
 
-    <span class="flex gap-1 justify-content-end">
-      <NuxtLink to="/admin/families">
+      <span class="flex gap-1 justify-content-end">
+        <NuxtLink to="/admin/families">
+          <Button
+            label="Annuler"
+            severity="secondary"
+            :disabled="processingRequest"
+          />
+        </NuxtLink>
         <Button
-          label="Annuler"
-          severity="secondary"
+          label="Sauvegarder"
+          type="submit"
           :disabled="processingRequest"
         />
-      </NuxtLink>
-      <Button
-        label="Sauvegarder"
-        type="submit"
-        :disabled="processingRequest"
-      />
-    </span>
-  </form>
+      </span>
+    </form>
+
+    <Dialog
+      v-model:visible="addFieldVisible"
+      modal
+      dismissable-mask
+      :closable="false"
+      header="Ajout d'un nouveau champ"
+      :style="{ width: '25rem' }"
+    >
+      <span class="flex align-items-center gap-2 flex-grow-1">
+
+        <label for="display_name_add">Titre :</label>
+        <InputText
+          id="display_name_add"
+          v-model="addFieldTitle"
+          :invalid="!addFieldTitle"
+          placeholder="Adresse du coiffeur"
+        />
+        <label for="key_add">Clé :</label>
+        <InputText
+          id="key_add"
+          v-model="addFieldKey"
+          :invalid="!addFieldKey"
+          placeholder="hairdresser_adress"
+        />
+        <Badge
+          v-tooltip.bottom="`Clé unique d'identification du champ.
+          Si modifiée, les anciennes entités ayant l'ancienne clé ne pourront plus afficher ce champ,
+          sauf si un champ du formulaire vient à porter de nouveau l'ancienne clé.`"
+          value="!"
+          severity="secondary"
+          class="mr-2 border-1 border-black-alpha-10"
+        />
+      </span>
+      <div class="flex justify-content-end gap-2">
+        <Button
+          type="button"
+          label="Annuler"
+          severity="secondary"
+          @click="addFieldVisible = false"
+        />
+        <Button
+          :disabled="!addFieldKey || !addFieldTitle"
+          type="button"
+          label="Confirmer"
+          @click="() => onFieldAdd(addFieldKey, addFieldTitle, addFieldFormPage)"
+        />
+      </div>
+    </Dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -218,6 +280,11 @@ const editedFamily: Ref<NewOrUpdateFamily> = ref(JSON.parse(JSON.stringify(fetch
 
 const processingRequest = ref(false)
 const toast = useToast()
+
+const addFieldVisible = ref(false)
+const addFieldTitle = ref('')
+const addFieldKey = ref('')
+const addFieldFormPage = ref(0)
 
 const page_count = ref(1 + Math.max(...editedFamily.value.entity_form.fields.map(field => field.form_page)))
 const display_indexes: Ref<Record<string, 'notDisplayed' | number>> = ref({})
@@ -245,8 +312,9 @@ initAdminLayout(
   ],
 )
 
-function hasFieldBeenEdited(index: number, field: keyof FormField) {
-  return editedFamily.value.entity_form.fields[index][field] !== fetchedFamily.entity_form.fields[index][field]
+function hasFieldAttributeBeenEdited(index: number, attribute: keyof FormField) {
+  return index < fetchedFamily.entity_form.fields.length
+    && editedFamily.value.entity_form.fields[index][attribute] !== fetchedFamily.entity_form.fields[index][attribute]
 }
 
 function getFieldsForPage(pageNumber: number) {
@@ -314,8 +382,6 @@ function onKeyChange(old_key: string, new_key: string) {
   editedFamily.value.entity_form.fields.forEach((field) => {
     if (field.key == old_key) {
       field.key = new_key
-      toast.add({ severity: 'error', summary: 'Erreur', detail: 'Clé déjà actuellement utilisée par un autre champ', life: 3000 })
-      return
     }
   })
   const display_index = display_indexes.value[old_key]
@@ -353,11 +419,65 @@ function onDisplayIndexChange(key: string, new_display_index: 'notDisplayed' | n
   display_indexes.value[key] = new_display_index
 }
 
-function onDelete(key: string, index: number) {
+function onFieldTypeChange(field: FormField) {
+  switch (field.field_type) {
+    case 'SingleLineText':
+      if (!field.field_type_metadata || !('format' in field.field_type_metadata)) {
+        field.field_type_metadata = { format: 'none' }
+      }
+      break
+    case 'EnumSingleOption':
+    case 'EnumMultiOption':
+      if (!field.field_type_metadata || !('options' in field.field_type_metadata)) {
+        field.field_type_metadata = { options: [] }
+      }
+      break
+    case 'EventList':
+      if (!field.field_type_metadata || !('event_types' in field.field_type_metadata)) {
+        field.field_type_metadata = { event_types: [] }
+      }
+      break
+    default:
+      field.field_type_metadata = null
+      break
+  }
+}
+
+function onFieldDelete(key: string, index: number) {
   editedFamily.value.entity_form.fields.splice(index, 1)
   if (display_indexes.value[key] != 'notDisplayed')
     max_display_index.value -= 1
   updatePageCount()
+}
+
+function onFieldAdd(key: string, title: string, form_page: number) {
+  console.log('tghest')
+  editedFamily.value.entity_form.fields.forEach((field) => {
+    if (field.key == key) {
+      toast.add({ severity: 'error', summary: 'Erreur', detail: 'Clé déjà actuellement utilisée par un autre champ', life: 3000 })
+      return
+    }
+  })
+  console.log('tewqest')
+  const new_field: FormField = {
+    display_name: title,
+    key: key,
+    field_type: 'SingleLineText',
+    field_type_metadata: { format: 'none' },
+    form_page: form_page,
+    display_weight: max_display_index.value + 1,
+    form_weight: 0,
+    user_facing: true,
+    indexed: false,
+    mandatory: false,
+  }
+  editedFamily.value.entity_form.fields.push(new_field)
+  max_display_index.value += 1
+  console.log('tedfst')
+  display_indexes.value[key] = max_display_index.value
+  updatePageCount()
+  addFieldVisible.value = false
+  console.log('teerst', addFieldVisible.value)
 }
 
 async function onSave() {
@@ -387,6 +507,7 @@ const fieldTypeOptions = [
 ]
 
 const fieldStringTypeOptions = [
+  { label: 'Aucun', value: 'none' },
   { label: 'URL', value: 'url' },
   { label: 'Téléphone', value: 'phone-number' },
   { label: 'E-mail', value: 'e-mail' },
