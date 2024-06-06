@@ -126,3 +126,5 @@ export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily'] &
     fields: FieldTypeMetadataEnum[]
   }
 }
+
+export type FormField = NewOrUpdateFamily['entity_form']['fields'][number]

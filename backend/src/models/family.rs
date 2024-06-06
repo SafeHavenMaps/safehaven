@@ -87,11 +87,11 @@ impl Form {
             return Err(AppError::Validation("Title cannot be empty".to_string()));
         }
 
-        if self.fields.is_empty() {
-            return Err(AppError::Validation(
-                "Form must have at least one field".to_string(),
-            ));
-        }
+        // if self.fields.is_empty() {
+        //     return Err(AppError::Validation(
+        //         "Form must have at least one field".to_string(),
+        //     ));
+        // }
 
         let mut keys = Vec::new();
         for field in self.fields.iter() {
