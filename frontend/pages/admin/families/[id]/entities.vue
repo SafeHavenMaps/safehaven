@@ -123,6 +123,11 @@
                   label="Options"
                   class="border-1 border-black-alpha-10"
                   severity="secondary"
+                  @click="() => {
+                    editOptionsField = field as FormField
+                    editOptionsOptions = (field.field_type_metadata as OptionsFieldTypeMetadata).options
+                    editOptionsVisible = true
+                  }"
                 />
               </span>
             </div>
@@ -197,126 +202,204 @@
           <Button
             label="Annuler"
             severity="secondary"
+            :loading="processingRequest"
             :disabled="processingRequest"
           />
         </NuxtLink>
         <Button
           label="Sauvegarder"
           type="submit"
-          :disabled="processingRequest"
+          :loading="processingRequest"
+          :disabled="processingRequest || anyFieldTitleOrKeyEmpty"
         />
       </span>
     </form>
 
-    <Dialog
-      v-if="editKeyVisible"
-      v-model:visible="editKeyVisible"
-      modal
-      dismissable-mask
-      :closable="false"
-      :header="`Édition de la clé du champ ${editKeyField!.display_name}`"
-    >
-      <div
-        class="flex flex-column gap-3"
+    <template>
+      <Dialog
+        v-if="editOptionsVisible"
+        v-model:visible="editOptionsVisible"
+        modal
+        dismissable-mask
+        :closable="false"
+        :header="`Édition des options du champ ${editOptionsField!.display_name}`"
       >
-        <span class="flex align-items-center gap-2">
-          <label for="display_name_add">Titre :</label>
-          <InputText
-            id="display_name_add"
-            v-model="editKeyField!.display_name"
-            :invalid="!editKeyField!.display_name"
-            placeholder="Adresse du coiffeur"
-          />
-        </span>
-        <span class="flex align-items-center gap-2 ml-2">
-          <label for="key_add">Clé :</label>
-          <InputText
-            id="key_add"
-            v-model="editKeyKey"
-            :invalid="!editKeyKey"
-            placeholder="hairdresser_adress"
-          />
-          <Badge
-            v-tooltip.bottom="`Clé unique d'identification du champ.
-          Si modifiée, les anciennes entités ayant l'ancienne clé ne pourront plus afficher ce champ,
-          sauf si un champ du formulaire avec un type compatible vient à porter de nouveau l'ancienne clé.`"
-            value="!"
-          />
-        </span>
-        <div class="flex justify-content-end gap-2">
-          <Button
-            type="button"
-            label="Annuler"
-            severity="secondary"
-            @click="editKeyVisible = false"
-          />
-          <Button
-            :disabled="!editKeyKey || !editKeyField"
-            type="button"
-            label="Confirmer"
-            @click="() => onKeyChange(editKeyField as FormField, editKeyKey)"
-          />
-        </div>
-      </div>
-    </Dialog>
+        <div class="flex flex-column gap-3">
+          <div
+            v-for="(option, index) in editOptionsOptions"
+            :key="index"
+            class="flex align-items-center gap-2"
+          >
+            <label :for="'option_label_' + index">Label :</label>
+            <InputText
+              :id="'option_label_' + index"
+              v-model="option.label"
+              placeholder="Label"
+            />
+            <label :for="'option_value_' + index">Clé :</label>
+            <InputText
+              :id="'option_value_' + index"
+              v-model="option.value"
+              placeholder="Value"
+            />
+            <Badge
+              v-tooltip.bottom="`Modifier la clé ou supprimer l'option peut entraîner des incohérences dans les entités utilisant cette option.`"
+              value="!"
+            />
+            <Button
+              v-tooltip.top="`Cette option ne sera plus visible sur les entités le comportant déjà
+                tant que la clé n'est pas réutilisée, mais les informations resteront en base de donnée.`"
+              rounded
+              outlined
+              class="m-0 p-1 ml-2"
+              severity="primary"
+              @click=" editOptionsOptions.splice(index, 1)"
+            >
+              <template #default>
+                <AppIcon
+                  icon-name="delete"
+                  size="18px"
+                />
+              </template>
+            </Button>
+          </div>
+          <span class="flex justify-content-center">
+            <Button
+              type="button"
+              label="Ajouter une option"
+              @click="editOptionsOptions.push({ label: '', value: '', hidden: false })"
+            />
+          </span>
 
-    <Dialog
-      v-model:visible="addFieldVisible"
-      modal
-      dismissable-mask
-      :closable="false"
-      header="Ajout d'un nouveau champ"
-    >
-      <div
-        class="flex flex-column gap-3"
+          <div class="flex justify-content-end gap-2">
+            <Button
+              type="button"
+              label="Annuler"
+              severity="secondary"
+              @click="editOptionsVisible = false"
+            />
+            <Button
+              type="button"
+              label="Confirmer"
+              @click="() => {
+                editOptionsField!.field_type_metadata = { options: editOptionsOptions }
+                editOptionsVisible = false
+              }"
+            />
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        v-if="editKeyVisible"
+        v-model:visible="editKeyVisible"
+        modal
+        dismissable-mask
+        :closable="false"
+        :header="`Édition de la clé du champ ${editKeyField!.display_name}`"
       >
-        <span class="flex align-items-center gap-2">
-          <label for="display_name_add">Titre :</label>
-          <InputText
-            id="display_name_add"
-            v-model="addFieldTitle"
-            :invalid="!addFieldTitle"
-            placeholder="Adresse du coiffeur"
-          />
-        </span>
-        <span class="flex align-items-center gap-2 ml-2">
-          <label for="key_add">Clé :</label>
-          <InputText
-            id="key_add"
-            v-model="addFieldKey"
-            :invalid="!addFieldKey"
-            placeholder="hairdresser_adress"
-          />
-          <Badge
-            v-tooltip.bottom="`Clé unique d'identification du champ.
+        <div
+          class="flex flex-column gap-3"
+        >
+          <span class="flex align-items-center gap-2">
+            <label for="display_name_add">Titre :</label>
+            <InputText
+              id="display_name_add"
+              v-model="editKeyField!.display_name"
+              :invalid="!editKeyField!.display_name"
+              placeholder="Adresse du coiffeur"
+            />
+          </span>
+          <span class="flex align-items-center gap-2 ml-2">
+            <label for="key_add">Clé :</label>
+            <InputText
+              id="key_add"
+              v-model="editKeyKey"
+              :invalid="!editKeyKey"
+              placeholder="hairdresser_adress"
+            />
+            <Badge
+              v-tooltip.bottom="`Clé unique d'identification du champ.
           Si modifiée, les anciennes entités ayant l'ancienne clé ne pourront plus afficher ce champ,
           sauf si un champ du formulaire avec un type compatible vient à porter de nouveau l'ancienne clé.`"
-            value="!"
-          />
-        </span>
-        <div class="flex justify-content-end gap-2">
-          <Button
-            type="button"
-            label="Annuler"
-            severity="secondary"
-            @click="addFieldVisible = false"
-          />
-          <Button
-            :disabled="!addFieldKey || !addFieldTitle"
-            type="button"
-            label="Confirmer"
-            @click="() => onFieldAdd(addFieldKey, addFieldTitle, addFieldFormPage)"
-          />
+              value="!"
+            />
+          </span>
+          <div class="flex justify-content-end gap-2">
+            <Button
+              type="button"
+              label="Annuler"
+              severity="secondary"
+              @click="editKeyVisible = false"
+            />
+            <Button
+              :disabled="!editKeyKey || !editKeyField?.display_name"
+              type="button"
+              label="Confirmer"
+              @click="() => onKeyChange(editKeyField as FormField, editKeyKey)"
+            />
+          </div>
         </div>
-      </div>
-    </Dialog>
+      </Dialog>
+
+      <Dialog
+        v-model:visible="addFieldVisible"
+        modal
+        dismissable-mask
+        :closable="false"
+        header="Ajout d'un nouveau champ"
+      >
+        <div
+          class="flex flex-column gap-3"
+        >
+          <span class="flex align-items-center gap-2">
+            <label for="display_name_add">Titre :</label>
+            <InputText
+              id="display_name_add"
+              v-model="addFieldTitle"
+              :invalid="!addFieldTitle"
+              placeholder="Adresse du coiffeur"
+            />
+          </span>
+          <span class="flex align-items-center gap-2 ml-2">
+            <label for="key_add">Clé :</label>
+            <InputText
+              id="key_add"
+              v-model="addFieldKey"
+              :invalid="!addFieldKey"
+              placeholder="hairdresser_adress"
+            />
+            <Badge
+              v-tooltip.bottom="`Clé unique d'identification du champ.
+          Si modifiée, les anciennes entités ayant l'ancienne clé ne pourront plus afficher ce champ,
+          sauf si un champ du formulaire avec un type compatible vient à porter de nouveau l'ancienne clé.`"
+              value="!"
+            />
+          </span>
+          <div class="flex justify-content-end gap-2">
+            <Button
+              type="button"
+              label="Annuler"
+              severity="secondary"
+              @click="addFieldVisible = false"
+            />
+            <Button
+              :disabled="!addFieldKey || !addFieldTitle"
+              type="button"
+              label="Confirmer"
+              @click="() => onFieldAdd(addFieldKey, addFieldTitle, addFieldFormPage)"
+            />
+          </div>
+        </div>
+      </Dialog>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { ConfirmationOptions } from 'primevue/confirmationoptions'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { NewOrUpdateFamily, StringFieldTypeMetadata } from '~/lib'
+import type { NewOrUpdateFamily, StringFieldTypeMetadata, OptionsFieldTypeMetadata } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
@@ -338,6 +421,10 @@ interface ExtendedConfirmationOptions extends ConfirmationOptions {
   objectId?: string
 }
 
+const anyFieldTitleOrKeyEmpty = computed(() => {
+  return editedFamily.value.entity_form.fields.some(field => !field.display_name || !field.key)
+})
+
 const addFieldVisible = ref(false)
 const addFieldTitle = ref('')
 const addFieldKey = ref('')
@@ -346,6 +433,10 @@ const addFieldFormPage = ref(0)
 const editKeyVisible = ref(false)
 const editKeyField: Ref<FormField | null> = ref(null)
 const editKeyKey = ref('')
+
+const editOptionsVisible = ref(false)
+const editOptionsField: Ref<FormField | null> = ref(null)
+const editOptionsOptions = ref<OptionsFieldTypeMetadata['options']>([])
 
 const page_count = ref(1 + Math.max(...editedFamily.value.entity_form.fields.map(field => field.form_page)))
 const display_indexes: Ref<Record<string, 'notDisplayed' | number>> = ref({})
@@ -545,6 +636,24 @@ function onFieldAdd(key: string, title: string, form_page: number) {
 
 async function onSave() {
   processingRequest.value = true
+  // Set field attributes not set automatically while editing (form_weight, user_facing and display_weight)
+  let form_weight_incr = 1
+  for (const page of Array.from({ length: page_count.value }, (_, i) => i + 1)) {
+    for (const field of getFieldsForPage(page)) {
+      field.form_weight = form_weight_incr
+      form_weight_incr++
+      const pseudo_display_index = display_indexes.value[field.key]
+      if (pseudo_display_index === 'notDisplayed') {
+        field.user_facing = false
+        field.display_weight = 0
+      }
+      else {
+        field.user_facing = true
+        field.display_weight = pseudo_display_index
+      }
+    }
+  }
+  // Send the request to the server and process the response
   try {
     await state.client.updateFamily(id, editedFamily.value)
     navigateTo('/admin/families')

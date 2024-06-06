@@ -90,9 +90,9 @@ export type StringFieldTypeMetadata = {
 
 export type OptionsFieldTypeMetadata = {
   options: {
-    value: number
+    value: string
     label: string
-    hidden: boolean
+    hidden?: boolean
   }[]
 }
 

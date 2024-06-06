@@ -43,12 +43,14 @@
         <Button
           label="Annuler"
           severity="secondary"
+          :loading="processingRequest"
           :disabled="processingRequest"
         />
       </NuxtLink>
       <Button
         label="Sauvegarder"
         type="submit"
+        :loading="processingRequest"
         :disabled="processingRequest || !editedFamily.title || !editedFamily.comment_form.title || !editedFamily.entity_form.title"
       />
     </span>

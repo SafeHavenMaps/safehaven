@@ -36,12 +36,14 @@
         <Button
           label="Annuler"
           severity="secondary"
+          :loading="processingRequest"
           :disabled="processingRequest"
         />
       </NuxtLink>
       <Button
         label="Sauvegarder"
         type="submit"
+        :loading="processingRequest"
         :disabled="processingRequest || !editedTag.title || (editedTag.is_filter && !editedTag.filter_description)"
       />
     </span>

@@ -61,12 +61,14 @@
         <Button
           label="Annuler"
           severity="secondary"
+          :loading="processingRequest"
           :disabled="processingRequest"
         />
       </NuxtLink>
       <Button
         label="Sauvegarder"
         type="submit"
+        :loading="processingRequest"
         :disabled="processingRequest || !editedAccessToken.title || !editedAccessToken.token"
       />
     </span>

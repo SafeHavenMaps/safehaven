@@ -49,12 +49,14 @@
         <Button
           label="Annuler"
           severity="secondary"
+          :loading="processingRequest"
           :disabled="processingRequest"
         />
       </NuxtLink>
       <Button
         label="Sauvegarder"
         type="submit"
+        :loading="processingRequest"
         :disabled="processingRequest || editPassword && (newPassword!=newPasswordConfirm || !newPassword) || !userName"
       />
     </span>
