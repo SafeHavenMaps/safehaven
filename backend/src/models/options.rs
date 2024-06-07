@@ -43,6 +43,8 @@ pub struct GeneralOptions {
     pub subtitle: Option<String>,
     pub logo_url: Option<String>,
     pub information: Option<String>,
+    pub popup: Option<String>,
+    pub popup_check_text: Option<String>,
 }
 
 impl OptionConfig for GeneralOptions {
@@ -58,6 +60,8 @@ impl Default for GeneralOptions {
             subtitle: Some("Carte associative".to_string()),
             logo_url: None,
             information: None,
+            popup: None,
+            popup_check_text: None,
         }
     }
 }

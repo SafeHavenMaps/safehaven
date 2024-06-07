@@ -1,6 +1,7 @@
 -- Create the materialized view with a deterministic ID
 CREATE MATERIALIZED VIEW entities_caches AS
-WITH parent_entities AS (
+-- For each location of each parent, get a row with the parent and its location flattened
+WITH transitive_locations AS (
     SELECT
         ee.child_id,
         e.id AS parent_id,
@@ -8,10 +9,15 @@ WITH parent_entities AS (
         parent_location.value,
         parent_location.ordinality AS location_index
     FROM entities_entities ee
-    JOIN entities e ON ee.parent_id = e.id,
-    LATERAL jsonb_array_elements(e.locations) WITH ORDINALITY AS parent_location(value, ordinality)
+    JOIN entities e ON ee.parent_id = e.id
+    -- Join the locations from the array of locations
+    LEFT JOIN LATERAL (
+        SELECT value, ordinality
+        FROM jsonb_array_elements(e.locations) WITH ORDINALITY AS location(value, ordinality)
+    ) AS parent_location ON true
 ),
-entity_locations AS (
+-- For each location of each entity, get a row with the entity and its location
+direct_locations AS (
     SELECT
         e.id AS entity_id,
         e.category_id,
@@ -26,79 +32,54 @@ entity_locations AS (
     LEFT JOIN entity_tags et ON e.id = et.entity_id
     LEFT JOIN entities_entities ee ON e.id = ee.parent_id
     LEFT JOIN entities e2 ON ee.child_id = e2.id
-    LEFT JOIN entity_tags cet ON ee.child_id = cet.entity_id,
-    LATERAL jsonb_array_elements(e.locations) WITH ORDINALITY AS location(value, ordinality)
+    LEFT JOIN entity_tags cet ON ee.child_id = cet.entity_id
+    LEFT JOIN LATERAL (
+        SELECT value, ordinality
+        FROM jsonb_array_elements(e.locations) WITH ORDINALITY AS location(value, ordinality)
+    ) AS location ON true
     WHERE e.moderated_at IS NOT NULL AND e.hide_from_map = FALSE
     GROUP BY e.id, c.family_id, e.display_name, e.category_id, location.value, location.ordinality
 )
 -- Add the entities with their locations to the materialized view
 SELECT
-    md5(el.entity_id::text || el.location_index::text || 'alone_loc')::uuid AS id,
-    el.entity_id,
-    el.category_id,
-    el.display_name,
-    el.family_id,
-    el.location_index,
-    (el.location ->> 'long')::double precision AS longitude,
-    (el.location ->> 'lat')::double precision AS latitude,
-    ST_Transform(ST_SetSRID(ST_MakePoint((el.location ->> 'long')::double precision, (el.location ->> 'lat')::double precision), 4326), 3857) AS web_mercator_location,
-    el.location ->> 'plain_text' AS plain_text_location,
-    el.tags_ids,
-    array_append(el.child_categories_ids, el.category_id) AS categories_ids,
+    md5(dl.entity_id::text || COALESCE(dl.location_index, -1)::text || 'alone_loc')::uuid AS id,
+    dl.entity_id,
+    dl.category_id,
+    dl.display_name,
+    dl.family_id,
+    dl.location_index,
+    (dl.location ->> 'long')::double precision AS longitude,
+    (dl.location ->> 'lat')::double precision AS latitude,
+    ST_Transform(ST_SetSRID(ST_MakePoint((dl.location ->> 'long')::double precision, (dl.location ->> 'lat')::double precision), 4326), 3857) AS web_mercator_location,
+    dl.location ->> 'plain_text' AS plain_text_location,
+    dl.tags_ids,
+    array_append(dl.child_categories_ids, dl.category_id) AS categories_ids,
     NULL AS parent_id,
     NULL AS parent_display_name,
-    to_tsvector('english', el.display_name) AS full_text_search_ts
-FROM entity_locations el
+    to_tsvector('english', dl.display_name) AS full_text_search_ts
+FROM direct_locations dl
 
 UNION
 
 -- Add the entities with their parents locations to the materialized view
 SELECT
-    md5(pe.child_id::text || pe.parent_id::text || pe.location_index::text || 'with_parent')::uuid AS id,
-    pe.child_id AS entity_id,
-    el.category_id,
-    el.display_name,
-    el.family_id,
-    pe.location_index,
-    (pe.value ->> 'long')::double precision AS longitude,
-    (pe.value ->> 'lat')::double precision AS latitude,
-    ST_Transform(ST_SetSRID(ST_MakePoint((pe.value ->> 'long')::double precision, (pe.value ->> 'lat')::double precision), 4326), 3857) AS web_mercator_location,
-    pe.value ->> 'plain_text' AS plain_text_location,
-    el.tags_ids,
-    array_append(el.child_categories_ids, el.category_id) AS categories_ids,
-    pe.parent_id,
-    pe.parent_display_name,
-    to_tsvector('english', el.display_name) AS full_text_search_ts
-FROM parent_entities pe
-JOIN entity_locations el ON pe.child_id = el.entity_id
-
-UNION
-
--- Add the entities without locations to the materialized view
-SELECT
-    md5(e.id::text || 'alone_no_loc')::uuid AS id,
-    e.id AS entity_id,
-    e.category_id,
-    e.display_name,
-    c.family_id,
-    0 AS location_index,
-    NULL AS longitude,
-    NULL AS latitude,
-    NULL AS web_mercator_location,
-    NULL AS plain_text_location,
-    array_remove(array_agg(DISTINCT et.tag_id) || array_agg(DISTINCT cet.tag_id), NULL) AS tags_ids,
-    array_append(array_agg(DISTINCT e2.category_id) FILTER (WHERE e2.category_id IS NOT NULL), e.category_id) AS categories_ids,
-    NULL AS parent_id,
-    NULL AS parent_display_name,
-    to_tsvector('english', e.display_name) AS full_text_search_ts
-FROM entities e
-JOIN categories c ON e.category_id = c.id
-LEFT JOIN entity_tags et ON e.id = et.entity_id
-LEFT JOIN entities_entities ee ON e.id = ee.parent_id
-LEFT JOIN entities e2 ON ee.child_id = e2.id
-LEFT JOIN entity_tags cet ON ee.child_id = cet.entity_id
-WHERE e.moderated_at IS NOT NULL AND e.hide_from_map = FALSE AND jsonb_array_length(e.locations) = 0
-GROUP BY e.id, c.family_id, e.display_name, e.category_id;
+    md5(tl.child_id::text || tl.parent_id::text || tl.location_index::text || 'with_parent')::uuid AS id,
+    tl.child_id AS entity_id,
+    dl.category_id,
+    dl.display_name,
+    dl.family_id,
+    tl.location_index,
+    (tl.value ->> 'long')::double precision AS longitude,
+    (tl.value ->> 'lat')::double precision AS latitude,
+    ST_Transform(ST_SetSRID(ST_MakePoint((tl.value ->> 'long')::double precision, (tl.value ->> 'lat')::double precision), 4326), 3857) AS web_mercator_location,
+    tl.value ->> 'plain_text' AS plain_text_location,
+    dl.tags_ids,
+    array_append(dl.child_categories_ids, dl.category_id) AS categories_ids,
+    tl.parent_id,
+    tl.parent_display_name,
+    to_tsvector('english', dl.display_name) AS full_text_search_ts
+FROM transitive_locations tl
+JOIN direct_locations dl ON tl.child_id = dl.entity_id;
 
 -- Create unique index on ID for concurrency refresh
 CREATE UNIQUE INDEX entities_caches_id_idx ON entities_caches(id);
