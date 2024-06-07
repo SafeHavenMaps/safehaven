@@ -98,44 +98,47 @@ const familyNodes = [{
   route: 'families',
   active: false,
 }].concat(
-  state.families.map(item => ({
-    label: item.title,
-    key: item.id,
-    icon: item.icon_hash!,
-    pending_count: state.countsByFamily[item.id][1] + state.countsByFamily[item.id][3],
-    iconDynamic: true,
-    route: '',
-    active: false,
-    items: [
-      {
-        label: 'Catégories',
-        icon: 'category',
-        route: item.id + '/categories',
-      },
-      {
-        label: 'Entités',
-        icon: 'entity',
-        route: item.id + '/entities',
-      },
-      {
-        label: 'Commentaires',
-        icon: 'comment',
-        route: item.id + '/comments',
-      },
-      {
-        label: 'Entités en attente',
-        icon: 'pendingEntity',
-        pending_count: state.countsByFamily[item.id][1],
-        route: item.id + '/pending-entities',
-      },
-      {
-        label: 'Commentaires en attente',
-        icon: 'pendingComment',
-        pending_count: state.countsByFamily[item.id][3],
-        route: item.id + '/pending-categories',
-      },
-    ],
-  })),
+  state.families.map((item) => {
+    const counts = state.countsByFamily[item.id] ?? [0, 0, 0, 0]
+    return {
+      label: item.title,
+      key: item.id,
+      icon: item.icon_hash!,
+      pending_count: counts[1] + counts[3],
+      iconDynamic: true,
+      route: '',
+      active: false,
+      items: [
+        {
+          label: 'Catégories',
+          icon: 'category',
+          route: item.id + '/categories',
+        },
+        {
+          label: 'Entités',
+          icon: 'entity',
+          route: item.id + '/entities',
+        },
+        {
+          label: 'Commentaires',
+          icon: 'comment',
+          route: item.id + '/comments',
+        },
+        {
+          label: 'Entités en attente',
+          icon: 'pendingEntity',
+          pending_count: counts[1],
+          route: item.id + '/pending-entities',
+        },
+        {
+          label: 'Commentaires en attente',
+          icon: 'pendingComment',
+          pending_count: counts[3],
+          route: item.id + '/pending-categories',
+        },
+      ],
+    }
+  }),
 )
 
 const nodes = [

@@ -29,7 +29,7 @@ initAdminLayout(
     [],
     [
       { label: 'Familles', url: '/admin/families' },
-      { label: `Édition du formulaire d'ajout de commentaires de la famille ${fetchedFamily.title}`, url: `/admin/families/${id}` },
+      { label: `Édition du formulaire d'ajout de commentaires de la famille ${fetchedFamily.title}`, url: `/admin/families/${id}/comments` },
     ],
 )
 

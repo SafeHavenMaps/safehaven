@@ -81,7 +81,7 @@ initAdminLayout(
   [],
   [
     { label: 'Familles', url: '/admin/families' },
-    { label: `Édition de l'affichage de la famille ${fetchedFamily.title}`, url: `/admin/families/${id}` },
+    { label: `Édition de l'affichage de la famille ${fetchedFamily.title}`, url: `/admin/families/${id}/general` },
   ],
 )
 
