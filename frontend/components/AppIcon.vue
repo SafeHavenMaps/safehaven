@@ -30,7 +30,6 @@ const props = defineProps<{
 }>()
 
 function imageSrc(hash: string): string {
-  console.log(`/api/icons/${hash}`)
   return `/api/icons/${hash}`
 }
 

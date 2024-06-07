@@ -4,7 +4,10 @@
 
     <div class="flex w-full flex-grow-1">
       <div class="flex w-full">
-        <div class="m-3 mt-1 p-2">
+        <div
+          ref="sidebarRef"
+          class="m-3 mt-1 p-2 fixed"
+        >
           <div
             class="sidebar-title mb-1"
           >
@@ -14,7 +17,10 @@
           <AdminSidebar />
         </div>
 
-        <div class="flex flex-column w-full">
+        <div
+          class="flex flex-column w-full"
+          :style="set_fixed_spacing()"
+        >
           <Breadcrumb
             :home=" { label: '', url: '' }"
             :model="currentBreadcrumbs"
@@ -120,6 +126,7 @@ const currentBreadcrumbs = ref<BreadcrumbItem[]>([])
 const currentActions = ref<ActionItem[]>([])
 const cardTitle = ref('')
 const cardIconName = ref('')
+const sidebarRef: Ref<HTMLElement | null> = ref(null)
 
 function initAdminLayout(
   newCardTitle: string,
@@ -134,6 +141,17 @@ function initAdminLayout(
 }
 
 provide('initAdminLayout', initAdminLayout)
+
+function set_fixed_spacing() {
+  if (sidebarRef.value) {
+    const computedStyle = window.getComputedStyle(sidebarRef.value)
+    const sidebarWidth = sidebarRef.value.offsetWidth
+    const marginRight = parseInt(computedStyle.marginRight) || 0
+    const marginLeft = parseInt(computedStyle.marginLeft) || 0
+    return { 'margin-left': `${sidebarWidth + marginRight + marginLeft}px` }
+  }
+  return {} // Return default/fallback styles if needed
+}
 </script>
 
 <style>

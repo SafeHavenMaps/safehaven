@@ -219,184 +219,182 @@
       </span>
     </form>
 
-    <template>
-      <Dialog
-        v-if="editOptionsVisible"
-        v-model:visible="editOptionsVisible"
-        modal
-        dismissable-mask
-        :closable="false"
-        :header="`Édition des options du champ ${editOptionsField!.display_name}`"
-      >
-        <div class="flex flex-column gap-3">
-          <div
-            v-for="(option, index) in editOptionsOptions"
-            :key="index"
-            class="flex align-items-center gap-2"
-          >
-            <label :for="'option_label_' + index">Label :</label>
-            <InputText
-              :id="'option_label_' + index"
-              v-model="option.label"
-              placeholder="Label"
-            />
-            <label :for="'option_value_' + index">Clé :</label>
-            <InputText
-              :id="'option_value_' + index"
-              v-model="option.value"
-              placeholder="Value"
-            />
-            <Badge
-              v-tooltip.bottom="`Modifier la clé ou supprimer l'option peut entraîner des incohérences dans les ${props.kindName}s utilisant cette option.`"
-              value="!"
-            />
-            <Button
-              v-tooltip.top="`Cette option ne sera plus visible sur les ${props.kindName}s le comportant déjà
-                  tant que la clé n'est pas réutilisée, mais les informations resteront en base de donnée.`"
-              rounded
-              outlined
-              class="m-0 p-1 ml-2"
-              severity="primary"
-              @click=" editOptionsOptions.splice(index, 1)"
-            >
-              <template #default>
-                <AppIcon
-                  icon-name="delete"
-                  size="18px"
-                />
-              </template>
-            </Button>
-          </div>
-          <span class="flex justify-content-center">
-            <Button
-              type="button"
-              label="Ajouter une option"
-              @click="editOptionsOptions.push({ label: '', value: '', hidden: false })"
-            />
-          </span>
-
-          <div class="flex justify-content-end gap-2">
-            <Button
-              type="button"
-              label="Annuler"
-              severity="secondary"
-              @click="editOptionsVisible = false"
-            />
-            <Button
-              type="button"
-              label="Confirmer"
-              @click="() => {
-                editOptionsField!.field_type_metadata = { options: editOptionsOptions }
-                editOptionsVisible = false
-              }"
-            />
-          </div>
-        </div>
-      </Dialog>
-
-      <Dialog
-        v-if="editKeyVisible"
-        v-model:visible="editKeyVisible"
-        modal
-        dismissable-mask
-        :closable="false"
-        :header="`Édition de la clé du champ ${editKeyField!.display_name}`"
-      >
+    <Dialog
+      v-if="editOptionsVisible"
+      v-model:visible="editOptionsVisible"
+      modal
+      dismissable-mask
+      :closable="false"
+      :header="`Édition des options du champ ${editOptionsField!.display_name}`"
+    >
+      <div class="flex flex-column gap-3">
         <div
-          class="flex flex-column gap-3"
+          v-for="(option, index) in editOptionsOptions"
+          :key="index"
+          class="flex align-items-center gap-2"
         >
-          <span class="flex align-items-center gap-2">
-            <label for="display_name_add">Titre :</label>
-            <InputText
-              id="display_name_add"
-              v-model="editKeyField!.display_name"
-              :invalid="!editKeyField!.display_name"
-              placeholder="Adresse du coiffeur"
-            />
-          </span>
-          <span class="flex align-items-center gap-2 ml-2">
-            <label for="key_add">Clé :</label>
-            <InputText
-              id="key_add"
-              v-model="editKeyKey"
-              :invalid="!editKeyKey"
-              placeholder="hairdresser_adress"
-            />
-            <Badge
-              v-tooltip.bottom="`Clé unique d'identification du champ.
+          <label :for="'option_label_' + index">Label :</label>
+          <InputText
+            :id="'option_label_' + index"
+            v-model="option.label"
+            placeholder="Label"
+          />
+          <label :for="'option_value_' + index">Clé :</label>
+          <InputText
+            :id="'option_value_' + index"
+            v-model="option.value"
+            placeholder="Value"
+          />
+          <Badge
+            v-tooltip.bottom="`Modifier la clé ou supprimer l'option peut entraîner des incohérences dans les ${props.kindName}s utilisant cette option.`"
+            value="!"
+          />
+          <Button
+            v-tooltip.top="`Cette option ne sera plus visible sur les ${props.kindName}s le comportant déjà
+                  tant que la clé n'est pas réutilisée, mais les informations resteront en base de donnée.`"
+            rounded
+            outlined
+            class="m-0 p-1 ml-2"
+            severity="primary"
+            @click=" editOptionsOptions.splice(index, 1)"
+          >
+            <template #default>
+              <AppIcon
+                icon-name="delete"
+                size="18px"
+              />
+            </template>
+          </Button>
+        </div>
+        <span class="flex justify-content-center">
+          <Button
+            type="button"
+            label="Ajouter une option"
+            @click="editOptionsOptions.push({ label: '', value: '', hidden: false })"
+          />
+        </span>
+
+        <div class="flex justify-content-end gap-2">
+          <Button
+            type="button"
+            label="Annuler"
+            severity="secondary"
+            @click="editOptionsVisible = false"
+          />
+          <Button
+            type="button"
+            label="Confirmer"
+            @click="() => {
+              editOptionsField!.field_type_metadata = { options: editOptionsOptions }
+              editOptionsVisible = false
+            }"
+          />
+        </div>
+      </div>
+    </Dialog>
+
+    <Dialog
+      v-if="editKeyVisible"
+      v-model:visible="editKeyVisible"
+      modal
+      dismissable-mask
+      :closable="false"
+      :header="`Édition de la clé du champ ${editKeyField!.display_name}`"
+    >
+      <div
+        class="flex flex-column gap-3"
+      >
+        <span class="flex align-items-center gap-2">
+          <label for="display_name_add">Titre :</label>
+          <InputText
+            id="display_name_add"
+            v-model="editKeyField!.display_name"
+            :invalid="!editKeyField!.display_name"
+            placeholder="Adresse du coiffeur"
+          />
+        </span>
+        <span class="flex align-items-center gap-2 ml-2">
+          <label for="key_add">Clé :</label>
+          <InputText
+            id="key_add"
+            v-model="editKeyKey"
+            :invalid="!editKeyKey"
+            placeholder="hairdresser_adress"
+          />
+          <Badge
+            v-tooltip.bottom="`Clé unique d'identification du champ.
             Si modifiée, les ${props.kindName}s en base de donnée comportant l'ancienne clé ne pourront plus afficher ce champ,
             sauf si un champ du formulaire avec un type compatible vient à porter de nouveau l'ancienne clé.`"
-              value="!"
-            />
-          </span>
-          <div class="flex justify-content-end gap-2">
-            <Button
-              type="button"
-              label="Annuler"
-              severity="secondary"
-              @click="editKeyVisible = false"
-            />
-            <Button
-              :disabled="!editKeyKey || !editKeyField?.display_name"
-              type="button"
-              label="Confirmer"
-              @click="() => onKeyChange(editKeyField as FormField, editKeyKey)"
-            />
-          </div>
+            value="!"
+          />
+        </span>
+        <div class="flex justify-content-end gap-2">
+          <Button
+            type="button"
+            label="Annuler"
+            severity="secondary"
+            @click="editKeyVisible = false"
+          />
+          <Button
+            :disabled="!editKeyKey || !editKeyField?.display_name"
+            type="button"
+            label="Confirmer"
+            @click="() => onKeyChange(editKeyField as FormField, editKeyKey)"
+          />
         </div>
-      </Dialog>
+      </div>
+    </Dialog>
 
-      <Dialog
-        v-model:visible="addFieldVisible"
-        modal
-        dismissable-mask
-        :closable="false"
-        header="Ajout d'un nouveau champ"
+    <Dialog
+      v-model:visible="addFieldVisible"
+      modal
+      dismissable-mask
+      :closable="false"
+      header="Ajout d'un nouveau champ"
+    >
+      <div
+        class="flex flex-column gap-3"
       >
-        <div
-          class="flex flex-column gap-3"
-        >
-          <span class="flex align-items-center gap-2">
-            <label for="display_name_add">Titre :</label>
-            <InputText
-              id="display_name_add"
-              v-model="addFieldTitle"
-              :invalid="!addFieldTitle"
-              placeholder="Adresse du coiffeur"
-            />
-          </span>
-          <span class="flex align-items-center gap-2 ml-2">
-            <label for="key_add">Clé :</label>
-            <InputText
-              id="key_add"
-              v-model="addFieldKey"
-              :invalid="!addFieldKey"
-              placeholder="hairdresser_adress"
-            />
-            <Badge
-              v-tooltip.bottom="`Clé unique d'identification du champ.
+        <span class="flex align-items-center gap-2">
+          <label for="display_name_add">Titre :</label>
+          <InputText
+            id="display_name_add"
+            v-model="addFieldTitle"
+            :invalid="!addFieldTitle"
+            placeholder="Adresse du coiffeur"
+          />
+        </span>
+        <span class="flex align-items-center gap-2 ml-2">
+          <label for="key_add">Clé :</label>
+          <InputText
+            id="key_add"
+            v-model="addFieldKey"
+            :invalid="!addFieldKey"
+            placeholder="hairdresser_adress"
+          />
+          <Badge
+            v-tooltip.bottom="`Clé unique d'identification du champ.
             Si modifiée, les ${props.kindName}s ayant l'ancienne clé ne pourront plus afficher ce champ,
             sauf si un champ du formulaire avec un type compatible vient à porter de nouveau l'ancienne clé.`"
-              value="!"
-            />
-          </span>
-          <div class="flex justify-content-end gap-2">
-            <Button
-              type="button"
-              label="Annuler"
-              severity="secondary"
-              @click="addFieldVisible = false"
-            />
-            <Button
-              :disabled="!addFieldKey || !addFieldTitle"
-              type="button"
-              label="Confirmer"
-              @click="() => onFieldAdd(addFieldKey, addFieldTitle, addFieldFormPage)"
-            />
-          </div>
+            value="!"
+          />
+        </span>
+        <div class="flex justify-content-end gap-2">
+          <Button
+            type="button"
+            label="Annuler"
+            severity="secondary"
+            @click="addFieldVisible = false"
+          />
+          <Button
+            :disabled="!addFieldKey || !addFieldTitle"
+            type="button"
+            label="Confirmer"
+            @click="() => onFieldAdd(addFieldKey, addFieldTitle, addFieldFormPage)"
+          />
         </div>
-      </Dialog>
-    </template>
+      </div>
+    </Dialog>
   </div>
 </template>
 
