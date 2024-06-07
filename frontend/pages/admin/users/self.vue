@@ -3,19 +3,9 @@
     class="flex flex-column gap-3 max-w-30rem mx-4"
     @submit.prevent="onSave"
   >
-    <AdminInputTextField
-      id="username"
-      v-model="userName"
-      label="Nom d'utilisateur⋅ice"
-      :variant="userName == name"
-    />
+    <span> Nom d'utilisateur⋅ice: {{ state.username }} </span>
 
-    <AdminInputSwitchField
-      id="userIsAdmin"
-      v-model="userIsAdmin"
-      label="Droits d'administration"
-      :disabled="state.username == name"
-    />
+    <span> Statut: {{ state.is_admin ? 'Administrateur⋅ice' : 'Modérateur⋅ice' }} </span>
 
     <AdminInputSwitchField
       id="editPassword"
@@ -56,20 +46,21 @@
 
     <span class="flex gap-1 justify-content-end   ">
       <NuxtLink
-        to="/admin/users"
+        to="/admin/"
       >
         <Button
-          label="Annuler"
+          label="Revenir à l'accueil"
           severity="secondary"
           :loading="processingRequest"
           :disabled="processingRequest"
         />
       </NuxtLink>
       <Button
+        v-if="editPassword"
         label="Sauvegarder"
         type="submit"
         :loading="processingRequest"
-        :disabled="processingRequest || editPassword && (newPassword!=newPasswordConfirm || !newPassword) || !userName"
+        :disabled="processingRequest || (newPassword!=newPasswordConfirm || !newPassword)"
       />
     </span>
   </form>
@@ -77,14 +68,8 @@
 
 <script setup lang="ts">
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { NewOrUpdatedUser } from '~/lib'
 import state from '~/lib/admin-state'
 
-const userId = useRoute().params.id as string
-
-const { is_admin, name } = await state.client.getUser(userId)
-const userIsAdmin = ref(is_admin)
-const userName = ref(name)
 const editPassword = ref(false)
 const newPassword = ref('')
 const newPasswordConfirm = ref('')
@@ -98,33 +83,23 @@ definePageMeta({
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  `Édition de l'utilisateur⋅ice ${name}`,
-  'user',
-  [],
-  [
-    { label: 'Utilisateur⋅ices', url: '/admin/users' },
-    { label: `Édition de l'utilisateur⋅ice ${name}`, url: `/admin/users/${userId}` },
-  ],
+    `Profil`,
+    'user',
+    [],
+    [
+      { label: `Profil`, url: `/admin/users/self` },
+    ],
 )
 
 async function onSave() {
   processingRequest.value = true
   try {
-    const newUser: NewOrUpdatedUser = { is_admin: userIsAdmin.value, name: userName.value }
-    if (editPassword.value) {
-      if ((newPassword.value != newPasswordConfirm.value || !newPassword.value))
-        throw new Error('Empty or non-matching password')
-      newUser['password'] = newPassword.value
-    }
-    await state.client.updateUser(userId, newUser)
-    if (state.username == name) {
-      state.logout()
-    }
-    navigateTo('/admin/users')
-    toast.add({ severity: 'success', summary: 'Succès', detail: 'Utilisateur⋅ice modifié⋅e avec succès', life: 3000 })
+    await state.client.changeSelfPassword({ is_admin: state.is_admin!, name: state.username!, password: newPassword.value })
+    editPassword.value = false
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Mot de passe mis à jour avec succès', life: 3000 })
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification de l\'utilisateur⋅ice', life: 3000 })
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification de mise à jour du mot de passe ', life: 3000 })
   }
   processingRequest.value = false
 }

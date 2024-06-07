@@ -1,13 +1,6 @@
 <template>
   <div>
-    <div>
-      <div>
-        mainpanel
-      </div>
-      <div>
-        filterbox
-      </div>
-    </div>
+    Accueil en construction, revenez plus tard!
   </div>
 </template>
 

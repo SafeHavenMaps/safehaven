@@ -34,6 +34,22 @@
           @click="(() => { state.logout() })"
         />
       </div>
+      <NuxtLink to="/admin/users/self">
+        <Button
+          text
+          rounded
+          severity="secondary"
+          class="p-0 mx-2"
+        >
+          <template #default>
+            <Avatar
+              :label="state.username![0].toUpperCase()"
+              shape="circle"
+              size="large"
+            />
+          </template>
+        </Button>
+      </NuxtLink>
     </template>
   </Toolbar>
 </template>
