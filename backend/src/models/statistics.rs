@@ -4,15 +4,12 @@ use crate::api::AppError;
 use sqlx::PgConnection;
 use std::collections::HashMap;
 
-pub async fn count_comments_entities(
-    conn: &mut PgConnection,
-) -> Result<
-    (
-        HashMap<String, (u32, u32, u32, u32)>,
-        HashMap<String, (u32, u32, u32, u32)>,
-    ),
-    AppError,
-> {
+pub type CountResult = (
+    HashMap<String, (u32, u32, u32, u32)>,
+    HashMap<String, (u32, u32, u32, u32)>,
+);
+
+pub async fn count_comments_entities(conn: &mut PgConnection) -> Result<CountResult, AppError> {
     let results = sqlx::query_as!(
         CommentEntityCounts,
         r#"
