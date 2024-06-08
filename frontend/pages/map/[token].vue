@@ -46,6 +46,8 @@
         @entity-selected="displayEntityId"
       />
     </Sidebar>
+
+    <StartPopup />
   </div>
 </template>
 

@@ -142,6 +142,8 @@
 
       <ViewerFilterConfig />
     </Dialog>
+
+    <StartPopup />
   </div>
 </template>
 

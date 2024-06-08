@@ -128,6 +128,24 @@ export class AppState {
     return this.initConfig !== null
   }
 
+  get hasInformation() {
+    return !!this.initConfig?.general.information
+  }
+
+  get getSanitizedPopup() {
+    if (!this.initConfig?.general.popup) {
+      return null
+    }
+
+    return {
+      siteTitle: this.initConfig!.general.title!,
+      sanitizedContent: purify_lenient(this.initConfig!.general.popup!),
+      sanitizedCheckbox: this.initConfig!.general.popup_check_text
+        ? purify_lenient(this.initConfig!.general.popup_check_text!)
+        : null,
+    }
+  }
+
   async getSanitizedInformation() {
     if (!this.initConfig?.general.information) {
       return null
