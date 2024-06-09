@@ -8,8 +8,8 @@ use uuid::Uuid;
 use crate::{
     api::{AppError, AppJson, DbConn},
     models::{
-        comment::Comment,
-        entity::{Entity, ListedEntity, NewEntity, UpdateEntity},
+        comment::AdminComment,
+        entity::{AdminEntity, AdminListedEntity, AdminNewOrUpdateEntity},
     },
 };
 
@@ -31,19 +31,19 @@ pub struct SearchQuery {
         ("page_size" = i64, Query, description = "Number of items per page (default: 20)")
     ),
     responses(
-        (status = 200, description = "Search results for entities", body = Vec<ListedEntity>),
+        (status = 200, description = "Search results for entities", body = Vec<AdminListedEntity>),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
 pub async fn admin_entities_search(
     DbConn(mut conn): DbConn,
     Query(query): Query<SearchQuery>,
-) -> Result<AppJson<Vec<ListedEntity>>, AppError> {
+) -> Result<AppJson<Vec<AdminListedEntity>>, AppError> {
     let page = query.page.unwrap_or(1);
     let page_size = query.page_size.unwrap_or(20);
 
     Ok(AppJson(
-        Entity::search(query.search, page, page_size, &mut conn).await?,
+        AdminEntity::search(query.search, page, page_size, &mut conn).await?,
     ))
 }
 
@@ -51,30 +51,33 @@ pub async fn admin_entities_search(
     get,
     path = "/api/admin/entities/pending",
     responses(
-        (status = 200, description = "List of pending entities", body = Vec<ListedEntity>),
+        (status = 200, description = "List of pending entities", body = Vec<AdminListedEntity>),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
 pub async fn admin_entities_pending(
     DbConn(mut conn): DbConn,
-) -> Result<AppJson<Vec<ListedEntity>>, AppError> {
-    Ok(AppJson(Entity::pending(&mut conn).await?))
+) -> Result<AppJson<Vec<AdminListedEntity>>, AppError> {
+    Ok(AppJson(AdminEntity::pending(&mut conn).await?))
 }
 
 #[utoipa::path(
     post,
     path = "/api/admin/entities",
-    request_body = NewEntity,
+    request_body = AdminNewOrUpdateEntity,
     responses(
-        (status = 200, description = "Entity created", body = Entity),
+        (status = 200, description = "Entity created", body = AdminEntity),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
 pub async fn admin_entity_new(
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
-    Json(new_entity): Json<NewEntity>,
-) -> Result<AppJson<Entity>, AppError> {
-    Ok(AppJson(Entity::new(new_entity, &mut conn).await?))
+    Json(new_entity): Json<AdminNewOrUpdateEntity>,
+) -> Result<AppJson<AdminEntity>, AppError> {
+    Ok(AppJson(
+        AdminEntity::new(new_entity, token.admin_id, &mut conn).await?,
+    ))
 }
 
 #[utoipa::path(
@@ -84,7 +87,7 @@ pub async fn admin_entity_new(
         ("id" = Uuid, Path, description = "Entity identifier")
     ),
     responses(
-        (status = 200, description = "Entity details", body = Entity),
+        (status = 200, description = "Entity details", body = AdminEntity),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
     )
@@ -92,19 +95,19 @@ pub async fn admin_entity_new(
 pub async fn admin_entity_get(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-) -> Result<AppJson<Entity>, AppError> {
-    Ok(AppJson(Entity::get(id, &mut conn).await?))
+) -> Result<AppJson<AdminEntity>, AppError> {
+    Ok(AppJson(AdminEntity::get(id, &mut conn).await?))
 }
 
 #[utoipa::path(
     put,
     path = "/api/admin/entities/{id}",
-    request_body = UpdateEntity,
+    request_body = AdminNewOrUpdateEntity,
     params(
         ("id" = Uuid, Path, description = "Entity identifier")
     ),
     responses(
-        (status = 200, description = "Entity updated", body = Entity),
+        (status = 200, description = "Entity updated", body = AdminEntity),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
     )
@@ -113,13 +116,10 @@ pub async fn admin_entity_update(
     token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-    Json(mut updated_entity): Json<UpdateEntity>,
-) -> Result<AppJson<Entity>, AppError> {
-    // Ensure the last_update_by field is set to the current admin's ID
-    updated_entity.last_update_by = Some(token.admin_id);
-
+    Json(updated_entity): Json<AdminNewOrUpdateEntity>,
+) -> Result<AppJson<AdminEntity>, AppError> {
     Ok(AppJson(
-        Entity::update(id, updated_entity, &mut conn).await?,
+        AdminEntity::update(id, updated_entity, token.admin_id, &mut conn).await?,
     ))
 }
 
@@ -139,7 +139,7 @@ pub async fn admin_entity_delete(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
-    Entity::delete(id, &mut conn).await?;
+    AdminEntity::delete(id, &mut conn).await?;
     Ok(AppJson(()))
 }
 
@@ -157,8 +157,8 @@ pub async fn admin_entity_delete(
 pub async fn admin_entity_get_comments(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-) -> Result<AppJson<Vec<Comment>>, AppError> {
-    Ok(AppJson(Comment::list_for_entity(id, &mut conn).await?))
+) -> Result<AppJson<Vec<AdminComment>>, AppError> {
+    Ok(AppJson(AdminComment::list_for_entity(id, &mut conn).await?))
 }
 
 #[utoipa::path(
@@ -177,7 +177,7 @@ pub async fn admin_entity_register_parent(
     DbConn(mut conn): DbConn,
     Path((parent_id, child_id)): Path<(Uuid, Uuid)>,
 ) -> Result<AppJson<()>, AppError> {
-    Entity::register_parent_child(parent_id, child_id, &mut conn).await?;
+    AdminEntity::register_parent_child(parent_id, child_id, &mut conn).await?;
     Ok(AppJson(()))
 }
 
@@ -198,6 +198,6 @@ pub async fn admin_entity_remove_parent(
     DbConn(mut conn): DbConn,
     Path((parent_id, child_id)): Path<(Uuid, Uuid)>,
 ) -> Result<AppJson<()>, AppError> {
-    Entity::delete_parent_child(parent_id, child_id, &mut conn).await?;
+    AdminEntity::delete_parent_child(parent_id, child_id, &mut conn).await?;
     Ok(AppJson(()))
 }

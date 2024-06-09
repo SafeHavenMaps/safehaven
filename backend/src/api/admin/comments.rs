@@ -3,37 +3,42 @@ use uuid::Uuid;
 
 use crate::{
     api::{AppError, AppJson, DbConn},
-    models::comment::{Comment, ListedComment, NewComment, UpdateComment},
+    models::comment::{AdminComment, AdminListedComment, AdminNewOrUpdateComment},
 };
+
+use super::AdminUserTokenClaims;
 
 #[utoipa::path(
     get,
     path = "/api/admin/comments/pending",
     responses(
-        (status = 200, description = "List of pending comments", body = Vec<ListedComment>),
+        (status = 200, description = "List of pending comments", body = Vec<AdminListedComment>),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
 pub async fn admin_comments_pending(
     DbConn(mut conn): DbConn,
-) -> Result<AppJson<Vec<ListedComment>>, AppError> {
-    Ok(AppJson(Comment::pending(&mut conn).await?))
+) -> Result<AppJson<Vec<AdminListedComment>>, AppError> {
+    Ok(AppJson(AdminComment::pending(&mut conn).await?))
 }
 
 #[utoipa::path(
     post,
     path = "/api/admin/comments",
-    request_body = NewComment,
+    request_body = AdminNewOrUpdateComment,
     responses(
-        (status = 200, description = "Comment created", body = Comment),
+        (status = 200, description = "Comment created", body = AdminComment),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
 pub async fn admin_comment_new(
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
-    Json(new_comment): Json<NewComment>,
-) -> Result<AppJson<Comment>, AppError> {
-    Ok(AppJson(Comment::new(new_comment, &mut conn).await?))
+    Json(new_comment): Json<AdminNewOrUpdateComment>,
+) -> Result<AppJson<AdminComment>, AppError> {
+    Ok(AppJson(
+        AdminComment::new(new_comment, token.admin_id, &mut conn).await?,
+    ))
 }
 
 #[utoipa::path(
@@ -43,7 +48,7 @@ pub async fn admin_comment_new(
         ("id" = Uuid, Path, description = "Comment identifier")
     ),
     responses(
-        (status = 200, description = "Comment details", body = Comment),
+        (status = 200, description = "Comment details", body = AdminComment),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
     )
@@ -51,30 +56,31 @@ pub async fn admin_comment_new(
 pub async fn admin_comment_get(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-) -> Result<AppJson<Comment>, AppError> {
-    Ok(AppJson(Comment::get(id, &mut conn).await?))
+) -> Result<AppJson<AdminComment>, AppError> {
+    Ok(AppJson(AdminComment::get(id, &mut conn).await?))
 }
 
 #[utoipa::path(
     put,
     path = "/api/admin/comments/{id}",
-    request_body = UpdateComment,
+    request_body = AdminNewOrUpdateComment,
     params(
         ("id" = Uuid, Path, description = "Comment identifier")
     ),
     responses(
-        (status = 200, description = "Comment updated", body = Comment),
+        (status = 200, description = "Comment updated", body = AdminComment),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
     )
 )]
 pub async fn admin_comment_update(
+    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-    Json(updated_comment): Json<UpdateComment>,
-) -> Result<AppJson<Comment>, AppError> {
+    Json(updated_comment): Json<AdminNewOrUpdateComment>,
+) -> Result<AppJson<AdminComment>, AppError> {
     Ok(AppJson(
-        Comment::update(id, updated_comment, &mut conn).await?,
+        AdminComment::update(id, updated_comment, token.admin_id, &mut conn).await?,
     ))
 }
 
@@ -94,6 +100,6 @@ pub async fn admin_comment_delete(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
-    Comment::delete(id, &mut conn).await?;
+    AdminComment::delete(id, &mut conn).await?;
     Ok(AppJson(()))
 }

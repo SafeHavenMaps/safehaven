@@ -1,6 +1,6 @@
 use crate::api::{AppError, AppJson, AppState, DbConn, MapUserToken};
-use crate::models::comment::{Comment, NewComment, PublicComment};
-use crate::models::entity::{Entity, ListedEntity, NewEntity, PublicEntity};
+use crate::models::comment::{PublicComment, PublicNewComment};
+use crate::models::entity::{PublicEntity, PublicListedEntity, PublicNewEntity};
 use crate::models::entity_cache::{
     CachedEntitiesWithPagination, CachedEntity, EntitiesAndClusters, FindEntitiesRequest,
     SearchEntitiesRequest,
@@ -197,7 +197,7 @@ async fn viewer_search_request(
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct NewEntityRequest {
-    entity: NewEntity,
+    entity: PublicNewEntity,
 }
 
 #[utoipa::path(
@@ -205,7 +205,7 @@ pub struct NewEntityRequest {
     path = "/api/map/entities",
     request_body = NewEntityRequest,
     responses(
-        (status = 200, description = "Entity", body = Entity),
+        (status = 200, description = "Entity", body = PublicEntity),
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
@@ -213,22 +213,22 @@ async fn viewer_new_entity(
     DbConn(mut conn): DbConn,
     MapUserToken(_token): MapUserToken,
     Json(request): Json<NewEntityRequest>,
-) -> Result<AppJson<Entity>, AppError> {
-    let db_entity = Entity::new(request.entity, &mut conn).await?;
+) -> Result<AppJson<PublicEntity>, AppError> {
+    let db_entity = PublicEntity::new(request.entity, &mut conn).await?;
     Ok(AppJson(db_entity))
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct NewCommentRequest {
-    comment: NewComment,
+    comment: PublicNewComment,
 }
 
 #[utoipa::path(
     post,
     path = "/api/map/comments",
-    request_body = NewEntityRequest,
+    request_body = NewCommentRequest,
     responses(
-        (status = 200, description = "Comment", body = Comment),
+        (status = 200, description = "Comment", body = PublicComment),
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
@@ -236,8 +236,8 @@ async fn viewer_new_comment(
     DbConn(mut conn): DbConn,
     MapUserToken(_token): MapUserToken,
     Json(request): Json<NewCommentRequest>,
-) -> Result<AppJson<Comment>, AppError> {
-    let db_comment = Comment::new(request.comment, &mut conn).await?;
+) -> Result<AppJson<PublicComment>, AppError> {
+    let db_comment = PublicComment::new(request.comment, &mut conn).await?;
     Ok(AppJson(db_comment))
 }
 
@@ -245,8 +245,8 @@ async fn viewer_new_comment(
 pub struct FetchedEntity {
     pub entity: PublicEntity,
     pub comments: Vec<PublicComment>,
-    pub parents: Vec<ListedEntity>,
-    pub children: Vec<ListedEntity>,
+    pub parents: Vec<PublicListedEntity>,
+    pub children: Vec<PublicListedEntity>,
 }
 
 #[utoipa::path(
@@ -263,7 +263,7 @@ async fn viewer_fetch_entity(
     MapUserToken(token): MapUserToken,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<FetchedEntity>, AppError> {
-    let entity = Entity::get_public(id, &mut conn).await?;
+    let entity = PublicEntity::get(id, &mut conn).await?;
 
     let can_read_entity = (token.perms.families_policy.allow_all
         || token
@@ -288,12 +288,12 @@ async fn viewer_fetch_entity(
     }
 
     let comments = match token.perms.can_access_comments {
-        true => Comment::list_for_public_entity(id, &entity.comment_form, &mut conn).await?,
+        true => PublicComment::list_for_public_entity(id, &entity.comment_form, &mut conn).await?,
         false => vec![],
     };
 
-    let parents = Entity::get_parents(id, &mut conn).await?;
-    let children = Entity::get_children(id, &mut conn).await?;
+    let parents = PublicEntity::get_parents(id, &mut conn).await?;
+    let children = PublicEntity::get_children(id, &mut conn).await?;
 
     Ok(AppJson(FetchedEntity {
         entity,
