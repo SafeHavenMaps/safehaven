@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO entities (display_name, category_id, data)\n            VALUES ($1, $2, $3)\n            RETURNING\n                id,\n                display_name,\n                category_id,\n                locations as \"locations: Json<Vec<UnprocessedLocation>>\",\n                data,\n                hide_from_map,\n                moderation_notes,\n                moderated_at,\n                created_at,\n                updated_at,\n                last_update_by\n            ",
+  "query": "\n            SELECT e.id, c.family_id, e.display_name, e.category_id, \n                e.locations as \"locations: Json<Vec<UnprocessedLocation>>\", \n                e.data, e.hide_from_map, e.moderation_notes, e.moderated_at, \n                e.created_at, e.updated_at, e.last_update_by,\n                COALESCE(\n                    (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), \n                    array[]::uuid[]\n                ) as \"tags!\"\n            FROM entities e\n            INNER JOIN categories c ON e.category_id = c.id\n            WHERE e.id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -10,60 +10,68 @@
       },
       {
         "ordinal": 1,
+        "name": "family_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
         "name": "display_name",
         "type_info": "Text"
       },
       {
-        "ordinal": 2,
+        "ordinal": 3,
         "name": "category_id",
         "type_info": "Uuid"
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "locations: Json<Vec<UnprocessedLocation>>",
         "type_info": "Jsonb"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "data",
         "type_info": "Jsonb"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "hide_from_map",
         "type_info": "Bool"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "moderation_notes",
         "type_info": "Text"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "moderated_at",
         "type_info": "Timestamp"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "created_at",
         "type_info": "Timestamp"
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "updated_at",
         "type_info": "Timestamp"
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "last_update_by",
         "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "tags!",
+        "type_info": "UuidArray"
       }
     ],
     "parameters": {
       "Left": [
-        "Text",
-        "Uuid",
-        "Jsonb"
+        "Uuid"
       ]
     },
     "nullable": [
@@ -73,12 +81,14 @@
       false,
       false,
       false,
+      false,
       true,
       true,
       false,
       false,
-      true
+      true,
+      null
     ]
   },
-  "hash": "e0b98e6ed6b332038fcf160165fcd7107211de11a4a58c25b9e09dc6b0f2d5f5"
+  "hash": "3deabfde9c25d41cc911a7979fdb73054d63e4dd5c5f1e61c0204788c241ab26"
 }

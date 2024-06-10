@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM icons WHERE id = (SELECT icon_id FROM families WHERE id = $1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e625c5d9489f670a20dd88f3383937a290bb75a1cd229cc03e840d84a6b37ba2"
+}

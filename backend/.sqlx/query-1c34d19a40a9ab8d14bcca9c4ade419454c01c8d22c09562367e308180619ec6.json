@@ -1,0 +1,102 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH updated AS (\n                UPDATE entities\n                SET \n                    display_name = $2, \n                    category_id = $3, \n                    locations = $4, \n                    data = $5, \n                    hide_from_map = $6, \n                    moderation_notes = $7, \n                    last_update_by = $9, \n                    moderated_at = CASE\n                        WHEN $8 THEN COALESCE(moderated_at, NOW())\n                        ELSE NULL\n                    END\n                WHERE id = $1\n                RETURNING *\n            )\n            SELECT \n                u.id,\n                u.display_name,\n                u.category_id,\n                u.locations AS \"locations: Json<Vec<UnprocessedLocation>>\",\n                u.data,\n                u.hide_from_map,\n                u.moderation_notes,\n                u.moderated_at,\n                u.created_at,\n                u.updated_at,\n                u.last_update_by,\n                c.family_id,\n                COALESCE(array(\n                    SELECT tag_id\n                    FROM entity_tags\n                    WHERE entity_id = u.id\n                ), array[]::uuid[]) AS \"tags!\"\n            FROM updated u\n            JOIN categories c ON c.id = u.category_id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "category_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "locations: Json<Vec<UnprocessedLocation>>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "data",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "hide_from_map",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "moderation_notes",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "moderated_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 10,
+        "name": "last_update_by",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "family_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "tags!",
+        "type_info": "UuidArray"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Uuid",
+        "Jsonb",
+        "Jsonb",
+        "Bool",
+        "Text",
+        "Bool",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      null
+    ]
+  },
+  "hash": "1c34d19a40a9ab8d14bcca9c4ade419454c01c8d22c09562367e308180619ec6"
+}

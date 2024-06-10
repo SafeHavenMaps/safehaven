@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT upsert_row_icon($1, $2, $3, 'families')",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "upsert_row_icon",
+        "type_info": "Void"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Bytea",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "6e6b275479ea4753c86bd3c06c4b12c65e764824fc5a82d3ebd60d17bc667233"
+}

@@ -473,11 +473,11 @@ impl AdminEntity {
             AdminListedEntity,
             r#"
             SELECT e.id, e.display_name, e.category_id, e.created_at, e.hide_from_map,
-                   e.moderation_notes, e.moderated_at, e.last_update_by, e.updated_at,
-                   COALESCE(
+                    e.moderation_notes, e.moderated_at, e.last_update_by, e.updated_at,
+                    COALESCE(
                         (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                         array[]::uuid[]
-                   ) as "tags!"
+                    ) as "tags!"
             FROM entities e
             WHERE e.moderated_at IS NULL
             ORDER BY created_at
@@ -504,11 +504,11 @@ impl AdminEntity {
             AdminListedEntity,
             r#"
             SELECT e.id, e.display_name, e.category_id, e.created_at, e.hide_from_map,
-                   e.moderation_notes, e.moderated_at, e.last_update_by, e.updated_at,
-                   COALESCE(
+                    e.moderation_notes, e.moderated_at, e.last_update_by, e.updated_at,
+                    COALESCE(
                         (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                         array[]::uuid[]
-                   ) as "tags!"
+                    ) as "tags!"
             FROM entities e
             WHERE e.full_text_search_ts @@ to_tsquery($1)
             ORDER BY ts_rank(e.full_text_search_ts, to_tsquery($1)) DESC

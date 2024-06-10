@@ -74,7 +74,6 @@
 </template>
 
 <script setup lang="ts">
-import { v4 as uuidv4 } from 'uuid'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdateAccessToken, Permissions } from '~/lib'
 import state from '~/lib/admin-state'
@@ -104,7 +103,7 @@ const editedAccessToken: Ref<NewOrUpdateAccessToken> = ref({
     },
   },
   title: '',
-  token: uuidv4(),
+  token: '',
 })
 
 const families = state.families

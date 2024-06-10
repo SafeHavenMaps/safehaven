@@ -1,0 +1,50 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            c.id AS category_id, \n            c.family_id, \n            COUNT(DISTINCT e.id) FILTER (WHERE e.moderated_at IS NOT NULL) AS \"moderated_entities_count!\", \n            COUNT(DISTINCT e.id) FILTER (WHERE e.moderated_at IS NULL) AS \"unmoderated_entities_count!\", \n            COUNT(cm.id) FILTER (WHERE cm.moderated_at IS NOT NULL) AS \"moderated_comments_count!\", \n            COUNT(cm.id) FILTER (WHERE cm.moderated_at IS NULL) AS \"unmoderated_comments_count!\"\n        FROM public.categories c\n        JOIN public.entities e ON c.id = e.category_id\n        LEFT JOIN public.comments cm ON e.id = cm.entity_id\n        GROUP BY c.id, c.family_id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "category_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "family_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "moderated_entities_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "unmoderated_entities_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "moderated_comments_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "unmoderated_comments_count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "a8bf154e85f13e7ba4d88770cb7f2e2074e076e6d588ae4e0219fc61168993fe"
+}

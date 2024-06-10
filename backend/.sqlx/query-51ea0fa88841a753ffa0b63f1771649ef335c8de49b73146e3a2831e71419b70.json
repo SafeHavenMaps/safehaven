@@ -1,24 +1,23 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT upsert_entity_icon($1, $2, $3, 'categories')",
+  "query": "\n                SELECT replace_tags_for_entity($1, $2)\n                ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "upsert_entity_icon",
+        "name": "replace_tags_for_entity",
         "type_info": "Void"
       }
     ],
     "parameters": {
       "Left": [
         "Uuid",
-        "Bytea",
-        "Text"
+        "UuidArray"
       ]
     },
     "nullable": [
       null
     ]
   },
-  "hash": "0fa426219025d3aba0440683203907c3f73421a155552ecac45046929f7c39a0"
+  "hash": "51ea0fa88841a753ffa0b63f1771649ef335c8de49b73146e3a2831e71419b70"
 }

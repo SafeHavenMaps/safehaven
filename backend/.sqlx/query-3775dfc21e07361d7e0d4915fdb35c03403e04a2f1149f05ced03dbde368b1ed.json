@@ -1,0 +1,85 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH inserted AS (\n                INSERT INTO entities (display_name, category_id, locations, data)\n                VALUES ($1, $2, $3, $4)\n                RETURNING *\n            ) \n            SELECT \n                i.id, \n                i.category_id, \n                i.display_name, \n                i.data,\n                i.locations AS \"locations: Json<Vec<UnprocessedLocation>>\",\n                i.created_at,\n                i.updated_at,\n                array[]::uuid[] AS \"tags!\", \n                c.family_id,\n                f.entity_form AS \"entity_form: Json<Form>\", \n                f.comment_form AS \"comment_form: Json<Form>\"\n            FROM inserted i\n            JOIN categories c ON c.id = i.category_id\n            JOIN families f ON f.id = c.family_id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "category_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "data",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "locations: Json<Vec<UnprocessedLocation>>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 7,
+        "name": "tags!",
+        "type_info": "UuidArray"
+      },
+      {
+        "ordinal": 8,
+        "name": "family_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 9,
+        "name": "entity_form: Json<Form>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 10,
+        "name": "comment_form: Json<Form>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid",
+        "Jsonb",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3775dfc21e07361d7e0d4915fdb35c03403e04a2f1149f05ced03dbde368b1ed"
+}

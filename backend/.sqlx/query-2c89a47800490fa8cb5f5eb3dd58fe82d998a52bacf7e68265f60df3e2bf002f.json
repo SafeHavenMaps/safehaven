@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE comments\n            SET entity_id = $2, author = $3, text = $4, data = $5, moderated_at = $6, moderated_by = $7\n            WHERE id = $1\n            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated_at, moderated_by\n            ",
+  "query": "\n            INSERT INTO comments (entity_id, author, text, data, moderated_at, moderated_by)\n            VALUES (\n                $1, -- entity_id\n                $2, -- author\n                $3, -- text\n                $4, -- data\n                CASE -- if moderated set moderated_at to now as new comment\n                    WHEN $5 THEN NOW()\n                    ELSE NULL\n                END, -- moderated_at\n                CASE\n                    WHEN $5 THEN $6\n                    ELSE NULL::uuid\n                END  -- moderated_by\n            )\n            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated_at, moderated_by\n            ",
   "describe": {
     "columns": [
       {
@@ -52,11 +52,10 @@
     "parameters": {
       "Left": [
         "Uuid",
-        "Uuid",
         "Text",
         "Text",
         "Jsonb",
-        "Timestamp",
+        "Bool",
         "Uuid"
       ]
     },
@@ -72,5 +71,5 @@
       true
     ]
   },
-  "hash": "98743a7319af9260bc22c78feeb5e4c4882bb3932d560029a45a02aa1dee1094"
+  "hash": "2c89a47800490fa8cb5f5eb3dd58fe82d998a52bacf7e68265f60df3e2bf002f"
 }
