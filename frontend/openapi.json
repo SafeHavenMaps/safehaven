@@ -569,7 +569,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewComment"
+                "$ref": "#/components/schemas/AdminNewOrUpdateComment"
               }
             }
           },
@@ -581,7 +581,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Comment"
+                  "$ref": "#/components/schemas/AdminComment"
                 }
               }
             }
@@ -613,7 +613,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ListedComment"
+                    "$ref": "#/components/schemas/AdminListedComment"
                   }
                 }
               }
@@ -656,7 +656,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Comment"
+                  "$ref": "#/components/schemas/AdminComment"
                 }
               }
             }
@@ -704,7 +704,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateComment"
+                "$ref": "#/components/schemas/AdminNewOrUpdateComment"
               }
             }
           },
@@ -716,7 +716,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Comment"
+                  "$ref": "#/components/schemas/AdminComment"
                 }
               }
             }
@@ -797,7 +797,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewEntity"
+                "$ref": "#/components/schemas/AdminNewOrUpdateEntity"
               }
             }
           },
@@ -809,7 +809,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Entity"
+                  "$ref": "#/components/schemas/AdminEntity"
                 }
               }
             }
@@ -841,7 +841,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ListedEntity"
+                    "$ref": "#/components/schemas/AdminListedEntity"
                   }
                 }
               }
@@ -905,7 +905,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ListedEntity"
+                    "$ref": "#/components/schemas/AdminListedEntity"
                   }
                 }
               }
@@ -948,7 +948,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Entity"
+                  "$ref": "#/components/schemas/AdminEntity"
                 }
               }
             }
@@ -996,7 +996,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateEntity"
+                "$ref": "#/components/schemas/AdminNewOrUpdateEntity"
               }
             }
           },
@@ -1008,7 +1008,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Entity"
+                  "$ref": "#/components/schemas/AdminEntity"
                 }
               }
             }
@@ -2354,7 +2354,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewEntityRequest"
+                "$ref": "#/components/schemas/NewCommentRequest"
               }
             }
           },
@@ -2366,7 +2366,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Comment"
+                  "$ref": "#/components/schemas/PublicComment"
                 }
               }
             }
@@ -2406,7 +2406,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Entity"
+                  "$ref": "#/components/schemas/PublicEntity"
                 }
               }
             }
@@ -2608,6 +2608,296 @@
           },
           "token": {
             "type": "string"
+          }
+        }
+      },
+      "AdminComment": {
+        "type": "object",
+        "required": [
+          "id",
+          "entity_id",
+          "author",
+          "text",
+          "data",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "author": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "data": {},
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moderated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "moderated_by": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "text": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminEntity": {
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "category_id",
+          "family_id",
+          "locations",
+          "data",
+          "tags",
+          "hide_from_map",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "data": {},
+          "display_name": {
+            "type": "string"
+          },
+          "family_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "hide_from_map": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "last_update_by": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "locations": {
+            "$ref": "#/components/schemas/Json"
+          },
+          "moderated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "moderation_notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminListedComment": {
+        "type": "object",
+        "required": [
+          "id",
+          "entity_id",
+          "author",
+          "entity_display_name",
+          "entity_category_id",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "author": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "entity_category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entity_display_name": {
+            "type": "string"
+          },
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moderated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "moderated_by": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminListedEntity": {
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "category_id",
+          "tags",
+          "hide_from_map",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "hide_from_map": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "last_update_by": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "moderated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "moderation_notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminNewOrUpdateComment": {
+        "type": "object",
+        "required": [
+          "entity_id",
+          "author",
+          "text",
+          "data",
+          "moderated"
+        ],
+        "properties": {
+          "author": {
+            "type": "string"
+          },
+          "data": {},
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moderated": {
+            "type": "boolean"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminNewOrUpdateEntity": {
+        "type": "object",
+        "required": [
+          "display_name",
+          "category_id",
+          "locations",
+          "data",
+          "tags",
+          "hide_from_map",
+          "moderated"
+        ],
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {},
+          "display_name": {
+            "type": "string"
+          },
+          "hide_from_map": {
+            "type": "boolean"
+          },
+          "locations": {
+            "$ref": "#/components/schemas/Json"
+          },
+          "moderated": {
+            "type": "boolean"
+          },
+          "moderation_notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },
@@ -2890,53 +3180,6 @@
           }
         }
       },
-      "Comment": {
-        "type": "object",
-        "required": [
-          "id",
-          "entity_id",
-          "author",
-          "text",
-          "data",
-          "created_at",
-          "updated_at"
-        ],
-        "properties": {
-          "author": {
-            "type": "string"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "data": {},
-          "entity_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "moderated_at": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "moderated_by": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "text": {
-            "type": "string"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
       "ConfigurationOption": {
         "oneOf": [
           {
@@ -2971,61 +3214,6 @@
             "items": {
               "$ref": "#/components/schemas/CachedEntity"
             }
-          }
-        }
-      },
-      "Entity": {
-        "type": "object",
-        "required": [
-          "id",
-          "display_name",
-          "category_id",
-          "locations",
-          "data",
-          "hide_from_map",
-          "created_at",
-          "updated_at"
-        ],
-        "properties": {
-          "category_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "data": {},
-          "display_name": {
-            "type": "string"
-          },
-          "hide_from_map": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "last_update_by": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "locations": {
-            "$ref": "#/components/schemas/Json"
-          },
-          "moderated_at": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "moderation_notes": {
-            "type": "string",
-            "nullable": true
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time"
           }
         }
       },
@@ -3089,7 +3277,7 @@
           "children": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ListedEntity"
+              "$ref": "#/components/schemas/PublicListedEntity"
             }
           },
           "comments": {
@@ -3104,7 +3292,7 @@
           "parents": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ListedEntity"
+              "$ref": "#/components/schemas/PublicListedEntity"
             }
           }
         }
@@ -3241,63 +3429,6 @@
           }
         }
       },
-      "ListedComment": {
-        "type": "object",
-        "required": [
-          "id",
-          "entity_id",
-          "entity_display_name",
-          "entity_category_id",
-          "created_at"
-        ],
-        "properties": {
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "entity_category_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "entity_display_name": {
-            "type": "string"
-          },
-          "entity_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
-      "ListedEntity": {
-        "type": "object",
-        "required": [
-          "id",
-          "display_name",
-          "category_id",
-          "created_at"
-        ],
-        "properties": {
-          "category_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "display_name": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
       "LoginRequest": {
         "type": "object",
         "required": [
@@ -3328,28 +3459,6 @@
           }
         }
       },
-      "NewComment": {
-        "type": "object",
-        "required": [
-          "entity_id",
-          "author",
-          "text",
-          "data"
-        ],
-        "properties": {
-          "author": {
-            "type": "string"
-          },
-          "data": {},
-          "entity_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "text": {
-            "type": "string"
-          }
-        }
-      },
       "NewCommentRequest": {
         "type": "object",
         "required": [
@@ -3357,30 +3466,7 @@
         ],
         "properties": {
           "comment": {
-            "$ref": "#/components/schemas/NewComment"
-          }
-        }
-      },
-      "NewEntity": {
-        "type": "object",
-        "required": [
-          "display_name",
-          "category_id",
-          "data",
-          "last_update_by"
-        ],
-        "properties": {
-          "category_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "data": {},
-          "display_name": {
-            "type": "string"
-          },
-          "last_update_by": {
-            "type": "string",
-            "format": "uuid"
+            "$ref": "#/components/schemas/PublicNewComment"
           }
         }
       },
@@ -3391,7 +3477,7 @@
         ],
         "properties": {
           "entity": {
-            "$ref": "#/components/schemas/NewEntity"
+            "$ref": "#/components/schemas/PublicNewEntity"
           }
         }
       },
@@ -3598,14 +3684,16 @@
         "type": "object",
         "required": [
           "id",
+          "display_name",
           "category_id",
           "family_id",
-          "display_name",
           "locations",
           "data",
           "tags",
           "entity_form",
-          "comment_form"
+          "comment_form",
+          "created_at",
+          "updated_at"
         ],
         "properties": {
           "category_id": {
@@ -3614,6 +3702,10 @@
           },
           "comment_form": {
             "$ref": "#/components/schemas/Json"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
           },
           "data": {},
           "display_name": {
@@ -3638,6 +3730,83 @@
             "items": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PublicListedEntity": {
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "category_id",
+          "created_at"
+        ],
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "PublicNewComment": {
+        "type": "object",
+        "required": [
+          "entity_id",
+          "author",
+          "text",
+          "data"
+        ],
+        "properties": {
+          "author": {
+            "type": "string"
+          },
+          "data": {},
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "PublicNewEntity": {
+        "type": "object",
+        "required": [
+          "display_name",
+          "category_id",
+          "locations",
+          "data"
+        ],
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {},
+          "display_name": {
+            "type": "string"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnprocessedLocation"
             }
           }
         }
@@ -3846,65 +4015,6 @@
           },
           "plain_text": {
             "type": "string"
-          }
-        }
-      },
-      "UpdateComment": {
-        "type": "object",
-        "required": [
-          "entity_id",
-          "author",
-          "text",
-          "data"
-        ],
-        "properties": {
-          "author": {
-            "type": "string"
-          },
-          "data": {},
-          "entity_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "moderated_at": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "moderated_by": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "text": {
-            "type": "string"
-          }
-        }
-      },
-      "UpdateEntity": {
-        "type": "object",
-        "required": [
-          "display_name",
-          "category_id",
-          "data"
-        ],
-        "properties": {
-          "category_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "data": {},
-          "display_name": {
-            "type": "string"
-          },
-          "last_update_by": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "moderation_notes": {
-            "type": "string",
-            "nullable": true
           }
         }
       },
