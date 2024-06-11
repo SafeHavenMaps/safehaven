@@ -1,8 +1,12 @@
 use crate::{
     api::{
-        admin::{self, AdminUserTokenClaims, LoginRequest, LoginResponse},
+        admin::{
+            self, entities::SearchRequest as AdminSearchRequest, AdminUserTokenClaims,
+            LoginRequest, LoginResponse,
+        },
         map::{
-            self, FetchedEntity, NewCommentRequest, NewEntityRequest, SearchRequest, ViewRequest,
+            self, FetchedEntity, NewCommentRequest, NewEntityRequest,
+            SearchRequest as MapSearchRequest, ViewRequest,
         },
         root::{self, BootstrapResponse, SafeMode, StatusResponse},
         ErrorResponse,
@@ -18,7 +22,10 @@ use crate::{
             AdminEntity, AdminListedEntity, AdminNewOrUpdateEntity, PublicEntity,
             PublicListedEntity, PublicNewEntity, UnprocessedLocation,
         },
-        entity_cache::{CachedEntitiesWithPagination, CachedEntity, Cluster, EntitiesAndClusters},
+        entity_cache::{
+            AdminCachedEntitiesWithPagination, CachedEntitiesWithPagination, CachedEntity, Cluster,
+            EntitiesAndClusters,
+        },
         family::{Family, Field, FieldType, Form, NewOrUpdateFamily},
         options::{
             CartographyClusterConfig, CartographyInitConfig, ConfigurationOption, GeneralOptions,
@@ -140,9 +147,11 @@ use utoipa::OpenApi;
         PublicNewEntity,
         CachedEntity,
         CachedEntitiesWithPagination,
+        AdminCachedEntitiesWithPagination,
         Cluster,
         EntitiesAndClusters,
         UnprocessedLocation,
+        AdminSearchRequest,
         // comments
         AdminComment,
         PublicNewComment,
@@ -161,7 +170,7 @@ use utoipa::OpenApi;
         LoginResponse,
         // map
         ViewRequest,
-        SearchRequest,
+        MapSearchRequest,
         NewCommentRequest,
         NewEntityRequest,
         FetchedEntity,

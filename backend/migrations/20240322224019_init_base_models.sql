@@ -65,7 +65,7 @@ CREATE TABLE entities (
     category_id UUID NOT NULL,
     locations JSONB NOT NULL DEFAULT '[]',
     data JSONB NOT NULL,
-    hide_from_map BOOLEAN NOT NULL DEFAULT FALSE,
+    hidden BOOLEAN NOT NULL DEFAULT FALSE,
     moderation_notes TEXT,
     moderated_at TIMESTAMP,
 
@@ -73,14 +73,11 @@ CREATE TABLE entities (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_update_by UUID,
 
-    full_text_search_ts TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', display_name)) STORED,
-
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
     FOREIGN KEY (last_update_by) REFERENCES users(id) ON DELETE SET NULL
 );
 CREATE INDEX entities_category_id_idx ON entities(category_id);
-CREATE INDEX entities_moderated_at_hide_from_map_idx ON entities(moderated_at, hide_from_map);
-CREATE INDEX entities_full_text_search_idx ON entities USING GIN(full_text_search_ts);
+CREATE INDEX entities_moderated_hidden_idx ON entities(moderated_at, hidden);
 
 CREATE TABLE entity_tags (
     entity_id UUID NOT NULL,

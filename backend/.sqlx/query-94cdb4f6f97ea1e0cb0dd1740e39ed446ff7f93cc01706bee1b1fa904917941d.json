@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT \n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                total_results as \"total_results!\",\n                total_pages as \"total_pages!\",\n                response_current_page as \"response_current_page!\"\n            FROM search_entities_admin($1, $2, $3, $4, $5, $6, $7)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "entity_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "category_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "tags_ids!",
+        "type_info": "UuidArray"
+      },
+      {
+        "ordinal": 4,
+        "name": "family_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "display_name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "total_results!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "total_pages!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "response_current_page!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid",
+        "Int8",
+        "Int8",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "94cdb4f6f97ea1e0cb0dd1740e39ed446ff7f93cc01706bee1b1fa904917941d"
+}

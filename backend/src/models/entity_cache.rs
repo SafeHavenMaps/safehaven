@@ -22,6 +22,16 @@ pub struct CachedEntity {
     pub plain_text_location: Option<String>,
 }
 
+#[derive(Deserialize, Serialize, ToSchema, Debug)]
+pub struct AdminCachedEntity {
+    pub id: Uuid,
+    pub entity_id: Uuid,
+    pub category_id: Uuid,
+    pub tags_ids: Vec<Uuid>,
+    pub family_id: Uuid,
+    pub display_name: String,
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 struct PaginatedCachedEntity {
     pub id: Uuid,
@@ -77,13 +87,59 @@ impl From<Vec<PaginatedCachedEntity>> for CachedEntitiesWithPagination {
     }
 }
 
-#[derive(Deserialize, Serialize, ToSchema, Debug)]
-pub struct CachedEntitiesWithPagination {
-    pub entities: Vec<CachedEntity>,
+#[derive(Deserialize, Serialize, Debug)]
+struct AdminPaginatedCachedEntity {
+    pub id: Uuid,
+    pub entity_id: Uuid,
+    pub category_id: Uuid,
+    pub tags_ids: Vec<Uuid>,
+    pub family_id: Uuid,
+    pub display_name: String,
     pub total_results: i64,
     pub total_pages: i64,
     pub response_current_page: i64,
 }
+
+impl From<Vec<AdminPaginatedCachedEntity>> for AdminCachedEntitiesWithPagination {
+    fn from(paginated_entities: Vec<AdminPaginatedCachedEntity>) -> Self {
+        let mut entities = Vec::new();
+        let total_results = paginated_entities.first().map_or(0, |e| e.total_results);
+        let total_pages = paginated_entities.first().map_or(0, |e| e.total_pages);
+        let response_current_page = paginated_entities
+            .first()
+            .map_or(0, |e| e.response_current_page);
+
+        for paginated_entity in paginated_entities {
+            let entity = AdminCachedEntity {
+                id: paginated_entity.id,
+                entity_id: paginated_entity.entity_id,
+                category_id: paginated_entity.entity_id,
+                tags_ids: paginated_entity.tags_ids,
+                family_id: paginated_entity.entity_id,
+                display_name: paginated_entity.display_name,
+            };
+            entities.push(entity);
+        }
+
+        AdminCachedEntitiesWithPagination {
+            entities,
+            total_results,
+            total_pages,
+            response_current_page,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, ToSchema, Debug)]
+pub struct PaginatedVec<T> {
+    pub entities: Vec<T>,
+    pub total_results: i64,
+    pub total_pages: i64,
+    pub response_current_page: i64,
+}
+
+pub type CachedEntitiesWithPagination = PaginatedVec<CachedEntity>;
+pub type AdminCachedEntitiesWithPagination = PaginatedVec<AdminCachedEntity>;
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct CachedClusteredEntity {
@@ -317,6 +373,52 @@ impl CachedEntity {
             &request.active_required_tags,
             &request.active_hidden_tags,
             request.require_locations
+        )
+        .fetch_all(conn)
+        .await
+        .map_err(AppError::Database)?;
+
+        Ok(results.into())
+    }
+}
+
+pub struct AdminSearchEntitiesRequest {
+    pub search_query: String,
+    pub family_id: Uuid,
+    pub page: i64,
+    pub page_size: i64,
+    pub active_categories_ids: Vec<Uuid>,
+    pub required_tags_ids: Vec<Uuid>,
+    pub exluded_tags_ids: Vec<Uuid>,
+}
+
+impl AdminCachedEntity {
+    pub async fn search_entities(
+        request: AdminSearchEntitiesRequest,
+        conn: &mut PgConnection,
+    ) -> Result<AdminCachedEntitiesWithPagination, AppError> {
+        let results = query_as!(
+            AdminPaginatedCachedEntity,
+            r#"
+            SELECT 
+                id as "id!",
+                entity_id as "entity_id!",
+                category_id as "category_id!",
+                tags_ids as "tags_ids!",
+                family_id as "family_id!",
+                display_name as "display_name!",
+                total_results as "total_results!",
+                total_pages as "total_pages!",
+                response_current_page as "response_current_page!"
+            FROM search_entities_admin($1, $2, $3, $4, $5, $6, $7)
+            "#,
+            request.search_query,
+            request.family_id,
+            request.page,
+            request.page_size,
+            &request.active_categories_ids,
+            &request.required_tags_ids,
+            &request.exluded_tags_ids
         )
         .fetch_all(conn)
         .await

@@ -23,6 +23,7 @@ direct_locations AS (
         e.category_id,
         e.display_name,
         c.family_id,
+        e.hidden,
         location.value as location,
         location.ordinality AS location_index,
         array_remove(array_agg(DISTINCT et.tag_id) || array_agg(DISTINCT cet.tag_id), NULL) AS tags_ids,
@@ -37,7 +38,6 @@ direct_locations AS (
         SELECT value, ordinality
         FROM jsonb_array_elements(e.locations) WITH ORDINALITY AS location(value, ordinality)
     ) AS location ON true
-    WHERE e.moderated_at IS NOT NULL AND e.hide_from_map = FALSE
     GROUP BY e.id, c.family_id, e.display_name, e.category_id, location.value, location.ordinality
 )
 -- Add the entities with their locations to the materialized view
@@ -56,7 +56,8 @@ SELECT
     array_append(dl.child_categories_ids, dl.category_id) AS categories_ids,
     NULL AS parent_id,
     NULL AS parent_display_name,
-    to_tsvector('english', dl.display_name) AS full_text_search_ts
+    dl.hidden,
+    to_tsvector(dl.display_name) AS full_text_search_ts
 FROM direct_locations dl
 
 UNION
@@ -77,7 +78,8 @@ SELECT
     array_append(dl.child_categories_ids, dl.category_id) AS categories_ids,
     tl.parent_id,
     tl.parent_display_name,
-    to_tsvector('english', dl.display_name) AS full_text_search_ts
+    dl.hidden,
+    to_tsvector(dl.display_name) AS full_text_search_ts
 FROM transitive_locations tl
 JOIN direct_locations dl ON tl.child_id = dl.entity_id;
 

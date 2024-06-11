@@ -60,6 +60,7 @@ BEGIN
                 ec.web_mercator_location,
                 ST_MakeEnvelope(input_xmin, input_ymin, input_xmax, input_ymax, 3857)
             )
+            AND NOT ec.hidden
             AND ec.family_id = input_family_id
             AND ec.parent_id IS NULL
             -- Categories filter
@@ -150,9 +151,10 @@ BEGIN
             (
                 search_query IS NULL
                 OR search_query = ''
-                OR (full_text_search_ts @@ plainto_tsquery('english', search_query))
+                OR (full_text_search_ts @@ plainto_tsquery(search_query))
             )
             AND ec.family_id = input_family_id
+            AND NOT ec.hidden
             -- Categories
             AND
             (allow_all_categories OR (ec.categories_ids && categories_list))
@@ -168,7 +170,7 @@ BEGIN
             -- If we do not require locations, we only return entities with locations
             AND (NOT require_locations OR ec.web_mercator_location IS NOT NULL)
         ORDER BY
-            ts_rank(full_text_search_ts, plainto_tsquery('english', search_query)) DESC,
+            ts_rank(full_text_search_ts, plainto_tsquery(search_query)) DESC,
             (ec.web_mercator_location IS NOT NULL) DESC -- prioritize entities with locations
     ),
     distinct_entities AS (
@@ -192,6 +194,75 @@ BEGIN
             ST_X(ec.web_mercator_location) AS web_mercator_x,
             ST_Y(ec.web_mercator_location) AS web_mercator_y,
             ec.plain_text_location,
+            tc.total_results,
+            CEIL(tc.total_results / page_size::FLOAT)::BIGINT AS total_pages,
+            current_page as response_current_page
+        FROM distinct_entities ec, total_count tc
+        LIMIT page_size
+        OFFSET (current_page - 1) * page_size
+    )
+    SELECT * FROM paginated_results;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION search_entities_admin(
+    search_query TEXT,
+    input_family_id UUID,
+
+    current_page BIGINT,
+    page_size BIGINT,
+
+    active_categories_ids UUID[],
+    required_tags_ids UUID[],
+    exluded_tags_ids UUID[]
+) RETURNS TABLE (
+    id UUID,
+    entity_id UUID,
+    category_id UUID,
+    tags_ids UUID[],
+    family_id UUID,
+    display_name TEXT,
+    hidden BOOL,
+
+    total_results BIGINT,
+    total_pages BIGINT,
+    response_current_page BIGINT
+) AS $$
+BEGIN
+    RETURN QUERY
+    WITH filtered_entities AS (
+        SELECT ec.*
+        FROM entities_caches ec
+        WHERE
+            (
+                search_query IS NULL
+                OR search_query = ''
+                OR (full_text_search_ts @@ plainto_tsquery(search_query))
+            )
+            AND ec.family_id = input_family_id
+            AND (active_categories_ids && ec.categories_ids)
+            AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
+            AND NOT (ec.tags_ids && exluded_tags_ids)
+        ORDER BY
+            ts_rank(full_text_search_ts, plainto_tsquery(search_query)) DESC
+    ),
+    distinct_entities AS (
+        SELECT DISTINCT ON (ec.entity_id) ec.*
+        FROM filtered_entities ec
+    ),
+    total_count AS (
+        SELECT COUNT(*) AS total_results FROM distinct_entities
+    ),
+    paginated_results AS (
+        SELECT
+            ec.id,
+            ec.entity_id,
+            ec.category_id,
+            ec.tags_ids,
+            ec.family_id,
+            ec.display_name,
+            ec.hidden,
+
             tc.total_results,
             CEIL(tc.total_results / page_size::FLOAT)::BIGINT AS total_pages,
             current_page as response_current_page

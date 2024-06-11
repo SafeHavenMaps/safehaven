@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT e.id, c.family_id, e.display_name, e.category_id, \n                e.locations as \"locations: Json<Vec<UnprocessedLocation>>\", \n                e.data, e.hide_from_map, e.moderation_notes, e.moderated_at, \n                e.created_at, e.updated_at, e.last_update_by,\n                COALESCE(\n                    (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), \n                    array[]::uuid[]\n                ) as \"tags!\"\n            FROM entities e\n            INNER JOIN categories c ON e.category_id = c.id\n            WHERE e.id = $1\n            ",
+  "query": "\n            SELECT e.id, c.family_id, e.display_name, e.category_id, \n                e.locations as \"locations: Json<Vec<UnprocessedLocation>>\", \n                e.data, e.hidden, e.moderation_notes, e.moderated_at, \n                e.created_at, e.updated_at, e.last_update_by,\n                COALESCE(\n                    (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), \n                    array[]::uuid[]\n                ) as \"tags!\"\n            FROM entities e\n            INNER JOIN categories c ON e.category_id = c.id\n            WHERE e.id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -35,7 +35,7 @@
       },
       {
         "ordinal": 6,
-        "name": "hide_from_map",
+        "name": "hidden",
         "type_info": "Bool"
       },
       {
@@ -90,5 +90,5 @@
       null
     ]
   },
-  "hash": "3deabfde9c25d41cc911a7979fdb73054d63e4dd5c5f1e61c0204788c241ab26"
+  "hash": "6bc13df5e3524120dc803ec7e59c86cda6f01e5d14326aea836596938e6859e4"
 }

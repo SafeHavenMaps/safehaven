@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            WITH updated AS (\n                UPDATE entities\n                SET \n                    display_name = $2, \n                    category_id = $3, \n                    locations = $4, \n                    data = $5, \n                    hide_from_map = $6, \n                    moderation_notes = $7, \n                    last_update_by = $9, \n                    moderated_at = CASE\n                        WHEN $8 THEN COALESCE(moderated_at, NOW())\n                        ELSE NULL\n                    END\n                WHERE id = $1\n                RETURNING *\n            )\n            SELECT \n                u.id,\n                u.display_name,\n                u.category_id,\n                u.locations AS \"locations: Json<Vec<UnprocessedLocation>>\",\n                u.data,\n                u.hide_from_map,\n                u.moderation_notes,\n                u.moderated_at,\n                u.created_at,\n                u.updated_at,\n                u.last_update_by,\n                c.family_id,\n                COALESCE(array(\n                    SELECT tag_id\n                    FROM entity_tags\n                    WHERE entity_id = u.id\n                ), array[]::uuid[]) AS \"tags!\"\n            FROM updated u\n            JOIN categories c ON c.id = u.category_id\n            ",
+  "query": "\n            WITH updated AS (\n                UPDATE entities\n                SET \n                    display_name = $2, \n                    category_id = $3, \n                    locations = $4, \n                    data = $5, \n                    hidden = $6, \n                    moderation_notes = $7, \n                    last_update_by = $9, \n                    moderated_at = CASE\n                        WHEN $8 THEN COALESCE(moderated_at, NOW())\n                        ELSE NULL\n                    END\n                WHERE id = $1\n                RETURNING *\n            )\n            SELECT \n                u.id,\n                u.display_name,\n                u.category_id,\n                u.locations AS \"locations: Json<Vec<UnprocessedLocation>>\",\n                u.data,\n                u.hidden,\n                u.moderation_notes,\n                u.moderated_at,\n                u.created_at,\n                u.updated_at,\n                u.last_update_by,\n                c.family_id,\n                COALESCE(array(\n                    SELECT tag_id\n                    FROM entity_tags\n                    WHERE entity_id = u.id\n                ), array[]::uuid[]) AS \"tags!\"\n            FROM updated u\n            JOIN categories c ON c.id = u.category_id\n            ",
   "describe": {
     "columns": [
       {
@@ -30,7 +30,7 @@
       },
       {
         "ordinal": 5,
-        "name": "hide_from_map",
+        "name": "hidden",
         "type_info": "Bool"
       },
       {
@@ -98,5 +98,5 @@
       null
     ]
   },
-  "hash": "1c34d19a40a9ab8d14bcca9c4ade419454c01c8d22c09562367e308180619ec6"
+  "hash": "e652076e5df9c986d594cb365f34906142b61903c63e300069a66acc8edcb0ed"
 }

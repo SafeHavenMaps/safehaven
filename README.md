@@ -23,8 +23,8 @@ We welcome contributions from everyone. To spin up a development environment, fo
 - Adjust the flake.nix variable to match your database database
 - Inside the `backend` folder
   - Run `sqlx migrate run` to create the database schema
-  - Run `cargo run -- serve` to start the backend server
 - Inside the `frontend` folder
   - Run `npm install` to install the dependencies
-  - Run `npm run generate-api` to generate the API client using the openapi definition
-  - Run `npm run dev` to start the development server
+- Inside the root folder:
+  - Run `regen_api` to regenerate the API
+  - Run `start_dev_env` to start the stack using process-compose

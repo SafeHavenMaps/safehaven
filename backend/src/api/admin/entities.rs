@@ -3,6 +3,7 @@ use axum::{
     Json,
 };
 use serde::Deserialize;
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::{
@@ -10,6 +11,9 @@ use crate::{
     models::{
         comment::AdminComment,
         entity::{AdminEntity, AdminListedEntity, AdminNewOrUpdateEntity},
+        entity_cache::{
+            AdminCachedEntitiesWithPagination, AdminCachedEntity, AdminSearchEntitiesRequest,
+        },
     },
 };
 
@@ -17,13 +21,21 @@ use super::AdminUserTokenClaims;
 
 #[derive(Deserialize, Debug)]
 pub struct SearchQuery {
-    pub search: String,
     pub page: Option<i64>,
     pub page_size: Option<i64>,
 }
 
+#[derive(Deserialize, Debug, ToSchema)]
+pub struct SearchRequest {
+    pub family: Uuid,
+    pub search: String,
+    pub active_categories_ids: Vec<Uuid>,
+    pub required_tags_ids: Vec<Uuid>,
+    pub exluded_tags_ids: Vec<Uuid>,
+}
+
 #[utoipa::path(
-    get,
+    post,
     path = "/api/admin/entities/search",
     params(
         ("search" = String, Query, description = "Search query"),
@@ -31,19 +43,32 @@ pub struct SearchQuery {
         ("page_size" = i64, Query, description = "Number of items per page (default: 20)")
     ),
     responses(
-        (status = 200, description = "Search results for entities", body = Vec<AdminListedEntity>),
+        (status = 200, description = "Search results for entities", body = Vec<AdminCachedEntitiesWithPagination>),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
 pub async fn admin_entities_search(
     DbConn(mut conn): DbConn,
-    Query(query): Query<SearchQuery>,
-) -> Result<AppJson<Vec<AdminListedEntity>>, AppError> {
-    let page = query.page.unwrap_or(1);
-    let page_size = query.page_size.unwrap_or(20);
+    Query(search_query): Query<SearchQuery>,
+    Json(search_req): Json<SearchRequest>,
+) -> Result<AppJson<AdminCachedEntitiesWithPagination>, AppError> {
+    let page = search_query.page.unwrap_or(1);
+    let page_size = search_query.page_size.unwrap_or(20);
 
     Ok(AppJson(
-        AdminEntity::search(query.search, page, page_size, &mut conn).await?,
+        AdminCachedEntity::search_entities(
+            AdminSearchEntitiesRequest {
+                search_query: search_req.search,
+                family_id: search_req.family,
+                page,
+                page_size,
+                active_categories_ids: search_req.active_categories_ids,
+                required_tags_ids: search_req.required_tags_ids,
+                exluded_tags_ids: search_req.exluded_tags_ids,
+            },
+            &mut conn,
+        )
+        .await?,
     ))
 }
 

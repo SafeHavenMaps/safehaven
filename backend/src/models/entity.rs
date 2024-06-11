@@ -178,17 +178,18 @@ pub struct AdminNewOrUpdateEntity {
     pub locations: Json<Vec<UnprocessedLocation>>,
     pub data: Value,
     pub tags: Vec<Uuid>,
-    pub hide_from_map: bool,
+    pub hidden: bool,
     pub moderation_notes: Option<String>,
     pub moderated: bool,
 }
+
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
 pub struct AdminListedEntity {
     pub id: Uuid,
     pub display_name: String,
     pub category_id: Uuid,
     pub tags: Vec<Uuid>,
-    pub hide_from_map: bool,
+    pub hidden: bool,
     pub moderation_notes: Option<String>,
     pub moderated_at: Option<chrono::NaiveDateTime>,
     pub created_at: chrono::NaiveDateTime,
@@ -205,7 +206,7 @@ pub struct AdminEntity {
     pub locations: Json<Vec<UnprocessedLocation>>,
     pub data: Value,
     pub tags: Vec<Uuid>,
-    pub hide_from_map: bool,
+    pub hidden: bool,
     pub moderation_notes: Option<String>,
     pub moderated_at: Option<chrono::NaiveDateTime>,
     pub created_at: chrono::NaiveDateTime,
@@ -234,7 +235,7 @@ impl AdminEntity {
             AdminEntity,
             r#"
             WITH inserted AS (
-                INSERT INTO entities (display_name, category_id, locations, data, hide_from_map, moderation_notes, last_update_by, moderated_at)
+                INSERT INTO entities (display_name, category_id, locations, data, hidden, moderation_notes, last_update_by, moderated_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7,
                     CASE
                         WHEN $8 THEN NOW()
@@ -253,7 +254,7 @@ impl AdminEntity {
                 i.category_id,
                 i.locations AS "locations: Json<Vec<UnprocessedLocation>>",
                 i.data,
-                i.hide_from_map,
+                i.hidden,
                 i.moderation_notes,
                 i.moderated_at,
                 i.created_at,
@@ -272,7 +273,7 @@ impl AdminEntity {
             new_entity.category_id,        // $2
             locations,                     // $3
             new_entity.data,               // $4
-            new_entity.hide_from_map,      // $5
+            new_entity.hidden,      // $5
             new_entity.moderation_notes,   // $6
             created_by,                    // $7
             new_entity.moderated           // $8
@@ -339,7 +340,7 @@ impl AdminEntity {
                     category_id = $3, 
                     locations = $4, 
                     data = $5, 
-                    hide_from_map = $6, 
+                    hidden = $6, 
                     moderation_notes = $7, 
                     last_update_by = $9, 
                     moderated_at = CASE
@@ -355,7 +356,7 @@ impl AdminEntity {
                 u.category_id,
                 u.locations AS "locations: Json<Vec<UnprocessedLocation>>",
                 u.data,
-                u.hide_from_map,
+                u.hidden,
                 u.moderation_notes,
                 u.moderated_at,
                 u.created_at,
@@ -375,7 +376,7 @@ impl AdminEntity {
             update.category_id,      // $3
             locations,               // $4
             update.data,             // $5
-            update.hide_from_map,    // $6
+            update.hidden,           // $6
             update.moderation_notes, // $7
             update.moderated,        // $8
             last_update_by           // $9
@@ -451,7 +452,7 @@ impl AdminEntity {
             r#"
             SELECT e.id, c.family_id, e.display_name, e.category_id, 
                 e.locations as "locations: Json<Vec<UnprocessedLocation>>", 
-                e.data, e.hide_from_map, e.moderation_notes, e.moderated_at, 
+                e.data, e.hidden, e.moderation_notes, e.moderated_at, 
                 e.created_at, e.updated_at, e.last_update_by,
                 COALESCE(
                     (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
@@ -472,7 +473,7 @@ impl AdminEntity {
         sqlx::query_as!(
             AdminListedEntity,
             r#"
-            SELECT e.id, e.display_name, e.category_id, e.created_at, e.hide_from_map,
+            SELECT e.id, e.display_name, e.category_id, e.created_at, e.hidden,
                     e.moderation_notes, e.moderated_at, e.last_update_by, e.updated_at,
                     COALESCE(
                         (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
@@ -482,42 +483,6 @@ impl AdminEntity {
             WHERE e.moderated_at IS NULL
             ORDER BY created_at
             "#
-        )
-        .fetch_all(conn)
-        .await
-        .map_err(AppError::Database)
-    }
-
-    pub async fn search(
-        query: String,
-        page: i64,
-        page_size: i64,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<AdminListedEntity>, AppError> {
-        if (page_size < 1) || (page < 1) {
-            return Err(AppError::InvalidPagination);
-        }
-
-        let offset = (page - 1) * page_size;
-
-        sqlx::query_as!(
-            AdminListedEntity,
-            r#"
-            SELECT e.id, e.display_name, e.category_id, e.created_at, e.hide_from_map,
-                    e.moderation_notes, e.moderated_at, e.last_update_by, e.updated_at,
-                    COALESCE(
-                        (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
-                        array[]::uuid[]
-                    ) as "tags!"
-            FROM entities e
-            WHERE e.full_text_search_ts @@ to_tsquery($1)
-            ORDER BY ts_rank(e.full_text_search_ts, to_tsquery($1)) DESC
-            LIMIT $2
-            OFFSET $3
-            "#,
-            query,
-            page_size,
-            offset
         )
         .fetch_all(conn)
         .await
