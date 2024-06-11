@@ -40,4 +40,11 @@ export default defineNuxtConfig({
       title: 'Safehaven',
     },
   },
+  vite: {
+    resolve: {
+      alias: {
+        ace: 'ace-builds/src-noconflict',
+      },
+    },
+  },
 })
