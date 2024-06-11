@@ -66,10 +66,10 @@
 </template>
 
 <script setup lang="ts">
-import type { PaginatedCachedEntities } from '~/lib'
+import type { ViewerPaginatedCachedEntities } from '~/lib'
 import state from '~/lib/viewer-state'
 
-type ReceivedEntity = PaginatedCachedEntities['entities'][0]
+type ReceivedEntity = ViewerPaginatedCachedEntities['entities'][0]
 
 const props = defineProps<{
   entity: ReceivedEntity

@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import type { Coordinate } from 'ol/coordinate'
-import type { CachedEntity, DisplayableCachedEntity } from '~/lib'
+import type { ViewerCachedEntity, DisplayableCachedEntity } from '~/lib'
 import state from '~/lib/viewer-state'
 import ViewerMap from '~/components/viewer/Map.vue'
 
@@ -87,7 +87,7 @@ async function displayEntityId(entityId: string) {
   await state.selectEntity(entityId)
 }
 
-async function goToEntity(entity: CachedEntity) {
+async function goToEntity(entity: ViewerCachedEntity) {
   await state.selectEntity(entity.entity_id)
 
   mapRef.value?.goToWebMercatorCoordinates([

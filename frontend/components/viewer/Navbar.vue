@@ -190,7 +190,7 @@ import state from '~/lib/viewer-state'
 import defaultLogo from '~/assets/logo_square.svg'
 import type { Result as NominatimResult } from '~/lib/nominatim'
 import { freeFormSearch } from '~/lib/nominatim'
-import type { CachedEntity, PaginatedCachedEntitiesWithLocation } from '~/lib'
+import type { ViewerCachedEntity, ViewerPaginatedCachedEntitiesWithLocation } from '~/lib'
 
 export interface Props {
   showCategorySwitcher?: boolean
@@ -207,7 +207,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   filtersChanged: []
   locationChosen: [Coordinate]
-  entityChosen: [CachedEntity]
+  entityChosen: [ViewerCachedEntity]
 }>()
 
 const filterOp = ref<OverlayPanel>()
@@ -218,7 +218,7 @@ const entitySearch: Ref<string> = ref('')
 const showInformation = ref(false)
 
 const currentLocationsResults: Ref<NominatimResult[]> = ref([])
-const currentEntitiesResults: Ref<PaginatedCachedEntitiesWithLocation | null> = ref(null)
+const currentEntitiesResults: Ref<ViewerPaginatedCachedEntitiesWithLocation | null> = ref(null)
 
 function currentSearchEntities() {
   return currentEntitiesResults.value?.entities ?? []
@@ -245,7 +245,7 @@ function locationChosen(result: NominatimResult) {
   emit('locationChosen', gpsCoordinates)
 }
 
-function entityChosen(result: CachedEntity) {
+function entityChosen(result: ViewerCachedEntity) {
   emit('entityChosen', result)
   searchOp!.value!.hide()
 }

@@ -17,7 +17,7 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
 
     active_categories_ids UUID[],
     required_tags_ids UUID[],
-    exluded_tags_ids UUID[]
+    excluded_tags_ids UUID[]
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -72,7 +72,7 @@ BEGIN
             -- User filters
             AND (active_categories_ids && ec.categories_ids)
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
-            AND NOT (ec.tags_ids && exluded_tags_ids)
+            AND NOT (ec.tags_ids && excluded_tags_ids)
     ),
     clusters AS (
         SELECT
@@ -122,7 +122,7 @@ CREATE OR REPLACE FUNCTION search_entities(
 
     active_categories_ids UUID[],
     required_tags_ids UUID[],
-    exluded_tags_ids UUID[],
+    excluded_tags_ids UUID[],
 
     require_locations BOOL
 ) RETURNS TABLE (
@@ -166,7 +166,7 @@ BEGIN
             -- User filters
             AND (active_categories_ids && ec.categories_ids)
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
-            AND NOT (ec.tags_ids && exluded_tags_ids)
+            AND NOT (ec.tags_ids && excluded_tags_ids)
             -- If we do not require locations, we only return entities with locations
             AND (NOT require_locations OR ec.web_mercator_location IS NOT NULL)
         ORDER BY
@@ -214,7 +214,7 @@ CREATE OR REPLACE FUNCTION search_entities_admin(
 
     active_categories_ids UUID[],
     required_tags_ids UUID[],
-    exluded_tags_ids UUID[]
+    excluded_tags_ids UUID[]
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -242,7 +242,7 @@ BEGIN
             AND ec.family_id = input_family_id
             AND (active_categories_ids && ec.categories_ids)
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
-            AND NOT (ec.tags_ids && exluded_tags_ids)
+            AND NOT (ec.tags_ids && excluded_tags_ids)
         ORDER BY
             ts_rank(full_text_search_ts, plainto_tsquery(search_query)) DESC
     ),

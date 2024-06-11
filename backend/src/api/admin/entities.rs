@@ -26,31 +26,31 @@ pub struct SearchQuery {
 }
 
 #[derive(Deserialize, Debug, ToSchema)]
-pub struct SearchRequest {
+pub struct AdminSearchRequest {
     pub family: Uuid,
     pub search: String,
     pub active_categories_ids: Vec<Uuid>,
     pub required_tags_ids: Vec<Uuid>,
-    pub exluded_tags_ids: Vec<Uuid>,
+    pub excluded_tags_ids: Vec<Uuid>,
 }
 
 #[utoipa::path(
     post,
     path = "/api/admin/entities/search",
+    request_body = AdminSearchRequest,
     params(
-        ("search" = String, Query, description = "Search query"),
         ("page" = i64, Query, description = "Current page (default: 1)"),
         ("page_size" = i64, Query, description = "Number of items per page (default: 20)")
     ),
     responses(
-        (status = 200, description = "Search results for entities", body = Vec<AdminCachedEntitiesWithPagination>),
+        (status = 200, description = "Search results for entities", body = AdminCachedEntitiesWithPagination),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
 pub async fn admin_entities_search(
     DbConn(mut conn): DbConn,
     Query(search_query): Query<SearchQuery>,
-    Json(search_req): Json<SearchRequest>,
+    Json(search_req): Json<AdminSearchRequest>,
 ) -> Result<AppJson<AdminCachedEntitiesWithPagination>, AppError> {
     let page = search_query.page.unwrap_or(1);
     let page_size = search_query.page_size.unwrap_or(20);
@@ -64,7 +64,7 @@ pub async fn admin_entities_search(
                 page_size,
                 active_categories_ids: search_req.active_categories_ids,
                 required_tags_ids: search_req.required_tags_ids,
-                exluded_tags_ids: search_req.exluded_tags_ids,
+                excluded_tags_ids: search_req.excluded_tags_ids,
             },
             &mut conn,
         )

@@ -861,21 +861,12 @@
       }
     },
     "/api/admin/entities/search": {
-      "get": {
+      "post": {
         "tags": [
           "admin::entities"
         ],
         "operationId": "admin_entities_search",
         "parameters": [
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Search query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "page",
             "in": "query",
@@ -897,16 +888,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Search results for entities",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AdminListedEntity"
-                  }
+                  "$ref": "#/components/schemas/AdminCachedEntitiesWithPagination"
                 }
               }
             }
@@ -1105,7 +1103,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Comment"
+                    "$ref": "#/components/schemas/AdminComment"
                   }
                 }
               }
@@ -2611,6 +2609,49 @@
           }
         }
       },
+      "AdminCachedEntity": {
+        "type": "object",
+        "required": [
+          "id",
+          "entity_id",
+          "category_id",
+          "tags_ids",
+          "family_id",
+          "display_name",
+          "hidden"
+        ],
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "family_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tags_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
       "AdminComment": {
         "type": "object",
         "required": [
@@ -2668,7 +2709,7 @@
           "locations",
           "data",
           "tags",
-          "hide_from_map",
+          "hidden",
           "created_at",
           "updated_at"
         ],
@@ -2689,7 +2730,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "hide_from_map": {
+          "hidden": {
             "type": "boolean"
           },
           "id": {
@@ -2783,7 +2824,7 @@
           "display_name",
           "category_id",
           "tags",
-          "hide_from_map",
+          "hidden",
           "created_at",
           "updated_at"
         ],
@@ -2799,7 +2840,7 @@
           "display_name": {
             "type": "string"
           },
-          "hide_from_map": {
+          "hidden": {
             "type": "boolean"
           },
           "id": {
@@ -2867,7 +2908,7 @@
           "locations",
           "data",
           "tags",
-          "hide_from_map",
+          "hidden",
           "moderated"
         ],
         "properties": {
@@ -2879,7 +2920,7 @@
           "display_name": {
             "type": "string"
           },
-          "hide_from_map": {
+          "hidden": {
             "type": "boolean"
           },
           "locations": {
@@ -2898,6 +2939,46 @@
               "type": "string",
               "format": "uuid"
             }
+          }
+        }
+      },
+      "AdminSearchRequest": {
+        "type": "object",
+        "required": [
+          "family",
+          "search",
+          "active_categories_ids",
+          "required_tags_ids",
+          "excluded_tags_ids"
+        ],
+        "properties": {
+          "active_categories_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "excluded_tags_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "family": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "required_tags_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "search": {
+            "type": "string"
           }
         }
       },
@@ -2964,105 +3045,6 @@
             "items": {
               "$ref": "#/components/schemas/Tag"
             }
-          }
-        }
-      },
-      "CachedEntitiesWithPagination": {
-        "type": "object",
-        "required": [
-          "entities",
-          "total_results",
-          "total_pages",
-          "response_current_page"
-        ],
-        "properties": {
-          "entities": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CachedEntity"
-            }
-          },
-          "response_current_page": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "total_pages": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "total_results": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "CachedEntity": {
-        "type": "object",
-        "required": [
-          "id",
-          "entity_id",
-          "category_id",
-          "categories_ids",
-          "tags_ids",
-          "family_id",
-          "display_name"
-        ],
-        "properties": {
-          "categories_ids": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "category_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "display_name": {
-            "type": "string"
-          },
-          "entity_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "family_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "parent_display_name": {
-            "type": "string",
-            "nullable": true
-          },
-          "parent_id": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "plain_text_location": {
-            "type": "string",
-            "nullable": true
-          },
-          "tags_ids": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "web_mercator_x": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "web_mercator_y": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
           }
         }
       },
@@ -3212,7 +3194,7 @@
           "entities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CachedEntity"
+              "$ref": "#/components/schemas/ViewerCachedEntity"
             }
           }
         }
@@ -3595,6 +3577,35 @@
           "password": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "PaginatedVec": {
+        "type": "object",
+        "required": [
+          "entities",
+          "total_results",
+          "total_pages",
+          "response_current_page"
+        ],
+        "properties": {
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/T"
+            }
+          },
+          "response_current_page": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_pages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_results": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -4102,6 +4113,76 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "ViewerCachedEntity": {
+        "type": "object",
+        "required": [
+          "id",
+          "entity_id",
+          "category_id",
+          "categories_ids",
+          "tags_ids",
+          "family_id",
+          "display_name"
+        ],
+        "properties": {
+          "categories_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "family_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parent_display_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "parent_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "plain_text_location": {
+            "type": "string",
+            "nullable": true
+          },
+          "tags_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "web_mercator_x": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "web_mercator_y": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       }

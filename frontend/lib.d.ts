@@ -21,7 +21,16 @@ export type PublicEntity = api.components['schemas']['PublicEntity']
 export type PublicListedEntity = api.components['schemas']['ListedEntity']
 export type PublicNewEntity = api.components['schemas']['NewEntity']
 export type Cluster = api.components['schemas']['Cluster']
-export type CachedEntity = api.components['schemas']['CachedEntity']
+type PaginatedVec<T> = api.components['schemas']['PaginatedVec'] & { entities: T[] }
+export type ViewerCachedEntity = api.components['schemas']['ViewerCachedEntity']
+export type ViewerPaginatedCachedEntities = PaginatedVec<ViewerCachedEntity>
+export type ViewerCachedEntityWithLocation = ViewerCachedEntity & {
+  web_mercator_x: number
+  web_mercator_y: number
+}
+export type ViewerPaginatedCachedEntitiesWithLocation = ViewerPaginatedCachedEntities & {
+  entities: (ViewerCachedEntityWithLocation)[]
+}
 export type FetchedEntity = api.components['schemas']['FetchedEntity']
 export type ResolvedFetchedEntity = FetchedEntity & {
   family: Family
@@ -32,6 +41,9 @@ export type ResolvedFetchedEntity = FetchedEntity & {
 export type AdminEntity = api.components['schemas']['AdminEntity']
 export type AdminListedEntity = api.components['schemas']['AdminListedEntity']
 export type AdminNewOrUpdateEntity = api.components['schemas']['AdminNewOrUpdateEntity']
+export type AdminSearchRequestBody = api.components['schemas']['AdminSearchRequest']
+export type AdminCachedEntity = api.components['schemas']['AdminCachedEntity']
+export type AdminPaginatedCachedEntities = PaginatedVec<AdminCachedEntity>
 
 export type PublicComment = api.components['schemas']['PublicComment']
 export type PublicNewComment = api.components['schemas']['PublicNewComment']
@@ -67,22 +79,13 @@ export interface HasCategory {
   category: Category
 }
 
-export type DisplayableCachedEntity = CachedEntity &
+export type DisplayableCachedEntity = ViewerCachedEntity &
   HasCoordinates &
   HasFamily &
   HasCategory &
   CanBeHighlighted
 
 export type DisplayableCluster = Cluster & HasCoordinates
-
-export type PaginatedCachedEntities = api.components['schemas']['CachedEntitiesWithPagination']
-
-export type PaginatedCachedEntitiesWithLocation = PaginatedCachedEntities & {
-  entities: (CachedEntity & {
-    web_mercator_x: number
-    web_mercator_y: number
-  })[]
-}
 
 export type StringFieldTypeMetadata = {
   format: string

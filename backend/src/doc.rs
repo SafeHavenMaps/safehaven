@@ -1,8 +1,7 @@
 use crate::{
     api::{
         admin::{
-            self, entities::SearchRequest as AdminSearchRequest, AdminUserTokenClaims,
-            LoginRequest, LoginResponse,
+            self, entities::AdminSearchRequest, AdminUserTokenClaims, LoginRequest, LoginResponse,
         },
         map::{
             self, FetchedEntity, NewCommentRequest, NewEntityRequest,
@@ -23,8 +22,8 @@ use crate::{
             PublicListedEntity, PublicNewEntity, UnprocessedLocation,
         },
         entity_cache::{
-            AdminCachedEntitiesWithPagination, CachedEntitiesWithPagination, CachedEntity, Cluster,
-            EntitiesAndClusters,
+            AdminCachedEntitiesWithPagination, AdminCachedEntity, Cluster, EntitiesAndClusters,
+            ViewerCachedEntitiesWithPagination, ViewerCachedEntity,
         },
         family::{Family, Field, FieldType, Form, NewOrUpdateFamily},
         options::{
@@ -145,9 +144,10 @@ use utoipa::OpenApi;
         PublicEntity,
         PublicListedEntity,
         PublicNewEntity,
-        CachedEntity,
-        CachedEntitiesWithPagination,
+        ViewerCachedEntity,
+        ViewerCachedEntitiesWithPagination,
         AdminCachedEntitiesWithPagination,
+        AdminCachedEntity,
         Cluster,
         EntitiesAndClusters,
         UnprocessedLocation,

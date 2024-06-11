@@ -2,8 +2,8 @@ use crate::api::{AppError, AppJson, AppState, DbConn, MapUserToken};
 use crate::models::comment::{PublicComment, PublicNewComment};
 use crate::models::entity::{PublicEntity, PublicListedEntity, PublicNewEntity};
 use crate::models::entity_cache::{
-    CachedEntitiesWithPagination, CachedEntity, EntitiesAndClusters, FindEntitiesRequest,
-    SearchEntitiesRequest,
+    EntitiesAndClusters, FindEntitiesRequest, SearchEntitiesRequest,
+    ViewerCachedEntitiesWithPagination, ViewerCachedEntity,
 };
 use axum::extract::{Path, State};
 use axum::{
@@ -127,7 +127,7 @@ pub async fn viewer_view_request(
     };
 
     Ok(AppJson(
-        CachedEntity::find_entities_in_rectangle(request, &mut conn).await?,
+        ViewerCachedEntity::find_entities_in_rectangle(request, &mut conn).await?,
     ))
 }
 
@@ -166,7 +166,7 @@ async fn viewer_search_request(
     DbConn(mut conn): DbConn,
     MapUserToken(token): MapUserToken,
     Json(request): Json<SearchRequest>,
-) -> Result<AppJson<CachedEntitiesWithPagination>, AppError> {
+) -> Result<AppJson<ViewerCachedEntitiesWithPagination>, AppError> {
     tracing::trace!("Received search request {}", request);
 
     if !is_token_allowed_for_family(&token, &request.family_id) {
@@ -191,7 +191,7 @@ async fn viewer_search_request(
     };
 
     Ok(AppJson(
-        CachedEntity::search_entities(request, &mut conn).await?,
+        ViewerCachedEntity::search_entities(request, &mut conn).await?,
     ))
 }
 

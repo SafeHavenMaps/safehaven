@@ -109,7 +109,7 @@ pub fn routes(state: &AppState) -> Router<AppState> {
         .route("/tags/:id", delete(tags::admin_tag_delete))
         // entities
         .route("/entities/pending", get(entities::admin_entities_pending))
-        .route("/entities/search", get(entities::admin_entities_search))
+        .route("/entities/search", post(entities::admin_entities_search))
         .route("/entities", post(entities::admin_entity_new))
         .route("/entities/:id", get(entities::admin_entity_get))
         .route("/entities/:id", put(entities::admin_entity_update))

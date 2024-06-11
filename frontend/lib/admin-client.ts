@@ -20,6 +20,8 @@ import type {
   NewOrUpdatedUser,
   SafeHavenOptions,
   ConfigurationOption,
+  AdminPaginatedCachedEntities,
+  AdminSearchRequestBody,
 } from '~/lib'
 
 // client as a closure
@@ -178,9 +180,10 @@ export default function useClient() {
       return data
     },
 
-    async searchEntities(query: { search: string, page: number, page_size: number }): Promise<AdminListedEntity[]> {
-      const { data, error } = await this.rawClient.GET('/api/admin/entities/search', {
-        params: { query: query },
+    async searchEntities(pagination: { page: number, page_size: number }, search_request: AdminSearchRequestBody): Promise<AdminPaginatedCachedEntities> {
+      const { data, error } = await this.rawClient.POST('/api/admin/entities/search', {
+        params: { query: pagination },
+        body: search_request,
       })
       if (error) throw error
       return data

@@ -150,7 +150,7 @@
 <script setup lang="ts">
 import type OverlayPanel from 'primevue/overlaypanel'
 import type { PageState } from 'primevue/paginator'
-import type { PaginatedCachedEntities } from '~/lib'
+import type { ViewerPaginatedCachedEntities } from '~/lib'
 import state from '~/lib/viewer-state'
 
 // Init state with url token
@@ -164,7 +164,7 @@ const pageSize = ref(20)
 
 const showCriterias = ref(false)
 
-const currentEntitiesResults: Ref<PaginatedCachedEntities | null> = ref(null)
+const currentEntitiesResults: Ref<ViewerPaginatedCachedEntities | null> = ref(null)
 const familySwitcher = ref<OverlayPanel>()
 
 function resultLabel() {

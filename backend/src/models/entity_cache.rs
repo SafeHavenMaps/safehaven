@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
-pub struct CachedEntity {
+pub struct ViewerCachedEntity {
     pub id: Uuid,
     pub entity_id: Uuid,
     pub category_id: Uuid,
@@ -30,6 +30,7 @@ pub struct AdminCachedEntity {
     pub tags_ids: Vec<Uuid>,
     pub family_id: Uuid,
     pub display_name: String,
+    pub hidden: bool,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -51,7 +52,7 @@ struct PaginatedCachedEntity {
     pub response_current_page: i64,
 }
 
-impl From<Vec<PaginatedCachedEntity>> for CachedEntitiesWithPagination {
+impl From<Vec<PaginatedCachedEntity>> for ViewerCachedEntitiesWithPagination {
     fn from(paginated_entities: Vec<PaginatedCachedEntity>) -> Self {
         let mut entities = Vec::new();
         let total_results = paginated_entities.first().map_or(0, |e| e.total_results);
@@ -61,7 +62,7 @@ impl From<Vec<PaginatedCachedEntity>> for CachedEntitiesWithPagination {
             .map_or(0, |e| e.response_current_page);
 
         for paginated_entity in paginated_entities {
-            let entity = CachedEntity {
+            let entity = ViewerCachedEntity {
                 id: paginated_entity.id,
                 entity_id: paginated_entity.entity_id,
                 category_id: paginated_entity.category_id,
@@ -78,7 +79,7 @@ impl From<Vec<PaginatedCachedEntity>> for CachedEntitiesWithPagination {
             entities.push(entity);
         }
 
-        CachedEntitiesWithPagination {
+        ViewerCachedEntitiesWithPagination {
             entities,
             total_results,
             total_pages,
@@ -95,6 +96,7 @@ struct AdminPaginatedCachedEntity {
     pub tags_ids: Vec<Uuid>,
     pub family_id: Uuid,
     pub display_name: String,
+    pub hidden: bool,
     pub total_results: i64,
     pub total_pages: i64,
     pub response_current_page: i64,
@@ -117,6 +119,7 @@ impl From<Vec<AdminPaginatedCachedEntity>> for AdminCachedEntitiesWithPagination
                 tags_ids: paginated_entity.tags_ids,
                 family_id: paginated_entity.entity_id,
                 display_name: paginated_entity.display_name,
+                hidden: paginated_entity.hidden,
             };
             entities.push(entity);
         }
@@ -138,7 +141,7 @@ pub struct PaginatedVec<T> {
     pub response_current_page: i64,
 }
 
-pub type CachedEntitiesWithPagination = PaginatedVec<CachedEntity>;
+pub type ViewerCachedEntitiesWithPagination = PaginatedVec<ViewerCachedEntity>;
 pub type AdminCachedEntitiesWithPagination = PaginatedVec<AdminCachedEntity>;
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -178,7 +181,7 @@ impl Cluster {
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct EntitiesAndClusters {
-    pub entities: Vec<CachedEntity>,
+    pub entities: Vec<ViewerCachedEntity>,
     pub clusters: Vec<Cluster>,
 }
 
@@ -228,7 +231,7 @@ pub struct SearchEntitiesRequest {
     pub require_locations: bool,
 }
 
-impl CachedEntity {
+impl ViewerCachedEntity {
     /// This function fetches entities within a rectangle defined by the coordinates of the bottom left and top right corners of a view port.
     /// It also filters entities based on the user's permissions.
     /// Careful: The coordinates of the viewport are in the format of (longitude, latitude) in projection Web Mercator (EPSG:3857).
@@ -286,7 +289,7 @@ impl CachedEntity {
         let entities = entities_with_clusters
             .iter()
             .filter(|e| e.cluster_id.is_none())
-            .map(|e| CachedEntity {
+            .map(|e| ViewerCachedEntity {
                 id: e.id,
                 entity_id: e.entity_id,
                 category_id: e.category_id,
@@ -333,7 +336,7 @@ impl CachedEntity {
     pub async fn search_entities(
         request: SearchEntitiesRequest,
         conn: &mut PgConnection,
-    ) -> Result<CachedEntitiesWithPagination, AppError> {
+    ) -> Result<ViewerCachedEntitiesWithPagination, AppError> {
         if (request.page_size < 1) || (request.page < 1) {
             return Err(AppError::InvalidPagination);
         }
@@ -389,7 +392,7 @@ pub struct AdminSearchEntitiesRequest {
     pub page_size: i64,
     pub active_categories_ids: Vec<Uuid>,
     pub required_tags_ids: Vec<Uuid>,
-    pub exluded_tags_ids: Vec<Uuid>,
+    pub excluded_tags_ids: Vec<Uuid>,
 }
 
 impl AdminCachedEntity {
@@ -409,7 +412,8 @@ impl AdminCachedEntity {
                 display_name as "display_name!",
                 total_results as "total_results!",
                 total_pages as "total_pages!",
-                response_current_page as "response_current_page!"
+                response_current_page as "response_current_page!",
+                hidden as "hidden!"
             FROM search_entities_admin($1, $2, $3, $4, $5, $6, $7)
             "#,
             request.search_query,
@@ -418,7 +422,7 @@ impl AdminCachedEntity {
             request.page_size,
             &request.active_categories_ids,
             &request.required_tags_ids,
-            &request.exluded_tags_ids
+            &request.excluded_tags_ids
         )
         .fetch_all(conn)
         .await

@@ -1,7 +1,7 @@
 import createClient from 'openapi-fetch'
 import type { paths } from './api'
 import createAuthMiddleware from './viewer-auth-middleware'
-import type { FetchedEntity, PaginatedCachedEntities, PaginatedCachedEntitiesWithLocation } from '~/lib'
+import type { FetchedEntity, ViewerCachedEntityWithLocation, ViewerPaginatedCachedEntities, ViewerPaginatedCachedEntitiesWithLocation } from '~/lib'
 
 export default function useClient() {
   const rawClient = createClient<paths>({ baseUrl: '/' })
@@ -79,7 +79,7 @@ export default function useClient() {
       activeCategories: string[],
       activeRequiredTags: string[],
       activeHiddenTags: string[],
-    ): Promise<PaginatedCachedEntitiesWithLocation> {
+    ): Promise<ViewerPaginatedCachedEntitiesWithLocation> {
       const { data, error } = await rawClient.POST('/api/map/search', {
         body: {
           search_query: query,
@@ -96,7 +96,7 @@ export default function useClient() {
 
       return {
         ...data,
-        entities: data.entities.map(entity => ({
+        entities: data.entities.map((entity: ViewerCachedEntityWithLocation) => ({
           ...entity,
           web_mercator_x: entity.web_mercator_x!,
           web_mercator_y: entity.web_mercator_y!,
@@ -112,7 +112,7 @@ export default function useClient() {
       activeHiddenTags: string[],
       page: number,
       pageSize: number,
-    ): Promise<PaginatedCachedEntities> {
+    ): Promise<ViewerPaginatedCachedEntities> {
       const { data, error } = await rawClient.POST('/api/map/search', {
         body: {
           search_query: query,
