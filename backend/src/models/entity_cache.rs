@@ -113,7 +113,7 @@ impl From<Vec<AdminPaginatedCachedEntity>> for AdminCachedEntitiesWithPagination
             let entity = AdminCachedEntity {
                 id: paginated_entity.id,
                 entity_id: paginated_entity.entity_id,
-                category_id: paginated_entity.entity_id,
+                category_id: paginated_entity.category_id,
                 tags_ids: paginated_entity.tags_ids,
                 family_id: paginated_entity.entity_id,
                 display_name: paginated_entity.display_name,
