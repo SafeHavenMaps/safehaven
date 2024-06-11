@@ -59,12 +59,23 @@
         sortable
       >
         <template #body="slotProps">
-          <li
-            v-for="tag in slotProps.data.tags_ids"
-            :key="tag"
-          >
-            {{ tag }}
-          </li>
+          <DisplayedTag
+            v-for="tag_id in slotProps.data.tags_ids.slice(0, max_tags_displayed)"
+            :key="tag_id"
+            :tag="tags[tag_id]"
+            class="m-1"
+          />
+          <Badge
+            v-if="slotProps.data.tags_ids.length > max_tags_displayed"
+            ref="opener"
+            :value="`+${slotProps.data.tags_ids.length - max_tags_displayed}`"
+            severity="info"
+            @mouseover="(event: Event) => {
+              overlayed_tags = slotProps.data.tags_ids.slice(max_tags_displayed)
+              overlay!.show(event)
+            }"
+            @mouseleave="() => overlay!.hide()"
+          />
         </template>
       </Column>
       <Column
@@ -94,17 +105,32 @@
         </template>
       </Column>
     </DataTable>
+
+    <OverlayPanel
+      ref="overlay"
+    >
+      <DisplayedTag
+        v-for="tag_id in overlayed_tags"
+        :key="tag_id"
+        :tag="tags[tag_id]"
+        class="m-1"
+      />
+    </OverlayPanel>
   </div>
 </template>
 
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
+import type OverlayPanel from 'primevue/overlaypanel'
 import type { PageState } from 'primevue/paginator'
+import DisplayedTag from '~/components/DisplayedTag.vue'
 import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { AdminPaginatedCachedEntities, Category } from '~/lib'
+import type { AdminPaginatedCachedEntities, Category, Tag } from '~/lib'
 import state from '~/lib/admin-state'
+
+const max_tags_displayed = 3
 
 const familyId = useRoute().params.familyId as string
 if (state.families == null)
@@ -116,6 +142,15 @@ const categories: CategoryRecord = (await state.client.listCategories()).reduce(
   categories[category.id] = category
   return categories
 }, {} as CategoryRecord)
+
+type TagRecord = Record<string, Tag>
+const tags: TagRecord = (await state.client.listTags()).reduce((tags, tag) => {
+  tags[tag.id] = tag
+  return tags
+}, {} as TagRecord)
+
+const overlay: Ref<null | InstanceType<typeof OverlayPanel>> = ref(null)
+const overlayed_tags: Ref<null | string[]> = ref(null)
 
 const search_query = ref('')
 const currentPage = ref(1)
