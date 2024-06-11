@@ -1,5 +1,10 @@
 <template>
   <div>
+    <p class="text-color-secondary">
+      Une page additionelle est insérée automatiquement au début du formulaire,
+      contenant le nom de l'auteur.ice ainsi qu'un champ libre.
+    </p>
+
     <AdminFamiliesEditForm
       :original-form-fields="(fetchedFamily.comment_form.fields as FormField[])"
       :on-save-callback="onSave"

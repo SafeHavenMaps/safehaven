@@ -1,11 +1,28 @@
 <template>
-  <div>
-    <AdminFamiliesEditForm
-      :original-form-fields="(fetchedFamily.entity_form.fields as FormField[])"
-      :on-save-callback="onSave"
-      kind-name="entité"
-    />
-  </div>
+  <TabView>
+    <TabPanel
+      header="Éditeur visuel"
+    >
+      <p class="text-color-secondary">
+        Une page additionelle est insérée automatiquement au début du formulaire,
+        contenant le titre de l'entité, sa position lontitude/lagitude et son addresse.
+      </p>
+
+      <AdminFamiliesEditForm
+        class="-ml-3"
+        :original-form-fields="(fetchedFamily.entity_form.fields as FormField[])"
+        :on-save-callback="onSave"
+        kind-name="entité"
+      />
+    </TabPanel>
+    <TabPanel header="Éditeur avancé">
+      <p class="text-color-secondary">
+        Édition directe du formulaire d'ajout en json, utile pour l'import/export.
+        Les changements ne sont pas synchonisés avec ceux de l'édition visuelle en absence de sauvegarde.
+      </p>
+      <!-- <AdminFamiliesEditFormJson /> -->
+    </TabPanel>
+  </TabView>
 </template>
 
 <script setup lang="ts">
