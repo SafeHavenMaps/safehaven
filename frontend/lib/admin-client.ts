@@ -3,22 +3,19 @@ import type { paths } from './api'
 import createAuthMiddleware from './admin-auth-middleware'
 import type {
   Family,
-  Entity,
-  Category,
-  Tag,
-  FetchedEntity,
-  ListedEntity,
-  ListedComment,
-  NewOrUpdateCategory,
-  NewOrUpdateTag,
-  NewComment,
-  UpdateComment,
-  NewEntity,
-  UpdateEntity,
-  NewOrUpdateAccessToken,
-  AccessToken,
   NewOrUpdateFamily,
-  SHComment,
+  Category,
+  NewOrUpdateCategory,
+  Tag,
+  NewOrUpdateTag,
+  AdminEntity,
+  AdminListedEntity,
+  AdminNewOrUpdateEntity,
+  AdminComment,
+  AdminListedComment,
+  AdminNewOrUpdateComment,
+  AccessToken,
+  NewOrUpdateAccessToken,
   User,
   NewOrUpdatedUser,
   SafeHavenOptions,
@@ -173,15 +170,15 @@ export default function useClient() {
       return data
     },
 
-    async getEntity(id: string): Promise<FetchedEntity> {
-      const { data, error } = await this.rawClient.GET('/api/map/entities/{id}', {
+    async getEntity(id: string): Promise<AdminEntity> {
+      const { data, error } = await this.rawClient.GET('/api/admin/entities/{id}', {
         params: { path: { id } },
       })
       if (error) throw error
       return data
     },
 
-    async searchEntities(query: { search: string, page: number, page_size: number }): Promise<ListedEntity[]> {
+    async searchEntities(query: { search: string, page: number, page_size: number }): Promise<AdminListedEntity[]> {
       const { data, error } = await this.rawClient.GET('/api/admin/entities/search', {
         params: { query: query },
       })
@@ -189,13 +186,13 @@ export default function useClient() {
       return data
     },
 
-    async createEntity(entity: NewEntity): Promise<Entity> {
+    async createEntity(entity: AdminNewOrUpdateEntity): Promise<AdminEntity> {
       const { data, error } = await this.rawClient.POST('/api/admin/entities', { body: entity })
       if (error) throw error
       return data
     },
 
-    async updateEntity(id: string, entity: UpdateEntity): Promise<Entity> {
+    async updateEntity(id: string, entity: AdminNewOrUpdateEntity): Promise<AdminEntity> {
       const { data, error } = await this.rawClient.PUT('/api/admin/entities/{id}', {
         body: entity,
         params: { path: { id } },
@@ -286,7 +283,7 @@ export default function useClient() {
       return data
     },
 
-    async getComment(id: string): Promise<SHComment> {
+    async getComment(id: string): Promise<AdminComment> {
       const { data, error } = await this.rawClient.GET('/api/admin/comments/{id}', {
         params: { path: { id } },
       })
@@ -294,13 +291,13 @@ export default function useClient() {
       return data
     },
 
-    async createComment(comment: NewComment): Promise<SHComment> {
+    async createComment(comment: AdminNewOrUpdateComment): Promise<AdminComment> {
       const { data, error } = await this.rawClient.POST('/api/admin/comments', { body: comment })
       if (error) throw error
       return data
     },
 
-    async updateComment(id: string, comment: UpdateComment): Promise<SHComment> {
+    async updateComment(id: string, comment: AdminNewOrUpdateComment): Promise<AdminComment> {
       const { data, error } = await this.rawClient.PUT('/api/admin/comments/{id}', {
         body: comment,
         params: { path: { id } },
@@ -317,19 +314,19 @@ export default function useClient() {
       return data
     },
 
-    async listPendingComments(): Promise<ListedComment[]> {
+    async listPendingComments(): Promise<AdminListedComment[]> {
       const { data, error } = await this.rawClient.GET('/api/admin/comments/pending')
       if (error) throw error
       return data
     },
 
-    async listPendingEntities(): Promise<ListedEntity[]> {
+    async listPendingEntities(): Promise<AdminListedEntity[]> {
       const { data, error } = await this.rawClient.GET('/api/admin/entities/pending')
       if (error) throw error
       return data
     },
 
-    async listEntityComments(id: string): Promise<SHComment[]> {
+    async listEntityComments(id: string): Promise<AdminComment[]> {
       const { data, error } = await this.rawClient.GET('/api/admin/entities/{id}/comments', {
         params: { path: { id } },
       })

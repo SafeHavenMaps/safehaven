@@ -175,7 +175,7 @@ pub async fn admin_entity_delete(
         ("id" = Uuid, Path, description = "Entity identifier")
     ),
     responses(
-        (status = 200, description = "List of comments for the entity", body = Vec<Comment>),
+        (status = 200, description = "List of comments for the entity", body = Vec<AdminComment>),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
