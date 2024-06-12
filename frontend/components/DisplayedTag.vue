@@ -1,6 +1,8 @@
 <template>
   <Tag
     :style="{
+      backgroundColor: 'navy',
+      borderColor: 'white',
       color: 'white',
     }"
   >

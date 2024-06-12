@@ -1,18 +1,36 @@
 <template>
   <div>
-    <span class="flex gap-3">
-      <IconField icon-position="left">
-        <InputIcon>
-          <AppIcon
-            icon-name="search"
-            class="-mt-1"
+    <span class="flex gap-4 align-items-end mb-3">
+      <form @submit.prevent="refreshTable">
+        <InputGroup
+          style="height: 36px; "
+        >
+          <InputText
+            v-model="search_query"
+            placeholder="Tapez votre recherche ici"
           />
-        </InputIcon>
-        <InputText
-          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
-          placeholder="Recherche"
-        />
-      </IconField>
+
+          <Button
+            type="button"
+            severity="warning"
+            label="Filtres"
+            @click="(event: Event) => filterOp?.toggle(event)"
+          >
+            <template #icon>
+              <AppIcon
+                class="mr-1"
+                icon-name="filter"
+              />
+            </template>
+          </Button>
+
+          <Button type="submit">
+            <template #icon>
+              <AppIcon icon-name="search" />
+            </template>
+          </Button>
+        </InputGroup>
+      </form>
       <MultiSelect
         v-model="state.tablesSelectedColumns[table_key]"
         :options="optionalColumns"
@@ -40,29 +58,28 @@
       <Column
         field="display_name"
         header="Nom d'affichage"
-        sortable
+        class="max-w-25rem"
       />
       <Column
         v-if="state.tablesSelectedColumns[table_key].includes('Catégorie')"
         field="category_id"
         header="Catégorie"
-        sortable
       >
         <template #body="slotProps">
-          <CategoryTag :category="categories[slotProps.data.category_id]" />
+          <CategoryTag :category="categoryRecord[slotProps.data.category_id]" />
         </template>
       </Column>
       <Column
         v-if="state.tablesSelectedColumns[table_key].includes('Tags')"
         field="tags"
         header="Tags"
-        sortable
+        class="max-w-18rem"
       >
         <template #body="slotProps">
           <DisplayedTag
             v-for="tag_id in slotProps.data.tags_ids.slice(0, max_tags_displayed)"
             :key="tag_id"
-            :tag="tags[tag_id]"
+            :tag="tagRecord[tag_id]"
             class="m-1"
           />
           <Badge
@@ -82,7 +99,6 @@
         v-if="state.tablesSelectedColumns[table_key].includes('Visibilité')"
         field="hidden"
         header="Visibilité"
-        sortable
       >
         <template #body="slotProps">
           <Tag
@@ -112,16 +128,23 @@
       <DisplayedTag
         v-for="tag_id in overlayed_tags"
         :key="tag_id"
-        :tag="tags[tag_id]"
+        :tag="tagRecord[tag_id]"
         class="m-1"
+      />
+    </OverlayPanel>
+
+    <OverlayPanel ref="filterOp">
+      <ViewerFilterConfig
+        v-model:filteringTags="tagFilteringList"
+        v-model:filteringCategories="categoryFilteringList"
+        class="w-25rem"
+        @filters-changed="refreshTable"
       />
     </OverlayPanel>
   </div>
 </template>
 
 <script setup lang="ts">
-import { FilterMatchMode } from 'primevue/api'
-import type { DataTableFilterMetaData } from 'primevue/datatable'
 import type OverlayPanel from 'primevue/overlaypanel'
 import type { PageState } from 'primevue/paginator'
 import DisplayedTag from '~/components/DisplayedTag.vue'
@@ -130,35 +153,36 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { AdminPaginatedCachedEntities, Category, Tag } from '~/lib'
 import state from '~/lib/admin-state'
 
-const max_tags_displayed = 3
+const max_tags_displayed = 2
 
 const familyId = useRoute().params.familyId as string
 if (state.families == null)
   await state.fetchFamilies()
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 
+const categoryList: Category[] = await state.client.listCategories()
 type CategoryRecord = Record<string, Category>
-const categories: CategoryRecord = (await state.client.listCategories()).reduce((categories, category) => {
+const categoryRecord: CategoryRecord = categoryList.reduce((categories, category) => {
   categories[category.id] = category
   return categories
 }, {} as CategoryRecord)
+const categoryFilteringList = ref(categoryList.map(tag => ({ ...tag, active: true })))
 
+const tagList: Tag[] = await state.client.listTags()
 type TagRecord = Record<string, Tag>
-const tags: TagRecord = (await state.client.listTags()).reduce((tags, tag) => {
+const tagRecord: TagRecord = tagList.reduce((tags, tag) => {
   tags[tag.id] = tag
   return tags
 }, {} as TagRecord)
+const tagFilteringList = ref(tagList.map(tag => ({ ...tag, active: null })))
 
-const overlay: Ref<null | InstanceType<typeof OverlayPanel>> = ref(null)
-const overlayed_tags: Ref<null | string[]> = ref(null)
+const overlay = ref<OverlayPanel>()
+const filterOp = ref<OverlayPanel>()
+const overlayed_tags: Ref<undefined | string[]> = ref(undefined)
 
 const search_query = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
-
-const activeCategories = ref(Object.keys(categories))
-const activeRequiredTags = ref([])
-const activeHiddenTags = ref([])
 
 // Initialize the ref with an empty array, then fetch to update entities asynchronously
 const currentEntitiesResults: Ref<AdminPaginatedCachedEntities | null> = ref(null)
@@ -168,9 +192,9 @@ async function refreshTable() {
     {
       search: search_query.value,
       family: familyId,
-      active_categories_ids: activeCategories.value,
-      required_tags_ids: activeRequiredTags.value,
-      excluded_tags_ids: activeHiddenTags.value,
+      active_categories_ids: categoryFilteringList.value.filter(t => t.active).map(t => t.id),
+      required_tags_ids: tagFilteringList.value.filter(t => t.active).map(t => t.id),
+      excluded_tags_ids: tagFilteringList.value.filter(t => t.active === false).map(t => t.id),
     },
   )
 }
@@ -187,11 +211,7 @@ const table_key = `dt-state-entities-${familyId}`
 if (!(table_key in state.tablesSelectedColumns)) {
   state.tablesSelectedColumns[table_key] = ['Catégorie', 'Visibilité', 'Tags']
 }
-if (!(table_key in state.tablesFilters)) {
-  state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  }
-}
+// TODO : save table search results?
 
 definePageMeta({
   layout: 'admin-ui',
@@ -228,4 +248,4 @@ async function onDelete(entity_id: string, entity_name: string) {
     toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression de l'entité ${entity_name}`, life: 3000 })
   }
 }
-</script>import type { PageState } from 'primevue/paginator'
+</script>

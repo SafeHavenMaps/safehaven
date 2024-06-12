@@ -73,6 +73,8 @@
 
   <OverlayPanel ref="filterOp">
     <ViewerFilterConfig
+      v-model:filteringTags="state.filteringTags"
+      v-model:filteringCategories="state.filteringCategories"
       class="w-25rem"
       @filters-changed="filtersChanged"
     />

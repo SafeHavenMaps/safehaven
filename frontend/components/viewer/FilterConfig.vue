@@ -11,13 +11,13 @@
           }"
         >
           <div
-            v-for="category in state.filteringCategories"
+            v-for="category in props.filteringCategories"
             :key="category.id"
             class="flex align-items-center justify-between mb-2"
           >
             <InputSwitch
               v-model="category.active"
-              @change="filtersChanged"
+              @update:model-value="(value:boolean) => categoryFiltersChanged()"
             />
             <div
               class="round ml-2 mr-2"
@@ -41,7 +41,7 @@
       >
         <span class="font-medium text-900 block mb-2">Filtres</span>
         <div
-          v-for="tag in state.filteringTags.filter(t => t.is_filter)"
+          v-for="tag in props.filteringTags.filter(t => t.is_filter)"
           :key="tag.id"
           class="mb-2 p-1"
         >
@@ -54,7 +54,7 @@
             :options="[true, null, false]"
             option-label="title"
             aria-labelledby="custom"
-            @change="filtersChanged"
+            @change="tagFiltersChanged"
           >
             <template #option="slotProps">
               <div class="button-content">
@@ -125,7 +125,7 @@
             :options="[true, null, false]"
             option-label="title"
             aria-labelledby="custom"
-            @change="filtersChanged"
+            @change="() => tagFiltersChanged()"
           >
             <template #option="slotProps">
               <div class="button-content">
@@ -144,10 +144,12 @@
 </template>
 
 <script setup lang="ts">
-import state from '~/lib/viewer-state'
+import type { Category, Tag } from '~/lib'
 
 export interface Props {
   maximumHeight?: string
+  filteringTags: (Tag & { active: boolean | null })[]
+  filteringCategories: (Category & { active: boolean })[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -155,13 +157,16 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  filtersChanged: []
+  (event: 'filtersChanged'): void
+  // update:modelValue events uneeded as props are not reassigned only mutated through references
+  // (event: 'update:modelValue:filteringCategories', categories: (Category & { active: boolean })[]): void
+  // (event: 'update:modelValue:filteringTags', tags: (Tag & { active: boolean | null })[]): void
 }>()
 
 const tagSearch = ref('')
 
 function shownAdvancedTags() {
-  const base = state.filteringTags.filter(t => !t.is_filter)
+  const base = props.filteringTags.filter(t => !t.is_filter)
 
   if (tagSearch.value === '') {
     return base
@@ -170,14 +175,17 @@ function shownAdvancedTags() {
   return base.filter(tag => tag.title.toLowerCase().includes(tagSearch.value.toLowerCase()))
 }
 
-function filtersChanged() {
+function tagFiltersChanged() {
+  emit('filtersChanged')
+}
+
+function categoryFiltersChanged() {
   emit('filtersChanged')
 }
 
 function resetFilters() {
-  state.filteringTags.filter(t => !t.is_filter).forEach(t => t.active = null)
-
-  filtersChanged()
+  props.filteringTags.filter(t => !t.is_filter).forEach(t => t.active = null)
+  tagFiltersChanged()
 }
 </script>
 

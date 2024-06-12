@@ -13,13 +13,14 @@
         <span>Espace d'administration</span>
       </template>
       <template #content>
-        <div class="flex flex-column gap-3">
+        <div class="flex flex-column gap-3 max-w-17rem">
           <Message
             v-if="failed_attempt"
             severity="error"
             :closable="false"
+            class="-my-1"
           >
-            Nom d'utilisateur⋅ice ou<br>
+            Nom d'utilisateur⋅ice ou
             mot de passe incorrect
           </Message>
           <label for="username">

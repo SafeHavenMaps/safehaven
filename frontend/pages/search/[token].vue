@@ -140,7 +140,10 @@
         </h3>
       </template>
 
-      <ViewerFilterConfig />
+      <ViewerFilterConfig
+        v-model:filteringTags="state.filteringTags"
+        v-model:filteringCategories="state.filteringCategories"
+      />
     </Dialog>
 
     <StartPopup />
