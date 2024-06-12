@@ -39,20 +39,17 @@
         class="w-full md:w-20rem"
       />
     </span>
+
     <DataTable
-      v-model:filters="state.tablesFilters[table_key]"
-      v-model:rows="pageSize"
-      paginator
-      state-storage="session"
-      :state-key="table_key"
-      data-key="id"
-      :value="currentEntitiesResults?.entities"
-      :total-records="currentEntitiesResults?.total_results"
-      striped-rows
+      :value="currentEntitiesResults!.entities"
+      :rows="pageSize"
+      :filters="state.tablesFilters[table_key]"
+      :total-records="currentEntitiesResults!.total_results"
       :rows-per-page-options="[5, 10, 20, 50]"
-      removable-sort
-      :global-filter-fields="['display_name']"
-      class=" "
+      :first="0"
+      lazy
+      paginator
+      data-key="id"
       @page="onPage"
     >
       <Column
@@ -113,7 +110,7 @@
             :id="slotProps.data.id"
             model-name="de l'entité"
             :name="slotProps.data.display_name"
-            :loading="processingRequest[slotProps.data.id]"
+            :loading="false"
             secure-delete
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/${familyId}/entities/${id}`)"
@@ -156,12 +153,15 @@ import state from '~/lib/admin-state'
 const max_tags_displayed = 2
 
 const familyId = useRoute().params.familyId as string
-if (state.families == null)
+if (state.families == null) {
   await state.fetchFamilies()
+}
+
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 
 const categoryList: Category[] = await state.client.listCategories()
 type CategoryRecord = Record<string, Category>
+
 const categoryRecord: CategoryRecord = categoryList.reduce((categories, category) => {
   categories[category.id] = category
   return categories
@@ -184,9 +184,23 @@ const search_query = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
 
-// Initialize the ref with an empty array, then fetch to update entities asynchronously
+let forceFullRefresh = false
+
+watch([
+  ...categoryFilteringList.value,
+  ...tagFilteringList.value,
+  search_query,
+], () => {
+  forceFullRefresh = true
+})
+
 const currentEntitiesResults: Ref<AdminPaginatedCachedEntities | null> = ref(null)
 async function refreshTable() {
+  if (forceFullRefresh) {
+    currentPage.value = 1
+    forceFullRefresh = false
+  }
+
   currentEntitiesResults.value = await state.client.searchEntities(
     { page: currentPage.value, page_size: pageSize.value },
     {
@@ -198,12 +212,13 @@ async function refreshTable() {
     },
   )
 }
-refreshTable()
 
-function onPage(event: PageState) {
+await refreshTable()
+
+async function onPage(event: PageState) {
   currentPage.value = event.page + 1
   pageSize.value = event.rows
-  refreshTable()
+  await refreshTable()
 }
 
 const optionalColumns = ref(['Catégorie', 'Tags', 'Visibilité'])
@@ -235,7 +250,6 @@ initAdminLayout(
   ],
 )
 
-const processingRequest: Ref<Record<string, boolean>> = ref({})
 const toast = useToast()
 
 async function onDelete(entity_id: string, entity_name: string) {

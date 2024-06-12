@@ -80,10 +80,10 @@
       <template #content>
         <DataView
           :value="currentEntitiesResults!.entities"
-          :paginator="true"
           :rows="pageSize"
           :total-records="currentEntitiesResults!.total_results"
           data-key="id"
+          paginator
           layout="list"
           @page="onPage"
         >
