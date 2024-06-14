@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE comments\n            SET \n                entity_id = $2,\n                author = $3,\n                text = $4,\n                data = $5,\n                moderated_at = CASE\n                    WHEN $7 THEN COALESCE(moderated_at, NOW())\n                    ELSE NULL\n                END,\n                moderated_by = CASE\n                    WHEN $7 THEN COALESCE(moderated_by, $6)\n                    ELSE NULL::uuid\n                END\n            WHERE id = $1\n            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated_at, moderated_by\n            ",
+  "query": "\n            UPDATE comments\n            SET \n                entity_id = $2,\n                author = $3,\n                text = $4,\n                data = $5,\n                moderated = $6,\n                version = $7\n            WHERE id = $1\n            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated, version\n            ",
   "describe": {
     "columns": [
       {
@@ -40,13 +40,13 @@
       },
       {
         "ordinal": 7,
-        "name": "moderated_at",
-        "type_info": "Timestamp"
+        "name": "moderated",
+        "type_info": "Bool"
       },
       {
         "ordinal": 8,
-        "name": "moderated_by",
-        "type_info": "Uuid"
+        "name": "version",
+        "type_info": "Int4"
       }
     ],
     "parameters": {
@@ -56,8 +56,8 @@
         "Text",
         "Text",
         "Jsonb",
-        "Uuid",
-        "Bool"
+        "Bool",
+        "Int4"
       ]
     },
     "nullable": [
@@ -68,9 +68,9 @@
       false,
       false,
       false,
-      true,
-      true
+      false,
+      false
     ]
   },
-  "hash": "5db366cb6f9c01b412d77c4e1efdf76b57c54ea6adda25821fd88767abf8cd5d"
+  "hash": "19ca3288d7d6d0e07f0788910a6f1f0edae75cb6deb692b900dd3c88f403e72e"
 }

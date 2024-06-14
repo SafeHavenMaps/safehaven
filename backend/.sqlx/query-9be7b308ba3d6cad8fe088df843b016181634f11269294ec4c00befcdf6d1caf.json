@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO tags (title, is_filter, filter_description, default_filter_status)\n            VALUES ($1, $2, $3, $4)\n            RETURNING id, title, is_filter, filter_description, default_filter_status\n            ",
+  "query": "\n            SELECT id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color\n            FROM tags\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -27,14 +27,26 @@
         "ordinal": 4,
         "name": "default_filter_status",
         "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "version",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "fill_color",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "border_color",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
       "Left": [
-        "Varchar",
-        "Bool",
-        "Text",
-        "Bool"
+        "Uuid"
       ]
     },
     "nullable": [
@@ -42,8 +54,11 @@
       false,
       false,
       true,
+      false,
+      false,
+      false,
       false
     ]
   },
-  "hash": "e304e7e19f71b233d53a2bac17519e6702dd01380d721fb5d43e4e95998e31af"
+  "hash": "9be7b308ba3d6cad8fe088df843b016181634f11269294ec4c00befcdf6d1caf"
 }

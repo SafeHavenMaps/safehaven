@@ -33,6 +33,7 @@ CREATE TABLE families (
     entity_form JSONB NOT NULL,
     comment_form JSONB NOT NULL,
     sort_order INT NOT NULL DEFAULT 0,
+    version INT NOT NULL DEFAULT 1,
 
     FOREIGN KEY (icon_id) REFERENCES icons(id) ON DELETE SET NULL
 );
@@ -45,6 +46,7 @@ CREATE TABLE categories (
     icon_id UUID,
     fill_color VARCHAR(7) NOT NULL DEFAULT '#FFFFFF',
     border_color VARCHAR(7) NOT NULL DEFAULT '#000000',
+    version INT NOT NULL DEFAULT 1,
 
     FOREIGN KEY (family_id) REFERENCES families(id) ON DELETE CASCADE,
     FOREIGN KEY (icon_id) REFERENCES icons(id) ON DELETE SET NULL
@@ -56,7 +58,11 @@ CREATE TABLE tags (
     title VARCHAR(255) NOT NULL,
     is_filter BOOLEAN NOT NULL DEFAULT FALSE,
     default_filter_status BOOLEAN NOT NULL DEFAULT TRUE,
-    filter_description TEXT
+    filter_description TEXT,
+    fill_color VARCHAR(7) NOT NULL DEFAULT '#E86BA7',
+    border_color VARCHAR(7) NOT NULL DEFAULT '#E696BA',
+
+    version INT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE entities (
@@ -67,17 +73,16 @@ CREATE TABLE entities (
     data JSONB NOT NULL,
     hidden BOOLEAN NOT NULL DEFAULT FALSE,
     moderation_notes TEXT,
-    moderated_at TIMESTAMP,
+    moderated BOOLEAN NOT NULL DEFAULT FALSE,
+    version INT NOT NULL DEFAULT 1,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_update_by UUID,
 
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
-    FOREIGN KEY (last_update_by) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 CREATE INDEX entities_category_id_idx ON entities(category_id);
-CREATE INDEX entities_moderated_hidden_idx ON entities(moderated_at, hidden);
+CREATE INDEX entities_moderated_hidden_idx ON entities(moderated, hidden);
 
 CREATE TABLE entity_tags (
     entity_id UUID NOT NULL,
@@ -100,11 +105,10 @@ CREATE TABLE comments (
     data JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    moderated_at TIMESTAMP,
-    moderated_by UUID,
+    moderated BOOLEAN NOT NULL DEFAULT FALSE,
+    version INT NOT NULL DEFAULT 1,
 
-    FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE,
-    FOREIGN KEY (moderated_by) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
 );
 CREATE INDEX comments_entity_id_idx ON comments(entity_id);
 
@@ -141,6 +145,7 @@ CREATE TABLE entities_entities (
 CREATE INDEX entities_entities_parent_id_idx ON entities_entities(parent_id);
 CREATE INDEX entities_entities_child_id_idx ON entities_entities(child_id);
 
+-- Prevent adding a parent as a child and vice versa
 CREATE OR REPLACE FUNCTION prevent_parent_as_child()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -149,7 +154,7 @@ BEGIN
         SELECT 1 FROM entities_entities
         WHERE parent_id = NEW.child_id
     ) THEN
-        RAISE EXCEPTION 'An entity that is already a parent cannot be a child.';
+        RAISE EXCEPTION 'sh_code_parent_as_child_error';
     END IF;
 
     -- Check if the entity to be added as a parent is already a child
@@ -157,7 +162,7 @@ BEGIN
         SELECT 1 FROM entities_entities
         WHERE child_id = NEW.parent_id
     ) THEN
-        RAISE EXCEPTION 'An entity that is already a child cannot be a parent.';
+        RAISE EXCEPTION 'sh_code_child_as_parent_error';
     END IF;
 
     RETURN NEW;
@@ -169,7 +174,6 @@ BEFORE INSERT OR UPDATE ON entities_entities
 FOR EACH ROW EXECUTE FUNCTION prevent_parent_as_child();
 
 --- Trigger to update the last_update_at column
-
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -187,3 +191,39 @@ CREATE TRIGGER update_comments_updated_at
 BEFORE UPDATE ON comments
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+-- Trigger to check and increment the version number
+CREATE OR REPLACE FUNCTION check_and_increment_version()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.version != OLD.version THEN
+        RAISE EXCEPTION 'sh_code_version_mismatch';
+    END IF;
+    NEW.version := OLD.version + 1;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger for entities
+CREATE TRIGGER check_and_increment_version_entities
+BEFORE UPDATE ON entities
+FOR EACH ROW
+EXECUTE FUNCTION check_and_increment_version();
+
+-- Trigger for categories
+CREATE TRIGGER check_and_increment_version_categories
+BEFORE UPDATE ON categories
+FOR EACH ROW
+EXECUTE FUNCTION check_and_increment_version();
+
+-- Trigger for tags
+CREATE TRIGGER check_and_increment_version_tags
+BEFORE UPDATE ON tags
+FOR EACH ROW
+EXECUTE FUNCTION check_and_increment_version();
+
+-- Trigger for families
+CREATE TRIGGER check_and_increment_version_families
+BEFORE UPDATE ON families
+FOR EACH ROW
+EXECUTE FUNCTION check_and_increment_version();

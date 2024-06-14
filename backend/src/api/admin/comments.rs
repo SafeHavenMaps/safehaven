@@ -6,8 +6,6 @@ use crate::{
     models::comment::{AdminComment, AdminListedComment, AdminNewOrUpdateComment},
 };
 
-use super::AdminUserTokenClaims;
-
 #[utoipa::path(
     get,
     path = "/api/admin/comments/pending",
@@ -32,13 +30,10 @@ pub async fn admin_comments_pending(
     )
 )]
 pub async fn admin_comment_new(
-    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Json(new_comment): Json<AdminNewOrUpdateComment>,
 ) -> Result<AppJson<AdminComment>, AppError> {
-    Ok(AppJson(
-        AdminComment::new(new_comment, token.admin_id, &mut conn).await?,
-    ))
+    Ok(AppJson(AdminComment::new(new_comment, &mut conn).await?))
 }
 
 #[utoipa::path(
@@ -74,13 +69,12 @@ pub async fn admin_comment_get(
     )
 )]
 pub async fn admin_comment_update(
-    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(updated_comment): Json<AdminNewOrUpdateComment>,
 ) -> Result<AppJson<AdminComment>, AppError> {
     Ok(AppJson(
-        AdminComment::update(id, updated_comment, token.admin_id, &mut conn).await?,
+        AdminComment::update(id, updated_comment, &mut conn).await?,
     ))
 }
 

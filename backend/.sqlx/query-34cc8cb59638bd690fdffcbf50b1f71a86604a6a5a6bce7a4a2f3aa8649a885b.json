@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, title, is_filter, filter_description, default_filter_status\n            FROM tags\n            WHERE id = ANY($1)\n            ",
+  "query": "\n            SELECT id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color\n            FROM tags\n            WHERE id = ANY($1)\n            ",
   "describe": {
     "columns": [
       {
@@ -27,6 +27,21 @@
         "ordinal": 4,
         "name": "default_filter_status",
         "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "version",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "fill_color",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "border_color",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
@@ -39,8 +54,11 @@
       false,
       false,
       true,
+      false,
+      false,
+      false,
       false
     ]
   },
-  "hash": "b29153958528bcea96441556da1f27f218cf0faa221a14acf2b653cbe906acf0"
+  "hash": "34cc8cb59638bd690fdffcbf50b1f71a86604a6a5a6bce7a4a2f3aa8649a885b"
 }

@@ -181,6 +181,7 @@ pub struct AdminNewOrUpdateEntity {
     pub hidden: bool,
     pub moderation_notes: Option<String>,
     pub moderated: bool,
+    pub version: i32,
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -191,10 +192,9 @@ pub struct AdminListedEntity {
     pub tags: Vec<Uuid>,
     pub hidden: bool,
     pub moderation_notes: Option<String>,
-    pub moderated_at: Option<chrono::NaiveDateTime>,
+    pub moderated: bool,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
-    pub last_update_by: Option<Uuid>,
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -208,16 +208,15 @@ pub struct AdminEntity {
     pub tags: Vec<Uuid>,
     pub hidden: bool,
     pub moderation_notes: Option<String>,
-    pub moderated_at: Option<chrono::NaiveDateTime>,
+    pub moderated: bool,
+    pub version: i32,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
-    pub last_update_by: Option<Uuid>,
 }
 
 impl AdminEntity {
     pub async fn new(
         new_entity: AdminNewOrUpdateEntity,
-        created_by: Uuid,
         conn: &mut PgConnection,
     ) -> Result<AdminEntity, AppError> {
         // Start a database transaction
@@ -235,17 +234,8 @@ impl AdminEntity {
             AdminEntity,
             r#"
             WITH inserted AS (
-                INSERT INTO entities (display_name, category_id, locations, data, hidden, moderation_notes, last_update_by, moderated_at)
-                VALUES ($1, $2, $3, $4, $5, $6, $7,
-                    CASE
-                        WHEN $8 THEN NOW()
-                        ELSE NULL
-                    END--,
-                    --CASE
-                    --    WHEN $8 THEN $7
-                    --    ELSE NULL::uuid
-                    --END
-                )
+                INSERT INTO entities (display_name, category_id, locations, data, hidden, moderation_notes, moderated)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
                 RETURNING *
             )
             SELECT 
@@ -256,10 +246,10 @@ impl AdminEntity {
                 i.data,
                 i.hidden,
                 i.moderation_notes,
-                i.moderated_at,
+                i.moderated,
                 i.created_at,
                 i.updated_at,
-                i.last_update_by,
+                i.version,
                 c.family_id,
                 COALESCE(array(
                     SELECT tag_id
@@ -269,14 +259,13 @@ impl AdminEntity {
             FROM inserted i
             JOIN categories c ON c.id = i.category_id
             "#,
-            new_entity.display_name,       // $1
-            new_entity.category_id,        // $2
-            locations,                     // $3
-            new_entity.data,               // $4
-            new_entity.hidden,      // $5
-            new_entity.moderation_notes,   // $6
-            created_by,                    // $7
-            new_entity.moderated           // $8
+            new_entity.display_name,
+            new_entity.category_id,
+            locations,
+            new_entity.data,
+            new_entity.hidden,
+            new_entity.moderation_notes,
+            new_entity.moderated
         )
         .fetch_one(&mut *tx)
         .await
@@ -304,7 +293,6 @@ impl AdminEntity {
     pub async fn update(
         id: Uuid,
         update: AdminNewOrUpdateEntity,
-        last_update_by: Uuid,
         conn: &mut PgConnection,
     ) -> Result<AdminEntity, AppError> {
         // Start a database transaction using the Acquire trait
@@ -342,11 +330,8 @@ impl AdminEntity {
                     data = $5, 
                     hidden = $6, 
                     moderation_notes = $7, 
-                    last_update_by = $9, 
-                    moderated_at = CASE
-                        WHEN $8 THEN COALESCE(moderated_at, NOW())
-                        ELSE NULL
-                    END
+                    moderated = $8,
+                    version = $9
                 WHERE id = $1
                 RETURNING *
             )
@@ -358,10 +343,10 @@ impl AdminEntity {
                 u.data,
                 u.hidden,
                 u.moderation_notes,
-                u.moderated_at,
+                u.moderated,
                 u.created_at,
                 u.updated_at,
-                u.last_update_by,
+                u.version,
                 c.family_id,
                 COALESCE(array(
                     SELECT tag_id
@@ -371,15 +356,15 @@ impl AdminEntity {
             FROM updated u
             JOIN categories c ON c.id = u.category_id
             "#,
-            id,                      // $1
-            update.display_name,     // $2
-            update.category_id,      // $3
-            locations,               // $4
-            update.data,             // $5
-            update.hidden,           // $6
-            update.moderation_notes, // $7
-            update.moderated,        // $8
-            last_update_by           // $9
+            id,
+            update.display_name,
+            update.category_id,
+            locations,
+            update.data,
+            update.hidden,
+            update.moderation_notes,
+            update.moderated,
+            update.version
         )
         .fetch_one(&mut *tx)
         .await
@@ -452,8 +437,8 @@ impl AdminEntity {
             r#"
             SELECT e.id, c.family_id, e.display_name, e.category_id, 
                 e.locations as "locations: Json<Vec<UnprocessedLocation>>", 
-                e.data, e.hidden, e.moderation_notes, e.moderated_at, 
-                e.created_at, e.updated_at, e.last_update_by,
+                e.data, e.hidden, e.moderation_notes, e.moderated, 
+                e.created_at, e.updated_at, e.version,
                 COALESCE(
                     (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                     array[]::uuid[]
@@ -474,13 +459,13 @@ impl AdminEntity {
             AdminListedEntity,
             r#"
             SELECT e.id, e.display_name, e.category_id, e.created_at, e.hidden,
-                    e.moderation_notes, e.moderated_at, e.last_update_by, e.updated_at,
+                    e.moderation_notes, e.moderated, e.updated_at,
                     COALESCE(
                         (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                         array[]::uuid[]
                     ) as "tags!"
             FROM entities e
-            WHERE e.moderated_at IS NULL
+            WHERE NOT e.moderated
             ORDER BY created_at
             "#
         )

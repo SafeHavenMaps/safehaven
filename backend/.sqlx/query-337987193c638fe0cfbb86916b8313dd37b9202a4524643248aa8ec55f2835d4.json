@@ -1,0 +1,71 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE tags\n            SET title = $2, is_filter = $3, filter_description = $4, default_filter_status = $5, version = $6, fill_color = $7, border_color = $8\n            WHERE id = $1\n            RETURNING id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "is_filter",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "filter_description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "default_filter_status",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "version",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "fill_color",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "border_color",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Bool",
+        "Text",
+        "Bool",
+        "Int4",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "337987193c638fe0cfbb86916b8313dd37b9202a4524643248aa8ec55f2835d4"
+}

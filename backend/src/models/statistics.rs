@@ -16,10 +16,10 @@ pub async fn count_comments_entities(conn: &mut PgConnection) -> Result<CountRes
         SELECT 
             c.id AS category_id, 
             c.family_id, 
-            COUNT(DISTINCT e.id) FILTER (WHERE e.moderated_at IS NOT NULL) AS "moderated_entities_count!", 
-            COUNT(DISTINCT e.id) FILTER (WHERE e.moderated_at IS NULL) AS "unmoderated_entities_count!", 
-            COUNT(cm.id) FILTER (WHERE cm.moderated_at IS NOT NULL) AS "moderated_comments_count!", 
-            COUNT(cm.id) FILTER (WHERE cm.moderated_at IS NULL) AS "unmoderated_comments_count!"
+            COUNT(DISTINCT e.id) FILTER (WHERE e.moderated) AS "moderated_entities_count!", 
+            COUNT(DISTINCT e.id) FILTER (WHERE NOT e.moderated) AS "unmoderated_entities_count!", 
+            COUNT(cm.id) FILTER (WHERE cm.moderated) AS "moderated_comments_count!", 
+            COUNT(cm.id) FILTER (WHERE NOT cm.moderated) AS "unmoderated_comments_count!"
         FROM public.categories c
         JOIN public.entities e ON c.id = e.category_id
         LEFT JOIN public.comments cm ON e.id = cm.entity_id

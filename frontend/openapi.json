@@ -2661,7 +2661,9 @@
           "text",
           "data",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "moderated",
+          "version"
         ],
         "properties": {
           "author": {
@@ -2680,15 +2682,8 @@
             "type": "string",
             "format": "uuid"
           },
-          "moderated_at": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "moderated_by": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
+          "moderated": {
+            "type": "boolean"
           },
           "text": {
             "type": "string"
@@ -2696,6 +2691,10 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -2710,6 +2709,8 @@
           "data",
           "tags",
           "hidden",
+          "moderated",
+          "version",
           "created_at",
           "updated_at"
         ],
@@ -2737,18 +2738,11 @@
             "type": "string",
             "format": "uuid"
           },
-          "last_update_by": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
           "locations": {
             "$ref": "#/components/schemas/Json"
           },
-          "moderated_at": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
+          "moderated": {
+            "type": "boolean"
           },
           "moderation_notes": {
             "type": "string",
@@ -2764,6 +2758,10 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -2776,7 +2774,8 @@
           "entity_display_name",
           "entity_category_id",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "moderated"
         ],
         "properties": {
           "author": {
@@ -2801,15 +2800,8 @@
             "type": "string",
             "format": "uuid"
           },
-          "moderated_at": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "moderated_by": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
+          "moderated": {
+            "type": "boolean"
           },
           "updated_at": {
             "type": "string",
@@ -2825,6 +2817,7 @@
           "category_id",
           "tags",
           "hidden",
+          "moderated",
           "created_at",
           "updated_at"
         ],
@@ -2847,15 +2840,8 @@
             "type": "string",
             "format": "uuid"
           },
-          "last_update_by": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "moderated_at": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
+          "moderated": {
+            "type": "boolean"
           },
           "moderation_notes": {
             "type": "string",
@@ -2881,7 +2867,8 @@
           "author",
           "text",
           "data",
-          "moderated"
+          "moderated",
+          "version"
         ],
         "properties": {
           "author": {
@@ -2897,6 +2884,10 @@
           },
           "text": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -2909,7 +2900,8 @@
           "data",
           "tags",
           "hidden",
-          "moderated"
+          "moderated",
+          "version"
         ],
         "properties": {
           "category_id": {
@@ -2939,6 +2931,10 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -3221,7 +3217,8 @@
           "title",
           "entity_form",
           "comment_form",
-          "sort_order"
+          "sort_order",
+          "version"
         ],
         "properties": {
           "comment_form": {
@@ -3244,6 +3241,10 @@
           },
           "title": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -3520,7 +3521,8 @@
           "title",
           "entity_form",
           "comment_form",
-          "sort_order"
+          "sort_order",
+          "version"
         ],
         "properties": {
           "comment_form": {
@@ -3535,6 +3537,10 @@
           },
           "title": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -3543,11 +3549,20 @@
         "required": [
           "title",
           "is_filter",
-          "default_filter_status"
+          "default_filter_status",
+          "version",
+          "fill_color",
+          "border_color"
         ],
         "properties": {
+          "border_color": {
+            "type": "string"
+          },
           "default_filter_status": {
             "type": "boolean"
+          },
+          "fill_color": {
+            "type": "string"
           },
           "filter_description": {
             "type": "string",
@@ -3558,6 +3573,10 @@
           },
           "title": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -3986,11 +4005,20 @@
           "id",
           "title",
           "is_filter",
-          "default_filter_status"
+          "default_filter_status",
+          "fill_color",
+          "border_color",
+          "version"
         ],
         "properties": {
+          "border_color": {
+            "type": "string"
+          },
           "default_filter_status": {
             "type": "boolean"
+          },
+          "fill_color": {
+            "type": "string"
           },
           "filter_description": {
             "type": "string",
@@ -4005,6 +4033,10 @@
           },
           "title": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

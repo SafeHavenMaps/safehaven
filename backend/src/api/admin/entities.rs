@@ -17,8 +17,6 @@ use crate::{
     },
 };
 
-use super::AdminUserTokenClaims;
-
 #[derive(Deserialize, Debug)]
 pub struct SearchQuery {
     pub page: Option<i64>,
@@ -96,13 +94,10 @@ pub async fn admin_entities_pending(
     )
 )]
 pub async fn admin_entity_new(
-    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Json(new_entity): Json<AdminNewOrUpdateEntity>,
 ) -> Result<AppJson<AdminEntity>, AppError> {
-    Ok(AppJson(
-        AdminEntity::new(new_entity, token.admin_id, &mut conn).await?,
-    ))
+    Ok(AppJson(AdminEntity::new(new_entity, &mut conn).await?))
 }
 
 #[utoipa::path(
@@ -138,13 +133,12 @@ pub async fn admin_entity_get(
     )
 )]
 pub async fn admin_entity_update(
-    token: AdminUserTokenClaims,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(updated_entity): Json<AdminNewOrUpdateEntity>,
 ) -> Result<AppJson<AdminEntity>, AppError> {
     Ok(AppJson(
-        AdminEntity::update(id, updated_entity, token.admin_id, &mut conn).await?,
+        AdminEntity::update(id, updated_entity, &mut conn).await?,
     ))
 }
 

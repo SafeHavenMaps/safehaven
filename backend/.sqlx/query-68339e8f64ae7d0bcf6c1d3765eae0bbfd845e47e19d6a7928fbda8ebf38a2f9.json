@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, entity_id, author, text, data, created_at, updated_at, moderated_at, moderated_by\n            FROM comments\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT id, entity_id, author, text, data, created_at, updated_at, moderated, version\n            FROM comments \n            WHERE entity_id = $1\n            ORDER BY created_at\n            ",
   "describe": {
     "columns": [
       {
@@ -40,13 +40,13 @@
       },
       {
         "ordinal": 7,
-        "name": "moderated_at",
-        "type_info": "Timestamp"
+        "name": "moderated",
+        "type_info": "Bool"
       },
       {
         "ordinal": 8,
-        "name": "moderated_by",
-        "type_info": "Uuid"
+        "name": "version",
+        "type_info": "Int4"
       }
     ],
     "parameters": {
@@ -62,9 +62,9 @@
       false,
       false,
       false,
-      true,
-      true
+      false,
+      false
     ]
   },
-  "hash": "d177f7943823dbc47a1eb4ceba5659ef4fea9a910818c86676c922349eea7c5d"
+  "hash": "68339e8f64ae7d0bcf6c1d3765eae0bbfd845e47e19d6a7928fbda8ebf38a2f9"
 }

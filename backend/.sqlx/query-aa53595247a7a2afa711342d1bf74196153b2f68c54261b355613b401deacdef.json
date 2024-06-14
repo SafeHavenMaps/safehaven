@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE families\n            SET title = $2, entity_form = $3, comment_form = $4, sort_order = $5\n            WHERE id = $1\n            RETURNING \n                id,\n                title,\n                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,\n                entity_form as \"entity_form: Json<Form>\",\n                comment_form as \"comment_form: Json<Form>\",\n                sort_order\n            ",
+  "query": "\n            SELECT id, title, (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,\n                entity_form as \"entity_form: Json<Form>\", \n                comment_form as \"comment_form: Json<Form>\",\n                sort_order,\n                version\n            FROM families\n            WHERE id = ANY($1)\n            ",
   "describe": {
     "columns": [
       {
@@ -32,15 +32,16 @@
         "ordinal": 5,
         "name": "sort_order",
         "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "version",
+        "type_info": "Int4"
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Varchar",
-        "Jsonb",
-        "Jsonb",
-        "Int4"
+        "UuidArray"
       ]
     },
     "nullable": [
@@ -49,8 +50,9 @@
       null,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "582728bb76b58a8b5e58d3caa0773be6f411d52b6e2e699a2831677260b89fe6"
+  "hash": "aa53595247a7a2afa711342d1bf74196153b2f68c54261b355613b401deacdef"
 }

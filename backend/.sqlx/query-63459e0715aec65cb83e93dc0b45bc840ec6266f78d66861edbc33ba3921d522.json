@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO comments (entity_id, author, text, data, moderated_at, moderated_by)\n            VALUES (\n                $1, -- entity_id\n                $2, -- author\n                $3, -- text\n                $4, -- data\n                CASE -- if moderated set moderated_at to now as new comment\n                    WHEN $5 THEN NOW()\n                    ELSE NULL\n                END, -- moderated_at\n                CASE\n                    WHEN $5 THEN $6\n                    ELSE NULL::uuid\n                END  -- moderated_by\n            )\n            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated_at, moderated_by\n            ",
+  "query": "\n            INSERT INTO comments (entity_id, author, text, data, moderated)\n            VALUES ($1, $2, $3, $4, $5)\n            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated, version\n            ",
   "describe": {
     "columns": [
       {
@@ -40,13 +40,13 @@
       },
       {
         "ordinal": 7,
-        "name": "moderated_at",
-        "type_info": "Timestamp"
+        "name": "moderated",
+        "type_info": "Bool"
       },
       {
         "ordinal": 8,
-        "name": "moderated_by",
-        "type_info": "Uuid"
+        "name": "version",
+        "type_info": "Int4"
       }
     ],
     "parameters": {
@@ -55,8 +55,7 @@
         "Text",
         "Text",
         "Jsonb",
-        "Bool",
-        "Uuid"
+        "Bool"
       ]
     },
     "nullable": [
@@ -67,9 +66,9 @@
       false,
       false,
       false,
-      true,
-      true
+      false,
+      false
     ]
   },
-  "hash": "2c89a47800490fa8cb5f5eb3dd58fe82d998a52bacf7e68265f60df3e2bf002f"
+  "hash": "63459e0715aec65cb83e93dc0b45bc840ec6266f78d66861edbc33ba3921d522"
 }

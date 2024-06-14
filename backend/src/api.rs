@@ -170,6 +170,23 @@ impl IntoResponse for AppError {
             AppError::Database(de) => match de {
                 sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "not_found", None),
                 _ => {
+                    // Check if error contains an sh_code_* within the SQL error message and return it
+                    // as a bad request error with the error code set
+                    if let Some(sh_code) = de
+                        .to_string()
+                        .split_whitespace()
+                        .find(|s| s.starts_with("sh_code"))
+                    {
+                        return (
+                            StatusCode::BAD_REQUEST,
+                            AppJson(ErrorResponse {
+                                error_code: sh_code.to_string(),
+                                details: None,
+                            }),
+                        )
+                            .into_response();
+                    }
+
                     tracing::error!("Sqlx error: {:?}", de);
                     (StatusCode::INTERNAL_SERVER_ERROR, "database_error", None)
                 }

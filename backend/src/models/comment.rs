@@ -64,21 +64,6 @@ impl PublicComment {
         .map_err(AppError::Database)
     }
 
-    // pub async fn get(given_id: Uuid, conn: &mut PgConnection) -> Result<PublicComment, AppError> {
-    //     sqlx::query_as!(
-    //         PublicComment,
-    //         r#"
-    //         SELECT id,  author, text, data, created_at, updated_at
-    //         FROM comments
-    //         WHERE id = $1
-    //         "#,
-    //         given_id
-    //     )
-    //     .fetch_one(conn)
-    //     .await
-    //     .map_err(AppError::Database)
-    // }
-
     pub async fn list_for_public_entity(
         given_entity_id: Uuid,
         comment_form: &Form,
@@ -117,8 +102,8 @@ pub struct AdminComment {
     pub data: Value,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
-    pub moderated_at: Option<chrono::NaiveDateTime>,
-    pub moderated_by: Option<Uuid>,
+    pub moderated: bool,
+    pub version: i32,
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -130,8 +115,7 @@ pub struct AdminListedComment {
     pub entity_category_id: Uuid,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
-    pub moderated_at: Option<chrono::NaiveDateTime>,
-    pub moderated_by: Option<Uuid>,
+    pub moderated: bool,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Default)]
@@ -141,12 +125,12 @@ pub struct AdminNewOrUpdateComment {
     pub text: String,
     pub data: Value,
     pub moderated: bool,
+    pub version: i32,
 }
 
 impl AdminComment {
     pub async fn new(
         new_comment: AdminNewOrUpdateComment,
-        created_by: Uuid,
         conn: &mut PgConnection,
     ) -> Result<AdminComment, AppError> {
         let family = Family::get_from_entity(new_comment.entity_id, conn).await?;
@@ -157,29 +141,15 @@ impl AdminComment {
         sqlx::query_as!(
             AdminComment,
             r#"
-            INSERT INTO comments (entity_id, author, text, data, moderated_at, moderated_by)
-            VALUES (
-                $1, -- entity_id
-                $2, -- author
-                $3, -- text
-                $4, -- data
-                CASE -- if moderated set moderated_at to now as new comment
-                    WHEN $5 THEN NOW()
-                    ELSE NULL
-                END, -- moderated_at
-                CASE
-                    WHEN $5 THEN $6
-                    ELSE NULL::uuid
-                END  -- moderated_by
-            )
-            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated_at, moderated_by
+            INSERT INTO comments (entity_id, author, text, data, moderated)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated, version
             "#,
             new_comment.entity_id,
-            new_comment.author, // name of the author of the comment
+            new_comment.author,
             new_comment.text,
             new_comment.data,
-            new_comment.moderated,
-            created_by // $6: uuid of user who sent the request
+            new_comment.moderated
         )
         .fetch_one(conn)
         .await
@@ -189,7 +159,6 @@ impl AdminComment {
     pub async fn update(
         id: Uuid,
         update: AdminNewOrUpdateComment,
-        updated_by: Uuid,
         conn: &mut PgConnection,
     ) -> Result<AdminComment, AppError> {
         let family = Family::get_from_entity(update.entity_id, conn).await?;
@@ -204,24 +173,18 @@ impl AdminComment {
                 author = $3,
                 text = $4,
                 data = $5,
-                moderated_at = CASE
-                    WHEN $7 THEN COALESCE(moderated_at, NOW())
-                    ELSE NULL
-                END,
-                moderated_by = CASE
-                    WHEN $7 THEN COALESCE(moderated_by, $6)
-                    ELSE NULL::uuid
-                END
+                moderated = $6,
+                version = $7
             WHERE id = $1
-            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated_at, moderated_by
+            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated, version
             "#,
             id,
             update.entity_id,
             update.author,
             update.text,
             update.data,
-            updated_by, // $6: user who sent the request
-            update.moderated // $7: the flag indicating if the updated comment is moderated
+            update.moderated,
+            update.version
         )
         .fetch_one(conn)
         .await
@@ -232,7 +195,7 @@ impl AdminComment {
         sqlx::query_as!(
             AdminComment,
             r#"
-            SELECT id, entity_id, author, text, data, created_at, updated_at, moderated_at, moderated_by
+            SELECT id, entity_id, author, text, data, created_at, updated_at, moderated, version
             FROM comments
             WHERE id = $1
             "#,
@@ -265,7 +228,7 @@ impl AdminComment {
         sqlx::query_as!(
             AdminComment,
             r#"
-            SELECT *
+            SELECT id, entity_id, author, text, data, created_at, updated_at, moderated, version
             FROM comments 
             WHERE entity_id = $1
             ORDER BY created_at
@@ -282,10 +245,10 @@ impl AdminComment {
             AdminListedComment,
             r#"
             SELECT c.id, c.entity_id, e.display_name as entity_display_name, e.category_id as entity_category_id, c.created_at,
-                c.author, c.moderated_at, c.moderated_by, c.updated_at
+                c.author, c.moderated, c.updated_at
             FROM comments c
             INNER JOIN entities e ON c.entity_id = e.id
-            WHERE c.moderated_at IS NULL
+            WHERE NOT c.moderated
             ORDER BY created_at
             "#
         )

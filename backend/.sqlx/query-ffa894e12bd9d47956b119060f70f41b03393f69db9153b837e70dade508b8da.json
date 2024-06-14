@@ -1,0 +1,69 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO tags (title, is_filter, filter_description, default_filter_status, fill_color, border_color)\n            VALUES ($1, $2, $3, $4, $5, $6)\n            RETURNING id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "is_filter",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "filter_description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "default_filter_status",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "version",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "fill_color",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "border_color",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Bool",
+        "Text",
+        "Bool",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "ffa894e12bd9d47956b119060f70f41b03393f69db9153b837e70dade508b8da"
+}

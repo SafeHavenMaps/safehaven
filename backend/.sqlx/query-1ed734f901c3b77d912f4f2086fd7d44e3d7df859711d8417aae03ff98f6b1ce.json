@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT c.id, c.entity_id, e.display_name as entity_display_name, e.category_id as entity_category_id, c.created_at,\n                c.author, c.moderated_at, c.moderated_by, c.updated_at\n            FROM comments c\n            INNER JOIN entities e ON c.entity_id = e.id\n            WHERE c.moderated_at IS NULL\n            ORDER BY created_at\n            ",
+  "query": "\n            SELECT c.id, c.entity_id, e.display_name as entity_display_name, e.category_id as entity_category_id, c.created_at,\n                c.author, c.moderated, c.updated_at\n            FROM comments c\n            INNER JOIN entities e ON c.entity_id = e.id\n            WHERE NOT c.moderated\n            ORDER BY created_at\n            ",
   "describe": {
     "columns": [
       {
@@ -35,16 +35,11 @@
       },
       {
         "ordinal": 6,
-        "name": "moderated_at",
-        "type_info": "Timestamp"
+        "name": "moderated",
+        "type_info": "Bool"
       },
       {
         "ordinal": 7,
-        "name": "moderated_by",
-        "type_info": "Uuid"
-      },
-      {
-        "ordinal": 8,
         "name": "updated_at",
         "type_info": "Timestamp"
       }
@@ -59,10 +54,9 @@
       false,
       false,
       false,
-      true,
-      true,
+      false,
       false
     ]
   },
-  "hash": "9d8b007a97cf4cd20e4b3ffb8df3f0cd6532981c210e7049b47861104ddfcfb8"
+  "hash": "1ed734f901c3b77d912f4f2086fd7d44e3d7df859711d8417aae03ff98f6b1ce"
 }

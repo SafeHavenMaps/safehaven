@@ -71,6 +71,7 @@ pub struct Family {
     pub entity_form: Json<Form>,
     pub comment_form: Json<Form>,
     pub sort_order: i32,
+    pub version: i32,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -79,6 +80,7 @@ pub struct NewOrUpdateFamily {
     pub entity_form: Form,
     pub comment_form: Form,
     pub sort_order: i32,
+    pub version: i32,
 }
 
 impl Form {
@@ -158,7 +160,8 @@ impl Family {
                 (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 entity_form as "entity_form: Json<Form>",
                 comment_form as "comment_form: Json<Form>",
-                sort_order
+                sort_order,
+                version
             "#,
             family.title,
             entity_form,
@@ -185,7 +188,7 @@ impl Family {
             Family,
             r#"
             UPDATE families
-            SET title = $2, entity_form = $3, comment_form = $4, sort_order = $5
+            SET title = $2, entity_form = $3, comment_form = $4, sort_order = $5, version = $6
             WHERE id = $1
             RETURNING 
                 id,
@@ -193,13 +196,15 @@ impl Family {
                 (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 entity_form as "entity_form: Json<Form>",
                 comment_form as "comment_form: Json<Form>",
-                sort_order
+                sort_order,
+                version
             "#,
             id,
             update.title,
             entity_form,
             comment_form,
-            update.sort_order
+            update.sort_order,
+            update.version
         )
         .fetch_one(conn)
         .await
@@ -228,7 +233,8 @@ impl Family {
             SELECT id, title, (SELECT hash FROM icons WHERE id = icon_id) as icon_hash, 
                 entity_form as "entity_form: Json<Form>", 
                 comment_form as "comment_form: Json<Form>",
-                sort_order
+                sort_order,
+                version
             FROM families
             WHERE id = $1
             "#,
@@ -246,7 +252,8 @@ impl Family {
             SELECT id, title, (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 entity_form as "entity_form: Json<Form>", 
                 comment_form as "comment_form: Json<Form>",
-                sort_order
+                sort_order,
+                version
             FROM families
             "#
         )
@@ -265,7 +272,8 @@ impl Family {
             SELECT id, title, (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 entity_form as "entity_form: Json<Form>", 
                 comment_form as "comment_form: Json<Form>",
-                sort_order
+                sort_order,
+                version
             FROM families
             WHERE id = ANY($1)
             "#,
@@ -286,7 +294,8 @@ impl Family {
             SELECT families.id, families.title, (SELECT hash FROM icons WHERE id = families.icon_id) as icon_hash,
                 families.entity_form as "entity_form: Json<Form>", 
                 families.comment_form as "comment_form: Json<Form>",
-                families.sort_order
+                families.sort_order,
+                families.version
             FROM families
             JOIN categories ON families.id = categories.family_id
             WHERE categories.id = $1
@@ -308,7 +317,8 @@ impl Family {
             SELECT families.id, families.title, (SELECT hash FROM icons WHERE id = families.icon_id) as icon_hash,
                 families.entity_form as "entity_form: Json<Form>", 
                 families.comment_form as "comment_form: Json<Form>",
-                families.sort_order
+                families.sort_order,
+                families.version
             FROM families
             JOIN categories ON families.id = categories.family_id
             JOIN entities ON categories.id = entities.category_id

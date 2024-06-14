@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT \n            c.id AS category_id, \n            c.family_id, \n            COUNT(DISTINCT e.id) FILTER (WHERE e.moderated_at IS NOT NULL) AS \"moderated_entities_count!\", \n            COUNT(DISTINCT e.id) FILTER (WHERE e.moderated_at IS NULL) AS \"unmoderated_entities_count!\", \n            COUNT(cm.id) FILTER (WHERE cm.moderated_at IS NOT NULL) AS \"moderated_comments_count!\", \n            COUNT(cm.id) FILTER (WHERE cm.moderated_at IS NULL) AS \"unmoderated_comments_count!\"\n        FROM public.categories c\n        JOIN public.entities e ON c.id = e.category_id\n        LEFT JOIN public.comments cm ON e.id = cm.entity_id\n        GROUP BY c.id, c.family_id\n        ",
+  "query": "\n        SELECT \n            c.id AS category_id, \n            c.family_id, \n            COUNT(DISTINCT e.id) FILTER (WHERE e.moderated) AS \"moderated_entities_count!\", \n            COUNT(DISTINCT e.id) FILTER (WHERE NOT e.moderated) AS \"unmoderated_entities_count!\", \n            COUNT(cm.id) FILTER (WHERE cm.moderated) AS \"moderated_comments_count!\", \n            COUNT(cm.id) FILTER (WHERE NOT cm.moderated) AS \"unmoderated_comments_count!\"\n        FROM public.categories c\n        JOIN public.entities e ON c.id = e.category_id\n        LEFT JOIN public.comments cm ON e.id = cm.entity_id\n        GROUP BY c.id, c.family_id\n        ",
   "describe": {
     "columns": [
       {
@@ -46,5 +46,5 @@
       null
     ]
   },
-  "hash": "a8bf154e85f13e7ba4d88770cb7f2e2074e076e6d588ae4e0219fc61168993fe"
+  "hash": "5316deb346a27cddcdce842ef5da51857ea95762639d548ce36918dc2027d1d2"
 }
