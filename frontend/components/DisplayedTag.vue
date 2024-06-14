@@ -1,7 +1,7 @@
 <template>
   <Tag
     :style="{
-      backgroundColor: 'navy',
+      backgroundColor: 'hotpink',
       borderColor: 'white',
       color: 'white',
     }"

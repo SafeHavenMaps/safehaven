@@ -194,7 +194,9 @@ if (!(table_key in state.tablesQueryParams)) {
     search_query: '',
     currentPage: 1,
     pageSize: 20,
-    categoryFilteringList: state.categories.map(category => ({ ...category, active: true })),
+    categoryFilteringList: state.categories
+      .filter(category => category.family_id == familyId)
+      .map(category => ({ ...category, active: true })),
     tagFilteringList: state.tags.map(tag => ({ ...tag, active: null })),
   }
 }

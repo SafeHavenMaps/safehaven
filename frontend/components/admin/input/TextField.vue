@@ -6,7 +6,7 @@
       :id="props.id"
       :model-value="props.modelValue"
       :variant="props.variant ? 'filled': 'outlined'"
-      :invalid="!props.modelValue || props.invalid"
+      :invalid="(!props.optional && !props.modelValue) || props.invalid"
       @update:model-value="updateValue"
     />
     <Textarea
@@ -14,7 +14,7 @@
       :id="props.id"
       :model-value="props.modelValue"
       :variant="props.variant ? 'filled': 'outlined'"
-      :invalid="!props.modelValue || props.invalid"
+      :invalid="(!props.optional && !props.modelValue) || props.invalid"
       @update:model-value="updateValue"
     />
     <Editor
@@ -37,6 +37,7 @@ const props = defineProps<{
   modelValue: string | undefined | null
   variant?: boolean
   invalid?: boolean
+  optional?: boolean
   helperText?: string
   textLength?: 'short' | 'long' | 'editor'
 }>()
