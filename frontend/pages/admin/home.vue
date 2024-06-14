@@ -123,17 +123,17 @@
     <div
       class="col-12 p-4"
     >
-      <Chart
+      <!-- <Chart
         type="line"
         :data="chartData"
         :options="chartOptions"
-      />
+      /> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Chart from 'primevue/chart'
+// import Chart from 'primevue/chart'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import state from '~/lib/admin-state'
 

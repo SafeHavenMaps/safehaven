@@ -157,17 +157,17 @@ html, body {
 }
 
 .content-container {
-  margin-top: 80px; /* Adjust this value based on your navbar's height */
+  margin-top: 74px; /* Adjust this value based on your navbar's height */
   transition: margin-top 0.3s;
   display: flex;
 }
 
 .sidebar {
   position: fixed;
-  top: 80px;
+  top: 74px;
   bottom: 0;
   left: 0;
-  width: 250px; /* Adjust the sidebar width as needed */
+  width: 17.7rem; /* Adjust the sidebar width as needed */
   background-color: #f7f7f7; /* Ensure the sidebar has a background color */
   z-index: 1001;
   transition: transform 0.3s ease-in-out;
