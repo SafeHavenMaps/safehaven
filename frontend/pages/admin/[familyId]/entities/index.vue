@@ -6,7 +6,7 @@
           style="height: 36px; "
         >
           <InputText
-            v-model="search_query"
+            v-model="state.tablesQueryParams[table_key].search_query"
             placeholder="Tapez votre recherche ici"
           />
 
@@ -41,15 +41,16 @@
     </span>
 
     <DataTable
-      :value="currentEntitiesResults!.entities"
-      :rows="pageSize"
-      :filters="state.tablesFilters[table_key]"
-      :total-records="currentEntitiesResults!.total_results"
-      :rows-per-page-options="[5, 10, 20, 50]"
-      :first="0"
+      :rows="state.tablesQueryParams[table_key].pageSize"
+      :first="firstRow"
       lazy
       paginator
       data-key="id"
+      :value="currentEntitiesResults?.entities"
+      :total-records="currentEntitiesResults?.total_results"
+      striped-rows
+      :rows-per-page-options="[5, 10, 20, 50]"
+      removable-sort
       @page="onPage"
     >
       <Column
@@ -110,7 +111,7 @@
             :id="slotProps.data.id"
             model-name="de l'entité"
             :name="slotProps.data.display_name"
-            :loading="false"
+            :loading="processingRequest[slotProps.data.id]"
             secure-delete
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/${familyId}/entities/${id}`)"
@@ -132,8 +133,8 @@
 
     <OverlayPanel ref="filterOp">
       <ViewerFilterConfig
-        v-model:filteringTags="tagFilteringList"
-        v-model:filteringCategories="categoryFilteringList"
+        v-model:filteringTags="state.tablesQueryParams[table_key].tagFilteringList!"
+        v-model:filteringCategories="state.tablesQueryParams[table_key].categoryFilteringList!"
         class="w-25rem"
         @filters-changed="refreshTable"
       />
@@ -151,45 +152,62 @@ import type { AdminPaginatedCachedEntities, Category, Tag } from '~/lib'
 import state from '~/lib/admin-state'
 
 const max_tags_displayed = 2
-
 const familyId = useRoute().params.familyId as string
 if (state.families == null) {
   await state.fetchFamilies()
 }
+if (state.categories == null) {
+  await state.fetchCategories()
+}
+if (state.tags == null) {
+  await state.fetchTags()
+}
 
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 
-const categoryList: Category[] = await state.client.listCategories()
 type CategoryRecord = Record<string, Category>
 
-const categoryRecord: CategoryRecord = categoryList.reduce((categories, category) => {
+const categoryRecord: CategoryRecord = state.categories.reduce((categories, category) => {
   categories[category.id] = category
   return categories
 }, {} as CategoryRecord)
-const categoryFilteringList = ref(categoryList.map(tag => ({ ...tag, active: true })))
 
-const tagList: Tag[] = await state.client.listTags()
 type TagRecord = Record<string, Tag>
-const tagRecord: TagRecord = tagList.reduce((tags, tag) => {
+const tagRecord: TagRecord = state.tags.reduce((tags, tag) => {
   tags[tag.id] = tag
   return tags
 }, {} as TagRecord)
-const tagFilteringList = ref(tagList.map(tag => ({ ...tag, active: null })))
 
 const overlay = ref<OverlayPanel>()
 const filterOp = ref<OverlayPanel>()
 const overlayed_tags: Ref<undefined | string[]> = ref(undefined)
 
-const search_query = ref('')
-const currentPage = ref(1)
-const pageSize = ref(20)
+const firstRow = ref(0)
+const optionalColumns = ref(['Catégorie', 'Tags', 'Visibilité'])
+const table_key = `dt-state-entities-${familyId}`
+if (!(table_key in state.tablesSelectedColumns)) {
+  state.tablesSelectedColumns[table_key] = ['Catégorie', 'Visibilité', 'Tags']
+}
+
+if (!(table_key in state.tablesQueryParams)) {
+  state.tablesQueryParams[table_key] = {
+    search_query: '',
+    currentPage: 1,
+    pageSize: 20,
+    categoryFilteringList: state.categories.map(category => ({ ...category, active: true })),
+    tagFilteringList: state.tags.map(tag => ({ ...tag, active: null })),
+  }
+}
+else {
+  firstRow.value = state.tablesQueryParams[table_key].currentPage * state.tablesQueryParams[table_key].pageSize - 1
+}
 
 let forceFullRefresh = false
 
 watch([
-  ...categoryFilteringList.value,
-  ...tagFilteringList.value,
-  search_query,
+  ...state.tablesQueryParams[table_key].categoryFilteringList!,
+  ...state.tablesQueryParams[table_key].tagFilteringList!,
+  state.tablesQueryParams[table_key].search_query,
 ], () => {
   forceFullRefresh = true
 })
@@ -197,18 +215,18 @@ watch([
 const currentEntitiesResults: Ref<AdminPaginatedCachedEntities | null> = ref(null)
 async function refreshTable() {
   if (forceFullRefresh) {
-    currentPage.value = 1
+    state.tablesQueryParams[table_key].currentPage = 1
     forceFullRefresh = false
   }
 
   currentEntitiesResults.value = await state.client.searchEntities(
-    { page: currentPage.value, page_size: pageSize.value },
+    { page: state.tablesQueryParams[table_key].currentPage, page_size: state.tablesQueryParams[table_key].pageSize },
     {
-      search: search_query.value,
+      search: state.tablesQueryParams[table_key].search_query,
       family: familyId,
-      active_categories_ids: categoryFilteringList.value.filter(t => t.active).map(t => t.id),
-      required_tags_ids: tagFilteringList.value.filter(t => t.active).map(t => t.id),
-      excluded_tags_ids: tagFilteringList.value.filter(t => t.active === false).map(t => t.id),
+      active_categories_ids: state.tablesQueryParams[table_key].categoryFilteringList!.filter(t => t.active).map(t => t.id),
+      required_tags_ids: state.tablesQueryParams[table_key].tagFilteringList!.filter(t => t.active).map(t => t.id),
+      excluded_tags_ids: state.tablesQueryParams[table_key].tagFilteringList!.filter(t => t.active === false).map(t => t.id),
     },
   )
 }
@@ -216,17 +234,10 @@ async function refreshTable() {
 await refreshTable()
 
 async function onPage(event: PageState) {
-  currentPage.value = event.page + 1
-  pageSize.value = event.rows
+  state.tablesQueryParams[table_key].currentPage = event.page + 1
+  state.tablesQueryParams[table_key].pageSize = event.rows
   await refreshTable()
 }
-
-const optionalColumns = ref(['Catégorie', 'Tags', 'Visibilité'])
-const table_key = `dt-state-entities-${familyId}`
-if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = ['Catégorie', 'Visibilité', 'Tags']
-}
-// TODO : save table search results?
 
 definePageMeta({
   layout: 'admin-ui',
@@ -250,6 +261,7 @@ initAdminLayout(
   ],
 )
 
+const processingRequest: Ref<Record<string, boolean>> = ref({})
 const toast = useToast()
 
 async function onDelete(entity_id: string, entity_name: string) {

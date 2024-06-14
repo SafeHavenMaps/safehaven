@@ -96,7 +96,7 @@ async function onSave() {
     if (editedCategory.value.fill_color.length == 6) {
       editedCategory.value.fill_color = `#${editedCategory.value.fill_color}`
     }
-    const { id } = await state.client.createCategory(editedCategory.value)
+    const { id } = await state.createCategory(editedCategory.value)
     navigateTo(`/admin/${familyId}/categories/new-icon-${id}`)
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Catégorie créée avec succès', life: 3000 })
   }

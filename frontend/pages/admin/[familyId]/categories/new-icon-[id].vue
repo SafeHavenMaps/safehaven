@@ -31,7 +31,7 @@ if (state.families == undefined)
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 const categoryId = useRoute().params.id as string
 
-const fetchedCategory = await state.client.getCategory(categoryId)
+const fetchedCategory = await state.fetchCategory(categoryId)
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(

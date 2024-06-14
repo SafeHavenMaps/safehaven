@@ -135,7 +135,8 @@ initAdminLayout(
 // Initialize the ref with an empty array, then fetch to update access tokens asynchronously
 const tags: Ref<Tag[]> = ref([])
 async function refreshTable() {
-  tags.value = await state.client.listTags()
+  await state.fetchTags()
+  tags.value = state.tags
 }
 refreshTable()
 

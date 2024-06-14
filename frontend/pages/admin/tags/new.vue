@@ -83,7 +83,7 @@ initAdminLayout(
 async function onSave() {
   processingRequest.value = true
   try {
-    await state.client.createTag(editedTag.value)
+    await state.createTag(editedTag.value)
     navigateTo('/admin/tags')
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Tag créé avec succès', life: 3000 })
   }

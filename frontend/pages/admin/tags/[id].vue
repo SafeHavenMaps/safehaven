@@ -63,7 +63,7 @@ definePageMeta({
 
 const tagId = useRoute().params.id as string
 
-const fetchedTag = await state.client.getTag(tagId)
+const fetchedTag = await state.fetchTag(tagId)
 const editedTag: Ref<NewOrUpdateTag> = ref(JSON.parse(JSON.stringify(fetchedTag))) // deep copy
 
 const processingRequest = ref(false)
@@ -87,7 +87,7 @@ function hasBeenEdited(field: keyof NewOrUpdateTag) {
 async function onSave() {
   try {
     processingRequest.value = true
-    await state.client.updateTag(tagId, editedTag.value)
+    await state.updateTag(tagId, editedTag.value)
     navigateTo('/admin/tags')
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Tag modifié avec succès', life: 3000 })
   }

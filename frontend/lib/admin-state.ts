@@ -7,14 +7,23 @@ import type {
   NewOrUpdateFamily,
   SafeHavenOptions,
   ConfigurationOption,
+  Tag,
+  Category,
+  NewOrUpdateTag,
+  NewOrUpdateCategory,
 } from '~/lib'
 
+interface Identifiable {
+  id: string | number
+}
 export class AppState {
   public client = useClient()
   // For categories, users, tags, access tokens, entities and comments the admin client shall be used directly
 
   private optionsData: SafeHavenOptions | null = null
   private familiesData: Family[] | null = null
+  private categoriesData: Category[] | null = null
+  private tagsData: Tag[] | null = null
 
   private countsByFamilyData: Record<string, number[]> = {}
   private countsByCategoryData: Record<string, number[]> = {}
@@ -24,6 +33,24 @@ export class AppState {
 
   public tablesSelectedColumns: Record<string, string[]> = {}
   public tablesFilters: Record<string, DataTableFilterMeta> = {}
+  public tablesQueryParams: Record<string, {
+    search_query: string
+    currentPage: number
+    pageSize: number
+    categoryFilteringList?: (Category & { active: boolean })[]
+    tagFilteringList?: (Tag & { active: boolean | null })[]
+  }> = {}
+
+  private compareIds(array1: Identifiable[] | null, array2: Identifiable[] | null): boolean {
+    console.log('blah')
+    const ids1 = array1?.map(item => item.id).sort()
+    const ids2 = array2?.map(item => item.id).sort()
+    if (ids1 == undefined || ids2 == undefined || ids1.length !== ids2.length) return false
+    for (let i = 0; i < ids1.length; i++) {
+      if (ids1[i] !== ids2[i]) return false
+    }
+    return true
+  }
 
   // Auth
   async login(username: string, password: string, remember_me: boolean) {
@@ -103,6 +130,84 @@ export class AppState {
   async deleteFamily(id: string) {
     await this.client.deleteFamily(id)
     this.familiesData = this.familiesData!.filter(f => f.id !== id)
+  }
+
+  // Categories
+  async fetchCategories(): Promise<void> {
+    const categories = await this.client.listCategories()
+    if (!this.compareIds(categories, toRaw(this.categoriesData))) {
+      this.categoriesData = categories
+      this.tablesQueryParams = {}
+    }
+  }
+
+  get categories(): Category[] {
+    return this.categoriesData!
+  }
+
+  async fetchCategory(id: string): Promise<Category> {
+    return await this.client.getCategory(id)
+  }
+
+  async createCategory(category: NewOrUpdateCategory): Promise<Category> {
+    const newCategory = await this.client.createCategory(category)
+    this.categoriesData!.push(newCategory)
+    this.tablesQueryParams = {}
+    return newCategory
+  }
+
+  async updateCategory(id: string, category: NewOrUpdateCategory): Promise<void> {
+    const updatedCategory = await this.client.updateCategory(id, category)
+    const index = this.categoriesData!.findIndex(c => c.id === id)
+    if (index !== -1) {
+      this.categoriesData![index] = updatedCategory
+    }
+    this.tablesQueryParams = {}
+  }
+
+  async deleteCategory(id: string): Promise<void> {
+    await this.client.deleteCategory(id)
+    this.categoriesData = this.categoriesData!.filter(c => c.id !== id)
+    this.tablesQueryParams = {}
+  }
+
+  // Tags
+  async fetchTags(): Promise<void> {
+    const tags = await this.client.listTags()
+    if (!this.compareIds(tags, this.tagsData)) {
+      this.tagsData = tags
+      this.tablesQueryParams = {}
+    }
+  }
+
+  get tags(): Tag[] {
+    return this.tagsData!
+  }
+
+  async fetchTag(id: string): Promise<Tag> {
+    return await this.client.getTag(id)
+  }
+
+  async createTag(tag: NewOrUpdateTag): Promise<Tag> {
+    const newTag = await this.client.createTag(tag)
+    this.tagsData!.push(newTag)
+    this.tablesQueryParams = {}
+    return newTag
+  }
+
+  async updateTag(id: string, tag: NewOrUpdateTag): Promise<void> {
+    const updatedTag = await this.client.updateTag(id, tag)
+    const index = this.tagsData!.findIndex(t => t.id === id)
+    if (index !== -1) {
+      this.tagsData![index] = updatedTag
+    }
+    this.tablesQueryParams = {}
+  }
+
+  async deleteTag(id: string): Promise<void> {
+    await this.client.deleteTag(id)
+    this.tagsData = this.tagsData!.filter(t => t.id !== id)
+    this.tablesQueryParams = {}
   }
 
   // Stats

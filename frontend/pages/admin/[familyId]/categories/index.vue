@@ -95,7 +95,8 @@ interface CategoryWCount extends Category { entity_count?: number }
 // Initialize the ref with an empty array, then fetch to update categories asynchronously
 const categories: Ref<CategoryWCount[]> = ref([])
 async function refreshTable() {
-  categories.value = await state.client.listCategories()
+  await state.fetchCategories()
+  categories.value = state.categories
   categories.value = categories.value.filter(category => category.family_id == familyId)
   await state.getEntitiesCommentsCounts()
   categories.value.forEach((category) => {
@@ -143,7 +144,7 @@ const toast = useToast()
 
 async function onDelete(category_id: string, category_name: string) {
   try {
-    await state.client.deleteCategory(category_id)
+    await state.deleteCategory(category_id)
     toast.add({ severity: 'success', summary: 'Succès', detail: `Catégorie ${category_name} supprimée avec succès`, life: 3000 })
     refreshTable()
   }

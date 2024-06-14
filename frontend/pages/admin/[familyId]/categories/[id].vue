@@ -71,7 +71,7 @@ if (state.families == undefined)
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 const categoryId = useRoute().params.id as string
 
-const fetchedCategory = await state.client.getCategory(categoryId)
+const fetchedCategory = await state.fetchCategory(categoryId)
 const editedCategory: Ref<NewOrUpdateCategory> = ref(JSON.parse(JSON.stringify(fetchedCategory))) // deep copy
 
 const processingRequest = ref(false)
@@ -104,7 +104,7 @@ async function onSave() {
     if (editedCategory.value.fill_color.length == 6) {
       editedCategory.value.fill_color = `#${editedCategory.value.fill_color}`
     }
-    await state.client.updateCategory(categoryId, editedCategory.value)
+    await state.updateCategory(categoryId, editedCategory.value)
     navigateTo(`/admin/${familyId}/categories`)
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Catégorie modifiée avec succès', life: 3000 })
   }
