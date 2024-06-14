@@ -11,6 +11,7 @@ pub struct NewOrUpdateCategory {
     pub default_status: bool,
     pub fill_color: String,
     pub border_color: String,
+    pub version: Option<i32>,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -22,6 +23,7 @@ pub struct Category {
     pub icon_hash: Option<String>,
     pub fill_color: String,
     pub border_color: String,
+    pub version: i32,
 }
 
 impl Category {
@@ -41,7 +43,8 @@ impl Category {
                 default_status,
                 (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 fill_color,
-                border_color
+                border_color,
+                version
             "#,
             category.title,
             category.family_id,
@@ -65,7 +68,8 @@ impl Category {
                 default_status,
                 (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 fill_color,
-                border_color
+                border_color,
+                version
             FROM categories
             WHERE id = $1
             "#,
@@ -81,11 +85,15 @@ impl Category {
         update: NewOrUpdateCategory,
         conn: &mut PgConnection,
     ) -> Result<Category, AppError> {
+        if update.version.is_none() {
+            return Err(AppError::Validation("Version is required".to_string()));
+        }
+
         sqlx::query_as!(
             Category,
             r#"
             UPDATE categories
-            SET title = $2, family_id = $3, default_status = $4, fill_color = $5, border_color = $6
+            SET title = $2, family_id = $3, default_status = $4, fill_color = $5, border_color = $6, version = $7
             WHERE id = $1
             RETURNING
                 id,
@@ -94,14 +102,16 @@ impl Category {
                 default_status,
                 (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 fill_color,
-                border_color
+                border_color,
+                version
             "#,
             id,
             update.title,
             update.family_id,
             update.default_status,
             update.fill_color,
-            update.border_color
+            update.border_color,
+            update.version
         )
         .fetch_one(conn)
         .await
@@ -134,7 +144,8 @@ impl Category {
                 default_status,
                 (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 fill_color,
-                border_color
+                border_color,
+                version
             FROM categories
             "#
         )
@@ -157,7 +168,8 @@ impl Category {
                 default_status,
                 (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 fill_color,
-                border_color
+                border_color,
+                version
             FROM categories
             WHERE family_id = ANY($1)
             "#,
@@ -183,7 +195,8 @@ impl Category {
                 default_status,
                 (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
                 fill_color,
-                border_color
+                border_color,
+                version
             FROM categories
             WHERE id = ANY($1) AND family_id = ANY($2)
             "#,

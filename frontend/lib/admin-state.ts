@@ -42,7 +42,6 @@ export class AppState {
   }> = {}
 
   private compareIds(array1: Identifiable[] | null, array2: Identifiable[] | null): boolean {
-    console.log('blah')
     const ids1 = array1?.map(item => item.id).sort()
     const ids2 = array2?.map(item => item.id).sort()
     if (ids1 == undefined || ids2 == undefined || ids1.length !== ids2.length) return false
@@ -115,21 +114,15 @@ export class AppState {
   }
 
   async createFamily(family: NewOrUpdateFamily) {
-    const newFamily = await this.client.createFamily(family)
-    this.familiesData!.push(newFamily)
+    await this.client.createFamily(family)
   }
 
   async updateFamily(id: string, family: NewOrUpdateFamily) {
-    const updatedFamily = await this.client.updateFamily(id, family)
-    const index = this.familiesData!.findIndex(f => f.id === id)
-    if (index !== -1) {
-      this.familiesData![index] = updatedFamily
-    }
+    await this.client.updateFamily(id, family)
   }
 
   async deleteFamily(id: string) {
     await this.client.deleteFamily(id)
-    this.familiesData = this.familiesData!.filter(f => f.id !== id)
   }
 
   // Categories
@@ -150,25 +143,16 @@ export class AppState {
   }
 
   async createCategory(category: NewOrUpdateCategory): Promise<Category> {
-    const newCategory = await this.client.createCategory(category)
-    this.categoriesData!.push(newCategory)
-    this.tablesQueryParams = {}
-    return newCategory
+    return await this.client.createCategory(category)
   }
 
   async updateCategory(id: string, category: NewOrUpdateCategory): Promise<void> {
-    const updatedCategory = await this.client.updateCategory(id, category)
-    const index = this.categoriesData!.findIndex(c => c.id === id)
-    if (index !== -1) {
-      this.categoriesData![index] = updatedCategory
-    }
+    await this.client.updateCategory(id, category)
     this.tablesQueryParams = {}
   }
 
   async deleteCategory(id: string): Promise<void> {
     await this.client.deleteCategory(id)
-    this.categoriesData = this.categoriesData!.filter(c => c.id !== id)
-    this.tablesQueryParams = {}
   }
 
   // Tags
@@ -189,24 +173,16 @@ export class AppState {
   }
 
   async createTag(tag: NewOrUpdateTag): Promise<Tag> {
-    const newTag = await this.client.createTag(tag)
-    this.tagsData!.push(newTag)
-    this.tablesQueryParams = {}
-    return newTag
+    return await this.client.createTag(tag)
   }
 
   async updateTag(id: string, tag: NewOrUpdateTag): Promise<void> {
-    const updatedTag = await this.client.updateTag(id, tag)
-    const index = this.tagsData!.findIndex(t => t.id === id)
-    if (index !== -1) {
-      this.tagsData![index] = updatedTag
-    }
+    await this.client.updateTag(id, tag)
     this.tablesQueryParams = {}
   }
 
   async deleteTag(id: string): Promise<void> {
     await this.client.deleteTag(id)
-    this.tagsData = this.tagsData!.filter(t => t.id !== id)
     this.tablesQueryParams = {}
   }
 

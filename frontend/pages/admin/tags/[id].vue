@@ -91,7 +91,8 @@ async function onSave() {
     navigateTo('/admin/tags')
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Tag modifié avec succès', life: 3000 })
   }
-  catch {
+  catch (error) {
+    console.error(error)
     toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification du tag', life: 3000 })
   }
   processingRequest.value = false

@@ -64,6 +64,8 @@ const editedTag: Ref<NewOrUpdateTag> = ref({
   is_filter: true,
   default_filter_status: true,
   filter_description: '',
+  border_color: '#E696BA',
+  fill_color: '#E86BA7',
 })
 
 const processingRequest = ref(false)

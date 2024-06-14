@@ -80,7 +80,7 @@ pub struct NewOrUpdateFamily {
     pub entity_form: Form,
     pub comment_form: Form,
     pub sort_order: i32,
-    pub version: i32,
+    pub version: Option<i32>,
 }
 
 impl Form {
@@ -178,6 +178,11 @@ impl Family {
         update: NewOrUpdateFamily,
         conn: &mut PgConnection,
     ) -> Result<Family, AppError> {
+        // Check if the version is provided
+        if update.version.is_none() {
+            return Err(AppError::Validation("Version is required".to_string()));
+        }
+
         update.entity_form.validate()?;
         update.comment_form.validate()?;
 

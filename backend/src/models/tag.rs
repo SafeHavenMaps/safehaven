@@ -22,7 +22,7 @@ pub struct NewOrUpdateTag {
     pub is_filter: bool,
     pub filter_description: Option<String>,
     pub default_filter_status: bool,
-    pub version: i32,
+    pub version: Option<i32>,
     pub fill_color: String,
     pub border_color: String,
 }
@@ -53,6 +53,11 @@ impl Tag {
         update: NewOrUpdateTag,
         conn: &mut PgConnection,
     ) -> Result<Tag, AppError> {
+        // Check if the version is provided
+        if update.version.is_none() {
+            return Err(AppError::Validation("Version is required".to_string()));
+        }
+
         sqlx::query_as!(
             Tag,
             r#"

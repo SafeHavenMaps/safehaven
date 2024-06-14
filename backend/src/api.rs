@@ -177,10 +177,11 @@ impl IntoResponse for AppError {
                         .split_whitespace()
                         .find(|s| s.starts_with("sh_code"))
                     {
+                        // Return the code as a bad request, remove the prefix
                         return (
                             StatusCode::BAD_REQUEST,
                             AppJson(ErrorResponse {
-                                error_code: sh_code.to_string(),
+                                error_code: sh_code[8..].to_string(),
                                 details: None,
                             }),
                         )

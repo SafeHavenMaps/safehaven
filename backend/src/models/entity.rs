@@ -181,7 +181,7 @@ pub struct AdminNewOrUpdateEntity {
     pub hidden: bool,
     pub moderation_notes: Option<String>,
     pub moderated: bool,
-    pub version: i32,
+    pub version: Option<i32>,
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -295,6 +295,11 @@ impl AdminEntity {
         update: AdminNewOrUpdateEntity,
         conn: &mut PgConnection,
     ) -> Result<AdminEntity, AppError> {
+        // Check if the version is provided
+        if update.version.is_none() {
+            return Err(AppError::Validation("Version is required".to_string()));
+        }
+
         // Start a database transaction using the Acquire trait
         let mut tx: Transaction<'_, Postgres> = conn.begin().await.map_err(AppError::Database)?;
 
