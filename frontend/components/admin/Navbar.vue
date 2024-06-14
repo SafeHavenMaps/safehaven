@@ -1,9 +1,25 @@
 <template>
   <Toolbar
-    class="admin-navbar mb-2 coco-text"
+    class="admin-navbar mb-2 coco-text top-0 left-0 fixed w-full"
   >
     <template #start>
       <div class="flex align-items-center">
+        <Button
+          outlined
+          severity="secondary"
+          small
+          class="p-1 mr-2"
+          style="color: white; border-color: white;"
+          @click="() => { emit('toggleSidebar') }"
+        >
+          <template #default>
+            <AppIcon
+              icon-name="menu"
+              size="24px"
+            />
+          </template>
+        </Button>
+
         <img
           height="40"
           width="40"
@@ -12,7 +28,7 @@
         >
         <div class="pl-3">
           <h3 class="my-0">
-            Espace d'administration SafeHaven
+            SafeHaven
           </h3>
           <span class="text-xs font-italic">
             {{ state.options.general.title }}
@@ -58,6 +74,8 @@
 import state from '~/lib/admin-state'
 import safehaven_logo from '~/assets/logo_square_white.svg'
 
+const emit = defineEmits(['toggleSidebar'])
+
 await state.fetchConfig()
 await state.check_login()
 </script>
@@ -69,5 +87,6 @@ await state.check_login()
   border-left-width: 0;
   border-right-width: 0;
   border-top-width: 0;
+  z-index: 1000;
 }
 </style>

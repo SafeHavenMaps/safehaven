@@ -70,6 +70,8 @@ const iconDict: Record<string, string> = {
   entityFormEdit: mdi.mdiPlaylistEdit,
   commentFormEdit: mdi.mdiCommentEditOutline,
   familyGeneralEdit: mdi.mdiPaletteOutline,
+  clock: mdi.mdiClockOutline,
+  menu: mdi.mdiMenu,
 }
 </script>
 

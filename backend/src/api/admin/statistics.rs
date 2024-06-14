@@ -1,7 +1,21 @@
 use crate::{
     api::{AppError, AppJson, DbConn},
-    models::statistics::{self, CountResult},
+    models::statistics::{self, CountResult, HomePageStats},
 };
+
+#[utoipa::path(
+    get,
+    path = "/api/admin/stats",
+    responses(
+        (status = 200, description = "Stats for the home page", body = Json<HomePageStats>),
+        (status = 401, description = "Invalid permissions", body = ErrorResponse),
+    )
+)]
+pub async fn admin_home_stats(
+    DbConn(mut conn): DbConn,
+) -> Result<AppJson<HomePageStats>, AppError> {
+    Ok(AppJson(statistics::home_page_stats(&mut conn).await?))
+}
 
 #[utoipa::path(
     get,

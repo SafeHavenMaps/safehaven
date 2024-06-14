@@ -30,6 +30,7 @@ use crate::{
             CartographyClusterConfig, CartographyInitConfig, ConfigurationOption, GeneralOptions,
             SafeHavenOptions, SafeModeConfig,
         },
+        statistics::HomePageStats,
         tag::{NewOrUpdateTag, Tag},
         user::{NewOrUpdatedUser, User},
     },
@@ -107,13 +108,16 @@ use utoipa::OpenApi;
         admin::comments::admin_comment_update,
         admin::comments::admin_comment_delete,
         // admin::statistics
+        admin::statistics::admin_home_stats,
         admin::statistics::admin_count_comments_entities
     ),
     components(schemas(
         // general
         ErrorResponse,
-        //admin
+        // admin
         AdminUserTokenClaims,
+        // stats
+        HomePageStats,
         // root
         StatusResponse,
         SafeMode,

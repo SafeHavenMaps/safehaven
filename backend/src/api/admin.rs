@@ -36,6 +36,8 @@ pub fn routes(state: &AppState) -> Router<AppState> {
         .route("/session", delete(admin_logout));
 
     let authenticated_router: Router<AppState> = Router::new()
+        // home statistic
+        .route("/stats", get(statistics::admin_home_stats))
         // sessions
         .route("/session", get(admin_login_check))
         // options

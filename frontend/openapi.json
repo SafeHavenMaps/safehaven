@@ -1769,6 +1769,36 @@
         }
       }
     },
+    "/api/admin/stats": {
+      "get": {
+        "tags": [
+          "admin::statistics"
+        ],
+        "operationId": "admin_home_stats",
+        "responses": {
+          "200": {
+            "description": "Stats for the home page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/stats/count-comments-entities": {
       "get": {
         "tags": [
@@ -3415,6 +3445,45 @@
             "type": "string",
             "default": "SafeHaven"
           }
+        }
+      },
+      "HomePageStats": {
+        "type": "object",
+        "required": [
+          "total_entities",
+          "total_comments",
+          "pending_entities",
+          "pending_comments",
+          "total_visits_30_days",
+          "total_visits_7_days",
+          "visits_30_days"
+        ],
+        "properties": {
+          "pending_comments": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pending_entities": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_comments": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_entities": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_visits_30_days": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_visits_7_days": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "visits_30_days": {}
         }
       },
       "LoginRequest": {

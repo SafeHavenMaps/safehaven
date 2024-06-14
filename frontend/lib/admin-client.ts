@@ -62,6 +62,13 @@ export default function useClient() {
       return data
     },
 
+    // Home stats
+    async getStats() {
+      const { data, error } = await this.rawClient.GET('/api/admin/stats')
+      if (error) throw error
+      return data
+    },
+
     // Options
     async getConfig(): Promise<SafeHavenOptions> {
       const { data, error } = await this.rawClient.GET('/api/admin/options')

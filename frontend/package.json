@@ -15,6 +15,7 @@
     "@nuxt/eslint": "^0.3.10",
     "@types/dompurify": "^3.0.5",
     "@types/validator": "^13.11.10",
+    "chart.js": "^4.4.3",
     "dompurify": "^3.1.4",
     "nuxt": "^3.11.2",
     "nuxt-primevue": "^3.0.0",
