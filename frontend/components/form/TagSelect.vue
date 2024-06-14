@@ -11,9 +11,10 @@
 
     <MultiSelect
       id="tag_id"
+      filter
+      empty-filter-message="Aucun résultat trouvé"
       :model-value="props.modelValue"
       :options="tags"
-      label="Tag"
       placeholder="Sélectionner des tags"
       option-value="id"
       option-label="title"

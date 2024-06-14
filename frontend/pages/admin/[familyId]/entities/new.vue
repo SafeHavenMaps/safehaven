@@ -1,76 +1,103 @@
 <template>
   <form
-    class="flex gap-5 mx-4"
+    class="mx-4"
     @submit.prevent="onSave"
   >
-    <div class="flex flex-grow-1 flex-column gap-3 max-w-30rem ">
-      <AdminInputTextField
-        id="display_name"
-        v-model="editedEntity.display_name"
-        label="Nom d'affichage"
-      />
-      <FormCategorySelect
-        v-model="editedEntity.category_id"
-        :categories="categories"
-      />
+    <TabView>
+      <TabPanel header="Contenu et modération">
+        <div class="flex flex-wrap gap-5">
+          <div class="flex flex-grow-1 flex-column gap-3 max-w-30rem ">
+            <AdminInputTextField
+              id="display_name"
+              v-model="editedEntity.display_name"
+              label="Nom d'affichage"
+            />
+            <FormCategorySelect
+              v-model="editedEntity.category_id"
+              :categories="categories"
+            />
 
-      <FormAdressSelect
-        id="locations"
-        v-model="editedEntity.locations"
-        label="locations"
-      />
+            <FormAdressSelect
+              id="locations"
+              v-model="editedEntity.locations"
+              label="Locations"
+            />
 
-      <FormDynamicField
-        id="data"
-        v-model="editedEntity.data"
-        label="Données"
-      />
-    </div>
-    <div class="flex flex-column flex-grow-1 gap-3 max-w-30rem ">
-      <FormTagSelect
-        v-model="editedEntity.tags"
-        :tags="tags"
-      />
+            <FormDynamicField
+              id="data"
+              v-model="editedEntity.data"
+              label="Données"
+            />
+          </div>
 
-      <AdminInputSwitchField
-        id="hidden"
-        v-model="editedEntity.hidden"
-        label="Cachée"
-        helper-text="Si activé, cette entité ne sera pas visible publiquement, même si modérée.
-      Utile pour des entités que vous souhaitez cacher à long terme sans les supprimer."
-      />
-      <AdminInputSwitchField
-        id="moderated"
-        v-model="editedEntity.moderated"
-        label="Modérée"
-        helper-text="Si activé, cette entité quittera la liste des entités en attente et sera rendue publique."
-      />
+          <div class="flex flex-column flex-grow-1 gap-3 max-w-30rem ">
+            <FormTagSelect
+              v-model="editedEntity.tags"
+              :tags="tags"
+            />
 
-      <AdminInputTextField
-        id="moderation_notes"
-        v-model="editedEntity.moderation_notes"
-        label="Notes de modération"
-        text-length="long"
-        optional
-      />
+            <AdminInputSwitchField
+              id="hidden"
+              v-model="editedEntity.hidden"
+              label="Cachée"
+              helper-text="Si activé, cette entité ne sera pas visible publiquement, même si modérée.
+                    Utile pour des entités que vous souhaitez cacher à long terme sans les supprimer."
+            />
+            <AdminInputSwitchField
+              id="moderated"
+              v-model="editedEntity.moderated"
+              label="Modérée"
+              helper-text="Si activé, cette entité quittera la liste des entités en attente et sera rendue publique."
+            />
 
-      <span class="flex gap-1 justify-content-end">
-        <NuxtLink :to="`/admin/${familyId}/entities`">
+            <AdminInputTextField
+              id="moderation_notes"
+              v-model="editedEntity.moderation_notes"
+              label="Notes de modération"
+              text-length="long"
+              optional
+            />
+
+            <span class="flex gap-1 justify-content-end">
+              <NuxtLink :to="`/admin/${familyId}/entities`">
+                <Button
+                  label="Annuler"
+                  severity="secondary"
+                  :loading="processingRequest"
+                  :disabled="processingRequest"
+                />
+              </NuxtLink>
+              <Button
+                label="Sauvegarder"
+                type="submit"
+                :loading="processingRequest"
+                :disabled="processingRequest || !editedEntity.display_name || !editedEntity.category_id"
+              />
+            </span>
+          </div>
+        </div>
+      </TabPanel>
+      <TabPanel header="Parenté">
+        <div class="flex flex-column gap-2 max-w-30rem">
+          Ajouter/retirer parents et enfants
+
           <Button
-            label="Annuler"
-            severity="secondary"
-            :loading="processingRequest"
-            :disabled="processingRequest"
+            label="Ajouter parent enfant là"
+            @click="childParentSelectVisible=true"
           />
-        </NuxtLink>
-        <Button
-          label="Sauvegarder"
-          type="submit"
-          :loading="processingRequest"
-          :disabled="processingRequest || !editedEntity.display_name || !editedEntity.category_id"
+        </div>
+
+        <AdminInputEntitySelect
+          v-model:visible="childParentSelectVisible"
+          :categories="categories"
+          :tags="tags"
+          :family-id="familyId"
         />
-      </span>
-    </div>
+      </TabPanel>
+      <TabPanel header="Commentaires">
+        Liste des commentaires
+      </TabPanel>
+    </TabView>
   </form>
 </template>
 
@@ -100,6 +127,8 @@ if (!state.tags) {
 const categories = computed(() => state.categories.filter(category => category.family_id == familyId))
 
 const tags = state.tags
+
+const childParentSelectVisible = ref(false)
 
 // Initialize editedEntity with default values for creation
 const editedEntity: Ref<AdminNewOrUpdateEntity> = ref({

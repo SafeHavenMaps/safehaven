@@ -14,7 +14,7 @@
             type="button"
             severity="warning"
             label="Filtres"
-            @click="(event: Event) => filterOp?.toggle(event)"
+            @click="(event: Event) => filters_overlay?.toggle(event)"
           >
             <template #icon>
               <AppIcon
@@ -86,10 +86,10 @@
             :value="`+${slotProps.data.tags_ids.length - max_tags_displayed}`"
             severity="info"
             @mouseover="(event: Event) => {
-              overlayed_tags = slotProps.data.tags_ids.slice(max_tags_displayed)
-              overlay!.show(event)
+              tooltip_excess_tags = slotProps.data.tags_ids.slice(max_tags_displayed)
+              tags_tooltip!.show(event)
             }"
-            @mouseleave="() => overlay!.hide()"
+            @mouseleave="() => tags_tooltip!.hide()"
           />
         </template>
       </Column>
@@ -121,17 +121,17 @@
     </DataTable>
 
     <OverlayPanel
-      ref="overlay"
+      ref="tags_tooltip"
     >
       <DisplayedTag
-        v-for="tag_id in overlayed_tags"
+        v-for="tag_id in tooltip_excess_tags"
         :key="tag_id"
         :tag="tagRecord[tag_id]"
         class="m-1"
       />
     </OverlayPanel>
 
-    <OverlayPanel ref="filterOp">
+    <OverlayPanel ref="filters_overlay">
       <ViewerFilterConfig
         v-model:filteringTags="state.tablesQueryParams[table_key].tagFilteringList!"
         v-model:filteringCategories="state.tablesQueryParams[table_key].categoryFilteringList!"
@@ -178,9 +178,9 @@ const tagRecord: TagRecord = state.tags.reduce((tags, tag) => {
   return tags
 }, {} as TagRecord)
 
-const overlay = ref<OverlayPanel>()
-const filterOp = ref<OverlayPanel>()
-const overlayed_tags: Ref<undefined | string[]> = ref(undefined)
+const filters_overlay = ref<OverlayPanel>()
+const tags_tooltip = ref<OverlayPanel>()
+const tooltip_excess_tags: Ref<undefined | string[]> = ref(undefined)
 
 const firstRow = ref(0)
 const optionalColumns = ref(['Catégorie', 'Tags', 'Visibilité'])
