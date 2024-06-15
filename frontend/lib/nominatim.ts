@@ -32,6 +32,7 @@ interface NominatimResponse {
 
 export interface Result {
   id: string
+  display_name: string
   title: string
   subtitle: string
   lat: number
@@ -79,6 +80,7 @@ export async function freeFormSearch(query: string, take: number = 5): Promise<R
     .map((result: NominatimResponse) => {
       const titles = fullTextToTitles(result.display_name)
       return {
+        display_name: result.display_name,
         ...titles,
         id: result.osm_id,
         lat: parseFloat(result.lat),

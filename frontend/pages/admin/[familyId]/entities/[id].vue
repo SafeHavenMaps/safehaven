@@ -68,6 +68,77 @@
               optional
             />
 
+            <div class="flex align-items-center gap-2">
+              <label>Adresses</label>
+              <Button
+                size="small"
+                outlined
+                severity="success"
+                label="Ajouter une adresse"
+                @click="addNewAddress"
+              />
+            </div>
+
+            <DataTable :value="editedEntity.locations">
+              <Column
+                field="plain_text"
+                header="Adresse"
+                sortable
+              />
+              <Column>
+                <template #body="slotProps">
+                  <div class="flex justify-content-end">
+                    <Button
+                      outlined
+                      rounded
+                      severity="warning"
+                      class="mr-1"
+                      @click="() => editAddress(slotProps.index)"
+                    >
+                      <template #icon>
+                        <AppIcon icon-name="edit" />
+                      </template>
+                    </Button>
+
+                    <Button
+                      outlined
+                      rounded
+                      severity="danger"
+                      @click="() => removeAddress(slotProps.index)"
+                    >
+                      <template #icon>
+                        <AppIcon icon-name="delete" />
+                      </template>
+                    </Button>
+                  </div>
+                </template>
+              </Column>
+            </DataTable>
+
+            <Dialog
+              v-model:visible="displayNominatimPicker"
+              header="Sélectionner une adresse"
+              :modal="true"
+              :closable="false"
+              :style="{ width: '40rem' }"
+            >
+              <NominatimPicker
+                v-model="currentlyEditedLocation"
+                @select="handleAddressSelect"
+              />
+              <template #footer>
+                <Button
+                  label="Annuler"
+                  severity="secondary"
+                  @click="cancelAddressChanges"
+                />
+                <Button
+                  label="Sélectionner"
+                  @click="applyAddressChanges"
+                />
+              </template>
+            </Dialog>
+
             <span class="flex gap-1 justify-content-end">
               <NuxtLink :to="`/admin/${familyId}/entities`">
                 <Button
@@ -87,6 +158,7 @@
           </div>
         </div>
       </TabPanel>
+
       <TabPanel header="Parenté">
         <div class="flex flex-column gap-2 max-w-30rem">
           Ajouter/retirer parents et enfants
@@ -104,6 +176,7 @@
           :family-id="familyId"
         />
       </TabPanel>
+
       <TabPanel header="Commentaires">
         Liste des commentaires
       </TabPanel>
@@ -114,7 +187,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { AdminNewOrUpdateEntity, EntityOrCommentData, FormField } from '~/lib'
+import type { AdminNewOrUpdateEntity, EntityOrCommentData, FormField, UnprocessedLocation } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
@@ -150,6 +223,49 @@ const editedEntity: Ref<AdminNewOrUpdateEntity> = ref(JSON.parse(JSON.stringify(
 
 const processingRequest = ref(false)
 const toast = useToast()
+
+const currentlyEditedLocation = ref<UnprocessedLocation | null>(null)
+const displayNominatimPicker = ref(false)
+
+function addNewAddress() {
+  currentlyEditedLocation.value = { plain_text: '', lat: 0, long: 0 }
+  displayNominatimPicker.value = true
+}
+
+function removeAddress(index: number) {
+  editedEntity.value.locations.splice(index, 1)
+}
+
+function editAddress(index: number) {
+  currentlyEditedLocation.value = { ...editedEntity.value.locations[index] }
+  displayNominatimPicker.value = true
+}
+
+function cancelAddressChanges() {
+  currentlyEditedLocation.value = null
+  displayNominatimPicker.value = false
+}
+
+function applyAddressChanges() {
+  if (currentlyEditedLocation.value) {
+    const existingIndex = editedEntity.value.locations.findIndex(
+      (location: { plain_text: string | undefined }) => location.plain_text === currentlyEditedLocation.value?.plain_text,
+    )
+
+    if (existingIndex === -1) {
+      editedEntity.value.locations.push({ ...currentlyEditedLocation.value })
+    }
+    else {
+      editedEntity.value.locations[existingIndex] = { ...currentlyEditedLocation.value }
+    }
+
+    displayNominatimPicker.value = false
+  }
+}
+
+function handleAddressSelect(location: UnprocessedLocation) {
+  currentlyEditedLocation.value = location
+}
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(

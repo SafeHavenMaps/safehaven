@@ -9,15 +9,12 @@
         >
           <SingleEntityMap
             v-if="props.entity.web_mercator_x && props.entity.web_mercator_y"
-            :entity="{
-              id: props.entity.id,
-              coordinates: [props.entity.web_mercator_x, props.entity.web_mercator_y],
-              category: {
-                fill_color: state.getCategory(props.entity.category_id).fill_color,
-                border_color: state.getCategory(props.entity.category_id).border_color,
-                icon_hash: state.getCategory(props.entity.category_id).icon_hash,
-              },
-            }"
+            :coordinates="[props.entity.web_mercator_x, props.entity.web_mercator_y]"
+            :fill-color="state.getCategory(props.entity.category_id).fill_color"
+            :border-color="state.getCategory(props.entity.category_id).fill_color"
+            :icon-hash="state.getCategory(props.entity.category_id).icon_hash"
+            :zoom="13"
+            :locked="true"
           />
           <div
             v-else

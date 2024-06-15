@@ -23,7 +23,7 @@
         Activités des 30 derniers jours
       </h3>
 
-      <div class="relative flex h-full w-full justify-content-center ">
+      <div class="relative flex h-full w-full justify-content-center">
         <Chart
           type="bar"
           :data="chartData"

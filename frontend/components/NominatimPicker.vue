@@ -1,0 +1,77 @@
+<template>
+  <div>
+    <form @submit.prevent="searchNominatim">
+      <InputGroup class="mb-4 mt-2">
+        <InputText
+          v-model="locationInput"
+          placeholder="Rechercher une adresse"
+        />
+        <Button
+          v-tooltip.bottom="'Lancer la recherche'"
+          severity="primary"
+          type="submit"
+        >
+          <template #icon>
+            <AppIcon icon-name="search" />
+          </template>
+        </Button>
+      </InputGroup>
+    </form>
+
+    <div v-if="errorVisible">
+      <Message severity="error">
+        Aucun résultat trouvé
+      </Message>
+    </div>
+    <div
+      v-else-if="locationSelected"
+      class="h-20rem"
+    >
+      <SingleEntityMap
+        :coordinates="transformedCoordinates"
+        :locked="false"
+        fill-color="#999999"
+        border-color="#222222"
+        :icon-hash="null"
+        :zoom="10"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { transform } from 'ol/proj'
+import type { UnprocessedLocation } from '~/lib'
+import { freeFormSearch } from '~/lib/nominatim'
+
+const props = defineProps<{ modelValue: UnprocessedLocation | null }>()
+const emits = defineEmits(['select'])
+
+const locationInput = ref(props.modelValue?.plain_text || '')
+const locationSelected = ref(props.modelValue)
+const errorVisible = ref(false)
+
+const transformedCoordinates = computed(() => {
+  if (!props.modelValue) return [0, 0]
+
+  return transform(
+    [props.modelValue!.long, props.modelValue!.lat], 'EPSG:4326', 'EPSG:3857')
+})
+
+async function searchNominatim() {
+  const results = await freeFormSearch(locationInput.value)
+
+  if (results.length === 0) {
+    errorVisible.value = true
+  }
+  else {
+    errorVisible.value = false
+    locationSelected.value = {
+      lat: results[0].lat,
+      long: results[0].lon,
+      plain_text: locationInput.value,
+    }
+    emits('select', locationSelected.value)
+  }
+}
+</script>

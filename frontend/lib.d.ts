@@ -40,7 +40,9 @@ export type ResolvedFetchedEntity = FetchedEntity & {
 
 export type AdminEntity = api.components['schemas']['AdminEntity']
 export type AdminListedEntity = api.components['schemas']['AdminListedEntity']
-export type AdminNewOrUpdateEntity = api.components['schemas']['AdminNewOrUpdateEntity']
+export type AdminNewOrUpdateEntity = api.components['schemas']['AdminNewOrUpdateEntity'] & {
+  locations: UnprocessedLocation[]
+}
 export type AdminSearchRequestBody = api.components['schemas']['AdminSearchRequest']
 export type AdminCachedEntity = api.components['schemas']['AdminCachedEntity']
 export type AdminPaginatedCachedEntities = PaginatedVec<AdminCachedEntity>
@@ -64,6 +66,9 @@ export type AccessTokenStats = api.components['schemas']['AccessTokenStats']
 export type User = api.components['schemas']['User']
 export type NewOrUpdatedUser = api.components['schemas']['NewOrUpdatedUser']
 export type AdminUserTokenClaims = api.components['schemas']['AdminUserTokenClaims']
+
+export type UnprocessedLocation = api.components['schemas']['UnprocessedLocation']
+
 export interface CanBeHighlighted {
   highlighted: boolean
 }

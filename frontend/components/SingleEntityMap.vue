@@ -5,14 +5,14 @@
       ref="mapRef"
       :load-tiles-while-animating="true"
       :load-tiles-while-interacting="true"
-      :interactions="[]"
-      :controls="[]"
+      :interactions="props.locked ? [] : undefined"
+      :controls="props.locked ? [] : undefined"
     >
       <ol-view
-        :center="entity.coordinates"
-        :zoom="13"
-        :min-zoom="13"
-        :max-zoom="13"
+        :center="props.coordinates"
+        :zoom="zoom"
+        :min-zoom="locked ? zoom : 2"
+        :max-zoom="locked ? zoom : 18"
         projection="EPSG:3857"
       />
 
@@ -21,17 +21,17 @@
       </ol-tile-layer>
 
       <ol-overlay
-        :position="props.entity.coordinates"
-        :stop-event="true"
+        :position="props.coordinates"
+        :stop-event="false"
       >
         <ViewerMapMarker
           :callback-item="null"
           :width="24"
           :height="38"
-          :fill="props.entity.category.fill_color"
-          :stroke="props.entity.category.border_color"
+          :fill="props.fillColor"
+          :stroke="props.borderColor"
           :highlighted="false"
-          :icon-url="`/api/icons/${props.entity.category.icon_hash}`"
+          :icon-url="iconUrl"
         />
       </ol-overlay>
     </ol-map>
@@ -41,19 +41,18 @@
 <script setup lang="ts">
 import type { Coordinate } from 'ol/coordinate'
 
-type EntitySubset = {
-  id: string
-  coordinates: Coordinate
-  category: {
-    fill_color: string
-    border_color: string
-    icon_hash: string | null | undefined
-  }
-}
-
 const props = defineProps<{
-  entity: EntitySubset
+  coordinates: Coordinate
+  fillColor: string
+  borderColor: string
+  iconHash: string | null | undefined
+  zoom: number
+  locked: boolean
 }>()
+
+const iconUrl = computed(() => {
+  return props.iconHash ? `/api/icons/${props.iconHash}` : null
+})
 </script>
 
 <style scoped lang="scss">
