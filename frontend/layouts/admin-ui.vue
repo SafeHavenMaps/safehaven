@@ -143,8 +143,6 @@ function initAdminLayout(
 provide('initAdminLayout', initAdminLayout)
 
 function resizeEverything() {
-  console.log('resize')
-
   const navbar = document.querySelector('.admin-navbar')
   const sidebar = sidebarRef.value
   const mainContent = contentContainerRef.value

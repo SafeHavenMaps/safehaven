@@ -108,7 +108,7 @@
       <Column>
         <template #body="slotProps">
           <EditDeleteButtons
-            :id="slotProps.data.id"
+            :id="slotProps.data.entity_id"
             model-name="de l'entité"
             :name="slotProps.data.display_name"
             :loading="processingRequest[slotProps.data.id]"
