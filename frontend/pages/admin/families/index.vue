@@ -142,8 +142,9 @@ interface FamilyWCount extends Family { entity_count?: number }
 
 const families: Ref<FamilyWCount[]> = ref([])
 async function refreshTable() {
-  families.value = await state.client.listFamilies()
+  await state.fetchFamilies()
   await state.getEntitiesCommentsCounts()
+  families.value = state.families
   families.value.forEach((family) => {
     const counts = state.countsByFamily[family.id]
     family.entity_count = counts ? counts[0] : 0 // As family not in count list if no entities attached

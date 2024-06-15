@@ -25,7 +25,7 @@
       <Dropdown
         id="sort_order"
         v-model="editedFamily.sort_order"
-        :options="Array.from({ length: state.families.length }, (_, i) => i + 1)"
+        :options="Array.from({ length: state.families.length + 1 }, (_, i) => i + 1)"
         class="w-full md:w-14rem"
       />
       <label for="sort_order">Ordre d'affichage parmi les familles</label>

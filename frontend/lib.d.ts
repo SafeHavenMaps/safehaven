@@ -134,9 +134,9 @@ export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily'] &
 export type FormField = NewOrUpdateFamily['entity_form']['fields'][number]
 
 export type EntityOrCommentEvent = {
-  date: Date
-  type: string
-  details: string
+  date: Date | undefined
+  type: string | undefined
+  details: string | undefined
 }
 
 export type FieldContentMap = {
