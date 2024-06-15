@@ -1,8 +1,13 @@
 <template>
   <div class="flex flex-column h-full w-full logoized">
-    <AdminNavbar @toggle-sidebar="() => { sidebarCollapsed = !sidebarCollapsed; }" />
+    <AdminNavbar
+      @toggle-sidebar="() => { sidebarCollapsed = !sidebarCollapsed; }"
+    />
 
-    <div class="flex w-full flex-grow-1 content-container">
+    <div
+      ref="contentContainerRef"
+      class="flex w-full flex-grow-1 content-container"
+    >
       <div
         ref="sidebarRef"
         class="sidebar"
@@ -89,6 +94,7 @@
 
 <script setup lang="ts">
 import type { ConfirmationOptions } from 'primevue/confirmationoptions'
+import AdminNavbar from '~/components/admin/Navbar.vue'
 
 type BreadcrumbItem = {
   label: string
@@ -118,6 +124,7 @@ const currentActions = ref<ActionItem[]>([])
 const cardTitle = ref('')
 const cardIconName = ref('')
 const sidebarRef: Ref<HTMLElement | null> = ref(null)
+const contentContainerRef: Ref<HTMLElement | null> = ref(null)
 const sidebarCollapsed = ref(false)
 
 function initAdminLayout(
@@ -133,6 +140,23 @@ function initAdminLayout(
 }
 
 provide('initAdminLayout', initAdminLayout)
+
+function updateSidebarTop() {
+  const navbar = document.querySelector('.admin-navbar')
+  const sidebar = sidebarRef.value
+  const mainContent = contentContainerRef.value
+  if (navbar && sidebar && mainContent) {
+    sidebar.style.top = `${navbar.clientHeight}px`
+    mainContent.style.marginTop = `${navbar.clientHeight}px`
+  }
+}
+
+onMounted(() => {
+  updateSidebarTop()
+  window.addEventListener('resize', updateSidebarTop)
+})
+
+watch(sidebarCollapsed, updateSidebarTop)
 </script>
 
 <style>
@@ -157,18 +181,15 @@ html, body {
 }
 
 .content-container {
-  margin-top: 74px; /* Adjust this value based on your navbar's height */
-  transition: margin-top 0.3s;
   display: flex;
 }
 
 .sidebar {
   position: fixed;
-  top: 74px;
   bottom: 0;
   left: 0;
-  width: 17.7rem; /* Adjust the sidebar width as needed */
-  background-color: #f7f7f7; /* Ensure the sidebar has a background color */
+  width: 17.7rem;
+  background-color: #f7f7f7;
   z-index: 1001;
   transition: transform 0.3s ease-in-out;
   transform: translateX(0);
@@ -176,7 +197,7 @@ html, body {
 }
 
 .sidebar.collapsed {
-  transform: translateX(-120%);
+  transform: translateX(-100%);
 }
 
 .sidebar-title {
@@ -186,7 +207,7 @@ html, body {
 }
 
 .main-content {
-  margin-left: 18rem; /* Adjust this value based on the sidebar width */
+  margin-left: 18rem;
   transition: margin-left 0.3s ease-in-out;
   width: calc(100% - 18rem);
 }

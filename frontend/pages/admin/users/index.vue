@@ -28,10 +28,19 @@
       :global-filter-fields="['name', 'id']"
     >
       <Column
-        field="name"
         header="Nom"
         sortable
-      />
+      >
+        <template #body="slotProps">
+          <div class="flex flex align-items-center justify-content-begin gap-2">
+            <AdminUserAvatar
+              :username="slotProps.data.name"
+              size="normal"
+            />
+            {{ slotProps.data.name }}
+          </div>
+        </template>
+      </Column>
       <Column
         header="Droits"
         field="is_admin"
@@ -60,7 +69,7 @@
             :id="slotProps.data.id"
             model-name="de l'utilisateur⋅ice"
             :name="slotProps.data.name"
-            :loading="processingRequest[slotProps.data.id]"
+            :loading="!!processingRequest[slotProps.data.id]"
             :prevent-delete="state.username == slotProps.data.name"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/users/${id}`)"

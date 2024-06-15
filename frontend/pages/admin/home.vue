@@ -153,7 +153,7 @@ initAdminLayout(
 
 const stats = await state.client.getStats()
 
-const chartData = {
+/* const chartData = {
   labels: Object.keys(stats.visits_30_days).map(date => new Date(date).toLocaleDateString()),
   datasets: [
     {
@@ -185,7 +185,7 @@ const chartOptions = {
       display: true,
     },
   },
-}
+} */
 </script>
 
 <style>
