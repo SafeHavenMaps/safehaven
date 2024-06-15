@@ -10,7 +10,7 @@
 
       <AdminFamiliesEditForm
         class="-ml-3"
-        :original-form-fields="(fetchedFamily.entity_form.fields as FormField[])"
+        :original-form-fields="fetchedFamily.entity_form.fields"
         :on-save-callback="onSave"
         kind-name="entité"
       />

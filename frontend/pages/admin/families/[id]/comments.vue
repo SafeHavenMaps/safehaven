@@ -6,7 +6,7 @@
     </p>
 
     <AdminFamiliesEditForm
-      :original-form-fields="(fetchedFamily.comment_form.fields as FormField[])"
+      :original-form-fields="fetchedFamily.comment_form.fields"
       :on-save-callback="onSave"
       kind-name="comment"
     />

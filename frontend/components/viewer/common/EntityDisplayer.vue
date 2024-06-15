@@ -130,32 +130,18 @@
         v-if="hasComments()"
         header="Commentaires"
       >
-        <Accordion :active-index="0">
-          <AccordionTab
-            v-for="comment in sortedComments()"
-            :key="comment.id"
-            :header="commentDisplayTitle(comment)"
-          >
-            <!-- eslint-disable vue/no-v-html -->
-            <p
-              style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;"
-              v-html="commentWithBreaks(comment.text)"
-            />
-
-            <ViewerCommonFormFields
-              :fields="props.entity?.family.comment_form.fields"
-              :data="comment.data"
-            />
-          </AccordionTab>
-        </Accordion>
+        <CommentsDisplayer
+          public
+          :comments="props.entity.comments"
+          :comment-form-fields="props.entity!.family.comment_form.fields"
+        />
       </TabPanel>
     </TabView>
   </div>
 </template>
 
 <script setup lang="ts">
-import { purify_strict } from '~/lib/dompurify'
-import type { Category, PublicComment, ResolvedFetchedEntity } from '~/lib'
+import type { Category, ResolvedFetchedEntity } from '~/lib'
 
 const props = defineProps<{
   entity: ResolvedFetchedEntity
@@ -168,14 +154,6 @@ const emits = defineEmits<{
 
 function getCategory(id: string) {
   return props.categories.find(c => c.id === id)!
-}
-
-function commentDisplayTitle(comment: PublicComment) {
-  return `${comment.author} - ${new Date(comment.created_at).toLocaleDateString()}`
-}
-
-function commentWithBreaks(txt: string) {
-  return purify_strict(txt)
 }
 
 function discreteScoreAveragesOnComments() {
@@ -193,7 +171,6 @@ function discreteScoreAveragesOnComments() {
 
 function hasScores() {
   const scores = discreteScoreAveragesOnComments()
-
   return scores.length > 0 && scores.some(score => !isNaN(score.average))
 }
 
@@ -207,10 +184,6 @@ function hasChildren() {
 
 function hasParent() {
   return props.entity.parents.length > 0
-}
-
-function sortedComments() {
-  return props.entity.comments.slice().sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 }
 
 function newEntitySelected(id: string) {

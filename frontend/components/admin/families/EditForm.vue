@@ -38,7 +38,7 @@
               class: 'flex flex-column gap-3 ml-1 ',
             },
           }"
-          @dragstart="onDragStart($event, field as FormField)"
+          @dragstart="onDragStart($event, field)"
           @dragover.prevent
           @drop="onDropField($event, index, page)"
         >
@@ -90,7 +90,7 @@
                   label="Modifier la clé"
                   outlined
                   @click="() => {
-                    editKeyField = field as FormField
+                    editKeyField = field
                     editKeyKey = field.key
                     editKeyVisible = true
                   }"
@@ -105,7 +105,7 @@
                   :options="fieldTypeOptions"
                   option-label="label"
                   option-value="value"
-                  @update:model-value="() => onFieldTypeChange(field as FormField)"
+                  @update:model-value="() => onFieldTypeChange(field)"
                 />
 
                 <Dropdown
@@ -124,7 +124,7 @@
                   class="border-1 border-black-alpha-10"
                   severity="secondary"
                   @click="() => {
-                    editOptionsField = field as FormField
+                    editOptionsField = field
                     editOptionsOptions = JSON.parse(JSON.stringify((field.field_type_metadata as OptionsFieldTypeMetadata).options))
                     editOptionsVisible = true
                   }"
@@ -137,7 +137,7 @@
                   class="border-1 border-black-alpha-10"
                   severity="secondary"
                   @click="() => {
-                    editEventsField = field as FormField
+                    editEventsField = field
                     editEventsEvents = JSON.parse(JSON.stringify((field.field_type_metadata as EventsFieldTypeMetadata).event_types))
                     editEventsVisible = true
                   }"
@@ -444,7 +444,7 @@
             :disabled="!editKeyKey || !editKeyField?.display_name"
             type="button"
             label="Confirmer"
-            @click="() => onKeyChange(editKeyField as FormField, editKeyKey)"
+            @click="() => onKeyChange(editKeyField!, editKeyKey)"
           />
         </div>
       </div>

@@ -10,10 +10,6 @@ export type CartographyInitConfig = api.components['schemas']['CartographyInitCo
 export type SafeHavenOptions = api.components['schemas']['SafeHavenOptions']
 export type ConfigurationOption = api.components['schemas']['ConfigurationOption']
 
-export type Family = Omit<api.components['schemas']['Family'], 'entity_form' | 'comment_form'> & {
-  entity_form: api.components['schemas']['Form']
-  comment_form: api.components['schemas']['Form']
-}
 export type Category = api.components['schemas']['Category']
 export type Tag = api.components['schemas']['Tag']
 
@@ -137,6 +133,15 @@ export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily'] &
 }
 
 export type FormField = NewOrUpdateFamily['entity_form']['fields'][number]
+
+export type Family = Omit<api.components['schemas']['Family'], 'entity_form' | 'comment_form'> & {
+  entity_form: api.components['schemas']['Form'] & {
+    fields: FormField[]
+  }
+  comment_form: api.components['schemas']['Form'] & {
+    fields: FormField[]
+  }
+}
 
 export type EntityOrCommentEvent = {
   date: Date | undefined

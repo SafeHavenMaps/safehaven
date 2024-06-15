@@ -1,11 +1,13 @@
 <template>
-  <form
+  <div
     class="mx-4"
-    @submit.prevent="onSave"
   >
     <TabView>
       <TabPanel header="Contenu et modération">
-        <div class="flex flex-wrap gap-5">
+        <form
+          class="flex flex-wrap gap-5"
+          @submit.prevent="onSave"
+        >
           <div class="flex flex-grow-1 flex-column gap-3 max-w-30rem">
             <AdminInputTextField
               id="display_name"
@@ -156,7 +158,7 @@
               />
             </span>
           </div>
-        </div>
+        </form>
       </TabPanel>
 
       <TabPanel header="Parenté">
@@ -178,10 +180,16 @@
       </TabPanel>
 
       <TabPanel header="Commentaires">
-        Liste des commentaires
+        <span v-if="entityComments.length == 0">Aucun commentaire pour le moment</span>
+        <CommentsDisplayer
+          style="max-width: 60rem;"
+          :comment-form-fields="family.comment_form.fields"
+          :comments="entityComments"
+          :public="false"
+        />
       </TabPanel>
     </TabView>
-  </form>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -215,10 +223,10 @@ const tags = state.tags
 
 const childParentSelectVisible = ref(false)
 
-// Fetch the entity to be edited
 const fetchedEntity = await state.client.getEntity(entityId)
+const entityComments = await state.client.listEntityComments(entityId)
 
-// Deep copy of the fetched entity for editing
+// Deep copy
 const editedEntity: Ref<AdminNewOrUpdateEntity> = ref(JSON.parse(JSON.stringify(fetchedEntity)))
 
 const processingRequest = ref(false)
