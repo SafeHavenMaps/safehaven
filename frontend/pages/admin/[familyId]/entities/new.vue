@@ -24,9 +24,10 @@
             />
 
             <FormDynamicField
-              id="data"
-              v-model="editedEntity.data"
-              label="Données"
+              v-for="field in family.entity_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
+              :key="field.key"
+              v-model:fieldContent="(editedEntity.data as EntityOrCommentData)[field.key]"
+              :form-field="field as FormField"
             />
           </div>
 
@@ -104,7 +105,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { AdminNewOrUpdateEntity } from '~/lib'
+import type { AdminNewOrUpdateEntity, EntityOrCommentData, FormField } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
@@ -114,7 +115,7 @@ definePageMeta({
 const familyId = useRoute().params.familyId as string
 if (state.families == undefined)
   await state.fetchFamilies()
-const familyTitle = state.families.filter(family => family.id == familyId)[0].title
+const family = state.families.filter(family => family.id == familyId)[0]
 
 // Fetch categories and tags if not already fetched
 if (!state.categories) {
@@ -150,7 +151,7 @@ initAdminLayout(
         'entity',
         [],
         [
-          { label: `${familyTitle}`, url: '/admin/families' },
+          { label: `${family.title}`, url: '/admin/families' },
           { label: 'Entités', url: `/admin/${familyId}/entities` },
           { label: `Édition d'une nouvelle entité`, url: `/admin/${familyId}/entities/new` },
         ],
