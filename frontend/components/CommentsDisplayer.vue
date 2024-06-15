@@ -6,19 +6,20 @@
     >
       <template #header>
         <span class="flex align-items-center gap-2 w-full">
-
           {{ comment.author }} - {{ new Date(comment.created_at).toLocaleDateString() }}
           <Tag
-            v-if="!public"
+            v-if="!public && (comment as AdminComment).moderated"
             value="À modérer"
           />
           <AdminEditDeleteButtons
             v-if="!public"
-            :id="`edit_delete_${comment.id}`"
-            model-name="le commentaire"
+            :id="comment.id"
+            model-name="du commentaire"
             :loading="false"
-            :name="`edit_delete_${comment.id}`"
+            :name="`de ${comment.author}`"
             class="ml-auto mr-2"
+            @edit="id => emit('edit', id)"
+            @delete="(id, name, onDeleteDone) => emit('delete', id, name, onDeleteDone)"
           />
         </span>
       </template>
@@ -48,6 +49,11 @@ const props = defineProps<{
   commentFormFields: FormField[]
   comments: AdminComment[]
   public: false
+}>()
+
+const emit = defineEmits<{
+  (e: 'edit', id: string): void
+  (e: 'delete', id: string, name: string, onDeleteDone: () => void): void
 }>()
 
 const sortedComments = computed(() => props.comments.slice().sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()))

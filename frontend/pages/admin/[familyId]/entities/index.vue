@@ -111,7 +111,6 @@
             :id="slotProps.data.entity_id"
             model-name="de l'entité"
             :name="slotProps.data.display_name"
-            secure-delete
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/${familyId}/entities/${id}`)"
           />

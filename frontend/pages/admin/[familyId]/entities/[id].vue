@@ -186,6 +186,8 @@
           :comment-form-fields="family.comment_form.fields"
           :comments="entityComments"
           :public="false"
+          @delete="onCommentDelete"
+          @edit="commentId => navigateTo(`/admin/${familyId}/entities/${entityId}/comments/${commentId}`)"
         />
       </TabPanel>
     </TabView>
@@ -195,7 +197,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { AdminNewOrUpdateEntity, EntityOrCommentData, FormField, UnprocessedLocation } from '~/lib'
+import type { AdminComment, AdminNewOrUpdateEntity, EntityOrCommentData, FormField, UnprocessedLocation } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
@@ -224,7 +226,11 @@ const tags = state.tags
 const childParentSelectVisible = ref(false)
 
 const fetchedEntity = await state.client.getEntity(entityId)
-const entityComments = await state.client.listEntityComments(entityId)
+const entityComments = ref<AdminComment[]>([])
+async function refreshComments() {
+  entityComments.value = await state.client.listEntityComments(entityId)
+}
+refreshComments()
 
 // Deep copy
 const editedEntity: Ref<AdminNewOrUpdateEntity> = ref(JSON.parse(JSON.stringify(fetchedEntity)))
@@ -298,5 +304,17 @@ async function onSave() {
     toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification de l\'entité', life: 3000 })
   }
   processingRequest.value = false
+}
+
+async function onCommentDelete(comment_id: string, comment_author: string, onDeleteDone: () => void) {
+  try {
+    await state.client.deleteComment(comment_id)
+    toast.add({ severity: 'success', summary: 'Succès', detail: `Commentaire ${comment_author} supprimé avec succès`, life: 3000 })
+    refreshComments()
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression du commentaire de ${comment_author}`, life: 3000 })
+  }
+  onDeleteDone()
 }
 </script>

@@ -100,7 +100,7 @@ function onDelete(event: Event) {
     const options: ExtendedConfirmationOptions = {
       target: event.currentTarget as HTMLElement,
       group: 'delete',
-      message: `Confirmer la suppression de ${props.modelName}`,
+      message: `Confirmer la suppression ${props.modelName}`,
       objectId: props.name,
       icon: 'warning',
       rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
