@@ -78,11 +78,10 @@
 
       <Column>
         <template #body="slotProps">
-          <EditDeleteButtons
+          <AdminEditDeleteButtons
             :id="slotProps.data.id"
             model-name="du tag"
             :name="slotProps.data.title"
-            :loading="processingRequest[slotProps.data.id]"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/tags/${id}`)"
           />
@@ -95,7 +94,6 @@
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
-import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Tag } from '~/lib'
 import state from '~/lib/admin-state'
@@ -140,10 +138,9 @@ async function refreshTable() {
 }
 refreshTable()
 
-const processingRequest: Ref<Record<string, boolean>> = ref({})
 const toast = useToast()
 
-async function onDelete(tag_id: string, tag_name: string) {
+async function onDelete(tag_id: string, tag_name: string, onDeleteDone: () => void) {
   try {
     await state.client.deleteTag(tag_id)
     toast.add({ severity: 'success', summary: 'Succès', detail: `Tag ${tag_name} supprimé avec succès`, life: 3000 })
@@ -152,5 +149,6 @@ async function onDelete(tag_id: string, tag_name: string) {
   catch {
     toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression du tag ${tag_name}`, life: 3000 })
   }
+  onDeleteDone()
 }
 </script>

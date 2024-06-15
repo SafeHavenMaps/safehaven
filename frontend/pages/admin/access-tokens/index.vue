@@ -16,7 +16,6 @@
       <MultiSelect
         v-model="state.tablesSelectedColumns[table_key]"
         :options="optionalColumns"
-
         display="chip"
         placeholder="Sélectionner des colonnes"
         class="w-full md:w-20rem"
@@ -137,11 +136,10 @@
             </template>
           </Button>
 
-          <EditDeleteButtons
+          <AdminEditDeleteButtons
             :id="slotProps.data.id"
             model-name="du jeton d'accès"
             :name="slotProps.data.title"
-            :loading="processingRequest[slotProps.data.id]"
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/access-tokens/${id}`)"
           />
@@ -154,7 +152,6 @@
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
-import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { AccessToken, PermissionPolicy } from '~/lib'
 import state from '~/lib/admin-state'
@@ -203,10 +200,9 @@ async function refreshTable() {
 }
 refreshTable()
 
-const processingRequest: Ref<Record<string, boolean>> = ref({})
 const toast = useToast()
 
-async function onDelete(access_token_id: string, access_token_name: string) {
+async function onDelete(access_token_id: string, access_token_name: string, onDeleteDone: () => void) {
   try {
     await state.client.deleteAccessToken(access_token_id)
     toast.add({ severity: 'success', summary: 'Succès', detail: `Jeton ${access_token_name} supprimée avec succès`, life: 3000 })
@@ -215,6 +211,7 @@ async function onDelete(access_token_id: string, access_token_name: string) {
   catch {
     toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression du jeton ${access_token_name}`, life: 3000 })
   }
+  onDeleteDone()
 }
 
 function viewDetails(access_token_id: string) {

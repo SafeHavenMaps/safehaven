@@ -79,11 +79,10 @@
                 <AppIcon icon-name="commentFormEdit" />
               </template>
             </Button>
-            <EditDeleteButtons
+            <AdminEditDeleteButtons
               :id="slotProps.data.id"
               model-name="de la famille"
               :name="slotProps.data.title"
-              :loading="processingRequest[slotProps.data.id]"
               secure-delete
               :secure-delete-entity-count="slotProps.data.entity_count"
               edit-absent
@@ -100,7 +99,6 @@
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
-import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Family } from '~/lib'
 import state from '~/lib/admin-state'
@@ -152,10 +150,9 @@ async function refreshTable() {
 }
 refreshTable()
 
-const processingRequest: Ref<Record<string, boolean>> = ref({})
 const toast = useToast()
 
-async function onDelete(family_id: string, family_name: string) {
+async function onDelete(family_id: string, family_name: string, onDeleteDone: () => void) {
   try {
     await state.client.deleteFamily(family_id)
     toast.add({ severity: 'success', summary: 'Succès', detail: `Famille ${family_name} supprimée avec succès`, life: 3000 })
@@ -164,5 +161,6 @@ async function onDelete(family_id: string, family_name: string) {
   catch {
     toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression de la famille ${family_name}`, life: 3000 })
   }
+  onDeleteDone()
 }
 </script>

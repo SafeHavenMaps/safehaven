@@ -61,11 +61,10 @@
       />
       <Column>
         <template #body="slotProps">
-          <EditDeleteButtons
+          <AdminEditDeleteButtons
             :id="slotProps.data.id"
             model-name="de la catégorie"
             :name="slotProps.data.title"
-            :loading="processingRequest[slotProps.data.id]"
             secure-delete
             :secure-delete-entity-count="slotProps.data.entity_count"
             @delete="onDelete"
@@ -80,7 +79,6 @@
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
-import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Category } from '~/lib'
 import state from '~/lib/admin-state'
@@ -139,10 +137,9 @@ initAdminLayout(
   ],
 )
 
-const processingRequest: Ref<Record<string, boolean>> = ref({})
 const toast = useToast()
 
-async function onDelete(category_id: string, category_name: string) {
+async function onDelete(category_id: string, category_name: string, onDeleteDone: () => void) {
   try {
     await state.deleteCategory(category_id)
     toast.add({ severity: 'success', summary: 'Succès', detail: `Catégorie ${category_name} supprimée avec succès`, life: 3000 })
@@ -151,5 +148,6 @@ async function onDelete(category_id: string, category_name: string) {
   catch {
     toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression de la catégorie ${category_name}`, life: 3000 })
   }
+  onDeleteDone()
 }
 </script>

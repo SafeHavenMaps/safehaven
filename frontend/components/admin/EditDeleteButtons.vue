@@ -21,8 +21,8 @@
   >
     <template #icon>
       <AppIcon
-        :icon-name="props.loading ? 'loading' : 'delete'"
-        :rotating="props.loading"
+        :icon-name="loading ? 'loading' : 'delete'"
+        :rotating="loading"
       />
     </template>
   </Button>
@@ -58,7 +58,7 @@
         :disabled="repeatName.toUpperCase() != props.name.toUpperCase()"
         type="button"
         label="Confirmer"
-        @click="() => { secureDeleteDialogVisible = false, emit('delete', props.id, props.name) }"
+        @click="() => { secureDeleteDialogVisible = false, loading = true, emit('delete', props.id, props.name, onDeleteDone) }"
       />
     </div>
   </Dialog>
@@ -73,7 +73,6 @@ const props = defineProps<{
   preventDelete?: boolean
   id: string
   name: string
-  loading: boolean
   secureDelete?: boolean
   secureDeleteEntityCount?: number
   editAbsent?: boolean
@@ -81,7 +80,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'edit', id: string): void
-  (e: 'delete', id: string, name: string): void
+  (e: 'delete', id: string, name: string, onDeleteDone: () => void): void
 }>()
 
 const confirm = useConfirm()
@@ -89,6 +88,7 @@ interface ExtendedConfirmationOptions extends ConfirmationOptions {
   objectId?: string
 }
 
+const loading = ref(false)
 const secureDeleteDialogVisible = ref(false)
 const repeatName = ref('')
 
@@ -108,9 +108,16 @@ function onDelete(event: Event) {
       rejectLabel: 'Annuler',
       acceptLabel: 'Confirmer',
       reject: () => {},
-      accept: () => emit('delete', props.id, props.name),
+      accept: () => {
+        loading.value = true
+        emit('delete', props.id, props.name, onDeleteDone)
+      },
     }
     confirm.require(options)
   }
+}
+
+function onDeleteDone() {
+  loading.value = false
 }
 </script>

@@ -107,11 +107,10 @@
       </Column>
       <Column>
         <template #body="slotProps">
-          <EditDeleteButtons
+          <AdminEditDeleteButtons
             :id="slotProps.data.entity_id"
             model-name="de l'entité"
             :name="slotProps.data.display_name"
-            :loading="processingRequest[slotProps.data.id]"
             secure-delete
             @delete="onDelete"
             @edit="id => navigateTo(`/admin/${familyId}/entities/${id}`)"
@@ -146,7 +145,6 @@
 import type OverlayPanel from 'primevue/overlaypanel'
 import type { PageState } from 'primevue/paginator'
 import DisplayedTag from '~/components/DisplayedTag.vue'
-import EditDeleteButtons from '~/components/admin/EditDeleteButtons.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { AdminPaginatedCachedEntities, Category, Tag } from '~/lib'
 import state from '~/lib/admin-state'
@@ -263,10 +261,9 @@ initAdminLayout(
   ],
 )
 
-const processingRequest: Ref<Record<string, boolean>> = ref({})
 const toast = useToast()
 
-async function onDelete(entity_id: string, entity_name: string) {
+async function onDelete(entity_id: string, entity_name: string, onDeleteDone: () => void) {
   try {
     await state.client.deleteEntity(entity_id)
     toast.add({ severity: 'success', summary: 'Succès', detail: `Entité ${entity_name} supprimée avec succès`, life: 3000 })
@@ -275,5 +272,6 @@ async function onDelete(entity_id: string, entity_name: string) {
   catch {
     toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression de l'entité ${entity_name}`, life: 3000 })
   }
+  onDeleteDone()
 }
 </script>
