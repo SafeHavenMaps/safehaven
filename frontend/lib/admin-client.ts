@@ -62,8 +62,16 @@ export default function useClient() {
       return data
     },
 
-    // Home stats
-    async getStats() {
+    // Home stats (What the hell is happening with typing here?)
+    async getStats(): Promise<{
+      total_entities: number
+      total_comments: number
+      pending_entities: number
+      pending_comments: number
+      total_visits_30_days: number
+      total_visits_7_days: number
+      visits_30_days: { [key: string]: number }
+    }> {
       const { data, error } = await this.rawClient.GET('/api/admin/stats')
       if (error) throw error
       return data

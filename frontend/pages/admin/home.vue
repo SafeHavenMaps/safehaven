@@ -1,139 +1,47 @@
 <template>
-  <div class="grid">
-    <div class="col-12 md:col-6 xl:col-2">
-      <Card class="card-green">
-        <template #title>
-          <div class="white-space-nowrap text-sm flex">
-            <AppIcon
-              icon-name="entity"
-              size="16px"
-              style="display: inline"
-            />&nbsp;
-            Entités
-          </div>
-        </template>
-        <template #content>
-          <div class="text-4xl font-bold">
-            {{ stats.total_entities }}
-          </div>
-        </template>
-      </Card>
+  <div class="relative h-full w-full">
+    <div class="grid">
+      <div
+        v-for="(card, index) in cards"
+        :key="index"
+        class="col-12 md:col-6 xl:col-2 relative"
+      >
+        <Card :class="card.class + ' relative'">
+          <template #title>
+            <div class="white-space-nowrap text-sm flex">
+              <AppIcon
+                :icon-name="card.iconName"
+                size="16px"
+                style="display: inline"
+              />&nbsp;
+              {{ card.title }}
+            </div>
+          </template>
+          <template #content>
+            <div class="text-4xl font-bold relative z-10">
+              {{ card.stat }}
+            </div>
+          </template>
+        </Card>
+      </div>
     </div>
 
-    <div class="col-12 md:col-6 xl:col-2">
-      <Card class="card-green">
-        <template #title>
-          <div class="white-space-nowrap text-sm flex">
-            <AppIcon
-              icon-name="comment"
-              size="16px"
-              style="display: inline"
-            />&nbsp;
-            Commentaires
-          </div>
-        </template>
-        <template #content>
-          <div class="text-4xl font-bold">
-            {{ stats.total_comments }}
-          </div>
-        </template>
-      </Card>
-    </div>
-
-    <div class="col-12 md:col-6 xl:col-2">
-      <Card class="card-orange">
-        <template #title>
-          <div class="white-space-nowrap text-sm flex">
-            <AppIcon
-              icon-name="addEntity"
-              size="16px"
-              style="display: inline"
-            />&nbsp;
-            Entités
-          </div>
-        </template>
-        <template #content>
-          <div class="text-4xl font-bold">
-            {{ stats.pending_entities }}
-          </div>
-        </template>
-      </card>
-    </div>
-
-    <div class="col-12 md:col-6 xl:col-2">
-      <Card class="card-orange">
-        <template #title>
-          <div class="white-space-nowrap text-sm flex">
-            <AppIcon
-              icon-name="addComment"
-              size="16px"
-              style="display: inline"
-            />&nbsp;
-            Commentaires
-          </div>
-        </template>
-        <template #content>
-          <div class="text-4xl font-bold">
-            {{ stats.pending_comments }}
-          </div>
-        </template>
-      </card>
-    </div>
-
-    <div class="col-12 md:col-6 xl:col-2">
-      <Card class="card-blue">
-        <template #title>
-          <div class="white-space-nowrap text-sm flex">
-            <AppIcon
-              icon-name="clock"
-              size="16px"
-              style="display: inline"
-            />&nbsp;
-            Visites (30j)
-          </div>
-        </template>
-        <template #content>
-          <div class="text-4xl font-bold">
-            {{ stats.total_visits_30_days }}
-          </div>
-        </template>
-      </card>
-    </div>
-
-    <div class="col-12 md:col-6 xl:col-2">
-      <Card class="card-blue">
-        <template #title>
-          <div class="white-space-nowrap text-sm flex">
-            <AppIcon
-              icon-name="clock"
-              size="16px"
-              style="display: inline"
-            />&nbsp;
-            Visites (7j)
-          </div>
-        </template>
-        <template #content>
-          <div class="text-4xl font-bold">
-            {{ stats.total_visits_7_days }}
-          </div>
-        </template>
-      </card>
-    </div>
-
-    <div
-      class="col-12 p-4"
-    >
-      <!-- <Chart
+    <div class="relative flex h-full w-full justify-content-center mt-2">
+      <div class="text-xl font-bold mb-3">
+        Activités des 30 derniers jours
+      </div>
+      <Chart
         type="line"
         :data="chartData"
         :options="chartOptions"
-      /> -->
+        class="absolute top-0 left-0 h-full w-full mt-3 xl:h-25rem"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// import Chart from 'primevue/chart'
+import Chart from 'primevue/chart'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import state from '~/lib/admin-state'
 
@@ -153,14 +61,24 @@ initAdminLayout(
 
 const stats = await state.client.getStats()
 
-/* const chartData = {
+const chartData = {
   labels: Object.keys(stats.visits_30_days).map(date => new Date(date).toLocaleDateString()),
   datasets: [
     {
       label: 'Visites',
       data: Object.values(stats.visits_30_days),
-      fill: false,
-      borderColor: '#E86BA7',
+      fill: true,
+      borderColor: '#e86ba7',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      backgroundColor: (context: any) => {
+        const chart = context.chart
+        const { ctx, chartArea } = chart
+
+        if (!chartArea) {
+          return
+        }
+        return getGradient(ctx, chartArea)
+      },
       tension: 0.3,
     },
   ],
@@ -172,36 +90,103 @@ const chartOptions = {
     legend: {
       display: false,
     },
-  },
-  preserveAspectRatio: false,
-  scales: {
-    x: {
-      display: true,
-      title: {
-        text: 'Date',
+    tooltip: {
+      enabled: true,
+      mode: 'index',
+      intersect: false,
+      callbacks: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        label: (context: any) => {
+          let label = context.dataset.label || ''
+          if (label) {
+            label += ': '
+          }
+          if (context.parsed.y !== null) {
+            label += context.parsed.y
+          }
+          return label
+        },
       },
     },
+  },
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      display: false,
+    },
     y: {
-      display: true,
+      display: false,
     },
   },
-} */
+}
+
+function getGradient(ctx: CanvasRenderingContext2D, chartArea: { top: number, bottom: number }) {
+  const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
+  gradient.addColorStop(0, 'rgba(232, 107, 167, 0.9)')
+  gradient.addColorStop(1, 'rgba(232, 107, 167, 0)')
+  return gradient
+}
+
+const cards = [
+  {
+    class: 'card-green',
+    iconName: 'entity',
+    title: 'Entités',
+    stat: stats.total_entities,
+  },
+  {
+    class: 'card-green',
+    iconName: 'comment',
+    title: 'Commentaires',
+    stat: stats.total_comments,
+  },
+  {
+    class: 'card-orange',
+    iconName: 'addEntity',
+    title: 'Entités',
+    stat: stats.pending_entities,
+  },
+  {
+    class: 'card-orange',
+    iconName: 'addComment',
+    title: 'Commentaires',
+    stat: stats.pending_comments,
+  },
+  {
+    class: 'card-blue',
+    iconName: 'clock',
+    title: 'Visites (30j)',
+    stat: stats.total_visits_30_days,
+  },
+  {
+    class: 'card-blue',
+    iconName: 'clock',
+    title: 'Visites (7j)',
+    stat: stats.total_visits_7_days,
+  },
+]
 </script>
 
 <style>
 .card-green {
   background-color: #6fac72;
   color: white;
+  position: relative;
+  overflow: hidden;
 }
 
 .card-orange {
   background-color: #ef9444;
   color: white;
+  position: relative;
+  overflow: hidden;
 }
 
 .card-blue {
   background-color: #E86BA7;
   color: white;
+  position: relative;
+  overflow: hidden;
 }
 
 .p-card-body {
@@ -210,5 +195,11 @@ const chartOptions = {
 
 .p-card-content {
   margin-top: 0.25rem;
+}
+
+.p-chart {
+  border-left: 1px dashed #DDD;
+  border-right: 1px dashed #DDD;
+  border-bottom: 1px dashed #DDD;
 }
 </style>
