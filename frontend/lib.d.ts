@@ -59,6 +59,7 @@ export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAcces
 export type PermissionPolicy = api.components['schemas']['PermissionPolicy']
 export type Permissions = api.components['schemas']['Permissions']
 export type AccessToken = api.components['schemas']['AccessToken'] & { permissions: Permissions }
+export type AccessTokenStats = api.components['schemas']['AccessTokenStats']
 
 export type User = api.components['schemas']['User']
 export type NewOrUpdatedUser = api.components['schemas']['NewOrUpdatedUser']

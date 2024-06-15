@@ -31,10 +31,10 @@
         Activités des 30 derniers jours
       </div>
       <Chart
-        type="line"
+        type="bar"
         :data="chartData"
         :options="chartOptions"
-        class="absolute top-0 left-0 h-full w-full mt-3 xl:h-25rem"
+        class="absolute top-0 left-0 h-full w-full mt-3 xl:mt-6 xl:h-25rem"
       />
     </div>
   </div>
@@ -115,7 +115,7 @@ const chartOptions = {
       display: false,
     },
     y: {
-      display: false,
+      display: true,
     },
   },
 }
@@ -195,11 +195,5 @@ const cards = [
 
 .p-card-content {
   margin-top: 0.25rem;
-}
-
-.p-chart {
-  border-left: 1px dashed #DDD;
-  border-right: 1px dashed #DDD;
-  border-bottom: 1px dashed #DDD;
 }
 </style>

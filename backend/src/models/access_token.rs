@@ -1,6 +1,6 @@
 use crate::api::AppError;
 use serde::{Deserialize, Serialize};
-use serde_json::to_value;
+use serde_json::{to_value, Value};
 use sqlx::{types::Json, PgConnection};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -36,6 +36,12 @@ pub struct AccessToken {
     pub permissions: Json<Permissions>,
     pub last_week_visits: i64,
     pub active: bool,
+}
+
+#[derive(Deserialize, Serialize, ToSchema, Debug)]
+pub struct AccessTokenStats {
+    pub origins: Json<Value>,
+    pub visits_30_days: Json<Value>,
 }
 
 impl AccessToken {
@@ -201,5 +207,60 @@ impl AccessToken {
         .await
         .map_err(AppError::Database)?;
         Ok(())
+    }
+
+    pub async fn get_stats(
+        access_token_id: Uuid,
+        conn: &mut PgConnection,
+    ) -> Result<AccessTokenStats, AppError> {
+        sqlx::query_as!(
+            AccessTokenStats,
+            r#"
+            SELECT
+            COALESCE((
+                WITH origins AS (
+                    SELECT DISTINCT(COALESCE(referrer, 'unknown')) AS referrer, COUNT(*) AS total
+                    FROM access_tokens_visits
+                    WHERE token_id = $1
+                    GROUP BY referrer
+                )
+                SELECT json_object_agg(referrer, total) FROM origins
+            ), '{}') as "origins!",
+            (
+                WITH date_series AS (
+                    SELECT generate_series(
+                        NOW()::date - INTERVAL '30 days',
+                        NOW()::date,
+                        INTERVAL '1 day'
+                    )::date AS visit_date
+                ),
+                aggregated_visits AS (
+                    SELECT
+                        ds.visit_date,
+                        COALESCE(COUNT(atv.visited_at), 0) AS visit_count
+                    FROM
+                        date_series ds
+                    LEFT JOIN
+                        access_tokens_visits atv
+                    ON
+                        ds.visit_date = DATE(atv.visited_at) 
+                        AND atv.token_id = $1
+                    GROUP BY
+                        ds.visit_date
+                    ORDER BY
+                        ds.visit_date
+                )
+                SELECT COALESCE(json_object_agg(
+                    TO_CHAR(visit_date, 'YYYY-MM-DD'),
+                    visit_count
+                ), '{}') AS visits
+                FROM aggregated_visits
+            ) as "visits_30_days!";
+            "#,
+            access_token_id
+        )
+        .fetch_one(conn)
+        .await
+        .map_err(AppError::Database)
     }
 }

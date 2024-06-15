@@ -125,6 +125,18 @@
 
       <Column>
         <template #body="slotProps">
+          <Button
+            outlined
+            rounded
+            class="mx-2"
+            severity="success"
+            @click="viewDetails(slotProps.data.id)"
+          >
+            <template #icon>
+              <AppIcon icon-name="stats" />
+            </template>
+          </Button>
+
           <EditDeleteButtons
             :id="slotProps.data.id"
             model-name="du jeton d'accès"
@@ -203,5 +215,9 @@ async function onDelete(access_token_id: string, access_token_name: string) {
   catch {
     toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression du jeton ${access_token_name}`, life: 3000 })
   }
+}
+
+function viewDetails(access_token_id: string) {
+  navigateTo(`/admin/access-tokens/details/${access_token_id}`)
 }
 </script>

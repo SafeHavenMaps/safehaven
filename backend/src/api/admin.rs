@@ -68,6 +68,10 @@ pub fn routes(state: &AppState) -> Router<AppState> {
             get(access_tokens::admin_access_token_get),
         )
         .route(
+            "/access_tokens/:id/stats",
+            get(access_tokens::admin_access_token_get_stats),
+        )
+        .route(
             "/access_tokens/:id",
             put(access_tokens::admin_access_token_update),
         )

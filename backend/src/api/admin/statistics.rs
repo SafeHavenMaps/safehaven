@@ -7,7 +7,7 @@ use crate::{
     get,
     path = "/api/admin/stats",
     responses(
-        (status = 200, description = "Stats for the home page", body = Json<HomePageStats>),
+        (status = 200, description = "Stats for the home page", body = HomePageStats),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]

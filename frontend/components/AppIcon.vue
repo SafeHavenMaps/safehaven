@@ -72,6 +72,7 @@ const iconDict: Record<string, string> = {
   familyGeneralEdit: mdi.mdiPaletteOutline,
   clock: mdi.mdiClockOutline,
   menu: mdi.mdiMenu,
+  stats: mdi.mdiChartBar,
 }
 </script>
 

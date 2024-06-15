@@ -11,7 +11,9 @@ use crate::{
         ErrorResponse,
     },
     models::{
-        access_token::{AccessToken, NewOrUpdateAccessToken, PermissionPolicy, Permissions},
+        access_token::{
+            AccessToken, AccessTokenStats, NewOrUpdateAccessToken, PermissionPolicy, Permissions,
+        },
         category::{Category, NewOrUpdateCategory},
         comment::{
             AdminComment, AdminListedComment, AdminNewOrUpdateComment, PublicComment,
@@ -67,6 +69,7 @@ use utoipa::OpenApi;
         admin::access_tokens::admin_access_tokens_list,
         admin::access_tokens::admin_access_token_new,
         admin::access_tokens::admin_access_token_get,
+        admin::access_tokens::admin_access_token_get_stats,
         admin::access_tokens::admin_access_token_update,
         admin::access_tokens::admin_access_token_delete,
         // admin::families
@@ -164,6 +167,7 @@ use utoipa::OpenApi;
         PublicComment,
         // access_tokens
         AccessToken,
+        AccessTokenStats,
         NewOrUpdateAccessToken,
         Permissions,
         PermissionPolicy,

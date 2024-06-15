@@ -3,7 +3,7 @@
 use crate::api::AppError;
 use serde::Serialize;
 use serde_json::Value;
-use sqlx::PgConnection;
+use sqlx::{types::Json, PgConnection};
 use std::collections::HashMap;
 use utoipa::ToSchema;
 
@@ -93,7 +93,7 @@ pub struct HomePageStats {
     pub total_visits_30_days: i64,
     pub total_visits_7_days: i64,
 
-    pub visits_30_days: Value,
+    pub visits_30_days: Json<Value>,
 }
 
 pub async fn home_page_stats(conn: &mut PgConnection) -> Result<HomePageStats, AppError> {

@@ -235,6 +235,58 @@
         }
       }
     },
+    "/api/admin/access_tokens/{id}/stats": {
+      "get": {
+        "tags": [
+          "admin::access_tokens"
+        ],
+        "operationId": "admin_access_token_get_stats",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Access token identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Access token statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessTokenStats"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/categories": {
       "get": {
         "tags": [
@@ -1781,7 +1833,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Json"
+                  "$ref": "#/components/schemas/HomePageStats"
                 }
               }
             }
@@ -2639,6 +2691,21 @@
           }
         }
       },
+      "AccessTokenStats": {
+        "type": "object",
+        "required": [
+          "origins",
+          "visits_30_days"
+        ],
+        "properties": {
+          "origins": {
+            "$ref": "#/components/schemas/Json"
+          },
+          "visits_30_days": {
+            "$ref": "#/components/schemas/Json"
+          }
+        }
+      },
       "AdminCachedEntity": {
         "type": "object",
         "required": [
@@ -3483,7 +3550,9 @@
             "type": "integer",
             "format": "int64"
           },
-          "visits_30_days": {}
+          "visits_30_days": {
+            "$ref": "#/components/schemas/Json"
+          }
         }
       },
       "LoginRequest": {

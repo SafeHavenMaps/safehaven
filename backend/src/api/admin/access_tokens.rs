@@ -1,6 +1,6 @@
 use crate::{
     api::{AppError, AppJson, DbConn},
-    models::access_token::{AccessToken, NewOrUpdateAccessToken},
+    models::access_token::{AccessToken, AccessTokenStats, NewOrUpdateAccessToken},
 };
 use axum::{extract::Path, Json};
 use uuid::Uuid;
@@ -54,6 +54,25 @@ pub async fn admin_access_token_get(
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<AccessToken>, AppError> {
     Ok(AppJson(AccessToken::get_with_id(id, &mut conn).await?))
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/admin/access_tokens/{id}/stats",
+    params(
+        ("id" = Uuid, Path, description = "Access token identifier")
+    ),
+    responses(
+        (status = 200, description = "Access token statistics", body = AccessTokenStats),
+        (status = 401, description = "Invalid permissions", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+    )
+)]
+pub async fn admin_access_token_get_stats(
+    DbConn(mut conn): DbConn,
+    Path(id): Path<Uuid>,
+) -> Result<AppJson<AccessTokenStats>, AppError> {
+    Ok(AppJson(AccessToken::get_stats(id, &mut conn).await?))
 }
 
 #[utoipa::path(

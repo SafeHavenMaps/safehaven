@@ -22,6 +22,7 @@ import type {
   ConfigurationOption,
   AdminPaginatedCachedEntities,
   AdminSearchRequestBody,
+  AccessTokenStats,
 } from '~/lib'
 
 // client as a closure
@@ -62,16 +63,8 @@ export default function useClient() {
       return data
     },
 
-    // Home stats (What the hell is happening with typing here?)
-    async getStats(): Promise<{
-      total_entities: number
-      total_comments: number
-      pending_entities: number
-      pending_comments: number
-      total_visits_30_days: number
-      total_visits_7_days: number
-      visits_30_days: { [key: string]: number }
-    }> {
+    // Home stats
+    async getStats() {
       const { data, error } = await this.rawClient.GET('/api/admin/stats')
       if (error) throw error
       return data
@@ -382,6 +375,14 @@ export default function useClient() {
 
     async getAccessToken(id: string): Promise<AccessToken> {
       const { data, error } = await this.rawClient.GET('/api/admin/access_tokens/{id}', {
+        params: { path: { id } },
+      })
+      if (error) throw error
+      return data
+    },
+
+    async getAccessTokenStats(id: string): Promise<AccessTokenStats> {
+      const { data, error } = await this.rawClient.GET('/api/admin/access_tokens/{id}/stats', {
         params: { path: { id } },
       })
       if (error) throw error
