@@ -125,7 +125,8 @@ const cardTitle = ref('')
 const cardIconName = ref('')
 const sidebarRef: Ref<HTMLElement | null> = ref(null)
 const contentContainerRef: Ref<HTMLElement | null> = ref(null)
-const sidebarCollapsed = ref(false)
+const adminBreakingPoint = 768
+const sidebarCollapsed = ref(window.innerWidth < adminBreakingPoint)
 
 function initAdminLayout(
   newCardTitle: string,
@@ -141,10 +142,22 @@ function initAdminLayout(
 
 provide('initAdminLayout', initAdminLayout)
 
-function updateSidebarTop() {
+function resizeEverything() {
+  console.log('resize')
+
   const navbar = document.querySelector('.admin-navbar')
   const sidebar = sidebarRef.value
   const mainContent = contentContainerRef.value
+
+  // If the sidebar is not collapsed but we go under the breaking point, we collapse it
+  if (window.innerWidth < adminBreakingPoint && !sidebarCollapsed.value) {
+    sidebarCollapsed.value = true
+  }
+  // Else, if the sidebar is collapsed but we go over the breaking point, we expand it
+  else if (window.innerWidth >= adminBreakingPoint && sidebarCollapsed.value) {
+    sidebarCollapsed.value = false
+  }
+
   if (navbar && sidebar && mainContent) {
     sidebar.style.top = `${navbar.clientHeight}px`
     mainContent.style.marginTop = `${navbar.clientHeight}px`
@@ -152,11 +165,9 @@ function updateSidebarTop() {
 }
 
 onMounted(() => {
-  updateSidebarTop()
-  window.addEventListener('resize', updateSidebarTop)
+  resizeEverything()
+  window.addEventListener('resize', resizeEverything)
 })
-
-watch(sidebarCollapsed, updateSidebarTop)
 </script>
 
 <style>
