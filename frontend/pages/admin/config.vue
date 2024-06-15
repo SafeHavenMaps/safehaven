@@ -154,7 +154,10 @@
         </span>
       </form>
     </TabPanel>
-    <TabPanel header="Mode Sécurisé">
+    <TabPanel
+      v-if="false"
+      header="Mode Sécurisé"
+    >
       <form
         class="flex flex-column gap-3 max-w-30rem mx-4"
         @submit.prevent="onSave('safe_mode', editedConfig.safe_mode)"

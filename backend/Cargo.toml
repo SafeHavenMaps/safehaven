@@ -32,4 +32,3 @@ clap = { version = "4", features = ["derive"] }
 clap_derive = { version = "4" }
 number_range = "0.3.2"
 crc32fast = "1.4.0"
-tree_magic = "0.2.3"
