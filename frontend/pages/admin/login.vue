@@ -43,7 +43,7 @@
             toggle-mask
             class="w-full -mt-2"
           />
-          <span>
+          <span class="hidden">
             <Checkbox
               v-model="remember_me"
               input-id="remember_me"
@@ -101,7 +101,7 @@ if (typeof redirect_query_param === 'string') {
 async function login() {
   awaiting_auth_response.value = true
   failed_attempt.value = false
-  console.log('Logging in with', username.value, password.value, 'with remember me set to', remember_me.value)
+
   try {
     await state.login(username.value, password.value, remember_me.value)
     await navigateTo(redirectUrl)
