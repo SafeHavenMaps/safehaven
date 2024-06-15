@@ -15,6 +15,7 @@ pub struct Form {
 pub enum FieldType {
     SingleLineText,
     MultiLineText,
+    RichText,
     Number,
     Boolean,
     DiscreteScore,

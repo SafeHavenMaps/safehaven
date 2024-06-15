@@ -35,13 +35,13 @@
       @update:model-value="updateField"
     />
     <!-- add fieldmetadata validation -->
-    <!-- <Editor
+    <Editor
       v-if="props.formField.field_type=='RichText'"
       :id="props.formField.key"
-      :model-value="props.modelValue!"
-      editor-style="height:320px"
-      @update:model-value="updateValue"
-    /> -->
+      :model-value="props.fieldContent as (string | undefined)"
+      editor-style="height:220px"
+      @update:model-value="updateField"
+    />
     <InputNumber
       v-if="props.formField.field_type=='Number'"
       :id="props.formField.key"
@@ -95,7 +95,7 @@
     <div
       v-if="props.formField.field_type=='EventList'"
       :id="props.formField.key"
-      class="flex flex-column gap-2 border-1 p-2 surface-border border-round"
+      class="flex flex-column gap-1 border-1 p-2 surface-border border-round"
     >
       <div
         v-for="(event, ev_index) in (props.fieldContent as EntityOrCommentEvent[])"
@@ -105,6 +105,7 @@
         <span class="flex align-items-center gap-3">
           <Dropdown
             v-model="event.type"
+            placeholder="type d'évènement"
             class="flex-grow-1"
             :options="props.formField.field_type_metadata?.event_types"
             option-value="value"
@@ -114,7 +115,7 @@
           <Calendar
             v-model="event.date"
             class="w-10rem"
-            :invalid="!event.date"
+            placeholder="jj/mm/aaaa"
             date-format="dd/mm/yy"
             show-icon
             icon-display="input"
@@ -139,21 +140,28 @@
 
         <span class="flex align-items-center gap-2">
           <label for="">Détails (optionels): </label>
-          <InputText
+          <Textarea
             v-model="event.details"
           />
         </span>
+        <Divider
+          class="m-0 mb-1"
+          type="dashed"
+        />
       </div>
       <span class="flex justify-content-center">
         <Button
           rounded
-          class="m-0 p-0"
+          size="small"
+          outlined
+          class="m-0 p-1 pr-2"
           @click="(props.fieldContent as EntityOrCommentEvent[]).push({ date: undefined, type: undefined, details: undefined })"
         >
           <template #default>
             <AppIcon
               icon-name="add"
             />
+            Nouvel évènement
           </template>
         </Button>
       </span>
@@ -164,7 +172,7 @@
 
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
-// import Editor from 'primevue/editor'
+import Editor from 'primevue/editor'
 import Calendar from 'primevue/calendar'
 import type { EntityOrCommentEvent, FieldContentMap, FormField } from '~/lib'
 
@@ -183,6 +191,6 @@ function updateField(value: undefined | FieldContentMap[FormField['field_type']]
 }
 
 if (props.formField.field_type == 'EventList' && props.fieldContent == undefined) {
-  emit('update:fieldContent', [])
+  emit('update:fieldContent', [{ date: undefined, type: undefined, details: undefined }])
 }
 </script>

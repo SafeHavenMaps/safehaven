@@ -774,10 +774,10 @@ async function onSave() {
 const fieldTypeOptions = [
   { label: 'Texte court', value: 'SingleLineText' },
   { label: 'Texte long', value: 'MultiLineText' },
-  { label: 'Éditeur riche', value: 'EditorText' },
+  { label: 'Éditeur riche', value: 'RichText' },
   { label: 'Vrai / Faux', value: 'Boolean' },
   { label: 'Nombre', value: 'Number' },
-  { label: 'Score', value: 'DiscreteScore' },
+  { label: 'Score discret', value: 'DiscreteScore' },
   { label: 'Date', value: 'Date' },
   { label: 'Choix Unique', value: 'EnumSingleOption' },
   { label: 'Choix Multiples', value: 'EnumMultiOption' },
