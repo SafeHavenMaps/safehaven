@@ -125,8 +125,21 @@
                   severity="secondary"
                   @click="() => {
                     editOptionsField = field as FormField
-                    editOptionsOptions = (field.field_type_metadata as OptionsFieldTypeMetadata).options
+                    editOptionsOptions = JSON.parse(JSON.stringify((field.field_type_metadata as OptionsFieldTypeMetadata).options))
                     editOptionsVisible = true
+                  }"
+                />
+                <Button
+                  v-if="['EventList'].includes(field.field_type)"
+                  :id="'field_type_metadata_' + index"
+                  v-model="field.field_type_metadata"
+                  label="Évènements"
+                  class="border-1 border-black-alpha-10"
+                  severity="secondary"
+                  @click="() => {
+                    editEventsField = field as FormField
+                    editEventsEvents = JSON.parse(JSON.stringify((field.field_type_metadata as EventsFieldTypeMetadata).event_types))
+                    editEventsVisible = true
                   }"
                 />
                 <Badge
@@ -237,13 +250,21 @@
           <InputText
             :id="'option_label_' + index"
             v-model="option.label"
-            placeholder="Label"
+            placeholder="nom de l'option"
+          />
+          <label
+            v-tooltip.bottom="`Si activé, ce champ ne sera pas affiché dans les résultats lorsque cette option est sélectionnée`"
+            :for="'option_hidden_' + index"
+          >Cachée :</label>
+          <InputSwitch
+            :id="'option_hidden_' + index"
+            v-model="option.hidden"
           />
           <label :for="'option_value_' + index">Clé :</label>
           <InputText
             :id="'option_value_' + index"
             v-model="option.value"
-            placeholder="Value"
+            placeholder="clé unique"
           />
           <Badge
             v-tooltip.bottom="`Modifier la clé ou supprimer l'option peut entraîner des incohérences dans les ${props.kindName}s utilisant cette option.`"
@@ -287,6 +308,90 @@
             @click="() => {
               editOptionsField!.field_type_metadata = { options: editOptionsOptions }
               editOptionsVisible = false
+            }"
+          />
+        </div>
+      </div>
+    </Dialog>
+
+    <Dialog
+      v-if="editEventsVisible"
+      v-model:visible="editEventsVisible"
+      modal
+      dismissable-mask
+      :closable="false"
+      :header="`Édition des évènements du champ ${editEventsField!.display_name}`"
+    >
+      <div class="flex flex-column gap-3">
+        <div
+          v-for="(event, index) in editEventsEvents"
+          :key="index"
+          class="flex align-items-center gap-2"
+        >
+          <label :for="'event_label_' + index">Label :</label>
+          <InputText
+            :id="'event_label_' + index"
+            v-model="event.label"
+            placeholder="nom de l'évènement"
+          />
+          <label :for="'event_color_' + index">Couleur :</label>
+          <InputText
+            :id="'event_color_' + index"
+            v-model="event.color"
+          />
+          <ColorPicker
+            :id="'event_color_picker_' + index"
+            v-model="event.color"
+            format="hex"
+          />
+          <label :for="'event_value_' + index">Clé :</label>
+          <InputText
+            :id="'event_value_' + index"
+            v-model="event.value"
+            placeholder="clé unique"
+          />
+          <Badge
+            v-tooltip.bottom="`Modifier la clé ou supprimer l'évènement peut entraîner des incohérences dans les ${props.kindName}s utilisant cette évènement.`"
+            value="!"
+          />
+          <Button
+            v-tooltip.top="`Cet évènement ne sera plus visible sur les ${props.kindName}s le comportant déjà
+                  tant que la clé n'est pas réutilisée, mais les informations resteront en base de donnée.`"
+            rounded
+            outlined
+            class="m-0 p-1 ml-2"
+            severity="primary"
+            @click=" editEventsEvents.splice(index, 1)"
+          >
+            <template #default>
+              <AppIcon
+                icon-name="delete"
+                size="18px"
+              />
+            </template>
+          </Button>
+        </div>
+        <span class="flex justify-content-center">
+          <Button
+            type="button"
+            label="Ajouter un évènement"
+            @click="editEventsEvents.push({ label: '', value: '', color: '#FFFFFF' })"
+          />
+        </span>
+
+        <div class="flex justify-content-end gap-2">
+          <Button
+            type="button"
+            label="Annuler"
+            severity="secondary"
+            @click="editEventsVisible = false"
+          />
+          <Button
+            type="button"
+            label="Confirmer"
+            @click="() => {
+              editEventsField!.field_type_metadata = { event_types: editEventsEvents }
+              editEventsVisible = false
             }"
           />
         </div>
@@ -400,7 +505,7 @@
 
 <script setup lang="ts">
 import type { ConfirmationOptions } from 'primevue/confirmationoptions'
-import type { FormField, StringFieldTypeMetadata, OptionsFieldTypeMetadata } from '~/lib'
+import type { FormField, StringFieldTypeMetadata, OptionsFieldTypeMetadata, EventsFieldTypeMetadata } from '~/lib'
 
 const props = defineProps<{
   kindName: string
@@ -409,6 +514,7 @@ const props = defineProps<{
 }>()
 
 const edited_form_fields: Ref<FormField[]> = ref(JSON.parse(JSON.stringify(props.originalFormFields))) // deep copy
+edited_form_fields.value.sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
 
 const processingRequest = ref(false)
 const toast = useToast()
@@ -434,6 +540,10 @@ const editKeyKey = ref('')
 const editOptionsVisible = ref(false)
 const editOptionsField: Ref<FormField | null> = ref(null)
 const editOptionsOptions = ref<OptionsFieldTypeMetadata['options']>([])
+
+const editEventsVisible = ref(false)
+const editEventsField: Ref<FormField | null> = ref(null)
+const editEventsEvents = ref<EventsFieldTypeMetadata['event_types']>([])
 
 const page_count = ref(1 + Math.max(0, ...edited_form_fields.value.map(field => field.form_page)))
 const display_indexes: Ref<Record<string, 'notDisplayed' | number>> = ref({})
@@ -636,6 +746,13 @@ async function onSave() {
       else {
         field.user_facing = true
         field.display_weight = pseudo_display_index
+      }
+      if (field.field_type == 'EventList') {
+        field.field_type_metadata?.event_types.forEach((event_type) => {
+          if (event_type.color.length == 6) {
+            event_type.color = `#${event_type.color}`
+          }
+        })
       }
     }
   }

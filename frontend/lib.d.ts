@@ -101,7 +101,7 @@ export type OptionsFieldTypeMetadata = {
 
 export type EventsFieldTypeMetadata = {
   event_types: {
-    value: number
+    value: string
     label: string
     color: string
   }[]
