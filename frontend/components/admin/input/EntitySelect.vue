@@ -87,8 +87,8 @@
 
     <OverlayPanel ref="filters_overlay">
       <ViewerFilterConfig
-        v-model:filteringTags="tagFilteringList!"
-        v-model:filteringCategories="categoryFilteringList!"
+        v-model:filteringTags="tagFilteringList"
+        v-model:filteringCategories="categoryFilteringList"
         @filters-changed="refreshSearch"
       />
     </OverlayPanel>
