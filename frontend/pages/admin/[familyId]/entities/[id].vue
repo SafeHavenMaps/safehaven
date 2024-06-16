@@ -13,16 +13,11 @@
               id="display_name"
               v-model="editedEntity.display_name"
               label="Nom d'affichage"
+              :variant="hasBeenEdited('display_name')"
             />
             <FormCategorySelect
               v-model="editedEntity.category_id"
               :categories="categories"
-            />
-
-            <FormAdressSelect
-              id="locations"
-              v-model="editedEntity.locations"
-              label="Locations"
             />
 
             <FormDynamicField
@@ -292,6 +287,10 @@ initAdminLayout(
     { label: `Édition de l'entité ${fetchedEntity.display_name}`, url: `/admin/${familyId}/entities/${entityId}` },
   ],
 )
+
+function hasBeenEdited(field: keyof AdminNewOrUpdateEntity) {
+  return editedEntity.value[field] !== fetchedEntity[field]
+}
 
 async function onSave() {
   processingRequest.value = true

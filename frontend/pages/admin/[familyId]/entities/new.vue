@@ -15,12 +15,6 @@
           :categories="categories"
         />
 
-        <FormAdressSelect
-          id="locations"
-          v-model="editedEntity.locations"
-          label="Locations"
-        />
-
         <FormDynamicField
           v-for="field in family.entity_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
           :key="field.key"

@@ -48,8 +48,8 @@
           v-for="result in currentEntitiesResults?.entities"
           :key="result.id"
           class="result mb-2 p-2"
-          :class="{ 'selected-result': chosenEntity === result.id }"
-          @click="chosenEntity=result.id"
+          :class="{ 'selected-result': chosenEntity?.id === result.id }"
+          @click="chosenEntity=result"
         >
           <div>{{ result.display_name }}</div>
 
@@ -77,10 +77,10 @@
       <Button
         type="button"
         label="Confirmer"
-        :disabled="chosenEntity == null"
+        :disabled="!Object.hasOwn(chosenEntity, 'display_name')"
         @click="() => {
           emit('update:visible', false)
-          saveEntity(chosenEntity!)
+          saveEntity(chosenEntity as AdminCachedEntity)
         }"
       />
     </div>
@@ -97,7 +97,7 @@
 
 <script setup lang="ts">
 import type OverlayPanel from 'primevue/overlaypanel'
-import type { AdminPaginatedCachedEntities, Category, Tag } from '~/lib'
+import type { AdminCachedEntity, AdminPaginatedCachedEntities, Category, Tag } from '~/lib'
 import state from '~/lib/admin-state'
 
 const props = withDefaults(defineProps<{
@@ -106,6 +106,7 @@ const props = withDefaults(defineProps<{
   tags: Tag[]
   familyId: string
   visible: boolean
+  previousEntityId?: string
 }>(), {
   title: 'Choix d\'une entité',
 })
@@ -117,7 +118,7 @@ const categoryFilteringList = ref<(Category & { active: boolean })[]>([])
 const tagFilteringList = ref<(Tag & { active: boolean | null })[]>([])
 
 const currentEntitiesResults: Ref<AdminPaginatedCachedEntities | null> = ref(null)
-const chosenEntity = ref<string | null> (null)
+const chosenEntity = ref<AdminCachedEntity | { id: string | undefined }>({ id: props.previousEntityId })
 
 type CategoryRecord = Record<string, Category>
 const categoryRecord: CategoryRecord = state.categories.reduce((categories, category) => {
@@ -147,10 +148,17 @@ async function refreshSearch() {
 
 const emit = defineEmits(['save_entity', 'update:visible'])
 
-function saveEntity(entity_id: string) {
+function saveEntity(entity_id: AdminCachedEntity) {
   resetSearchParams()
   emit('save_entity', entity_id)
 }
+
+watch(
+  () => props.previousEntityId,
+  (newId) => {
+    chosenEntity.value = { id: newId }
+  },
+)
 
 resetSearchParams()
 </script>
