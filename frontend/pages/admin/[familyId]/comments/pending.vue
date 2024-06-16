@@ -27,29 +27,35 @@
       state-storage="session"
       :state-key="table_key"
       data-key="id"
-      :value="entities"
+      :value="comments"
       striped-rows
       :rows="10"
       :rows-per-page-options="[5, 10, 20, 50]"
       removable-sort
-      :global-filter-fields="['display_name']"
+      :global-filter-fields="['author', 'entity_display_name']"
       class=" "
     >
       <Column
-        field="display_name"
-        header="Nom d'affichage"
+        field="author"
+        header="Auteur"
+        class="max-w-25rem"
+        sortable
+      />
+      <Column
+        field="entity_display_name"
+        header="Nom de l'entité"
         class="max-w-25rem"
         sortable
       />
 
       <Column
         v-if="state.tablesSelectedColumns[table_key].includes('Catégorie')"
-        field="category_id"
+        field="entity_category_id"
         header="Catégorie"
         sortable
       >
         <template #body="slotProps">
-          <CategoryTag :category="categoryRecord[slotProps.data.category_id]" />
+          <CategoryTag :category="categoryRecord[slotProps.data.entity_category_id]" />
         </template>
       </Column>
 
@@ -73,27 +79,14 @@
           {{ new Date(slotProps.data.updated_at).toLocaleDateString() }}
         </template>
       </Column>
-
-      <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Visibilité')"
-        field="hidden"
-        header="Visibilité"
-      >
-        <template #body="slotProps">
-          <Tag
-            :value="slotProps.data.hidden ? 'Caché' : 'Visible'"
-            :severity="slotProps.data.hidden ? 'error' : 'success'"
-          />
-        </template>
-      </Column>
       <Column>
         <template #body="slotProps">
           <AdminEditDeleteButtons
             :id="slotProps.data.id"
-            model-name="de l'entité"
-            :name="slotProps.data.display_name"
+            model-name="du commentaire"
+            :name="slotProps.data.entity_display_name"
             @delete="onDelete"
-            @edit="id => navigateTo(`/admin/${familyId}/entities/${id}`)"
+            @edit="id => navigateTo(`/admin/${familyId}/comments/${id}`)"
           />
         </template>
       </Column>
@@ -105,7 +98,7 @@
 import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { AdminListedEntity, Category } from '~/lib'
+import type { AdminListedComment, Category } from '~/lib'
 import state from '~/lib/admin-state'
 
 const familyId = useRoute().params.familyId as string
@@ -117,25 +110,24 @@ if (state.categories == null)
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 
 type CategoryRecord = Record<string, Category>
-
 const categoryRecord: CategoryRecord = state.categories.reduce((categories, category) => {
   categories[category.id] = category
   return categories
 }, {} as CategoryRecord)
 
-// Initialize the ref with an empty array, then fetch to update entities asynchronously
-const entities: Ref<AdminListedEntity[]> = ref([])
+// Initialize the ref with an empty array, then fetch to update comments asynchronously
+const comments: Ref<AdminListedComment[]> = ref([])
 async function refreshTable() {
-  entities.value = await state.client.listPendingEntities()
-  entities.value = entities.value.filter(entity => categoryRecord[entity.category_id].family_id == familyId)
+  comments.value = await state.client.listPendingComments()
+  comments.value = comments.value.filter(comment => categoryRecord[comment.entity_category_id].family_id === familyId)
   state.getEntitiesCommentsCounts()
 }
 refreshTable()
 
-const optionalColumns = ref(['Catégorie', 'Créé le', 'Mis à jour le', 'Visibilité'])
-const table_key = `dt-state-entities-${familyId}`
+const optionalColumns = ref(['Catégorie', 'Créé le', 'Mis à jour le'])
+const table_key = `dt-state-comments-${familyId}`
 if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = ['Catégorie', 'Créé le']
+  state.tablesSelectedColumns[table_key] = ['Créé le', 'Catégorie']
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {
@@ -149,32 +141,32 @@ definePageMeta({
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  'Entités en attente de modération',
-  'pendingEntity',
+  'Commentaires en attente de modération',
+  'pendingComment',
   [
     {
       icon: 'add',
-      label: 'Nouvelle entité',
+      label: 'Nouveau commentaire',
       severity: 'success',
-      url: `/admin/${familyId}/entities/new`,
+      url: `/admin/${familyId}/comments/new`,
     },
   ],
   [
     { label: `${familyTitle}`, url: '/admin/families' },
-    { label: 'Entités en attente', url: `/admin/${familyId}/entities/pending` },
+    { label: 'Commentaires en attente', url: `/admin/${familyId}/comments/pending` },
   ],
 )
 
 const toast = useToast()
 
-async function onDelete(entity_id: string, entity_name: string, onDeleteDone: () => void) {
+async function onDelete(comment_id: string, comment_name: string, onDeleteDone: () => void) {
   try {
-    await state.client.deleteEntity(entity_id)
-    toast.add({ severity: 'success', summary: 'Succès', detail: `Entité ${entity_name} supprimée avec succès`, life: 3000 })
+    await state.client.deleteComment(comment_id)
+    toast.add({ severity: 'success', summary: 'Succès', detail: `Commentaire ${comment_name} supprimé avec succès`, life: 3000 })
     refreshTable()
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression de l'entité ${entity_name}`, life: 3000 })
+    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression du commentaire ${comment_name}`, life: 3000 })
   }
   onDeleteDone()
 }
