@@ -197,10 +197,18 @@ async fn authentication_middleware(
                 }
             };
 
-            let user = User::get(refresh_token_data.admin_id, &mut conn).await?;
-            let new_token_data = create_user_claim(&user);
-
-            (new_token_data, true)
+            match User::get(refresh_token_data.admin_id, &mut conn).await {
+                Ok(user) => {
+                    let new_token_data = create_user_claim(&user);
+                    (new_token_data, true)
+                }
+                // if the user is not found, clear the cookie jar
+                Err(AppError::Database(sqlx::Error::RowNotFound)) => {
+                    let purged_jar = expire_cookies(cookies);
+                    return Ok((purged_jar, AppError::Unauthorized).into_response());
+                }
+                Err(err) => return Err(err),
+            }
         }
     };
 
