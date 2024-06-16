@@ -35,11 +35,11 @@ The administration panel will provide you with the ability to create new users a
 
 ```bash
 docker run -d \ 
-  -e SAFEHAVEN_database_url="postgresql://user:password@host/safehaven" \  # Set the database path
-  -e SAFEHAVEN_database_pool_size="5" \                                    # Set the number of connections to the database
-  -e SAFEHAVEN_secure_cookie="true" \                                      # Activate if you have a reverse proxy with HTTPS.
-  -e SAFEHAVEN_token_secret="SecretForValidatingAngSigningTokens" \        # Set a secret that will be used to sign sessions
-  ghcr.io/safehavenmaps/safehaven:latest                                   # Change latest to the latest version, check the releases
+  -e SAFEHAVEN_DATABASE__URL="postgresql://user:password@host/safehaven" \  # Set the database path
+  -e SAFEHAVEN_DATABASE__POOL_SIZE="5" \                                    # Set the number of connections to the database
+  -e SAFEHAVEN_SECURE_COOKIE="true" \                                       # Activate if you have a reverse proxy with HTTPS.
+  -e SAFEHAVEN_TOKEN_SECRET="SecretForValidatingAngSigningTokens" \         # Set a secret that will be used to sign sessions
+  ghcr.io/safehavenmaps/safehaven:latest                                    # Change latest to the latest version, check the releases
 ```
 
 ## Current status

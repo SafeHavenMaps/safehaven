@@ -49,6 +49,6 @@ impl Default for SafeHavenConfig {
 pub fn load(config_path: &str) -> Result<SafeHavenConfig, figment::Error> {
     Figment::from(Serialized::defaults(SafeHavenConfig::default()))
         .merge(Toml::file(config_path))
-        .merge(Env::prefixed("SAFEHAVEN_"))
+        .merge(Env::prefixed("SAFEHAVEN_").split("__"))
         .extract()
 }

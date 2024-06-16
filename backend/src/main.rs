@@ -28,6 +28,8 @@ enum Commands {
     Openapi(OpenapiArgs),
     /// Serve the application
     Serve(ServeArgs),
+    /// Print the configuration
+    Config(ConfigArgs),
 }
 
 #[derive(Args, Clone)]
@@ -48,12 +50,24 @@ struct ServeArgs {
     redoc: bool,
 }
 
+#[derive(Args, Clone)]
+struct ConfigArgs {}
+
 #[tokio::main]
 async fn main() {
     let args = Cli::parse();
     match &args.command {
         Commands::Openapi(a) => openapi(a),
         Commands::Serve(a) => serve(a).await,
+        Commands::Config(_) => {
+            let config = config::load("safehaven.toml").unwrap_or_else(|e| {
+                tracing::error!("Cannot load configuration: {}", e);
+                exit(1);
+            });
+            // Print as json
+            let json = serde_json::to_string_pretty(&config).unwrap();
+            println!("{}", json);
+        }
     };
 }
 
