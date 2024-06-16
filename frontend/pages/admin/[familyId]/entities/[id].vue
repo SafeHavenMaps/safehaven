@@ -304,6 +304,7 @@ async function onSave() {
     toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification de l\'entité', life: 3000 })
   }
   processingRequest.value = false
+  state.getEntitiesCommentsCounts()
 }
 
 async function onCommentDelete(comment_id: string, comment_author: string, onDeleteDone: () => void) {

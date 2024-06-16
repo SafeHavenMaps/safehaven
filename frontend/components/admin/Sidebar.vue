@@ -60,7 +60,6 @@
           size="16px"
           icon-name="chevronDown"
         />
-
       </a>
     </template>
   </PanelMenu>
@@ -75,9 +74,8 @@ await state.getEntitiesCommentsCounts()
 function getMenuItems() {
   const currentRoute = useRoute().fullPath
 
-  return nodes.map((node) => {
+  return nodes.value.map((node) => {
     node.active = (!!node.route && currentRoute.startsWith(`/admin/${node.route}`))
-
     return node
   })
 }
@@ -92,7 +90,7 @@ function classForLink(active: boolean) {
   return classes
 }
 
-const familyNodes = [{
+const familyNodes = computed(() => [{
   label: 'Gestion',
   icon: 'listEdit',
   route: 'families',
@@ -120,28 +118,23 @@ const familyNodes = [{
           route: item.id + '/entities',
         },
         {
-          label: 'Commentaires',
-          icon: 'comment',
-          route: item.id + '/comments',
-        },
-        {
           label: 'Entités en attente',
           icon: 'pendingEntity',
           pending_count: counts[1],
-          route: item.id + '/pending-entities',
+          route: item.id + '/entities/pending',
         },
         {
           label: 'Commentaires en attente',
           icon: 'pendingComment',
           pending_count: counts[3],
-          route: item.id + '/pending-categories',
+          route: item.id + '/comments/pending',
         },
       ],
     }
   }),
-)
+))
 
-const nodes = [
+const nodes = computed(() => [
   {
     label: 'Accueil',
     icon: 'home',
@@ -171,7 +164,7 @@ const nodes = [
     label: 'Familles',
     icon: 'family',
     pending_count: Object.values(state.countsByFamily).reduce((summed_count, counts) => summed_count + counts[1] + counts[3], 0),
-    items: familyNodes,
+    items: familyNodes.value,
     active: false,
   },
   {
@@ -180,7 +173,7 @@ const nodes = [
     route: 'tags',
     active: false,
   },
-].filter(node => !node.admin_only || state.is_admin)
+].filter(node => !node.admin_only || state.is_admin))
 </script>
 
 <style>
