@@ -1935,6 +1935,7 @@ dependencies = [
  "figment",
  "jsonwebtoken",
  "number_range",
+ "rand",
  "scrypt",
  "serde",
  "serde_json",

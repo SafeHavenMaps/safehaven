@@ -27,7 +27,7 @@ ALTER DATABASE safehaven SET default_text_search_config = 'pg_catalog.french';
 
 ## Configure
 
-SafeHaven is initialized with a default user named `admin` with the password `safehaven`. You should change this password as soon as possible.
+SafeHaven is initialized with a default user named `admin` with a random password, which can be retrieved from backend logs.
 
 The administration panel will provide you with the ability to create new users and manage the application. A wiki will be available soon to help you with the configuration.
 

@@ -63,11 +63,25 @@ impl AppState {
             .expect("can't get users count")
             == 0
         {
-            tracing::info!("No users found, creating admin user");
+            let user =
+                std::env::var("SAFEHAVEN_DEFAULT_USER").unwrap_or_else(|_| "admin".to_string());
+            let password = match std::env::var("SAFEHAVEN_DEFAULT_PASSWORD") {
+                Ok(password) => password,
+                Err(_) => {
+                    use rand::distributions::{Alphanumeric, DistString};
+                    Alphanumeric.sample_string(&mut rand::thread_rng(), 32)
+                }
+            };
+
+            tracing::info!(
+                "No users found, creating admin user {} with password {}",
+                &user,
+                &password
+            );
 
             let admin = NewOrUpdatedUser {
-                name: "admin".to_string(),
-                password: Some("safehaven".to_string()),
+                name: user,
+                password: Some(password),
                 is_admin: true,
             };
 
