@@ -49,6 +49,13 @@ impl AppState {
             .await
             .expect("can't connect to database");
 
+        sqlx::migrate!()
+            .run(&pool)
+            .await
+            .expect("can't run migrations");
+
+        tracing::info!("Migrations executed");
+
         let mut conn = pool.acquire().await.expect("can't acquire connection");
 
         if User::get_users_count(&mut conn)
@@ -86,15 +93,6 @@ impl AppState {
     pub async fn reload_data(&self, conn: &mut PgConnection) {
         let mut dyn_config = self.dyn_config.write().await;
         *dyn_config = SafeHavenOptions::load(conn).await;
-    }
-
-    pub async fn execute_migration(&self) {
-        sqlx::migrate!()
-            .run(&self.pool)
-            .await
-            .expect("can't run migrations");
-
-        tracing::info!("Migrations executed");
     }
 
     pub fn generate_token<T>(&self, claims: T) -> String
