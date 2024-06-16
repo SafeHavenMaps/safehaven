@@ -209,7 +209,7 @@
             frontend
           ];
           config = {
-            Cmd = ["/bin/safehaven"];
+            Cmd = ["/bin/safehaven" "serve"];
             Env = [
               "SAFEHAVEN_serve_public_path=/usr/share/safehaven/static"
             ];

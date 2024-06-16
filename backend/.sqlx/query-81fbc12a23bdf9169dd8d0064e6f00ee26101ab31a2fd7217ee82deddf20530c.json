@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO categories (title, family_id, default_status, fill_color, border_color)\n            VALUES ($1, $2, $3, $4, $5)\n            RETURNING\n                id,\n                title,\n                family_id,\n                default_status,\n                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,\n                fill_color,\n                border_color\n            ",
+  "query": "\n            INSERT INTO categories (title, family_id, default_status, fill_color, border_color)\n            VALUES ($1, $2, $3, $4, $5)\n            RETURNING\n                id,\n                title,\n                family_id,\n                default_status,\n                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,\n                fill_color,\n                border_color,\n                version\n            ",
   "describe": {
     "columns": [
       {
@@ -37,6 +37,11 @@
         "ordinal": 6,
         "name": "border_color",
         "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "version",
+        "type_info": "Int4"
       }
     ],
     "parameters": {
@@ -55,8 +60,9 @@
       false,
       null,
       false,
+      false,
       false
     ]
   },
-  "hash": "e295a52642b271888af88a196a8583729362814e8dd8289a09fcc7fb2d40a526"
+  "hash": "81fbc12a23bdf9169dd8d0064e6f00ee26101ab31a2fd7217ee82deddf20530c"
 }

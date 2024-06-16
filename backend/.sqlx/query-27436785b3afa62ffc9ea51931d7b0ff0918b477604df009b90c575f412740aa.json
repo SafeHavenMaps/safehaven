@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            (SELECT COUNT(*) FROM entities WHERE moderated) as \"total_entities!\",\n            (SELECT COUNT(*) FROM comments WHERE moderated) as \"total_comments!\",\n            (SELECT COUNT(*) FROM entities WHERE NOT moderated) as \"pending_entities!\",\n            (SELECT COUNT(*) FROM comments WHERE NOT moderated) as \"pending_comments!\",\n            (SELECT COUNT(*) FROM access_tokens_visits WHERE visited_at >= NOW()::date - INTERVAL '30 days') as \"total_visits_30_days!\",\n            (SELECT COUNT(*) FROM access_tokens_visits WHERE visited_at >= NOW()::date - INTERVAL '7 days') as \"total_visits_7_days!\",\n            (\n                WITH date_series AS (\n                    SELECT generate_series(\n                        NOW()::date - INTERVAL '30 days',\n                        NOW()::date,\n                        INTERVAL '1 day'\n                    )::date AS visit_date\n                ),\n                aggregated_visits AS (\n                    SELECT\n                        ds.visit_date,\n                        COALESCE(COUNT(atv.visited_at), 0) AS visit_count\n                    FROM\n                        date_series ds\n                    LEFT JOIN\n                        access_tokens_visits atv\n                    ON\n                        ds.visit_date = DATE(atv.visited_at)\n                    WHERE\n                        ds.visit_date >= NOW()::date - INTERVAL '30 days'\n                    GROUP BY\n                        ds.visit_date\n                    ORDER BY\n                        ds.visit_date\n                )\n                SELECT json_object_agg(\n                    TO_CHAR(visit_date, 'YYYY-MM-DD'),\n                    visit_count\n                ) AS visits\n                FROM aggregated_visits\n            )\n            as \"visits_30_days!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total_entities!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "total_comments!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "pending_entities!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "pending_comments!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "total_visits_30_days!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "total_visits_7_days!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "visits_30_days!",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "27436785b3afa62ffc9ea51931d7b0ff0918b477604df009b90c575f412740aa"
+}
