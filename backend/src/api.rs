@@ -129,13 +129,10 @@ impl AppState {
 
         loop {
             while let Some(notification) = listener.try_recv().await? {
-                tracing::info!(
-                    "Received notification on channel {}",
-                    notification.channel()
-                );
-
                 match notification.channel() {
                     "reload_options" => {
+                        tracing::info!("Received notification to reload options");
+
                         self.reload_data(
                             &mut self
                                 .pool
@@ -145,7 +142,12 @@ impl AppState {
                         )
                         .await;
                     }
-                    _ => {}
+                    _ => {
+                        tracing::warn!(
+                            "Received notification from unknown channel : {:?}",
+                            notification.channel()
+                        )
+                    }
                 }
             }
         }
