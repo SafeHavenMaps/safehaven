@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, NoneAsEmptyString};
 use tokio::task;
 use utoipa::ToSchema;
+use uuid::Uuid;
 
 pub fn routes() -> Router<AppState> {
     Router::new()
@@ -63,6 +64,9 @@ pub struct BootstrapResponse {
     signed_token: String,
     families: Vec<Family>,
     categories: Vec<Category>,
+    allowed_categories: Vec<Uuid>,
+    allowed_tags: Vec<Uuid>,
+    can_access_comments: bool,
     tags: Vec<Tag>,
     cartography_init_config: CartographyInitConfig,
 }
@@ -108,24 +112,18 @@ async fn boostrap(
 
     let families = match perms.families_policy.allow_all {
         true => Family::list(&mut conn).await?,
-        false => Family::list_restricted(perms.families_policy.allow_list, &mut conn).await?,
+        false => Family::list_restricted(&perms.families_policy.allow_list, &mut conn).await?,
     };
     tracing::trace!("Loaded {} families", families.len());
 
     let families_ids: Vec<_> = families.iter().map(|f| f.id).collect();
 
-    let categories = match perms.categories_policy.allow_all {
-        true => Category::list_with_families(families_ids, &mut conn).await?,
-        false => {
-            Category::list_restricted(perms.categories_policy.allow_list, families_ids, &mut conn)
-                .await?
-        }
-    };
+    let categories = Category::list_with_families(families_ids, &mut conn).await?;
     tracing::trace!("Loaded {} categories", categories.len());
 
     let tags = match perms.tags_policy.allow_all {
         true => Tag::list(&mut conn).await?,
-        false => Tag::list_restricted(perms.tags_policy.allow_list, &mut conn).await?,
+        false => Tag::list_restricted(&perms.tags_policy.allow_list, &mut conn).await?,
     };
     tracing::trace!("Loaded {} tags", tags.len());
 
@@ -141,10 +139,37 @@ async fn boostrap(
 
     let dyn_config = app_state.dyn_config.read().await;
 
+    let allowed_categories = match perms.categories_policy.allow_all {
+        true => categories
+            .iter()
+            .map(|c| c.id)
+            .filter(|id| {
+                perms
+                    .categories_policy
+                    .force_exclude
+                    .iter()
+                    .all(|f| f != id)
+            })
+            .collect(),
+        false => perms.categories_policy.allow_list.clone(),
+    };
+
+    let allowed_tags = match perms.tags_policy.allow_all {
+        true => tags
+            .iter()
+            .map(|t| t.id)
+            .filter(|id| perms.tags_policy.force_exclude.iter().all(|f| f != id))
+            .collect(),
+        false => perms.tags_policy.allow_list.clone(),
+    };
+
     let resp = BootstrapResponse {
         signed_token,
         families,
         categories,
+        allowed_categories,
+        allowed_tags,
+        can_access_comments: perms.can_access_comments,
         tags,
         cartography_init_config: dyn_config.cartography_init.clone(),
     };

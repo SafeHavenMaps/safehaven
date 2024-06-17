@@ -15,6 +15,7 @@ WITH transitive_locations AS (
         SELECT value, ordinality
         FROM jsonb_array_elements(e.locations) WITH ORDINALITY AS location(value, ordinality)
     ) AS parent_location ON true
+    WHERE e.moderated
 ),
 -- For each location of each entity, get a row with the entity and its location
 direct_locations AS (
@@ -38,6 +39,7 @@ direct_locations AS (
         SELECT value, ordinality
         FROM jsonb_array_elements(e.locations) WITH ORDINALITY AS location(value, ordinality)
     ) AS location ON true
+    WHERE e.moderated
     GROUP BY e.id, c.family_id, e.display_name, e.category_id, location.value, location.ordinality
 )
 -- Add the entities with their locations to the materialized view

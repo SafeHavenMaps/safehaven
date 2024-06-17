@@ -124,7 +124,7 @@ impl Tag {
     }
 
     pub async fn list_restricted(
-        ids: Vec<Uuid>,
+        ids: &Vec<Uuid>,
         conn: &mut PgConnection,
     ) -> Result<Vec<Tag>, AppError> {
         sqlx::query_as!(

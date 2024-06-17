@@ -269,7 +269,7 @@ impl Family {
     }
 
     pub async fn list_restricted(
-        ids: Vec<Uuid>,
+        ids: &Vec<Uuid>,
         conn: &mut PgConnection,
     ) -> Result<Vec<Family>, AppError> {
         sqlx::query_as!(

@@ -3111,10 +3111,30 @@
           "signed_token",
           "families",
           "categories",
+          "allowed_categories",
+          "allowed_tags",
+          "can_access_comments",
           "tags",
           "cartography_init_config"
         ],
         "properties": {
+          "allowed_categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "allowed_tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "can_access_comments": {
+            "type": "boolean"
+          },
           "cartography_init_config": {
             "$ref": "#/components/schemas/CartographyInitConfig"
           },
@@ -3923,7 +3943,8 @@
           "id",
           "display_name",
           "category_id",
-          "created_at"
+          "created_at",
+          "tags"
         ],
         "properties": {
           "category_id": {
@@ -3940,6 +3961,13 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },

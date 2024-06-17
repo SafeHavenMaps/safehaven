@@ -29,6 +29,7 @@ pub struct PublicListedEntity {
     pub display_name: String,
     pub category_id: Uuid,
     pub created_at: chrono::NaiveDateTime,
+    pub tags: Vec<Uuid>,
 }
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
 pub struct PublicEntity {
@@ -139,7 +140,14 @@ impl PublicEntity {
         sqlx::query_as!(
             PublicListedEntity,
             r#"
-            SELECT e.id, e.display_name, e.category_id, e.created_at
+            SELECT e.id,
+            e.display_name,
+            e.category_id,
+            e.created_at,
+                COALESCE(
+                    (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
+                    array[]::uuid[]
+                ) as "tags!"
             FROM entities e
             INNER JOIN entities_entities ee ON e.id = ee.child_id
             WHERE ee.parent_id = $1
@@ -158,7 +166,14 @@ impl PublicEntity {
         sqlx::query_as!(
             PublicListedEntity,
             r#"
-            SELECT e.id, e.display_name, e.category_id, e.created_at
+            SELECT e.id,
+            e.display_name,
+            e.category_id,
+            e.created_at,
+                COALESCE(
+                    (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
+                    array[]::uuid[]
+                ) as "tags!"
             FROM entities e
             INNER JOIN entities_entities ee ON e.id = ee.parent_id
             WHERE ee.child_id = $1

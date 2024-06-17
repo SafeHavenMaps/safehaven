@@ -264,6 +264,8 @@ async fn viewer_fetch_entity(
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<FetchedEntity>, AppError> {
     let entity = PublicEntity::get(id, &mut conn).await?;
+    let parents = PublicEntity::get_parents(id, &mut conn).await?;
+    let children = PublicEntity::get_children(id, &mut conn).await?;
 
     let can_read_entity = (token.perms.families_policy.allow_all
         || token
@@ -283,7 +285,41 @@ async fn viewer_fetch_entity(
                 .iter()
                 .all(|tag| token.perms.tags_policy.allow_list.contains(tag)));
 
-    if !can_read_entity {
+    let filtered_children: Vec<PublicListedEntity> = children
+        .into_iter()
+        .filter(|child| {
+            (token.perms.categories_policy.allow_all
+                || token
+                    .perms
+                    .categories_policy
+                    .allow_list
+                    .contains(&child.category_id))
+                && (token.perms.tags_policy.allow_all
+                    || child
+                        .tags
+                        .iter()
+                        .all(|tag| token.perms.tags_policy.allow_list.contains(tag)))
+        })
+        .collect();
+
+    let filtered_parents: Vec<PublicListedEntity> = parents
+        .into_iter()
+        .filter(|parent| {
+            (token.perms.categories_policy.allow_all
+                || token
+                    .perms
+                    .categories_policy
+                    .allow_list
+                    .contains(&parent.category_id))
+                && (token.perms.tags_policy.allow_all
+                    || parent
+                        .tags
+                        .iter()
+                        .all(|tag| token.perms.tags_policy.allow_list.contains(tag)))
+        })
+        .collect();
+
+    if !can_read_entity && filtered_children.len() == 0 {
         return Err(AppError::Unauthorized);
     }
 
@@ -292,13 +328,10 @@ async fn viewer_fetch_entity(
         false => vec![],
     };
 
-    let parents = PublicEntity::get_parents(id, &mut conn).await?;
-    let children = PublicEntity::get_children(id, &mut conn).await?;
-
     Ok(AppJson(FetchedEntity {
         entity,
         comments,
-        parents,
-        children,
+        parents: filtered_parents,
+        children: filtered_children,
     }))
 }

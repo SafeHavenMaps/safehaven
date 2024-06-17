@@ -19,6 +19,9 @@ type ViewData = {
   clusters: DisplayableCluster[]
 }
 
+type AllowedCategory = Category & { allowed: boolean }
+type AllowedTag = Tag & { allowed: boolean }
+
 export class AppState {
   initialized = false
 
@@ -31,9 +34,10 @@ export class AppState {
   private initConfig: InitConfig | null = null
 
   private familiesData: Family[] | null = null
-  private categoriesData: Category[] | null = null
-  private tagsData: Tag[] | null = null
+  private categoriesData: AllowedCategory[] | null = null
+  private tagsData: AllowedTag[] | null = null
   private cartographyInitConfigData: CartographyInitConfig | null = null
+  private canAccessCommentsData = false
 
   private familiesLookupTable: Record<string, Family> = {}
   private categoriesLookupTable: Record<string, Category> = {}
@@ -57,6 +61,10 @@ export class AppState {
 
   get activeRequiredTags() {
     return this.filteringTags.filter(t => t.active).map(t => t.id)
+  }
+
+  get canAccessComments() {
+    return this.canAccessCommentsData
   }
 
   get activeHiddenTags() {
@@ -91,7 +99,7 @@ export class AppState {
   set activeFamily(family: Family) {
     this.activeFamilyId = family.id
     this.filteringCategories = this.categories
-      .filter(c => c.family_id === family.id)
+      .filter(c => c.family_id === family.id && c.allowed)
       .map((c) => {
         return {
           ...c,
@@ -166,10 +174,22 @@ export class AppState {
       .sort((a, b) => a.sort_order - b.sort_order)
 
     this.categoriesData = data.categories
+      .map((category) => {
+        return {
+          ...category,
+          allowed: data.allowed_categories.includes(category.id),
+        }
+      })
       .sort((a, b) => a.title.localeCompare(b.title))
 
-    this.tagsData = data.tags
+    this.tagsData = data.tags.map((tag) => {
+      return {
+        ...tag,
+        allowed: data.allowed_tags.includes(tag.id),
+      }
+    })
     this.filteringTags = this.tagsData
+      .filter(tag => tag.allowed)
       .map((tag) => {
         return {
           ...tag,
@@ -190,6 +210,8 @@ export class AppState {
       this.tagsLookupTable[tag.id] = tag
     })
 
+    this.canAccessCommentsData = data.can_access_comments
+
     if (this.familiesData.length === 0) {
       throw new Error('No families available')
     }
@@ -203,7 +225,7 @@ export class AppState {
     return this.familiesData!
   }
 
-  get categories(): Category[] {
+  get categories(): AllowedCategory[] {
     return this.categoriesData!
   }
 
