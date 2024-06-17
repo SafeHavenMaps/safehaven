@@ -23,6 +23,7 @@
     <Sidebar
       v-model:visible="state.hasActiveEntity"
       :modal="false"
+      :dismissable="false"
       :style="fitContainer()"
       position="left"
       class="w-full md:w-20rem lg:w-30rem"
@@ -36,6 +37,11 @@
           <h3 class="m-0">
             {{ state.activeEntity!.entity.display_name }}
           </h3>
+
+          <ViewerCommentAddForm
+            :family="state.activeEntity!.family"
+            :entity="state.activeEntity!.entity"
+          />
         </div>
       </template>
 

@@ -1,6 +1,8 @@
 <template>
   <div>
-    <TabView>
+    <TabView
+      v-model:activeIndex="active"
+    >
       <TabPanel
         v-if="hasChildren()"
         header="Rattachés"
@@ -135,11 +137,6 @@
           :comments="props.entity.comments"
           :comment-form-fields="props.entity!.family.comment_form.fields"
         />
-
-        <ViewerCommentAddForm
-          :family="props.entity.family"
-          :entity="props.entity.entity"
-        />
       </TabPanel>
     </TabView>
   </div>
@@ -156,6 +153,8 @@ const props = defineProps<{
 const emits = defineEmits<{
   entitySelected: [string]
 }>()
+
+const active = ref(0)
 
 function getCategory(id: string) {
   return props.categories.find(c => c.id === id)!
@@ -194,4 +193,11 @@ function hasParent() {
 function newEntitySelected(id: string) {
   emits('entitySelected', id)
 }
+
+watch(
+  () => props.entity,
+  (__, _) => {
+    active.value = 0
+  },
+)
 </script>

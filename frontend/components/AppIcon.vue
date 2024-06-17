@@ -45,6 +45,7 @@ const iconDict: Record<string, string> = {
   pendingEntity: mdi.mdiMapMarkerAlert,
   comment: mdi.mdiCommentOutline,
   pendingComment: mdi.mdiCommentAlertOutline,
+  commentAdd: mdi.mdiCommentPlusOutline,
   userGroup: mdi.mdiAccountGroup,
   accessToken: mdi.mdiLock,
   mapSearch: mdi.mdiMapSearch,
