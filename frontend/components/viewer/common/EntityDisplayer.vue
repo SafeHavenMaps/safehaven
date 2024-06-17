@@ -135,6 +135,11 @@
           :comments="props.entity.comments"
           :comment-form-fields="props.entity!.family.comment_form.fields"
         />
+
+        <ViewerCommentAddForm
+          :family="props.entity.family"
+          :entity="props.entity.entity"
+        />
       </TabPanel>
     </TabView>
   </div>

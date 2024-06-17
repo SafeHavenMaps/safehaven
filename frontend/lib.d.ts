@@ -16,6 +16,7 @@ export type Tag = api.components['schemas']['Tag']
 export type PublicEntity = api.components['schemas']['PublicEntity']
 export type PublicListedEntity = api.components['schemas']['ListedEntity']
 export type PublicNewEntity = api.components['schemas']['NewEntity']
+export type NewEntityRequest = api.components['schemas']['NewEntityRequest']
 export type Cluster = api.components['schemas']['Cluster']
 type PaginatedVec<T> = api.components['schemas']['PaginatedVec'] & { entities: T[] }
 export type ViewerCachedEntity = api.components['schemas']['ViewerCachedEntity']
@@ -46,6 +47,7 @@ export type AdminPaginatedCachedEntities = PaginatedVec<AdminCachedEntity>
 
 export type PublicComment = api.components['schemas']['PublicComment']
 export type PublicNewComment = api.components['schemas']['PublicNewComment']
+export type NewCommentRequest = api.components['schemas']['NewCommentRequest']
 export type AdminComment = api.components['schemas']['AdminComment']
 export type AdminListedComment = api.components['schemas']['AdminListedComment']
 export type AdminNewOrUpdateComment = api.components['schemas']['AdminNewOrUpdateComment']

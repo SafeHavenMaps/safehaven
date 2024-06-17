@@ -1,7 +1,7 @@
 import createClient from 'openapi-fetch'
 import type { paths } from './api'
 import createAuthMiddleware from './viewer-auth-middleware'
-import type { FetchedEntity, ViewerCachedEntityWithLocation, ViewerPaginatedCachedEntities, ViewerPaginatedCachedEntitiesWithLocation } from '~/lib'
+import type { FetchedEntity, NewCommentRequest, NewEntityRequest, PublicComment, PublicEntity, ViewerCachedEntityWithLocation, ViewerPaginatedCachedEntities, ViewerPaginatedCachedEntitiesWithLocation } from '~/lib'
 
 type Callback = () => Promise<void>
 
@@ -134,6 +134,18 @@ export default function useClient() {
       })
       if (error) throw error
 
+      return data
+    },
+
+    async createComment(comment: NewCommentRequest): Promise<PublicComment> {
+      const { data, error } = await this.rawClient.POST('/api/map/comments', { body: comment })
+      if (error) throw error
+      return data
+    },
+
+    async createEntity(entity: NewEntityRequest): Promise<PublicEntity> {
+      const { data, error } = await this.rawClient.POST('/api/map/entities', { body: entity })
+      if (error) throw error
       return data
     },
   }

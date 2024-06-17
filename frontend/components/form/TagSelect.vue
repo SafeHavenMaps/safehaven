@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Tag } from '~/lib'
+import type { Tag, TagRecord } from '~/lib'
 
 const props = defineProps<{
   modelValue: string[] | undefined | null
@@ -42,8 +42,6 @@ const emit = defineEmits(['update:modelValue'])
 function updateValue(value: undefined | string) {
   emit('update:modelValue', value)
 }
-
-type TagRecord = Record<string, Tag>
 
 const tagRecord: TagRecord = props.tags.reduce((tags, tag) => {
   tags[tag.id] = tag

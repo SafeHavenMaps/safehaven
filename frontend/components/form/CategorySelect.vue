@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Category } from '~/lib'
+import type { Category, CategoryRecord } from '~/lib'
 
 const props = defineProps<{
   modelValue: string | undefined | null
@@ -39,8 +39,6 @@ const emit = defineEmits(['update:modelValue'])
 function updateValue(value: undefined | string) {
   emit('update:modelValue', value)
 }
-
-type CategoryRecord = Record<string, Category>
 
 const categoryRecord: CategoryRecord = props.categories.reduce((categories, category) => {
   categories[category.id] = category
