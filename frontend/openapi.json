@@ -998,7 +998,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminEntity"
+                  "$ref": "#/components/schemas/AdminEntityWithRelations"
                 }
               }
             }
@@ -2760,17 +2760,26 @@
           "created_at",
           "updated_at",
           "moderated",
-          "version"
+          "version",
+          "entity_display_name",
+          "category_id"
         ],
         "properties": {
           "author": {
             "type": "string"
+          },
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
           },
           "created_at": {
             "type": "string",
             "format": "date-time"
           },
           "data": {},
+          "entity_display_name": {
+            "type": "string"
+          },
           "entity_id": {
             "type": "string",
             "format": "uuid"
@@ -2844,6 +2853,87 @@
           "moderation_notes": {
             "type": "string",
             "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AdminEntityWithRelations": {
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "category_id",
+          "family_id",
+          "locations",
+          "data",
+          "tags",
+          "hidden",
+          "moderated",
+          "version",
+          "created_at",
+          "updated_at",
+          "parents",
+          "children"
+        ],
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminListedEntity"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "data": {},
+          "display_name": {
+            "type": "string"
+          },
+          "family_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "locations": {
+            "$ref": "#/components/schemas/sqlx.types.Json"
+          },
+          "moderated": {
+            "type": "boolean"
+          },
+          "moderation_notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "parents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminListedEntity"
+            }
           },
           "tags": {
             "type": "array",
@@ -2939,10 +3029,6 @@
           },
           "moderated": {
             "type": "boolean"
-          },
-          "moderation_notes": {
-            "type": "string",
-            "nullable": true
           },
           "tags": {
             "type": "array",

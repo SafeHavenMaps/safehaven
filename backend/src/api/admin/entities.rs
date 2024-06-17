@@ -2,7 +2,9 @@ use axum::{
     extract::{Path, Query},
     Json,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use sqlx::FromRow;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -10,7 +12,7 @@ use crate::{
     api::{AppError, AppJson, DbConn},
     models::{
         comment::AdminComment,
-        entity::{AdminEntity, AdminListedEntity, AdminNewOrUpdateEntity},
+        entity::{AdminEntity, AdminListedEntity, AdminNewOrUpdateEntity, UnprocessedLocation},
         entity_cache::{
             AdminCachedEntitiesWithPagination, AdminCachedEntity, AdminSearchEntitiesRequest,
         },
@@ -30,6 +32,25 @@ pub struct AdminSearchRequest {
     pub active_categories_ids: Vec<Uuid>,
     pub required_tags_ids: Vec<Uuid>,
     pub excluded_tags_ids: Vec<Uuid>,
+}
+
+#[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
+pub struct AdminEntityWithRelations {
+    pub id: Uuid,
+    pub display_name: String,
+    pub category_id: Uuid,
+    pub family_id: Uuid,
+    pub locations: sqlx::types::Json<Vec<UnprocessedLocation>>,
+    pub data: Value,
+    pub tags: Vec<Uuid>,
+    pub hidden: bool,
+    pub moderation_notes: Option<String>,
+    pub moderated: bool,
+    pub version: i32,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
+    pub parents: Vec<AdminListedEntity>,
+    pub children: Vec<AdminListedEntity>,
 }
 
 #[utoipa::path(
@@ -107,7 +128,7 @@ pub async fn admin_entity_new(
         ("id" = Uuid, Path, description = "Entity identifier")
     ),
     responses(
-        (status = 200, description = "Entity details", body = AdminEntity),
+        (status = 200, description = "Entity details", body = AdminEntityWithRelations),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
     )
@@ -115,8 +136,32 @@ pub async fn admin_entity_new(
 pub async fn admin_entity_get(
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
-) -> Result<AppJson<AdminEntity>, AppError> {
-    Ok(AppJson(AdminEntity::get(id, &mut conn).await?))
+) -> Result<AppJson<AdminEntityWithRelations>, AppError> {
+    // Fetch the main AdminEntity
+    let admin_entity = AdminEntity::get(id, &mut conn).await?;
+    // Fetch related children and parents
+    let children = AdminEntity::get_children(id, &mut conn).await?;
+    let parents = AdminEntity::get_parents(id, &mut conn).await?;
+    // Recompose AdminEntityWithRelations
+    let admin_entity_with_relations = AdminEntityWithRelations {
+        id: admin_entity.id,
+        display_name: admin_entity.display_name,
+        category_id: admin_entity.category_id,
+        family_id: admin_entity.family_id,
+        locations: admin_entity.locations,
+        data: admin_entity.data,
+        tags: admin_entity.tags,
+        hidden: admin_entity.hidden,
+        moderation_notes: admin_entity.moderation_notes,
+        moderated: admin_entity.moderated,
+        version: admin_entity.version,
+        created_at: admin_entity.created_at,
+        updated_at: admin_entity.updated_at,
+        parents: parents,
+        children: children,
+    };
+    // Return the recomposed entity
+    Ok(AppJson(admin_entity_with_relations))
 }
 
 #[utoipa::path(

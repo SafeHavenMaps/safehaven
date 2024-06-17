@@ -1,7 +1,9 @@
 use crate::{
     api::{
         admin::{
-            self, entities::AdminSearchRequest, AdminUserTokenClaims, LoginRequest, LoginResponse,
+            self,
+            entities::{AdminEntityWithRelations, AdminSearchRequest},
+            AdminUserTokenClaims, LoginRequest, LoginResponse,
         },
         map::{
             self, FetchedEntity, NewCommentRequest, NewEntityRequest,
@@ -146,6 +148,7 @@ use utoipa::OpenApi;
         NewOrUpdateTag,
         // entities
         AdminEntity,
+        AdminEntityWithRelations,
         AdminListedEntity,
         AdminNewOrUpdateEntity,
         PublicEntity,

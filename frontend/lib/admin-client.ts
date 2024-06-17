@@ -23,6 +23,7 @@ import type {
   AdminPaginatedCachedEntities,
   AdminSearchRequestBody,
   AccessTokenStats,
+  AdminEntityWithRelations,
 } from '~/lib'
 
 // client as a closure
@@ -180,7 +181,7 @@ export default function useClient() {
       return data
     },
 
-    async getEntity(id: string): Promise<AdminEntity> {
+    async getEntity(id: string): Promise<AdminEntityWithRelations> {
       const { data, error } = await this.rawClient.GET('/api/admin/entities/{id}', {
         params: { path: { id } },
       })

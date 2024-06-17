@@ -206,7 +206,6 @@ pub struct AdminListedEntity {
     pub category_id: Uuid,
     pub tags: Vec<Uuid>,
     pub hidden: bool,
-    pub moderation_notes: Option<String>,
     pub moderated: bool,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
@@ -451,6 +450,54 @@ impl AdminEntity {
         Ok(())
     }
 
+    pub async fn get_parents(
+        given_id: Uuid,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<AdminListedEntity>, AppError> {
+        sqlx::query_as!(
+            AdminListedEntity,
+            r#"
+            SELECT e.id, e.display_name, e.category_id, e.created_at, e.hidden,
+                    e.moderated, e.updated_at,
+                    COALESCE(
+                        (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
+                        array[]::uuid[]
+                    ) as "tags!"
+                FROM entities e
+                INNER JOIN entities_entities ee ON e.id = ee.parent_id
+                WHERE ee.child_id = $1
+                "#,
+            given_id
+        )
+        .fetch_all(conn)
+        .await
+        .map_err(AppError::Database)
+    }
+
+    pub async fn get_children(
+        given_id: Uuid,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<AdminListedEntity>, AppError> {
+        sqlx::query_as!(
+            AdminListedEntity,
+            r#"
+            SELECT e.id, e.display_name, e.category_id, e.created_at, e.hidden,
+                    e.moderated, e.updated_at,
+                    COALESCE(
+                        (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
+                        array[]::uuid[]
+                    ) as "tags!"
+                FROM entities e
+                INNER JOIN entities_entities ee ON e.id = ee.child_id
+                WHERE ee.parent_id = $1
+                "#,
+            given_id
+        )
+        .fetch_all(conn)
+        .await
+        .map_err(AppError::Database)
+    }
+
     pub async fn get(given_id: Uuid, conn: &mut PgConnection) -> Result<AdminEntity, AppError> {
         sqlx::query_as!(
             AdminEntity,
@@ -479,7 +526,7 @@ impl AdminEntity {
             AdminListedEntity,
             r#"
             SELECT e.id, e.display_name, e.category_id, e.created_at, e.hidden,
-                    e.moderation_notes, e.moderated, e.updated_at,
+                    e.moderated, e.updated_at,
                     COALESCE(
                         (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                         array[]::uuid[]

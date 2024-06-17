@@ -36,6 +36,7 @@ export type ResolvedFetchedEntity = FetchedEntity & {
 
 export type AdminEntity = api.components['schemas']['AdminEntity']
 export type AdminListedEntity = api.components['schemas']['AdminListedEntity']
+export type AdminEntityWithRelations = api.components['schemas']['AdminEntityWithRelations']
 export type AdminNewOrUpdateEntity = api.components['schemas']['AdminNewOrUpdateEntity'] & {
   locations: UnprocessedLocation[]
 }
