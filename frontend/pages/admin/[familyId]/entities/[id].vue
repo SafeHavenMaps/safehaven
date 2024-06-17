@@ -95,6 +95,7 @@
           :categories="categories"
           :tags="tags"
           :family-id="familyId"
+          @update-kinship="async () => fetchedEntity = (await state.client.getEntity(entityId))"
         />
       </TabPanel>
 
@@ -142,7 +143,7 @@ const categories = computed(() => state.categories.filter(category => category.f
 
 const tags = state.tags
 
-const fetchedEntity = await state.client.getEntity(entityId)
+const fetchedEntity = ref(await state.client.getEntity(entityId))
 const entityComments = ref<AdminComment[]>([])
 async function refreshComments() {
   entityComments.value = await state.client.listEntityComments(entityId)
@@ -150,25 +151,25 @@ async function refreshComments() {
 refreshComments()
 
 // Deep copy
-const editedEntity: Ref<AdminNewOrUpdateEntity> = ref(JSON.parse(JSON.stringify(fetchedEntity)))
+const editedEntity: Ref<AdminNewOrUpdateEntity> = ref(JSON.parse(JSON.stringify(fetchedEntity.value)))
 
 const processingRequest = ref(false)
 const toast = useToast()
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  `Édition de l'entité ${fetchedEntity.display_name}`,
+  `Édition de l'entité ${fetchedEntity.value.display_name}`,
   'entity',
   [],
   [
     { label: `${family.title}`, url: '/admin/families' },
     { label: 'Entités', url: `/admin/${familyId}/entities` },
-    { label: `Édition de l'entité ${fetchedEntity.display_name}`, url: `/admin/${familyId}/entities/${entityId}` },
+    { label: `Édition de l'entité ${fetchedEntity.value.display_name}`, url: `/admin/${familyId}/entities/${entityId}` },
   ],
 )
 
 function hasBeenEdited(field: keyof AdminNewOrUpdateEntity) {
-  return editedEntity.value[field] !== fetchedEntity[field]
+  return editedEntity.value[field] !== fetchedEntity.value[field]
 }
 
 async function onSave() {
