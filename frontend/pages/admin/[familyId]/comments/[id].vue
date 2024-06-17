@@ -110,7 +110,8 @@ const family = state.families.filter(family => family.id == familyId)[0]
 const commentId = useRoute().params.id as string
 
 const fetchedComment: AdminComment = await state.client.getComment(commentId)
-const parentEntityToDisplay = ref<{ category_id: string, display_name: string }>(await state.client.getEntity(fetchedComment.entity_id))
+const parentEntityToDisplay = ref<{ category_id: string, display_name: string }>
+                                ({category_id:fetchedComment.category_id, display_name:fetchedComment.entity_display_name})
 const editedComment: Ref<AdminNewOrUpdateComment> = ref(JSON.parse(JSON.stringify(fetchedComment))) // deep copy
 
 const processingRequest = ref(false)

@@ -104,6 +104,8 @@ pub struct AdminComment {
     pub updated_at: chrono::NaiveDateTime,
     pub moderated: bool,
     pub version: i32,
+    pub entity_display_name: String,
+    pub category_id: Uuid,
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -141,9 +143,16 @@ impl AdminComment {
         sqlx::query_as!(
             AdminComment,
             r#"
-            INSERT INTO comments (entity_id, author, text, data, moderated)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated, version
+            WITH inserted AS (
+                INSERT INTO comments (entity_id, author, text, data, moderated)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING *
+            )
+            SELECT i.id, i.entity_id, i.author, i.text, i.data, i.created_at, i.updated_at, i.moderated, i.version, 
+                display_name as entity_display_name, category_id 
+            FROM inserted i
+            JOIN entities e 
+            ON e.id = entity_id
             "#,
             new_comment.entity_id,
             new_comment.author,
@@ -167,16 +176,23 @@ impl AdminComment {
         sqlx::query_as!(
             AdminComment,
             r#"
-            UPDATE comments
-            SET 
-                entity_id = $2,
-                author = $3,
-                text = $4,
-                data = $5,
-                moderated = $6,
-                version = $7
-            WHERE id = $1
-            RETURNING id, entity_id, author, text, data, created_at, updated_at, moderated, version
+            WITH inserted AS (
+                UPDATE comments
+                SET 
+                    entity_id = $2,
+                    author = $3,
+                    text = $4,
+                    data = $5,
+                    moderated = $6,
+                    version = $7
+                WHERE id = $1
+                RETURNING *
+            )
+            SELECT i.id, i.entity_id, i.author, i.text, i.data, i.created_at, i.updated_at, i.moderated, i.version, 
+                e.display_name as entity_display_name, e.category_id 
+            FROM inserted i
+            JOIN entities e 
+            ON e.id = entity_id
             "#,
             id,
             update.entity_id,
@@ -195,9 +211,11 @@ impl AdminComment {
         sqlx::query_as!(
             AdminComment,
             r#"
-            SELECT id, entity_id, author, text, data, created_at, updated_at, moderated, version
-            FROM comments
-            WHERE id = $1
+            SELECT c.id, c.entity_id, c.author, c.text, c.data, c.created_at, c.updated_at, c.moderated, c.version,
+                e.display_name as entity_display_name, e.category_id
+            FROM comments c
+            JOIN entities e ON e.id = c.entity_id
+            WHERE c.id = $1
             "#,
             given_id
         )
@@ -228,8 +246,10 @@ impl AdminComment {
         sqlx::query_as!(
             AdminComment,
             r#"
-            SELECT id, entity_id, author, text, data, created_at, updated_at, moderated, version
-            FROM comments 
+            SELECT c.id, c.entity_id, c.author, c.text, c.data, c.created_at, c.updated_at, c.moderated, c.version,
+                e.display_name as entity_display_name, e.category_id
+            FROM comments c
+            JOIN entities e ON e.id = c.entity_id
             WHERE entity_id = $1
             ORDER BY created_at
             "#,
