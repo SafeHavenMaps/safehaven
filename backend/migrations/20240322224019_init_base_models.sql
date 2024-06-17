@@ -149,6 +149,11 @@ CREATE INDEX entities_entities_child_id_idx ON entities_entities(child_id);
 CREATE OR REPLACE FUNCTION prevent_parent_as_child()
 RETURNS TRIGGER AS $$
 BEGIN
+    -- Check if the child and parent are the same
+    IF NEW.parent_id = NEW.child_id THEN
+        RAISE EXCEPTION 'sh_code_same_entity_error';
+    END IF;
+
     -- Check if the entity to be added as a child is already a parent
     IF EXISTS (
         SELECT 1 FROM entities_entities
