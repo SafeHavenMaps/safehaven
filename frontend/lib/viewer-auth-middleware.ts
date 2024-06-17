@@ -2,7 +2,7 @@ import type { Middleware } from 'openapi-fetch'
 
 export default function createAuthMiddleware(
   authToken: string,
-  onAuthError: () => void,
+  onAuthError: () => Promise<void>,
 ): Middleware {
   return {
     async onRequest(request, _options) {
@@ -12,7 +12,7 @@ export default function createAuthMiddleware(
 
     async onResponse(response, _options) {
       if (response.status === 401) {
-        onAuthError()
+        await onAuthError()
       }
       return response
     },

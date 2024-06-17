@@ -154,6 +154,10 @@ export class AppState {
     }
   }
 
+  get redirectUrl() {
+    return this.initConfig!.general.redirect_url
+  }
+
   async getSanitizedInformation() {
     if (!this.initConfig?.general.information) {
       return null
@@ -168,6 +172,17 @@ export class AppState {
   }
 
   async bootstrapWithToken(token: string) {
+    this.client.onAuthenticationFailed(async () => {
+      try {
+        await this.bootstrapWithToken(token)
+      }
+      catch {
+        if (state.redirectUrl) {
+          window.location.href = state.redirectUrl
+        }
+      }
+    })
+
     const data = await this.client.bootstrap(token)
 
     this.familiesData = data.families

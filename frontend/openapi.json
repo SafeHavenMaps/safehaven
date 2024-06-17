@@ -3524,6 +3524,11 @@
             "default": null,
             "nullable": true
           },
+          "redirect_url": {
+            "type": "string",
+            "default": null,
+            "nullable": true
+          },
           "subtitle": {
             "type": "string",
             "default": "Carte associative",

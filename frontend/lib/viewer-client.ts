@@ -3,11 +3,18 @@ import type { paths } from './api'
 import createAuthMiddleware from './viewer-auth-middleware'
 import type { FetchedEntity, ViewerCachedEntityWithLocation, ViewerPaginatedCachedEntities, ViewerPaginatedCachedEntitiesWithLocation } from '~/lib'
 
+type Callback = () => Promise<void>
+
 export default function useClient() {
   const rawClient = createClient<paths>({ baseUrl: '/' })
+  let authenticationFailed: Callback | null = null
 
   return {
     rawClient: rawClient,
+
+    onAuthenticationFailed(callback: Callback) {
+      authenticationFailed = callback
+    },
 
     async checkStatus() {
       const { data, error } = await rawClient.GET('/api/status')
@@ -22,11 +29,11 @@ export default function useClient() {
       if (error) throw error
 
       // Install auth middleware to the stack. If it fails, ejects it.
-      const authMiddleware = createAuthMiddleware(data.signed_token, () => {
+      const authMiddleware = createAuthMiddleware(data.signed_token, async () => {
         rawClient.eject(authMiddleware)
-        // ToDo: Handle lifecycle of the app when the token is invalid
-        // Maybe refresh it using the bootstrapped token?
-        // For now, the only fix is refreshing the page for the user
+        if (authenticationFailed) {
+          await authenticationFailed()
+        }
       })
       rawClient.use(authMiddleware)
 

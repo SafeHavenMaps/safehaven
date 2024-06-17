@@ -45,6 +45,7 @@ pub struct GeneralOptions {
     pub information: Option<String>,
     pub popup: Option<String>,
     pub popup_check_text: Option<String>,
+    pub redirect_url: Option<String>,
 }
 
 impl OptionConfig for GeneralOptions {
@@ -62,6 +63,7 @@ impl Default for GeneralOptions {
             information: None,
             popup: None,
             popup_check_text: None,
+            redirect_url: None,
         }
     }
 }
