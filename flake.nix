@@ -211,7 +211,7 @@
           config = {
             Cmd = ["/bin/safehaven" "serve"];
             Env = [
-              "SAFEHAVEN_SERVE_PUBLIC_PATH=/usr/share/safehaven/static"
+              "SH__SERVE_PUBLIC_PATH=/usr/share/safehaven/static"
             ];
             ExposedPorts = {"28669/tcp" = {};};
           };
