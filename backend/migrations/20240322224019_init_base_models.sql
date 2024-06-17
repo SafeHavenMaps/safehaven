@@ -227,3 +227,17 @@ CREATE TRIGGER check_and_increment_version_families
 BEFORE UPDATE ON families
 FOR EACH ROW
 EXECUTE FUNCTION check_and_increment_version();
+
+-- Trigger for options, notify the backend to reload the options
+CREATE OR REPLACE FUNCTION notify_backend_reload_options()
+RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM pg_notify('reload_options', '');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER notify_backend_reload_options_trigger
+AFTER INSERT OR UPDATE OR DELETE ON options
+FOR EACH STATEMENT
+EXECUTE FUNCTION notify_backend_reload_options();

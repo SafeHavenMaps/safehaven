@@ -78,7 +78,6 @@ pub async fn admin_options_update(
     }
 
     SafeHavenOptions::insert_or_update_config(&mut conn, config).await;
-    app_state.reload_data(&mut conn).await;
 
     let dyn_config = app_state.dyn_config.read().await.clone();
 
@@ -107,7 +106,6 @@ pub async fn admin_options_delete(
     }
 
     SafeHavenOptions::delete(&mut conn, name).await?;
-    app_state.reload_data(&mut conn).await;
 
     let dyn_config = app_state.dyn_config.read().await.clone();
 

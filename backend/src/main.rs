@@ -6,6 +6,7 @@ mod models;
 use api::AppState;
 use axum::{extract::MatchedPath, http::Request, Router};
 use clap::{arg, command, Args, Parser, Subcommand};
+use config::SafeHavenConfig;
 use std::fs;
 use std::{process::exit, sync::Arc};
 use tokio::net::TcpListener;
@@ -80,31 +81,7 @@ fn openapi(args: &OpenapiArgs) {
     tracing::info!("OpenAPI file saved to {}", args.path);
 }
 
-async fn serve(args: &ServeArgs) {
-    tracing_subscriber::registry()
-        .with(
-            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                if cfg!(debug_assertions) {
-                    // Development build
-                    "safehaven=trace,tower_http=debug,axum::rejection=trace"
-                } else {
-                    // Release build
-                    "safehaven=info,tower_http=info,axum::rejection=warn"
-                }
-                .into()
-            }),
-        )
-        .with(tracing_subscriber::fmt::layer())
-        .init();
-
-    let config = config::load(args.config.as_str()).unwrap_or_else(|e| {
-        tracing::error!("Cannot load configuration: {}", e);
-        exit(1);
-    });
-
-    let config = Arc::new(config);
-    let app_state = AppState::from_config(config.clone()).await;
-
+async fn build_server(app_state: AppState, config: Arc<SafeHavenConfig>) {
     tracing::info!("Starting server at {}", config.listen_addr);
 
     let mut app = Router::new()
@@ -141,5 +118,40 @@ async fn serve(args: &ServeArgs) {
     }
 
     let listener = TcpListener::bind(&config.listen_addr).await.unwrap();
+
     axum::serve(listener, app).await.unwrap();
+}
+
+async fn serve(args: &ServeArgs) {
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+                if cfg!(debug_assertions) {
+                    // Development build
+                    "safehaven=trace,tower_http=debug,axum::rejection=trace"
+                } else {
+                    // Release build
+                    "safehaven=info,tower_http=info,axum::rejection=warn"
+                }
+                .into()
+            }),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
+    let config = config::load(args.config.as_str()).unwrap_or_else(|e| {
+        tracing::error!("Cannot load configuration: {}", e);
+        exit(1);
+    });
+
+    let config = Arc::new(config);
+    let app_state = AppState::from_config(config.clone()).await;
+
+    let server = build_server(app_state.clone(), config);
+    let db_notifier = app_state.listen_postgresql_events();
+
+    tokio::select! {
+        _ = server => {},
+        _ = db_notifier => {},
+    }
 }

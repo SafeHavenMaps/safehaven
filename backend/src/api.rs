@@ -23,7 +23,10 @@ use axum_extra::{
     TypedHeader,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{postgres::PgPoolOptions, PgConnection, Pool, Postgres};
+use sqlx::{
+    postgres::{PgListener, PgPoolOptions},
+    PgConnection, Pool, Postgres,
+};
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::sync::RwLock;
 use utoipa::ToSchema;
@@ -103,8 +106,53 @@ impl AppState {
         }
     }
 
+    pub async fn listen_postgresql_events(&self) {
+        loop {
+            match self.internal_listen().await {
+                Ok(_) => break,
+                Err(e) => {
+                    tracing::error!("Error listening for PostgreSQL notifications: {:?}", e);
+                }
+            }
+
+            // Sleep for 10 seconds to try to reconnect if something goes wrong
+            tokio::time::sleep(Duration::from_secs(10)).await;
+        }
+    }
+
+    async fn internal_listen(&self) -> Result<(), sqlx::Error> {
+        let mut listener = PgListener::connect_with(&self.pool).await?;
+
+        listener.listen("reload_options").await?;
+
+        tracing::info!("Listening for PostgreSQL notifications");
+
+        loop {
+            while let Some(notification) = listener.try_recv().await? {
+                tracing::info!(
+                    "Received notification on channel {}",
+                    notification.channel()
+                );
+
+                match notification.channel() {
+                    "reload_options" => {
+                        self.reload_data(
+                            &mut self
+                                .pool
+                                .acquire()
+                                .await
+                                .expect("Couldn't acquire connection"),
+                        )
+                        .await;
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+
     /// Reload the dynamic configuration from the database
-    pub async fn reload_data(&self, conn: &mut PgConnection) {
+    async fn reload_data(&self, conn: &mut PgConnection) {
         let mut dyn_config = self.dyn_config.write().await;
         *dyn_config = SafeHavenOptions::load(conn).await;
     }
