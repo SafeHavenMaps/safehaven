@@ -16,7 +16,7 @@ use uuid::Uuid;
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/status", get(status))
-        .route("/bootstrap/:token", get(boostrap))
+        .route("/bootstrap/:token", get(bootstrap))
 }
 
 #[derive(Serialize, ToSchema)]
@@ -89,7 +89,7 @@ pub struct BootstrapQueryParams {
         (status = 200, description = "Bootstraping data", body = BootstrapResponse)
     )
 )]
-async fn boostrap(
+async fn bootstrap(
     State(app_state): State<AppState>,
     Path(token): Path<String>,
     Query(query): Query<BootstrapQueryParams>,
@@ -103,7 +103,7 @@ async fn boostrap(
 
     tracing::trace!("Bootstrapping: found access token");
 
-    let signed_token = app_state.generate_token(MapUserTokenClaims {
+    let signed_token = app_state.generate_refresh_token(MapUserTokenClaims {
         iat: Utc::now().timestamp() as usize,
         exp: (Utc::now() + TimeDelta::try_minutes(5).expect("valid duration")).timestamp() as usize,
         perms: perms.clone(),

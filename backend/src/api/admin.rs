@@ -1,4 +1,5 @@
 pub mod access_tokens;
+pub mod auth;
 pub mod categories;
 pub mod comments;
 pub mod entities;
@@ -10,24 +11,18 @@ pub mod users;
 
 use crate::api::{AppError, AppJson, AppState, DbConn};
 use crate::models::user::User;
-use axum::async_trait;
-use axum::extract::{FromRequestParts, Request, State};
-use axum::http::request::Parts;
-use axum::middleware::{self, Next};
+use axum::extract::State;
+use axum::middleware;
 use axum::response::{IntoResponse, Response};
 use axum::{
     routing::{delete, get, post, put, Router},
     Json,
 };
-use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
-use chrono::{TimeDelta, Utc};
+use axum_extra::extract::cookie::CookieJar;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use uuid::Uuid;
 
-// Consts
-const TOKEN_COOKIE_NAME: &str = "token";
-const REFRESH_TOKEN_COOKIE_NAME: &str = "refresh_token";
+pub use auth::AdminUserIdentity;
 
 pub fn routes(state: &AppState) -> Router<AppState> {
     let unauthenticated_router: Router<AppState> = Router::new()
@@ -145,124 +140,12 @@ pub fn routes(state: &AppState) -> Router<AppState> {
         )
         .route_layer(middleware::from_fn_with_state(
             state.clone(),
-            authentication_middleware,
+            auth::authentication_middleware,
         ));
 
     Router::new()
         .merge(authenticated_router)
         .merge(unauthenticated_router)
-}
-
-async fn authentication_middleware(
-    State(app_state): State<AppState>,
-    DbConn(mut conn): DbConn,
-    cookies: CookieJar,
-    mut request: Request,
-    next: Next,
-) -> Result<Response, AppError> {
-    // Get the token from the cookies
-    let token = cookies
-        .get(TOKEN_COOKIE_NAME)
-        .ok_or(AppError::Unauthorized)?
-        .value();
-
-    // Decode the token
-    let token_data = jsonwebtoken::decode::<AdminUserTokenClaims>(
-        token,
-        &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
-        &jsonwebtoken::Validation::default(),
-    );
-
-    let (token_data, new_token) = match token_data {
-        // If the token is valid we just return the claims
-        Ok(data) => (data.claims, false),
-
-        // If the token is invalid we try to use the refresh token to generate a new one
-        // If the refresh token is invalid we return an error
-        Err(_) => {
-            let refresh_token = cookies
-                .get(REFRESH_TOKEN_COOKIE_NAME)
-                .ok_or(AppError::Unauthorized)?
-                .value();
-
-            let refresh_token_data = match jsonwebtoken::decode::<AdminRefreshUserTokenClaims>(
-                refresh_token,
-                &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
-                &jsonwebtoken::Validation::default(),
-            ) {
-                Ok(data) => data.claims,
-                Err(_) => {
-                    let purged_jar = expire_cookies(cookies);
-                    return Ok((purged_jar, AppError::Unauthorized).into_response());
-                }
-            };
-
-            match User::get(refresh_token_data.admin_id, &mut conn).await {
-                Ok(user) => {
-                    let new_token_data = create_user_claim(&user);
-                    (new_token_data, true)
-                }
-                // if the user is not found, clear the cookie jar
-                Err(AppError::Database(sqlx::Error::RowNotFound)) => {
-                    let purged_jar = expire_cookies(cookies);
-                    return Ok((purged_jar, AppError::Unauthorized).into_response());
-                }
-                Err(err) => return Err(err),
-            }
-        }
-    };
-
-    // put the token claims in the request
-    request.extensions_mut().insert(token_data.clone());
-
-    // Execute the chain
-    let response = next.run(request).await;
-
-    match new_token {
-        // If a new token is generated we need to set it in the response
-        true => {
-            let auth_cookie = create_user_cookie(token_data, &app_state);
-            let jar = cookies.remove(TOKEN_COOKIE_NAME).add(auth_cookie);
-            Ok((jar, response).into_response())
-        }
-
-        // Otherwise we just return the response
-        false => Ok(response),
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
-pub struct AdminUserTokenClaims {
-    pub admin_id: Uuid,
-    pub username: String,
-    pub is_admin: bool,
-    pub exp: usize,
-    pub iat: usize,
-}
-
-#[async_trait]
-impl<S> FromRequestParts<S> for AdminUserTokenClaims
-where
-    S: Send + Sync,
-{
-    type Rejection = AppError;
-
-    async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        // Extract the claims from the request extensions
-        let claims = parts
-            .extensions
-            .get::<AdminUserTokenClaims>()
-            .ok_or(AppError::Unauthorized)?;
-
-        Ok(claims.clone())
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct AdminRefreshUserTokenClaims {
-    pub admin_id: Uuid,
-    pub exp: usize,
-    pub iat: usize,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -277,33 +160,19 @@ pub struct LoginResponse {
     is_admin: bool,
 }
 
-struct AppJsonWCookies<T> {
-    pub body: T,
-    pub jar: CookieJar,
-}
-
-impl<T> IntoResponse for AppJsonWCookies<T>
-where
-    axum::Json<T>: IntoResponse,
-{
-    fn into_response(self) -> Response {
-        (self.jar, axum::Json(self.body)).into_response()
-    }
-}
-
 #[utoipa::path(
     get,
     path = "/api/admin/session",
     responses(
-        (status = 200, description = "Check login", body = AdminUserTokenClaims),
+        (status = 200, description = "Check login", body = AdminUserIdentity),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
 async fn admin_login_check(
-    token_claims: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(_conn): DbConn,
-) -> Result<AppJson<AdminUserTokenClaims>, AppError> {
-    Ok(AppJson(token_claims))
+) -> Result<AppJson<AdminUserIdentity>, AppError> {
+    Ok(AppJson(user))
 }
 
 #[utoipa::path(
@@ -311,27 +180,26 @@ async fn admin_login_check(
     path = "/api/admin/session",
     request_body = LoginRequest,
     responses(
-        (status = 200, description = "Login", body = LoginResponse, headers(("Set-Cookie" = CookieJar, description = "Cookie jar with auth cookie inside"))),
+        (status = 200, description = "Login and set cookies", body = LoginResponse),
         (status = 404, description = "User or password not found", body = ErrorResponse),
     )
 )]
 async fn admin_login(
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
+    jar: CookieJar,
     Json(request): Json<LoginRequest>,
-) -> Result<AppJsonWCookies<LoginResponse>, AppError> {
-    let auth_user = User::authenticate(request.username, request.password, &mut conn).await?;
+) -> Response {
+    let auth_user = match User::authenticate(request.username, request.password, &mut conn).await {
+        Ok(auth_user) => auth_user,
+        Err(err) => return err.into_response(),
+    };
 
-    let auth_cookie = create_user_cookie(create_user_claim(&auth_user), &app_state);
-    let refresh_cookie = create_refresh_cookie(auth_user.id, &app_state);
-    let jar = CookieJar::new().add(auth_cookie).add(refresh_cookie);
-
-    Ok(AppJsonWCookies {
-        body: LoginResponse {
-            is_admin: auth_user.is_admin,
-        },
-        jar,
-    })
+    let new_cookies = auth::login(&app_state, jar, &auth_user, request.remember_me);
+    let body = LoginResponse {
+        is_admin: auth_user.is_admin,
+    };
+    (new_cookies, axum::Json(body)).into_response()
 }
 
 #[utoipa::path(
@@ -343,61 +211,5 @@ async fn admin_login(
     )
 )]
 async fn admin_logout(cookies: CookieJar) -> Response {
-    expire_cookies(cookies).into_response()
-}
-
-fn expire_cookies(cookies: CookieJar) -> CookieJar {
-    cookies
-        .remove(TOKEN_COOKIE_NAME)
-        .remove(REFRESH_TOKEN_COOKIE_NAME)
-        .add(
-            Cookie::build((TOKEN_COOKIE_NAME, ""))
-                .path("/api/admin/")
-                .http_only(true)
-                .same_site(SameSite::Strict)
-                .removal(),
-        )
-        .add(
-            Cookie::build((REFRESH_TOKEN_COOKIE_NAME, ""))
-                .path("/api/admin/")
-                .http_only(true)
-                .same_site(SameSite::Strict)
-                .removal(),
-        )
-}
-
-fn create_user_claim(user: &User) -> AdminUserTokenClaims {
-    AdminUserTokenClaims {
-        admin_id: user.id,
-        username: user.name.clone(),
-        is_admin: user.is_admin,
-        iat: Utc::now().timestamp() as usize,
-        exp: (Utc::now() + TimeDelta::try_hours(1).expect("valid duration")).timestamp() as usize,
-    }
-}
-
-fn create_user_cookie<'a>(claims: AdminUserTokenClaims, app_state: &AppState) -> Cookie<'a> {
-    let token = app_state.generate_token(claims);
-
-    Cookie::build((TOKEN_COOKIE_NAME, token))
-        .path("/api/admin/")
-        .secure(app_state.config.secure_cookie)
-        .http_only(true)
-        .same_site(SameSite::Strict)
-        .build()
-}
-
-fn create_refresh_cookie<'a>(user_id: Uuid, app_state: &AppState) -> Cookie<'a> {
-    let token = app_state.generate_token(AdminRefreshUserTokenClaims {
-        admin_id: user_id,
-        iat: Utc::now().timestamp() as usize,
-        exp: (Utc::now() + TimeDelta::try_days(7).expect("valid duration")).timestamp() as usize,
-    });
-
-    Cookie::build((REFRESH_TOKEN_COOKIE_NAME, token))
-        .path("/api/admin/")
-        .secure(app_state.config.secure_cookie)
-        .http_only(true)
-        .same_site(SameSite::Strict)
-        .build()
+    auth::expire_cookies(cookies).into_response()
 }

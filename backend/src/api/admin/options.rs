@@ -5,7 +5,7 @@ use crate::{
     models::options::{ConfigurationOption, SafeHavenOptions},
 };
 
-use super::AdminUserTokenClaims;
+use super::auth::AdminUserIdentity;
 
 #[utoipa::path(
     get,
@@ -44,7 +44,7 @@ where
 )]
 pub async fn admin_options_update(
     Path(name): Path<String>,
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
     raw_body: axum::body::Bytes,
@@ -69,7 +69,7 @@ pub async fn admin_options_update(
         }
     };
 
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
@@ -98,11 +98,11 @@ pub async fn admin_options_update(
 )]
 pub async fn admin_options_delete(
     Path(name): Path<String>,
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
 ) -> Result<AppJson<SafeHavenOptions>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 

@@ -6,7 +6,7 @@ use crate::{
     models::user::{NewOrUpdatedUser, User},
 };
 
-use super::AdminUserTokenClaims;
+use super::auth::AdminUserIdentity;
 
 #[utoipa::path(
     get,
@@ -17,10 +17,10 @@ use super::AdminUserTokenClaims;
     )
 )]
 pub async fn admin_users_list(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
 ) -> Result<AppJson<Vec<User>>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
@@ -37,11 +37,11 @@ pub async fn admin_users_list(
     )
 )]
 pub async fn admin_user_new(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Json(new_user): Json<NewOrUpdatedUser>,
 ) -> Result<AppJson<User>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
@@ -61,11 +61,11 @@ pub async fn admin_user_new(
     )
 )]
 pub async fn admin_user_get(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<User>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
@@ -83,17 +83,17 @@ pub async fn admin_user_get(
     )
 )]
 pub async fn admin_user_change_self_password(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Json(user_with_changed_password): Json<NewOrUpdatedUser>,
 ) -> Result<AppJson<User>, AppError> {
-    if user_with_changed_password.name != token.username
-        || user_with_changed_password.is_admin != token.is_admin
+    if user_with_changed_password.name != user.username
+        || user_with_changed_password.is_admin != user.is_admin
     {
         return Err(AppError::Unauthorized);
     }
     Ok(AppJson(
-        User::update_user(token.admin_id, user_with_changed_password, &mut conn).await?,
+        User::update_user(user.admin_id, user_with_changed_password, &mut conn).await?,
     ))
 }
 
@@ -111,12 +111,12 @@ pub async fn admin_user_change_self_password(
     )
 )]
 pub async fn admin_user_update(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(updated_user): Json<NewOrUpdatedUser>,
 ) -> Result<AppJson<User>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
@@ -138,11 +138,11 @@ pub async fn admin_user_update(
     )
 )]
 pub async fn admin_user_delete(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 

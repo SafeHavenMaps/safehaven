@@ -109,7 +109,7 @@ impl AppState {
         *dyn_config = SafeHavenOptions::load(conn).await;
     }
 
-    pub fn generate_token<T>(&self, claims: T) -> String
+    pub fn generate_refresh_token<T>(&self, claims: T) -> String
     where
         T: serde::Serialize,
     {
