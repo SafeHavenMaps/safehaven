@@ -90,17 +90,8 @@
       </TabPanel>
 
       <TabPanel header="Parenté">
-        <div class="flex flex-column gap-2 max-w-30rem">
-          Ajouter/retirer parents et enfants
-
-          <Button
-            label="Ajouter parent/enfant"
-            @click="childParentSelectVisible=true"
-          />
-        </div>
-
-        <AdminInputEntitySelect
-          v-model:visible="childParentSelectVisible"
+        <AdminEntityKinshipTable
+          :main-entity="fetchedEntity"
           :categories="categories"
           :tags="tags"
           :family-id="familyId"
@@ -150,8 +141,6 @@ if (!state.tags) {
 const categories = computed(() => state.categories.filter(category => category.family_id == familyId))
 
 const tags = state.tags
-
-const childParentSelectVisible = ref(false)
 
 const fetchedEntity = await state.client.getEntity(entityId)
 const entityComments = ref<AdminComment[]>([])

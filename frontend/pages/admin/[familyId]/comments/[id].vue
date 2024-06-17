@@ -40,7 +40,7 @@
 
       <span>
         Rattaché à {{ parentEntityToDisplay.display_name }} <CategoryTag
-          :category="categoryRecord[parentEntityToDisplay.category_id]"
+          :category="state.categoryRecord[parentEntityToDisplay.category_id]"
         />
 
       </span>
@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { AdminNewOrUpdateComment, AdminComment, EntityOrCommentData, FormField, Category } from '~/lib'
+import type { AdminNewOrUpdateComment, AdminComment, EntityOrCommentData, FormField } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
@@ -118,11 +118,7 @@ const processingRequest = ref(false)
 const toast = useToast()
 
 const categories = computed(() => state.categories.filter(category => category.family_id == familyId))
-type CategoryRecord = Record<string, Category>
-const categoryRecord: CategoryRecord = state.categories.reduce((categories, category) => {
-  categories[category.id] = category
-  return categories
-}, {} as CategoryRecord)
+
 const tags = state.tags
 
 const entitySelectVisible = ref(false)

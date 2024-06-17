@@ -61,7 +61,7 @@
           </div>
 
           <div class="mt-1">
-            <CategoryTag :category="categoryRecord[result.category_id]" />
+            <CategoryTag :category="state.categoryRecord[result.category_id]" />
           </div>
         </div>
       </div>
@@ -119,12 +119,6 @@ const tagFilteringList = ref<(Tag & { active: boolean | null })[]>([])
 
 const currentEntitiesResults: Ref<AdminPaginatedCachedEntities | null> = ref(null)
 const chosenEntity = ref<AdminCachedEntity | { id: string | undefined }>({ id: props.previousEntityId })
-
-type CategoryRecord = Record<string, Category>
-const categoryRecord: CategoryRecord = state.categories.reduce((categories, category) => {
-  categories[category.id] = category
-  return categories
-}, {} as CategoryRecord)
 
 function resetSearchParams() {
   search_query.value = ''

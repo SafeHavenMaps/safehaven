@@ -55,7 +55,7 @@
         sortable
       >
         <template #body="slotProps">
-          <CategoryTag :category="categoryRecord[slotProps.data.entity_category_id]" />
+          <CategoryTag :category="state.categoryRecord[slotProps.data.entity_category_id]" />
         </template>
       </Column>
 
@@ -98,7 +98,7 @@
 import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { AdminListedComment, Category } from '~/lib'
+import type { AdminListedComment } from '~/lib'
 import state from '~/lib/admin-state'
 
 const familyId = useRoute().params.familyId as string
@@ -109,17 +109,11 @@ if (state.categories == null)
 
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 
-type CategoryRecord = Record<string, Category>
-const categoryRecord: CategoryRecord = state.categories.reduce((categories, category) => {
-  categories[category.id] = category
-  return categories
-}, {} as CategoryRecord)
-
 // Initialize the ref with an empty array, then fetch to update comments asynchronously
 const comments: Ref<AdminListedComment[]> = ref([])
 async function refreshTable() {
   comments.value = await state.client.listPendingComments()
-  comments.value = comments.value.filter(comment => categoryRecord[comment.entity_category_id].family_id === familyId)
+  comments.value = comments.value.filter(comment => state.categoryRecord[comment.entity_category_id].family_id === familyId)
   state.getEntitiesCommentsCounts()
 }
 refreshTable()

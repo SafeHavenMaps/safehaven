@@ -64,7 +64,7 @@
         header="Catégorie"
       >
         <template #body="slotProps">
-          <CategoryTag :category="categoryRecord[slotProps.data.category_id]" />
+          <CategoryTag :category="state.categoryRecord[slotProps.data.category_id]" />
         </template>
       </Column>
       <Column
@@ -77,7 +77,7 @@
           <DisplayedTag
             v-for="tag_id in slotProps.data.tags_ids.slice(0, max_tags_displayed)"
             :key="tag_id"
-            :tag="tagRecord[tag_id]"
+            :tag="state.tagRecord[tag_id]"
             class="m-1"
           />
           <Badge
@@ -124,7 +124,7 @@
       <DisplayedTag
         v-for="tag_id in tooltip_excess_tags"
         :key="tag_id"
-        :tag="tagRecord[tag_id]"
+        :tag="state.tagRecord[tag_id]"
         class="m-1"
       />
     </OverlayPanel>
@@ -145,7 +145,7 @@ import type OverlayPanel from 'primevue/overlaypanel'
 import type { PageState } from 'primevue/paginator'
 import DisplayedTag from '~/components/DisplayedTag.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
-import type { AdminPaginatedCachedEntities, Category, Tag } from '~/lib'
+import type { AdminPaginatedCachedEntities } from '~/lib'
 import state from '~/lib/admin-state'
 
 const max_tags_displayed = 2
@@ -161,19 +161,6 @@ if (state.tags == null) {
 }
 
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
-
-type CategoryRecord = Record<string, Category>
-
-const categoryRecord: CategoryRecord = state.categories.reduce((categories, category) => {
-  categories[category.id] = category
-  return categories
-}, {} as CategoryRecord)
-
-type TagRecord = Record<string, Tag>
-const tagRecord: TagRecord = state.tags.reduce((tags, tag) => {
-  tags[tag.id] = tag
-  return tags
-}, {} as TagRecord)
 
 const filters_overlay = ref<OverlayPanel>()
 const tags_tooltip = ref<OverlayPanel>()
