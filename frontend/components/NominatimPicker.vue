@@ -18,7 +18,7 @@
       </InputGroup>
     </form>
 
-    <div v-if="errorVisible">
+    <div v-if="!results.length">
       <Message severity="error">
         Aucun résultat trouvé
       </Message>
@@ -30,11 +30,12 @@
       <SingleEntityMap
         :coordinates="transformedCoordinates"
         :locked="false"
-        fill-color="#999999"
+        fill-color="#9999FF"
         border-color="#222222"
         :icon-hash="null"
         :zoom="10"
       />
+      <small class="text-secondary">Addresse : {{ results[0].display_name }}</small>
     </div>
   </div>
 </template>
@@ -42,14 +43,14 @@
 <script setup lang="ts">
 import { transform } from 'ol/proj'
 import type { UnprocessedLocation } from '~/lib'
-import { freeFormSearch } from '~/lib/nominatim'
+import { freeFormSearch, type Result } from '~/lib/nominatim'
 
 const props = defineProps<{ modelValue: UnprocessedLocation | null }>()
 const emits = defineEmits(['select'])
 
 const locationInput = ref(props.modelValue?.plain_text || '')
 const locationSelected = ref(props.modelValue)
-const errorVisible = ref(false)
+const results = ref<Result[]>([])
 
 const transformedCoordinates = computed(() => {
   if (!props.modelValue) return [0, 0]
@@ -59,16 +60,12 @@ const transformedCoordinates = computed(() => {
 })
 
 async function searchNominatim() {
-  const results = await freeFormSearch(locationInput.value)
+  results.value = await freeFormSearch(locationInput.value)
 
-  if (results.length === 0) {
-    errorVisible.value = true
-  }
-  else {
-    errorVisible.value = false
+  if (results.value.length !== 0) {
     locationSelected.value = {
-      lat: results[0].lat,
-      long: results[0].lon,
+      lat: results.value[0].lat,
+      long: results.value[0].lon,
       plain_text: locationInput.value,
     }
     emits('select', locationSelected.value)

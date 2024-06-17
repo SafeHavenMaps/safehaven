@@ -164,3 +164,7 @@ export type FieldContentMap = {
 }
 
 export type EntityOrCommentData = Record<string, FieldContentMap[FormField['field_type']]>
+
+export type FamilyRecord = Record<string, Family>
+export type CategoryRecord = Record<string, Category>
+export type TagRecord = Record<string, Tag>

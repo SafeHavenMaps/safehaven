@@ -11,6 +11,9 @@ import type {
   Category,
   NewOrUpdateTag,
   NewOrUpdateCategory,
+  CategoryRecord,
+  FamilyRecord,
+  TagRecord,
 } from '~/lib'
 
 interface Identifiable {
@@ -22,8 +25,11 @@ export class AppState {
 
   private optionsData: SafeHavenOptions | null = null
   private familiesData: Family[] | null = null
+  public familyRecord: FamilyRecord = {}
   private categoriesData: Category[] | null = null
+  public categoryRecord: CategoryRecord = {}
   private tagsData: Tag[] | null = null
+  public tagRecord: TagRecord = {}
 
   private countsByFamilyData: Record<string, number[]> = {}
   private countsByCategoryData: Record<string, number[]> = {}
@@ -103,6 +109,10 @@ export class AppState {
   // Families
   async fetchFamilies(): Promise<void> {
     this.familiesData = await this.client.listFamilies()
+    this.familyRecord = this.familiesData.reduce((families, family) => {
+      families[family.id] = family
+      return families
+    }, {} as FamilyRecord)
   }
 
   get families(): Family[] {
@@ -129,9 +139,13 @@ export class AppState {
   async fetchCategories(): Promise<void> {
     const categories = await this.client.listCategories()
     if (!this.compareIds(categories, toRaw(this.categoriesData))) {
-      this.categoriesData = categories
       this.tablesQueryParams = {}
     }
+    this.categoriesData = categories
+    this.categoryRecord = this.categories.reduce((categories, category) => {
+      categories[category.id] = category
+      return categories
+    }, {} as CategoryRecord)
   }
 
   get categories(): Category[] {
@@ -159,9 +173,13 @@ export class AppState {
   async fetchTags(): Promise<void> {
     const tags = await this.client.listTags()
     if (!this.compareIds(tags, this.tagsData)) {
-      this.tagsData = tags
       this.tablesQueryParams = {}
     }
+    this.tagsData = tags
+    this.tagRecord = this.tags.reduce((tags, tag) => {
+      tags[tag.id] = tag
+      return tags
+    }, {} as TagRecord)
   }
 
   get tags(): Tag[] {
