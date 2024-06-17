@@ -1728,7 +1728,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminUserTokenClaims"
+                  "$ref": "#/components/schemas/AdminUserIdentity"
                 }
               }
             }
@@ -1762,15 +1762,7 @@
         },
         "responses": {
           "200": {
-            "description": "Login",
-            "headers": {
-              "Set-Cookie": {
-                "schema": {
-                  "$ref": "#/components/schemas/CookieJar"
-                },
-                "description": "Cookie jar with auth cookie inside"
-              }
-            },
+            "description": "Login and set cookies",
             "content": {
               "application/json": {
                 "schema": {
@@ -2388,7 +2380,7 @@
         "tags": [
           "root"
         ],
-        "operationId": "boostrap",
+        "operationId": "bootstrap",
         "parameters": [
           {
             "name": "token",
@@ -3161,27 +3153,17 @@
           }
         }
       },
-      "AdminUserTokenClaims": {
+      "AdminUserIdentity": {
         "type": "object",
         "required": [
           "admin_id",
           "username",
-          "is_admin",
-          "exp",
-          "iat"
+          "is_admin"
         ],
         "properties": {
           "admin_id": {
             "type": "string",
             "format": "uuid"
-          },
-          "exp": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "iat": {
-            "type": "integer",
-            "minimum": 0
           },
           "is_admin": {
             "type": "boolean"
