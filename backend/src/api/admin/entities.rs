@@ -157,8 +157,8 @@ pub async fn admin_entity_get(
         version: admin_entity.version,
         created_at: admin_entity.created_at,
         updated_at: admin_entity.updated_at,
-        parents: parents,
-        children: children,
+        parents,
+        children,
     };
     // Return the recomposed entity
     Ok(AppJson(admin_entity_with_relations))

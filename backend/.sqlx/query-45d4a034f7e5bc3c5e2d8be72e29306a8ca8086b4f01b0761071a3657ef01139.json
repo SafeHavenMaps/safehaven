@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, entity_id, author, text, data, created_at, updated_at, moderated, version\n            FROM comments \n            WHERE entity_id = $1\n            ORDER BY created_at\n            ",
+  "query": "\n            WITH inserted AS (\n                INSERT INTO comments (entity_id, author, text, data, moderated)\n                VALUES ($1, $2, $3, $4, $5)\n                RETURNING *\n            )\n            SELECT i.id, i.entity_id, i.author, i.text, i.data, i.created_at, i.updated_at, i.moderated, i.version, \n                display_name as entity_display_name, category_id \n            FROM inserted i\n            JOIN entities e \n            ON e.id = entity_id\n            ",
   "describe": {
     "columns": [
       {
@@ -47,11 +47,25 @@
         "ordinal": 8,
         "name": "version",
         "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "entity_display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "category_id",
+        "type_info": "Uuid"
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Uuid",
+        "Text",
+        "Text",
+        "Jsonb",
+        "Bool"
       ]
     },
     "nullable": [
@@ -63,8 +77,10 @@
       false,
       false,
       false,
+      false,
+      false,
       false
     ]
   },
-  "hash": "68339e8f64ae7d0bcf6c1d3765eae0bbfd845e47e19d6a7928fbda8ebf38a2f9"
+  "hash": "45d4a034f7e5bc3c5e2d8be72e29306a8ca8086b4f01b0761071a3657ef01139"
 }
