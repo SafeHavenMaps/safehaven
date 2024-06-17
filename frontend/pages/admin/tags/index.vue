@@ -37,10 +37,13 @@
       class=" "
     >
       <Column
-        field="title"
         header="Titre"
         sortable
-      />
+      >
+        <template #body="slotProps">
+          <DisplayedTag :tag="slotProps.data" />
+        </template>
+      </Column>
       <Column
         v-if="state.tablesSelectedColumns[table_key].includes('Filtrage')"
         field="is_filter"

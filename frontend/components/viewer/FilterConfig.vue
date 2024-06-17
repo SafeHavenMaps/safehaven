@@ -113,11 +113,7 @@
           class="mb-2 p-1"
         >
           <div class="mb-1">
-            <Tag
-              class="mr-1 mb-1"
-            >
-              {{ tag.title }}
-            </Tag>
+            <DisplayedTag :tag="tag" />
           </div>
 
           <SelectButton
