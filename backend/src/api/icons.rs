@@ -23,7 +23,10 @@ async fn get_icon(
     if let Some(icon) = state.icon_cache.read().await.get(&hash) {
         return (
             StatusCode::OK,
-            [("Content-Type", icon.1.clone())],
+            [
+                ("Content-Type", icon.1.clone()),
+                ("Cache-Control", "public, max-age=31536000".to_owned()),
+            ],
             icon.0.clone(),
         )
             .into_response();
@@ -41,7 +44,10 @@ async fn get_icon(
 
             (
                 StatusCode::OK,
-                [("Content-Type", icon.http_mime_type.clone())],
+                [
+                    ("Content-Type", icon.http_mime_type.clone()),
+                    ("Cache-Control", "public, max-age=31536000".to_owned()),
+                ],
                 icon.data,
             )
                 .into_response()
