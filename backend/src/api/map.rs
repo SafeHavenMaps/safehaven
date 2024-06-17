@@ -319,7 +319,7 @@ async fn viewer_fetch_entity(
         })
         .collect();
 
-    if !can_read_entity && filtered_children.len() == 0 {
+    if !can_read_entity && filtered_children.is_empty() {
         return Err(AppError::Unauthorized);
     }
 
