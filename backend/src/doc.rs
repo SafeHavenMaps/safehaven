@@ -3,7 +3,7 @@ use crate::{
         admin::{
             self,
             entities::{AdminEntityWithRelations, AdminSearchRequest},
-            AdminUserTokenClaims, LoginRequest, LoginResponse,
+            AdminUserIdentity, LoginRequest, LoginResponse,
         },
         map::{
             self, FetchedEntity, NewCommentRequest, NewEntityRequest,
@@ -45,7 +45,7 @@ use utoipa::OpenApi;
 #[openapi(
     paths(
         root::status,
-        root::boostrap,
+        root::bootstrap,
         // map
         map::viewer_view_request,
         map::viewer_search_request,
@@ -120,7 +120,7 @@ use utoipa::OpenApi;
         // general
         ErrorResponse,
         // admin
-        AdminUserTokenClaims,
+        AdminUserIdentity,
         // stats
         HomePageStats,
         // root

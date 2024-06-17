@@ -12,7 +12,7 @@ use crate::{
     },
 };
 
-use super::AdminUserTokenClaims;
+use super::AdminUserIdentity;
 
 #[utoipa::path(
     get,
@@ -38,11 +38,11 @@ pub async fn admin_families_list(
     )
 )]
 pub async fn admin_family_new(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Json(new_family): Json<NewOrUpdateFamily>,
 ) -> Result<AppJson<Family>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
@@ -82,12 +82,12 @@ pub async fn admin_family_get(
     )
 )]
 pub async fn admin_family_update(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     Json(new_family): Json<NewOrUpdateFamily>,
 ) -> Result<AppJson<Family>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
@@ -108,12 +108,12 @@ pub async fn admin_family_update(
     )
 )]
 pub async fn admin_family_update_icon(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
     mut multipart: Multipart,
 ) -> Result<(), AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
@@ -151,11 +151,11 @@ pub async fn admin_family_update_icon(
     )
 )]
 pub async fn admin_family_delete(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
@@ -176,11 +176,11 @@ pub async fn admin_family_delete(
     )
 )]
 pub async fn admin_family_delete_icon(
-    token: AdminUserTokenClaims,
+    user: AdminUserIdentity,
     DbConn(mut conn): DbConn,
     Path(id): Path<Uuid>,
 ) -> Result<AppJson<()>, AppError> {
-    if !token.is_admin {
+    if !user.is_admin {
         return Err(AppError::Unauthorized);
     }
 
