@@ -20,53 +20,129 @@
     </template>
 
     <template #center>
-      <ViewerFamilySwitcher v-if="props.showFamilySwitcher" />
+      <ViewerFamilySwitcher
+        v-if="props.showFamilySwitcher"
+        class="hidden xl:block"
+      />
     </template>
 
     <template #end>
-      <div class="align-items-center">
-        <Button
-          label="Informations"
-          class="p-button-text mr-2"
-          @click="showInformation = true"
-        >
-          <template #icon>
-            <AppIcon icon-name="information" />
-          </template>
-        </Button>
-        <Button
-          label="Ajouter"
-          class="p-button-success mr-2"
-        >
-          <template #icon>
-            <AppIcon
-              icon-name="addEntity"
-              class="-ml-1 mr-1"
-            />
-          </template>
-        </Button>
-        <Button
-          v-if="props.showCategorySwitcher"
-          label="Filtres"
-          class="p-button-help mr-2"
-          @click="openFilterPanel"
-        >
-          <template #icon>
-            <AppIcon
-              icon-name="filter"
-              class="-ml-1 mr-1"
-            />
-          </template>
-        </Button>
-        <Button
-          v-if="props.showSearch"
-          class="p-button-warning mr-2"
-          @click="openSearchPanel"
-        >
-          <template #icon>
-            <AppIcon icon-name="mapSearch" />
-          </template>
-        </Button>
+      <Button
+        outlined
+        severity="primary"
+        small
+        class="p-1 mr-2 block xl:hidden"
+        @click="openOverflowPanel"
+      >
+        <template #default>
+          <AppIcon
+            icon-name="menu"
+            size="24px"
+          />
+        </template>
+      </Button>
+
+      <OverlayPanel ref="overflowPanel">
+        <div class="flex flex-column gap-3">
+          <ViewerFamilySwitcher
+            v-if="props.showFamilySwitcher"
+          />
+          <div class="flex gap-2 align-items-center">
+            <Button
+              label="Informations"
+              class="p-button-text"
+              @click="showInformation = true"
+            >
+              <template #icon>
+                <AppIcon icon-name="information" />
+              </template>
+            </Button>
+            <Button
+              label="Ajouter"
+              class="p-button-success "
+            >
+              <template #icon>
+                <AppIcon
+                  icon-name="addEntity"
+                  class="-ml-1 mr-1"
+                />
+              </template>
+            </Button>
+            <Button
+              v-if="props.showCategorySwitcher"
+              label="Filtres"
+              class="p-button-help "
+              @click="openFilterPanel"
+            >
+              <template #icon>
+                <AppIcon
+                  icon-name="filter"
+                  class="-ml-1 mr-1"
+                />
+              </template>
+            </Button>
+
+            <Button
+              v-if="props.showSearch"
+              class="p-button-warning "
+              @click="openSearchPanel"
+            >
+              <template #icon>
+                <AppIcon icon-name="mapSearch" />
+              </template>
+            </Button>
+          </div>
+        </div>
+      </OverlayPanel>
+
+      <div
+        class="justify-content-end align-items-center hidden xl:flex"
+      >
+        <div class="align-items-center">
+          <Button
+            label="Informations"
+            class="p-button-text mr-2"
+            @click="showInformation = true"
+          >
+            <template #icon>
+              <AppIcon icon-name="information" />
+            </template>
+          </Button>
+          <Button
+            label="Ajouter"
+            class="p-button-success mr-2"
+          >
+            <template #icon>
+              <AppIcon
+                icon-name="addEntity"
+                class="-ml-1 mr-1"
+              />
+            </template>
+          </Button>
+          <Button
+            v-if="props.showCategorySwitcher"
+            label="Filtres"
+            class="p-button-help mr-2"
+            @click="openFilterPanel"
+          >
+            <template #icon>
+              <AppIcon
+                icon-name="filter"
+                class="-ml-1 mr-1"
+              />
+            </template>
+          </Button>
+
+          <Button
+            v-if="props.showSearch"
+            class="p-button-warning mr-2"
+            @click="openSearchPanel"
+          >
+            <template #icon>
+              <AppIcon icon-name="mapSearch" />
+            </template>
+          </Button>
+        </div>
       </div>
     </template>
   </Toolbar>
@@ -214,6 +290,7 @@ const emit = defineEmits<{
 
 const filterOp = ref<OverlayPanel>()
 const searchOp = ref<OverlayPanel>()
+const overflowPanel = ref<OverlayPanel>()
 
 const placeSearch: Ref<string> = ref('')
 const entitySearch: Ref<string> = ref('')
@@ -232,6 +309,10 @@ function openFilterPanel(event: Event) {
 
 function openSearchPanel(event: Event) {
   searchOp!.value!.toggle(event)
+}
+
+function openOverflowPanel(event: Event) {
+  overflowPanel!.value!.toggle(event)
 }
 
 async function searchLocation() {
