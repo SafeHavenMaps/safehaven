@@ -44,13 +44,14 @@
         </Button>
 
         <OverlayPanel ref="overflowPanel">
-          <div class="flex flex-column gap-3">
+          <div class="flex flex-column  gap-3">
             <ViewerFamilySwitcher
               v-if="props.showFamilySwitcher"
             />
-            <div class="flex gap-2 align-items-center">
+
+            <div class="flex gap-2">
               <Button
-                label="Informations"
+                label="Info"
                 class="p-button-text"
                 @click="showInformation = true"
               >
@@ -58,14 +59,16 @@
                   <AppIcon icon-name="information" />
                 </template>
               </Button>
+
               <ViewerEntityAddForm
                 :family="state.activeFamily"
                 :categories="state.categories.filter(category => category.family_id == state.activeFamily.id)"
               />
+
               <Button
                 v-if="props.showCategorySwitcher"
                 label="Filtres"
-                class="p-button-help "
+                class="p-button-help"
                 @click="openFilterPanel"
               >
                 <template #icon>
@@ -78,7 +81,7 @@
 
               <Button
                 v-if="props.showSearch"
-                class="p-button-warning "
+                class="p-button-warning"
                 @click="openSearchPanel"
               >
                 <template #icon>
@@ -90,46 +93,46 @@
         </OverlayPanel>
 
         <div
-          class="justify-content-end align-items-center hidden xl:flex"
+          class="hidden xl:flex justify-content-end align-items-center gap-2"
         >
-          <div class="align-items-center">
-            <Button
-              label="Informations"
-              class="p-button-text mr-2"
-              @click="showInformation = true"
-            >
-              <template #icon>
-                <AppIcon icon-name="information" />
-              </template>
-            </Button>
-            <ViewerEntityAddForm
-              :family="state.activeFamily"
-              :categories="state.categories.filter(category => category.family_id == state.activeFamily.id)"
-            />
-            <Button
-              v-if="props.showCategorySwitcher"
-              label="Filtres"
-              class="p-button-help mr-2"
-              @click="openFilterPanel"
-            >
-              <template #icon>
-                <AppIcon
-                  icon-name="filter"
-                  class="-ml-1 mr-1"
-                />
-              </template>
-            </Button>
+          <Button
+            label="Informations"
+            class="p-button-text"
+            @click="showInformation = true"
+          >
+            <template #icon>
+              <AppIcon icon-name="information" />
+            </template>
+          </Button>
 
-            <Button
-              v-if="props.showSearch"
-              class="p-button-warning mr-2"
-              @click="openSearchPanel"
-            >
-              <template #icon>
-                <AppIcon icon-name="mapSearch" />
-              </template>
-            </Button>
-          </div>
+          <ViewerEntityAddForm
+            :family="state.activeFamily"
+            :categories="state.categories.filter(category => category.family_id == state.activeFamily.id)"
+          />
+
+          <Button
+            v-if="props.showCategorySwitcher"
+            label="Filtres"
+            class="p-button-help"
+            @click="openFilterPanel"
+          >
+            <template #icon>
+              <AppIcon
+                icon-name="filter"
+                class="-ml-1 mr-1"
+              />
+            </template>
+          </Button>
+
+          <Button
+            v-if="props.showSearch"
+            class="p-button-warning"
+            @click="openSearchPanel"
+          >
+            <template #icon>
+              <AppIcon icon-name="mapSearch" />
+            </template>
+          </Button>
         </div>
       </div>
     </template>

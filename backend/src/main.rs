@@ -1,6 +1,7 @@
 mod api;
 mod config;
 mod doc;
+mod helpers;
 mod models;
 
 use api::AppState;

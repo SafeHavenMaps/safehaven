@@ -1,7 +1,6 @@
 <template>
   <Button
     label="Ajouter"
-    class="mr-2"
     severity="info"
     @click="formVisible = true"
   >

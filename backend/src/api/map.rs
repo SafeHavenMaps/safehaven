@@ -222,9 +222,12 @@ async fn viewer_new_entity(
     Json(request): Json<PublicNewEntityRequest>,
 ) -> Result<AppJson<PublicNewEntityResponse>, AppError> {
     let db_entity = PublicEntity::new(request.entity, &mut conn).await?;
+
     let mut new_comment = request.comment;
     new_comment.entity_id = db_entity.id;
+
     let db_comment = PublicComment::new(new_comment, &mut conn).await?;
+
     Ok(AppJson(PublicNewEntityResponse {
         entity: db_entity,
         comment: db_comment,

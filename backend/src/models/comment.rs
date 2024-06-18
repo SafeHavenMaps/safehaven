@@ -45,7 +45,7 @@ impl PublicComment {
         conn: &mut PgConnection,
     ) -> Result<PublicComment, AppError> {
         let family = Family::get_from_entity(comment.entity_id, conn).await?;
-        family.comment_form.validate_data(comment.data.clone())?;
+        family.comment_form.validate_data(&comment.data)?;
 
         sqlx::query_as!(
             PublicComment,
@@ -136,9 +136,7 @@ impl AdminComment {
         conn: &mut PgConnection,
     ) -> Result<AdminComment, AppError> {
         let family = Family::get_from_entity(new_comment.entity_id, conn).await?;
-        family
-            .comment_form
-            .validate_data(new_comment.data.clone())?;
+        family.comment_form.validate_data(&new_comment.data)?;
 
         sqlx::query_as!(
             AdminComment,
@@ -171,7 +169,7 @@ impl AdminComment {
         conn: &mut PgConnection,
     ) -> Result<AdminComment, AppError> {
         let family = Family::get_from_entity(update.entity_id, conn).await?;
-        family.comment_form.validate_data(update.data.clone())?;
+        family.comment_form.validate_data(&update.data)?;
 
         sqlx::query_as!(
             AdminComment,

@@ -1,4 +1,5 @@
 use crate::api::AppError;
+use crate::helpers::deserializers::empty_string_is_invalid;
 use crate::models::family::Family;
 use serde::{Deserialize, Serialize};
 use serde_json::{to_value, Value};
@@ -10,6 +11,7 @@ use super::family::Form;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct UnprocessedLocation {
+    #[serde(deserialize_with = "empty_string_is_invalid")]
     pub plain_text: String,
     pub lat: f64,
     pub long: f64,
@@ -17,6 +19,7 @@ pub struct UnprocessedLocation {
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct PublicNewEntity {
+    #[serde(deserialize_with = "empty_string_is_invalid")]
     pub display_name: String,
     pub category_id: Uuid,
     pub locations: Vec<UnprocessedLocation>,
@@ -68,7 +71,7 @@ impl PublicEntity {
         conn: &mut PgConnection,
     ) -> Result<PublicEntity, AppError> {
         let family = Family::get_from_category(entity.category_id, conn).await?;
-        family.entity_form.validate_data(entity.data.clone())?;
+        family.entity_form.validate_data(&entity.data)?;
 
         let locations = to_value(entity.locations).unwrap();
 
@@ -238,7 +241,7 @@ impl AdminEntity {
 
         // Validate the new data against the form from the corresponding family
         let family = Family::get_from_category(new_entity.category_id, &mut tx).await?;
-        family.entity_form.validate_data(new_entity.data.clone())?;
+        family.entity_form.validate_data(&new_entity.data)?;
 
         // Serialize locations to JSON
         let locations = to_value(new_entity.locations).unwrap();
@@ -319,7 +322,7 @@ impl AdminEntity {
 
         // Validate the new data against the form from the corresponding family
         let family = Family::get_from_category(update.category_id, &mut tx).await?;
-        family.entity_form.validate_data(update.data.clone())?;
+        family.entity_form.validate_data(&update.data)?;
 
         // Serialize locations to JSON
         let locations = to_value(update.locations).unwrap();

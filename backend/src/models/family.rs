@@ -90,12 +90,6 @@ impl Form {
             return Err(AppError::Validation("Title cannot be empty".to_string()));
         }
 
-        // if self.fields.is_empty() {
-        //     return Err(AppError::Validation(
-        //         "Form must have at least one field".to_string(),
-        //     ));
-        // }
-
         let mut keys = Vec::new();
         for field in self.fields.iter() {
             if keys.contains(&field.key) {
@@ -111,13 +105,9 @@ impl Form {
         Ok(())
     }
 
-    pub fn validate_data(&self, data: Value) -> Result<(), AppError> {
-        for field in self.fields.iter() {
-            if field.mandatory {
-                data.get(&field.key).ok_or_else(|| {
-                    AppError::Validation(format!("Mandatory field {} is missing", field.key))
-                })?;
-            }
+    pub fn validate_data(&self, data: &Value) -> Result<(), AppError> {
+        for field in &self.fields {
+            field.validate_data(data.get(&field.key))?;
         }
         Ok(())
     }
@@ -135,6 +125,95 @@ impl Field {
             ));
         }
 
+        Ok(())
+    }
+
+    fn validate_data(&self, value: Option<&Value>) -> Result<(), AppError> {
+        let value = match value {
+            None if self.mandatory => {
+                return Err(AppError::Validation(format!(
+                    "Mandatory field {} is missing",
+                    self.key
+                )))
+            }
+            None => return Ok(()),
+            Some(value) => value,
+        };
+
+        if value.is_null() {
+            if self.mandatory {
+                return Err(AppError::Validation(format!(
+                    "Mandatory field {} is missing",
+                    self.key
+                )));
+            } else {
+                return Ok(());
+            }
+        }
+
+        match &self.field_type {
+            FieldType::SingleLineText | FieldType::MultiLineText | FieldType::RichText => {
+                let str_value = value.as_str().ok_or_else(|| {
+                    AppError::Validation(format!("Field {} is not a string", self.key))
+                })?;
+
+                if self.mandatory && str_value.is_empty() {
+                    return Err(AppError::Validation(format!(
+                        "Mandatory field {} is empty",
+                        self.key
+                    )));
+                }
+            }
+
+            FieldType::Number | FieldType::DiscreteScore => {
+                let num_value = value.as_f64().ok_or_else(|| {
+                    AppError::Validation(format!("Field {} is not a number", self.key))
+                })?;
+
+                if self.mandatory && num_value.is_nan() {
+                    return Err(AppError::Validation(format!(
+                        "Mandatory field {} is not a valid number",
+                        self.key
+                    )));
+                }
+            }
+
+            FieldType::Boolean => {
+                value.as_bool().ok_or_else(|| {
+                    AppError::Validation(format!("Field {} is not a boolean", self.key))
+                })?;
+            }
+
+            FieldType::Date => {
+                let str_value = value.as_str().ok_or_else(|| {
+                    AppError::Validation(format!("Field {} is not a string", self.key))
+                })?;
+
+                if self.mandatory && str_value.is_empty() {
+                    return Err(AppError::Validation(format!(
+                        "Mandatory field {} is empty",
+                        self.key
+                    )));
+                }
+
+                // Check if date is valid using chrono
+            }
+
+            FieldType::EnumMultiOption | FieldType::EventList => {
+                let arr_value = value.as_array().ok_or_else(|| {
+                    AppError::Validation(format!("Field {} is not an array", self.key))
+                })?;
+
+                if self.mandatory && arr_value.is_empty() {
+                    return Err(AppError::Validation(format!(
+                        "Mandatory field {} is empty",
+                        self.key
+                    )));
+                }
+            }
+
+            _ => {}
+        }
         Ok(())
     }
 }
