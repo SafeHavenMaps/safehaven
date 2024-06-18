@@ -103,7 +103,7 @@ async fn bootstrap(
 
     tracing::trace!("Bootstrapping: found access token");
 
-    let signed_token = app_state.generate_refresh_token(MapUserTokenClaims {
+    let signed_token = app_state.generate_token(MapUserTokenClaims {
         iat: Utc::now().timestamp() as usize,
         exp: (Utc::now() + TimeDelta::try_minutes(5).expect("valid duration")).timestamp() as usize,
         perms: perms.clone(),
