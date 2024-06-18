@@ -101,7 +101,7 @@
         :key="ev_index"
         class="flex flex-column gap-2"
       >
-        <span class="flex align-items-center gap-3">
+        <span class="flex flex-wrap align-items-center gap-3">
           <Dropdown
             v-model="event.type"
             placeholder="type d'évènement"
