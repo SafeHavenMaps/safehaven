@@ -8,6 +8,7 @@
       v-model="editedTag.title"
       label="Titre"
       :variant="hasBeenEdited('title')"
+      :invalid="!editedTag.title"
     />
 
     <AdminInputSwitchField
@@ -31,22 +32,23 @@
       label="Description du filtre"
       :variant="hasBeenEdited('filter_description')"
       helper-text="(description exposée aux utilisateurices)"
+      :invalid="editedTag.is_filter && !editedTag.filter_description"
     />
 
     <AdminInputColorField
       id="border_color"
       v-model="editedTag.border_color"
-      v-model:invalid="border_color_invalid"
       label="Couleur de bordure"
       :variant="hasBeenEdited('border_color')"
+      :invalid="!validator.isHexColor(editedTag.border_color)"
     />
 
     <AdminInputColorField
       id="fill_color"
       v-model="editedTag.fill_color"
-      v-model:invalid="fill_color_invalid"
       label="Couleur de remplissage"
       :variant="hasBeenEdited('fill_color')"
+      :invalid="!validator.isHexColor(editedTag.fill_color)"
     />
 
     <span class="flex gap-1 justify-content-end">
@@ -69,6 +71,7 @@
 </template>
 
 <script setup lang="ts">
+import validator from 'validator'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdateTag } from '~/lib'
 import state from '~/lib/admin-state'
@@ -92,8 +95,6 @@ const editedTag: Ref<NewOrUpdateTag> = ref(isNew
     }
   : JSON.parse(JSON.stringify(fetchedTag)),
 )
-const border_color_invalid = ref(false)
-const fill_color_invalid = ref(false)
 
 const processingRequest = ref(false)
 const toast = useToast()
@@ -102,8 +103,8 @@ function isDisabled() {
   return processingRequest.value
     || !editedTag.value.title
     || (editedTag.value.is_filter && !editedTag.value.filter_description)
-    || border_color_invalid.value
-    || fill_color_invalid.value
+    || !validator.isHexColor(editedTag.value.border_color)
+    || !validator.isHexColor(editedTag.value.fill_color)
 }
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
