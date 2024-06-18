@@ -168,8 +168,8 @@ function discreteScoreAveragesOnComments() {
       key: field.key,
       display_name: field.display_name,
       average: props.entity.comments
-        .map(c => (c.data as Record<string, number>)[field.key])
-        .reduce((acc, score) => acc + score, 0) / props.entity.comments.length,
+        .map(c => (c.data as Record<string, number>)[field.key] ?? 0)
+        .reduce((acc, score) => acc + score, 0) / props.entity.comments.filter(c => (c.data as Record<string, number>)[field.key]!=null).length,
     }))
 }
 
