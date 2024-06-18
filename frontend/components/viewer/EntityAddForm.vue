@@ -34,7 +34,7 @@
           <AdminInputTextField
             id="display_name"
             v-model="editedEntity.display_name"
-            label="Nom de l'entité"
+            label="Nom d'affichage"
           />
 
           <FormCategorySelect
