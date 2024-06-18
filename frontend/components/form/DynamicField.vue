@@ -17,7 +17,7 @@
     v-else
     class="flex flex-column gap-2"
   >
-    <label :for="props.formField.key">{{ props.formField.display_name }}</label>
+    <label :for="props.formField.key">{{ props.formField.display_name }} <RequiredIndicator v-if="props.formField.mandatory" /></label>
     <InputText
       v-if="props.formField.field_type=='SingleLineText'"
       :id="props.formField.key"

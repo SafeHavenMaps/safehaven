@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-column gap-2">
-    <label for="category_id">Catégorie</label>
+    <label for="category_id">Catégorie <RequiredIndicator /></label>
     <Dropdown
       id="category_id"
       :model-value="props.modelValue"

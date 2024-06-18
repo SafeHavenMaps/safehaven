@@ -1,6 +1,6 @@
 <template>
   <div class="flex align-items-center gap-2">
-    <label>Adresses</label>
+    <label>Adresses <RequiredIndicator /></label>
     <Button
       size="small"
       outlined
