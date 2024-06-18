@@ -20,12 +20,13 @@
     v-model:visible="formVisible"
     modal
     closable
+    class="w-full max-w-30rem"
     :header="props.family.comment_form.title"
-    :content-props="{ onClick: (event) => { event.stopPropagation() } }"
+    :content-props="{ onClick: (event: Event) => { event.stopPropagation() } }"
   >
     <form
       v-if="curr_page == 0"
-      class="flex flex-grow-1 flex-column gap-3 w-30rem"
+      class="flex flex-grow-1 flex-column gap-3"
       @submit.prevent="curr_page+=1"
     >
       <AdminInputTextField

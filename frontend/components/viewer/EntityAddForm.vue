@@ -16,6 +16,7 @@
     v-model:visible="formVisible"
     modal
     closable
+    class="w-full max-w-30rem"
     :header="props.family.entity_form.title"
     :content-props="{ onClick: (event: Event) => { event.stopPropagation() } }"
   >
@@ -23,7 +24,7 @@
     <form
       v-for="page in Array.from({ length: entityPageCount+1 }, (_, i) => i)"
       :key="`EntityPage${page}`"
-      class="flex flex-grow-1 flex-column gap-3 w-30rem"
+      class="flex flex-grow-1 flex-column gap-3"
       @submit.prevent="curr_page += 1"
     >
       <div
