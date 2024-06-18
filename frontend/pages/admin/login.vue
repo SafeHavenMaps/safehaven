@@ -43,7 +43,7 @@
             toggle-mask
             class="w-full -mt-2"
           />
-          <span class="hidden">
+          <span>
             <Checkbox
               v-model="remember_me"
               input-id="remember_me"

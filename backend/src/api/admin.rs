@@ -195,7 +195,7 @@ async fn admin_login(
         Err(err) => return err.into_response(),
     };
 
-    let new_cookies = auth::login(&app_state, jar, &auth_user, request.remember_me);
+    let new_cookies = auth::set_auth_cookies(&app_state, jar, &auth_user, request.remember_me);
     let body = LoginResponse {
         is_admin: auth_user.is_admin,
     };
