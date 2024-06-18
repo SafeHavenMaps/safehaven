@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="flex gap-3">
+    <span class="flex gap-4">
       <IconField
         icon-position="left"
       >
@@ -18,7 +18,7 @@
         :options="optionalColumns"
         display="chip"
         placeholder="Sélectionner des colonnes"
-        class="w-full md:w-20rem"
+        class="w-full md:w-80"
       />
     </span>
     <DataTable
@@ -48,11 +48,11 @@
       />
       <Column v-if="state.is_admin">
         <template #body="slotProps">
-          <div class="flex gap-2 justify-content-center">
+          <div class="flex gap-2 justify-center">
             <Button
               outlined
               rounded
-              severity="warning"
+              severity="warn"
               @click="navigateTo(`/admin/families/${slotProps.data.id}/general`)"
             >
               <template #icon>
@@ -62,7 +62,7 @@
             <Button
               outlined
               rounded
-              severity="warning"
+              severity="warn"
               @click="navigateTo(`/admin/families/${slotProps.data.id}/entities`)"
             >
               <template #icon>
@@ -72,7 +72,7 @@
             <Button
               outlined
               rounded
-              severity="warning"
+              severity="warn"
               @click="navigateTo(`/admin/families/${slotProps.data.id}/comments`)"
             >
               <template #icon>
@@ -97,7 +97,6 @@
 </template>
 
 <script setup lang="ts">
-import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Family } from '~/lib'
@@ -111,7 +110,7 @@ if (!(table_key in state.tablesSelectedColumns)) {
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    global: { value: null, matchMode: 'contains' },
   }
 }
 

@@ -1,14 +1,12 @@
 <template>
-  <div class="h-full flex flex-column">
+  <div class="h-full flex flex-col">
     <ViewerNavbar
       :show-category-switcher="false"
       :show-search="false"
       :show-family-switcher="false"
     />
 
-    <Card
-      class="m-2 p-2"
-    >
+    <Card class="m-2 p-2">
       <template #header>
         <span class="text-2xl font-bold">
           Recherche
@@ -17,55 +15,102 @@
 
       <template #content>
         <form @submit.prevent="submitSearch">
-          <InputGroup>
-            <InputText
-              v-model="query"
-              placeholder="Tapez votre recherche ici"
-            />
+          <div class="hidden sm:block">
+            <InputGroup>
+              <InputText
+                v-model="query"
+                placeholder="Tapez votre recherche ici"
+              />
 
-            <Button
-              type="button"
-              severity="secondary"
-              :label="state.activeFamily.title"
-              @click="showFamilySwitcher"
-            >
-              <template #icon>
-                <AppIcon
-                  :icon-name="state.activeFamily.icon_hash!"
-                  dynamic
-                  class="mr-1"
-                  size="20px"
-                />
-              </template>
-            </Button>
+              <Button
+                type="button"
+                severity="secondary"
+                :label="state.activeFamily.title"
+                @click="showFamilySwitcher"
+              >
+                <template #icon>
+                  <AppIcon
+                    :icon-name="state.activeFamily.icon_hash!"
+                    dynamic
+                    class="mr-1"
+                    size="20px"
+                  />
+                </template>
+              </Button>
 
-            <Button
-              type="button"
-              severity="warning"
-              label="Filtres"
-              @click="showCriteriasModal()"
-            >
-              <template #icon>
-                <AppIcon
-                  class="mr-1"
-                  icon-name="filter"
-                />
-              </template>
-            </Button>
+              <Button
+                type="button"
+                severity="warn"
+                label="Filtres"
+                @click="showCriteriasModal()"
+              >
+                <template #icon>
+                  <AppIcon
+                    class="mr-1"
+                    icon-name="filter"
+                  />
+                </template>
+              </Button>
 
-            <Button type="submit">
-              <template #icon>
-                <AppIcon icon-name="search" />
-              </template>
-            </Button>
-          </InputGroup>
+              <Button type="submit">
+                <template #icon>
+                  <AppIcon icon-name="search" />
+                </template>
+              </Button>
+            </InputGroup>
+          </div>
+          <div class="sm:hidden flex flex-col justify-end items-end gap-2">
+            <InputGroup>
+              <InputText
+                v-model="query"
+                placeholder="Tapez votre recherche ici"
+              />
+              <Button type="submit">
+                <template #icon>
+                  <AppIcon icon-name="search" />
+                </template>
+              </Button>
+            </InputGroup>
+
+            <div class="flex gap-2">
+              <Button
+                type="button"
+                severity="secondary"
+                :label="state.activeFamily.title"
+                @click="showFamilySwitcher"
+              >
+                <template #icon>
+                  <AppIcon
+                    :icon-name="state.activeFamily.icon_hash!"
+                    dynamic
+                    class="mr-1"
+                    size="20px"
+                  />
+                </template>
+              </Button>
+
+              <Button
+                type="button"
+                severity="warn"
+                label="Filtres"
+                @click="showCriteriasModal()"
+              >
+                <template #icon>
+                  <AppIcon
+                    class="mr-1"
+                    icon-name="filter"
+                  />
+                </template>
+              </Button>
+            </div>
+          </div>
         </form>
       </template>
     </Card>
 
-    <OverlayPanel ref="familySwitcher">
+    <Popover ref="familySwitcher">
       <ViewerFamilySwitcher />
-    </OverlayPanel>
+    </Popover>
 
     <Card
       v-if="currentEntitiesResults"
@@ -110,7 +155,7 @@
         <div
           v-if="
             state.activeEntity"
-          class="flex align-items-center gap-2"
+          class="flex items-center gap-2"
         >
           <CategoryTag :category="state.activeEntity!.category" />
           <h3 class="m-0">
@@ -151,7 +196,7 @@
 </template>
 
 <script setup lang="ts">
-import type OverlayPanel from 'primevue/overlaypanel'
+import type Popover from 'primevue/popover'
 import type { PageState } from 'primevue/paginator'
 import type { ViewerPaginatedCachedEntities } from '~/lib'
 import state from '~/lib/viewer-state'
@@ -168,7 +213,7 @@ const pageSize = ref(20)
 const showCriterias = ref(false)
 
 const currentEntitiesResults: Ref<ViewerPaginatedCachedEntities | null> = ref(null)
-const familySwitcher = ref<OverlayPanel>()
+const familySwitcher = ref<typeof Popover>()
 
 function resultLabel() {
   const result = currentEntitiesResults!.value?.total_results ?? 0

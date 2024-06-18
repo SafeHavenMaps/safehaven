@@ -1,12 +1,12 @@
 <template>
-  <div class="flex flex-column h-full w-full logoized">
+  <div class="flex flex-col h-full w-full logoized">
     <AdminNavbar
-      @toggle-sidebar="() => { sidebarCollapsed = !sidebarCollapsed; }"
+      @toggle-sidebar="toggleSidebar"
     />
 
     <div
       ref="contentContainerRef"
-      class="flex w-full flex-grow-1 content-container"
+      class="flex w-full grow content-container"
     >
       <div
         ref="sidebarRef"
@@ -20,13 +20,13 @@
       </div>
 
       <div
-        class="flex flex-column w-full main-content"
+        class="flex flex-col w-full main-content"
         :class="{ collapsed: sidebarCollapsed }"
       >
         <Breadcrumb
           :home="{ label: '', url: '' }"
           :model="currentBreadcrumbs"
-          class="breadcrumb p-1"
+          class="breadcrumb !p-2"
         >
           <template #item="{ item, props }">
             <NuxtLink
@@ -46,9 +46,9 @@
           </template>
         </Breadcrumb>
 
-        <Card class="m-3 ml-0 mt-1 flex-grow-1 w-full scroll-container">
+        <Card class="m-4 ml-0 mt-1 grow w-full scroll-container">
           <template #title>
-            <div class="flex align-items-end">
+            <div class="flex items-center">
               <AppIcon
                 :icon-name="cardIconName"
                 class="mr-2"
@@ -83,7 +83,7 @@
 
     <ConfirmPopup group="delete">
       <template #message="slotProps">
-        <div class="flex flex-row align-items-center w-full gap-2 p-3 mb-2 pb-0">
+        <div class="flex flex-row items-center w-full gap-2 p-4 mb-2 pb-0">
           <AppIcon :icon-name="slotProps.message.icon!" />
           <span>{{ slotProps.message.message }} <b>{{ (slotProps.message as ExtendedConfirmationOptions).objectId }}</b></span>
         </div>
@@ -140,6 +140,13 @@ function initAdminLayout(
   currentBreadcrumbs.value = breadcrumb
 }
 
+let hasBeenChangedManually = false
+
+function toggleSidebar() {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+  hasBeenChangedManually = true
+}
+
 provide('initAdminLayout', initAdminLayout)
 
 function resizeEverything() {
@@ -147,13 +154,16 @@ function resizeEverything() {
   const sidebar = sidebarRef.value
   const mainContent = contentContainerRef.value
 
+  // If the sidebar has been changed manually, we don't want to change it automatically
+  if (!hasBeenChangedManually) {
   // If the sidebar is not collapsed but we go under the breaking point, we collapse it
-  if (window.innerWidth < adminBreakingPoint && !sidebarCollapsed.value) {
-    sidebarCollapsed.value = true
-  }
-  // Else, if the sidebar is collapsed but we go over the breaking point, we expand it
-  else if (window.innerWidth >= adminBreakingPoint && sidebarCollapsed.value) {
-    sidebarCollapsed.value = false
+    if (window.innerWidth < adminBreakingPoint && !sidebarCollapsed.value) {
+      sidebarCollapsed.value = true
+    }
+    // Else, if the sidebar is collapsed but we go over the breaking point, we expand it
+    else if (window.innerWidth >= adminBreakingPoint && sidebarCollapsed.value) {
+      sidebarCollapsed.value = false
+    }
   }
 
   if (navbar && sidebar && mainContent) {
@@ -163,75 +173,76 @@ function resizeEverything() {
 }
 
 onMounted(() => {
-  resizeEverything()
   window.addEventListener('resize', resizeEverything)
+  nextTick(resizeEverything)
 })
 </script>
 
 <style>
 html, body {
-  background-color: #f7f7f7;
-  margin: 0;
-  padding: 0;
-  height: 100%;
+  background-color: #f7f7f7 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
 }
 
 .admin-navbar {
-  background-color: #E86BA7;
-  border-radius: 0;
-  border-left-width: 0;
-  border-right-width: 0;
-  border-top-width: 0;
-  z-index: 1000;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+  background-color: #E86BA7 !important;
+  border-radius: 0 !important;
+  border-left-width: 0 !important;
+  border-right-width: 0 !important;
+  border-top-width: 0 !important;
+  z-index: 1000 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
 }
 
 .content-container {
-  display: flex;
+  display: flex !important;
 }
 
 .sidebar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 17.7rem;
-  background-color: #f7f7f7;
-  z-index: 1001;
-  transition: transform 0.3s ease-in-out;
-  transform: translateX(0);
-  padding: 1rem;
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  top: 74px;
+  width: 17.7rem !important;
+  background-color: #f7f7f7 !important;
+  z-index: 1001 !important;
+  transition: transform 0.3s ease-in-out !important;
+  transform: translateX(0) !important;
+  padding: 1rem !important;
 }
 
 .sidebar.collapsed {
-  transform: translateX(-100%);
+  transform: translateX(-100%) !important;
 }
 
 .sidebar-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: rgb(51, 65, 85);
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: rgb(51, 65, 85) !important;
 }
 
 .main-content {
-  margin-left: 18rem;
-  transition: margin-left 0.3s ease-in-out;
-  width: calc(100% - 18rem);
+  margin-left: 18rem !important;
+  transition: margin-left 0.3s ease-in-out !important;
+  width: calc(100% - 18rem) !important;
 }
 
 .main-content.collapsed {
-  margin-left: 0;
-  width: 100%;
+  margin-left: 0 !important;
+  width: 100% !important;
 }
 
 .scroll-container {
-  overflow-x: auto;
-  height: 100%;
+  overflow-x: auto !important;
+  height: 100% !important;
 }
 
 .breadcrumb {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <form @submit.prevent="searchNominatim">
-      <InputGroup class="mb-4 mt-2">
+      <InputGroup class="mb-6 mt-2">
         <InputText
           v-model="locationInput"
           placeholder="Rechercher une adresse"
@@ -25,7 +25,7 @@
     </div>
     <div
       v-else-if="locationSelected && resultsSearched"
-      class="h-20rem"
+      class="h-80"
     >
       <SingleEntityMap
         :coordinates="transformedCoordinates"

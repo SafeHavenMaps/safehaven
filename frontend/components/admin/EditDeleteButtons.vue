@@ -4,7 +4,7 @@
     outlined
     rounded
     class="mx-2"
-    severity="warning"
+    severity="warn"
     @click="() => emit('edit', props.id)"
   >
     <template #icon>
@@ -36,7 +36,7 @@
     :header="`Suppression ${props.modelName} ${props.name}`"
     :style="{ width: '25rem' }"
   >
-    <span class="p-text-secondary block mb-3 -mt-2">
+    <span class="p-text-secondary block mb-4 -mt-2">
       <p>La suppression {{ props.modelName }} {{ props.name }}
         entraînera <b>la suppression définitive de {{ props.secureDeleteEntityCount }} entités</b>.</p>
       <p>Cette action ne pourra pas être annulée. Pour confirmer, veuillez entrer le nom {{ props.modelName }} ci-dessous :</p>
@@ -44,10 +44,10 @@
     <InputText
       id="repeatName"
       v-model="repeatName"
-      class="mb-4"
+      class="mb-6"
       autocomplete="off"
     />
-    <div class="flex justify-content-end gap-2">
+    <div class="flex justify-end gap-2">
       <Button
         type="button"
         label="Annuler"
@@ -58,7 +58,11 @@
         :disabled="repeatName.toUpperCase() != props.name.toUpperCase()"
         type="button"
         label="Confirmer"
-        @click="() => { secureDeleteDialogVisible = false, loading = true, emit('delete', props.id, props.name, onDeleteDone) }"
+        @click="() => {
+          secureDeleteDialogVisible = false,
+          loading = true,
+          emit('delete', props.id, props.name, onDeleteDone)
+        }"
       />
     </div>
   </Dialog>

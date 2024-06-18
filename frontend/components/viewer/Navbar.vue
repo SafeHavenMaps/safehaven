@@ -1,55 +1,57 @@
 <template>
   <Toolbar>
     <template #start>
-      <div class="flex align-items-center">
+      <div class="flex items-center">
         <img
           height="40"
           width="40"
           alt="icon"
           :src="state.logo ?? defaultLogo"
         >
-        <div class="pl-3">
-          <h3 class="my-0">
+        <div class="pl-4">
+          <div class="my-0 font-extrabold">
             {{ state.title }}
-          </h3>
-          <span class="text-xs font-italic">
+          </div>
+          <div class="text-xs italic">
             {{ state.subtitle }}
-          </span>
+          </div>
         </div>
       </div>
     </template>
 
     <template #center>
-      <ViewerFamilySwitcher
-        v-if="props.showFamilySwitcher"
-        class="hidden xl:block"
-      />
+      <div class="hidden lg:block">
+        <ViewerFamilySwitcher
+          v-if="props.showFamilySwitcher"
+        />
+      </div>
     </template>
 
     <template #end>
-      <div class="align-items-center">
-        <Button
-          outlined
-          severity="primary"
-          small
-          class="p-1 mr-2 block xl:hidden"
-          @click="openOverflowPanel"
-        >
-          <template #default>
-            <AppIcon
-              icon-name="menu"
-              size="24px"
-            />
-          </template>
-        </Button>
+      <div class="items-center">
+        <div class="block lg:hidden">
+          <Button
+            outlined
+            severity="primary"
+            small
+            @click="openOverflowPanel"
+          >
+            <template #default>
+              <AppIcon
+                icon-name="menu"
+                size="24px"
+              />
+            </template>
+          </Button>
+        </div>
 
-        <OverlayPanel ref="overflowPanel">
-          <div class="flex flex-column gap-3">
+        <Popover ref="overflowPanel">
+          <div class="flex flex-col gap-4">
             <ViewerFamilySwitcher
               v-if="props.showFamilySwitcher"
             />
 
-            <div class="flex flex-column gap-2">
+            <div class="flex flex-col gap-2">
               <Button
                 label="Info"
                 outlined
@@ -92,10 +94,10 @@
               </Button>
             </div>
           </div>
-        </OverlayPanel>
+        </Popover>
 
         <div
-          class="hidden xl:flex justify-content-end align-items-center gap-2"
+          class="hidden lg:flex justify-end items-center gap-2"
         >
           <Button
             label="Informations"
@@ -140,14 +142,14 @@
     </template>
   </Toolbar>
 
-  <OverlayPanel ref="filterOp">
+  <Popover ref="filterOp">
     <ViewerFilterConfig
       v-model:filteringTags="state.filteringTags"
       v-model:filteringCategories="state.filteringCategories"
-      class="w-25rem"
+      class="w-[25rem]"
       @filters-changed="filtersChanged"
     />
-  </OverlayPanel>
+  </Popover>
 
   <Dialog
     v-model:visible="filterPopupVisible"
@@ -160,99 +162,115 @@
       @filters-changed="filtersChanged"
     />
   </Dialog>
+  <Popover ref="searchOp">
+    <div class="flex flex-col gap-4 w-[25rem]">
+      <Tabs value="0">
+        <TabList>
+          <Tab value="0">
+            Chercher un point
+          </Tab>
+          <Tab value="1">
+            Chercher un lieu
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel value="0">
+            <form @submit.prevent="searchEntity">
+              <label for="placeSearch">
+                Recherche d'un point sur la carte
+              </label>
+              <InputGroup>
+                <InputText
+                  v-model="entitySearch"
+                />
+                <Button type="submit">
+                  <template #icon>
+                    <AppIcon icon-name="search" />
+                  </template>
+                </Button>
+              </InputGroup>
+            </form>
 
-  <OverlayPanel ref="searchOp">
-    <div class="flex flex-column gap-3 w-25rem">
-      <TabView>
-        <TabPanel header="Chercher un point">
-          <form @submit.prevent="searchEntity">
-            <label for="placeSearch">
-              Recherche d'un point sur la carte
-            </label>
+            <div v-if="currentSearchEntities().length > 0">
+              <Divider type="dotted" />
 
-            <InputGroup>
-              <InputText
-                v-model="entitySearch"
-              />
-              <Button type="submit">
-                <template #icon>
-                  <AppIcon icon-name="search" />
-                </template>
-              </Button>
-            </InputGroup>
-          </form>
-
-          <div v-if="currentSearchEntities().length > 0">
-            <Divider type="dotted" />
-
-            <div style="max-height: 500px; overflow-y: auto;">
-              <div
-                v-for="result in currentSearchEntities()"
-                :key="result.id"
-                class="result mb-2 p-2"
-                @click="entityChosen(result)"
-              >
-                <div>{{ result.display_name }}</div>
-
+              <div style="max-height: 500px; overflow-y: auto;">
                 <div
-                  v-if="result.parent_display_name"
-                  class="text-xs"
+                  v-for="result in currentSearchEntities()"
+                  :key="result.id"
+                  class="result mb-2 p-2"
+                  @click="entityChosen(result)"
                 >
-                  {{ result.parent_display_name }}
-                </div>
+                  <div>{{ result.display_name }}</div>
 
-                <div class="mt-1">
-                  <CategoryTag :category="state.getCategory(result.category_id)" />
+                  <div
+                    v-if="result.parent_display_name"
+                    class="text-xs"
+                  >
+                    {{ result.parent_display_name }}
+                  </div>
+
+                  <div class="mt-1">
+                    <CategoryTag :category="state.getCategory(result.category_id)" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </TabPanel>
+          </TabPanel>
 
-        <TabPanel header="Chercher un lieu">
-          <form @submit.prevent="searchLocation">
-            <label for="placeSearch">
-              Recherche d'une ville, d'un lieu, d'une adresse
-            </label>
+          <TabPanel value="1">
+            <form @submit.prevent="searchLocation">
+              <label for="placeSearch">
+                Recherche d'une ville, d'un lieu, d'une adresse
+              </label>
 
-            <InputGroup>
-              <InputText
-                v-model="placeSearch"
-                placeholder="Tours, France"
-              />
-              <Button type="submit">
-                <template #icon>
-                  <AppIcon icon-name="search" />
-                </template>
-              </Button>
-            </InputGroup>
-          </form>
+              <InputGroup>
+                <InputText
+                  v-model="placeSearch"
+                  placeholder="Tours, France"
+                />
+                <Button type="submit">
+                  <template #icon>
+                    <AppIcon icon-name="search" />
+                  </template>
+                </Button>
+              </InputGroup>
+            </form>
 
-          <div v-if="currentLocationsResults.length > 0">
+            <div v-if="oneSearchMade && currentLocationsResults.length > 0">
+              <Divider type="dotted" />
+
+              <div style="max-height: 500px; overflow-y: auto;">
+                <div
+                  v-for="result in currentLocationsResults"
+                  :key="result.id"
+                  class="result mb-2 p-2"
+                  @click="locationChosen(result)"
+                >
+                  <span>{{ result.title }}</span><br>
+                  <span class="text-xs text-surface-800">{{ result.subtitle }}</span>
+                </div>
+              </div>
+            </div>
+            <div
+              v-else-if="oneSearchMade && currentLocationsResults.length == 0"
+              class="my-2"
+            >
+              <Message severity="error">
+                Aucun résultat trouvé
+              </Message>
+            </div>
+
             <Divider type="dotted" />
 
-            <div style="max-height: 500px; overflow-y: auto;">
-              <div
-                v-for="result in currentLocationsResults"
-                :key="result.id"
-                class="result mb-2 p-2"
-                @click="locationChosen(result)"
-              >
-                <span>{{ result.title }}</span><br>
-                <span class="text-xs text-800">{{ result.subtitle }}</span>
-              </div>
+            <div class="text-xs text-surface-800">
+              Recherche avec Nominatim © OpenStreetMap Contributor
             </div>
-          </div>
-
-          <Divider type="dotted" />
-
-          <div class="text-xs text-800">
-            Recherche avec Nominatim © OpenStreetMap Contributor
-          </div>
-        </TabPanel>
-      </TabView>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </div>
-  </OverlayPanel>
+  </Popover>
 
   <Dialog
     v-model:visible="showInformation"
@@ -267,13 +285,15 @@
 </template>
 
 <script setup lang="ts">
-import type OverlayPanel from 'primevue/overlaypanel'
+import type Popover from 'primevue/popover'
 import type { Coordinate } from 'ol/coordinate'
 import state from '~/lib/viewer-state'
 import defaultLogo from '~/assets/logo_square.svg'
 import type { Result as NominatimResult } from '~/lib/nominatim'
 import { freeFormSearch } from '~/lib/nominatim'
 import type { ViewerCachedEntity, ViewerPaginatedCachedEntitiesWithLocation } from '~/lib'
+
+const oneSearchMade = ref(false)
 
 export interface Props {
   showCategorySwitcher?: boolean
@@ -293,9 +313,9 @@ const emit = defineEmits<{
   entityChosen: [ViewerCachedEntity]
 }>()
 
-const filterOp = ref<OverlayPanel>()
-const searchOp = ref<OverlayPanel>()
-const overflowPanel = ref<OverlayPanel>()
+const filterOp = ref<typeof Popover>()
+const searchOp = ref<typeof Popover>()
+const overflowPanel = ref<typeof Popover>()
 
 const placeSearch: Ref<string> = ref('')
 const entitySearch: Ref<string> = ref('')
@@ -324,6 +344,7 @@ function openOverflowPanel(event: Event) {
 
 async function searchLocation() {
   currentLocationsResults.value = await freeFormSearch(placeSearch.value)
+  oneSearchMade.value = true
 }
 
 async function searchEntity() {

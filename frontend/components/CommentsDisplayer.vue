@@ -1,11 +1,12 @@
 <template>
-  <Accordion :active-index="0">
-    <AccordionTab
+  <Accordion :value="sortedComments[0].id">
+    <AccordionPanel
       v-for="comment in sortedComments"
       :key="comment.id"
+      :value="comment.id"
     >
-      <template #header>
-        <span class="flex align-items-center gap-2 w-full">
+      <AccordionHeader>
+        <span class="flex items-center gap-2 w-full">
           {{ comment.author }} - {{ new Date(comment.created_at).toLocaleDateString() }}
           <Tag
             v-if="!public && (comment as AdminComment).moderated"
@@ -22,18 +23,22 @@
             @delete="(id, name, onDeleteDone) => emit('delete', id, name, onDeleteDone)"
           />
         </span>
-      </template>
-      <!-- eslint-disable vue/no-v-html -->
-      <p
-        style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;"
-        v-html="purify_strict(comment.text)"
-      />
+      </AccordionHeader>
 
-      <ViewerCommonFormFields
-        :fields="props.commentFormFields"
-        :data="comment.data"
-      />
-    </AccordionTab>
+      <!-- eslint-disable vue/no-v-html -->
+      <AccordionContent>
+        <p
+          style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;"
+          class="rich-text-content"
+          v-html="purify_strict(comment.text)"
+        />
+
+        <ViewerCommonFormFields
+          :fields="props.commentFormFields"
+          :data="comment.data"
+        />
+      </AccordionContent>
+    </AccordionPanel>
   </Accordion>
 </template>
 

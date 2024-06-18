@@ -1,7 +1,7 @@
 <template>
   <div>
     <form
-      class="flex flex-column gap-3 mx-4"
+      class="flex flex-col gap-4 mx-6 my-2"
       style="width:68rem;"
       @submit.prevent="onSave"
     >
@@ -13,10 +13,10 @@
         style="background-color: #FAF8FF;"
         :pt="{
           legend: {
-            class: 'border-1 surface-border',
+            class: '!border !border-surface',
           },
           content: {
-            class: 'flex flex-column align-items-stretch',
+            class: '!flex !flex-col justify-center items-stretch',
           },
         }"
         @dragover.prevent
@@ -26,16 +26,16 @@
           v-for="(field, index) in getFieldsForPage(page)"
           :key="field.key"
           :draggable="true"
-          class="draggable-item mb-2"
+          class="draggable-item !my-2"
           :legend="field.display_name"
           :toggleable="true"
           style="background-color: #FAEFFF;"
           :pt="{
             legend: {
-              class: 'border-1 surface-border',
+              class: '!border !border-surface !flex !items-center !justify-between !pl-3',
             },
             content: {
-              class: 'flex flex-column gap-3 ml-1 ',
+              class: '!flex !flex-col !justify-center !gap-4 !ml-1',
             },
           }"
           @dragstart="onDragStart($event, field)"
@@ -50,6 +50,7 @@
               text
               class="m-0 p-0 ml-2"
               severity="primary"
+              size="small"
               @click=" (event: Event) => confirm.require({
                 target: event.currentTarget as HTMLElement,
                 group: 'delete',
@@ -71,12 +72,13 @@
               </template>
             </Button>
           </template>
-          <span class="flex gap-5">
+
+          <span class="flex gap-8 my-2">
             <div
-              class="flex flex-column gap-3 mr-5"
+              class="flex flex-col gap-4 mr-8"
               style="min-width: 50%;"
             >
-              <span class="flex align-items-center gap-2 flex-grow-1">
+              <span class="flex items-center gap-2 grow">
 
                 <label :for="'display_name_' + index">Titre :</label>
                 <InputText
@@ -84,7 +86,7 @@
                   v-model="field.display_name"
                   :variant="hasFieldAttributeBeenEdited(index, 'display_name') ? 'filled': 'outlined'"
                   :invalid="!field.display_name"
-                  class="mr-4 flex-grow-1"
+                  class="mr-6 grow"
                 />
                 <Button
                   label="Modifier la clé"
@@ -97,9 +99,9 @@
                 />
               </span>
 
-              <span class="flex align-items-center gap-2">
+              <span class="flex items-center gap-2">
                 <label :for="'field_type_' + index"> Type : </label>
-                <Dropdown
+                <Select
                   :id="'field_type_' + index"
                   v-model="field.field_type"
                   :options="fieldTypeOptions"
@@ -108,7 +110,7 @@
                   @update:model-value="() => onFieldTypeChange(field)"
                 />
 
-                <Dropdown
+                <Select
                   v-if="['SingleLineText'].includes(field.field_type)"
                   :id="'field_type_' + index"
                   v-model="(field.field_type_metadata as StringFieldTypeMetadata).format"
@@ -121,7 +123,7 @@
                   :id="'field_type_metadata_' + index"
                   v-model="field.field_type_metadata"
                   label="Options"
-                  class="border-1 border-black-alpha-10"
+                  class="border border-black/10"
                   severity="secondary"
                   @click="() => {
                     editOptionsField = field
@@ -134,7 +136,7 @@
                   :id="'field_type_metadata_' + index"
                   v-model="field.field_type_metadata"
                   label="Évènements"
-                  class="border-1 border-black-alpha-10"
+                  class="border border-black/10"
                   severity="secondary"
                   @click="() => {
                     editEventsField = field
@@ -149,20 +151,19 @@
               </span>
             </div>
 
-            <div class="flex flex-column gap-3">
-              <span class="flex align-items-center gap-2">
+            <div class="flex flex-col gap-4">
+              <span class="flex items-center gap-2">
                 <label :for="'display_weight_' + index"> Ordre d'affichage : </label>
-                <Dropdown
+                <Select
                   :id="'display_weight_' + index"
                   :model-value="display_indexes[field.key]"
                   option-label="label"
                   option-value="value"
-                  :options="[{ value: 'notDisplayed',
-                               label: 'Non-affiché publiquement' }, ...Array.from({ length: max_display_index }, (_, i) => ({ value: i + 1, label: i + 1 }))]"
+                  :options="[{ value: 'notDisplayed', label: 'Non-affiché publiquement' }, ...Array.from({ length: max_display_index }, (_, i) => ({ value: i + 1, label: i + 1 }))]"
                   @update:model-value="(new_index : 'notDisplayed' | number) => onDisplayIndexChange(field.key, new_index) "
                 /> <!--  field.user_facing -->
               </span>
-              <span class="flex align-items-center gap-5">
+              <span class="flex items-center gap-8">
                 <AdminInputSwitchField
                   :id="'mandatory_' + index"
                   v-model="field.mandatory"
@@ -181,17 +182,17 @@
 
           </span>
 
-          <span class="flex align-items-center gap-2 mr-3">
+          <span class="flex items-center gap-2 mr-4">
             <label :for="'help_' + index">Texte d'aide :</label>
             <InputText
               :id="'help_' + index"
               v-model="field.help"
-              class="flex flex-grow-1"
+              class="flex grow"
               :variant="hasFieldAttributeBeenEdited(index, 'help') ? 'filled': 'outlined'"
             />
           </span>
         </Fieldset>
-        <div class="flex justify-content-center">
+        <div class="flex justify-center">
           <Button
             outlined
             rounded
@@ -214,7 +215,7 @@
         </div>
       </Fieldset>
 
-      <span class="flex gap-1 justify-content-end">
+      <span class="flex gap-1 justify-end">
         <NuxtLink to="/admin/families">
           <Button
             label="Annuler"
@@ -240,11 +241,11 @@
       :closable="false"
       :header="`Édition des options du champ ${editOptionsField!.display_name}`"
     >
-      <div class="flex flex-column gap-3">
+      <div class="flex flex-col gap-4">
         <div
           v-for="(option, index) in editOptionsOptions"
           :key="index"
-          class="flex align-items-center gap-2"
+          class="flex items-center gap-2"
         >
           <label :for="'option_label_' + index">Label :</label>
           <InputText
@@ -256,7 +257,7 @@
             v-tooltip.bottom="`Si activé, ce champ ne sera pas affiché dans les résultats lorsque cette option est sélectionnée`"
             :for="'option_hidden_' + index"
           >Cachée :</label>
-          <InputSwitch
+          <ToggleSwitch
             :id="'option_hidden_' + index"
             v-model="option.hidden"
           />
@@ -287,7 +288,7 @@
             </template>
           </Button>
         </div>
-        <span class="flex justify-content-center">
+        <span class="flex justify-center">
           <Button
             type="button"
             label="Ajouter une option"
@@ -295,7 +296,7 @@
           />
         </span>
 
-        <div class="flex justify-content-end gap-2">
+        <div class="flex justify-end gap-2">
           <Button
             type="button"
             label="Annuler"
@@ -322,11 +323,11 @@
       :closable="false"
       :header="`Édition des évènements du champ ${editEventsField!.display_name}`"
     >
-      <div class="flex flex-column gap-3">
+      <div class="flex flex-col gap-4">
         <div
           v-for="(event, index) in editEventsEvents"
           :key="index"
-          class="flex align-items-center gap-2"
+          class="flex items-center gap-2"
         >
           <label :for="'event_label_' + index">Label :</label>
           <InputText
@@ -371,7 +372,7 @@
             </template>
           </Button>
         </div>
-        <span class="flex justify-content-center">
+        <span class="flex justify-center">
           <Button
             type="button"
             label="Ajouter un évènement"
@@ -379,7 +380,7 @@
           />
         </span>
 
-        <div class="flex justify-content-end gap-2">
+        <div class="flex justify-end gap-2">
           <Button
             type="button"
             label="Annuler"
@@ -407,9 +408,9 @@
       :header="`Édition de la clé du champ ${editKeyField!.display_name}`"
     >
       <div
-        class="flex flex-column gap-3"
+        class="flex flex-col gap-4"
       >
-        <span class="flex align-items-center gap-2">
+        <span class="flex items-center gap-2">
           <label for="display_name_add">Titre :</label>
           <InputText
             id="display_name_add"
@@ -418,7 +419,7 @@
             placeholder="Adresse du coiffeur"
           />
         </span>
-        <span class="flex align-items-center gap-2 ml-2">
+        <span class="flex items-center gap-2 ml-2">
           <label for="key_add">Clé :</label>
           <InputText
             id="key_add"
@@ -433,7 +434,7 @@
             value="!"
           />
         </span>
-        <div class="flex justify-content-end gap-2">
+        <div class="flex justify-end gap-2">
           <Button
             type="button"
             label="Annuler"
@@ -458,9 +459,9 @@
       header="Ajout d'un nouveau champ"
     >
       <div
-        class="flex flex-column gap-3"
+        class="flex flex-col gap-4"
       >
-        <span class="flex align-items-center gap-2">
+        <span class="flex items-center gap-2">
           <label for="display_name_add">Titre :</label>
           <InputText
             id="display_name_add"
@@ -469,7 +470,7 @@
             placeholder="Adresse du coiffeur"
           />
         </span>
-        <span class="flex align-items-center gap-2 ml-2">
+        <span class="flex items-center gap-2 ml-2">
           <label for="key_add">Clé :</label>
           <InputText
             id="key_add"
@@ -484,7 +485,7 @@
             value="!"
           />
         </span>
-        <div class="flex justify-content-end gap-2">
+        <div class="flex justify-end gap-2">
           <Button
             type="button"
             label="Annuler"
@@ -794,9 +795,10 @@ const fieldStringTypeOptions = [
 
 <style scoped>
 .draggable-item {
-cursor: grab;
+  cursor: grab;
 }
+
 .draggable-item:active {
-cursor: grabbing;
+  cursor: grabbing;
 }
 </style>

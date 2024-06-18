@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="flex gap-3">
+    <span class="flex gap-4">
       <IconField icon-position="left">
         <InputIcon>
           <AppIcon
@@ -18,7 +18,7 @@
         :options="optionalColumns"
         display="chip"
         placeholder="Sélectionner des colonnes"
-        class="w-full md:w-20rem"
+        class="w-full md:w-80"
       />
     </span>
     <DataTable
@@ -38,7 +38,7 @@
       <Column
         field="display_name"
         header="Nom d'affichage"
-        class="max-w-25rem"
+        class="max-w-[25rem]"
         sortable
       />
 
@@ -102,7 +102,6 @@
 </template>
 
 <script setup lang="ts">
-import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { AdminListedEntity } from '~/lib'
@@ -132,7 +131,7 @@ if (!(table_key in state.tablesSelectedColumns)) {
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    global: { value: null, matchMode: 'contains' },
   }
 }
 

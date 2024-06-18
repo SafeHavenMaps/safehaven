@@ -1,7 +1,7 @@
 <template>
   <PanelMenu
     :model="getMenuItems()"
-    class="navigation-tree mt-4"
+    class="navigation-tree mt-6"
     style="width: 17rem;"
   >
     <template #item="{ item }">
@@ -27,7 +27,7 @@
             severity="danger"
           />
           <span
-            class="flex-grow-1 text-link"
+            class="grow text-link"
           >{{ item.label }}</span>
         </a>
       </NuxtLink>
@@ -49,7 +49,7 @@
           severity="danger"
         />
         <span
-          class="flex-grow-1 text-link"
+          class="grow text-link"
         >
           {{ item.label }}
         </span>
@@ -81,7 +81,7 @@ function getMenuItems() {
 }
 
 function classForLink(active: boolean) {
-  const classes = ['flex', 'align-items-center', 'cursor-pointer', 'text-color', 'px-3', 'py-2', 'gap-2']
+  const classes = ['flex', 'items-center', 'cursor-pointer', 'text-color', 'px-4', 'py-2', 'gap-2']
 
   if (active) {
     classes.push('active-link')
@@ -182,35 +182,36 @@ const nodes = computed(() => [
 }
 
 .p-panelmenu-panel {
-  border-width: 0;
+  border-width: 0 !important;
+  background: transparent !important;
 }
 
 .p-panelmenu-header-content {
-  cursor: pointer;
-  background-color: transparent;
+  cursor: pointer !important;
+  background-color: transparent !important;
 }
 
 .p-panelmenu-content {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 
 .arrow-icon {
-  transform: rotate(0deg);
-  transition: all 0.2s ease-in-out;
+  transform: rotate(0deg) !important;
+  transition: all 0.2s ease-in-out !important;
 
 }
 
 div[aria-expanded="true"] .arrow-icon,
 li[aria-expanded="true"] .arrow-icon {
-  transform: rotate(-180deg);
-  transition: all 0.2s ease-in-out;
+  transform: rotate(-180deg) !important;
+  transition: all 0.2s ease-in-out !important;
 }
 
 a {
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 .navigation-tree {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 </style>

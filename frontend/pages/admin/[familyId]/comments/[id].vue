@@ -1,9 +1,9 @@
 <template>
   <form
-    class="flex flex-wrap gap-5 mx-4"
+    class="flex flex-wrap gap-8 mx-6"
     @submit.prevent="onSave"
   >
-    <div class="flex flex-grow-1 flex-column gap-3 max-w-30rem">
+    <div class="flex grow flex-col gap-4 max-w-[30rem]">
       <AdminInputTextField
         id="author"
         v-model="editedComment.author"
@@ -28,7 +28,7 @@
       />
     </div>
 
-    <div class="flex flex-column flex-grow-1 gap-3 max-w-30rem">
+    <div class="flex flex-col grow gap-4 max-w-[30rem]">
       <span v-if="!isNew">Commentaire créé le
         {{ Intl.DateTimeFormat('fr-FR', {
           dateStyle: 'long',
@@ -71,7 +71,7 @@
         label="Modérée"
         helper-text="Si activé, cette entité quittera la liste des entités en attente et sera rendue publique."
       />
-      <span class="flex gap-1 justify-content-end">
+      <span class="flex gap-1 justify-end">
         <NuxtLink :to="returnUrl">
           <Button
             label="Annuler"

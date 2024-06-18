@@ -1,10 +1,10 @@
 <template>
   <div
     v-if="props.formField.field_type=='Boolean'"
-    class="flex flex-column gap-2"
+    class="flex flex-col gap-2"
   >
-    <span class="flex gap-2 align-items-center">
-      <InputSwitch
+    <span class="flex gap-2 items-center">
+      <ToggleSwitch
         :id="props.formField.key"
         :model-value="(props.fieldContent as (boolean | undefined))"
         @update:model-value="updateField"
@@ -15,7 +15,7 @@
   </div>
   <div
     v-else
-    class="flex flex-column gap-2"
+    class="flex flex-col gap-2"
   >
     <label :for="props.formField.key">{{ props.formField.display_name }} <RequiredIndicator v-if="props.formField.mandatory" /></label>
     <InputText
@@ -61,7 +61,7 @@
       option-label="label"
       @update:model-value="updateField"
     />
-    <Calendar
+    <DatePicker
       v-if="props.formField.field_type=='Date'"
       :id="props.formField.key"
       :model-value="props.fieldContent as (Date | undefined)"
@@ -73,7 +73,7 @@
       show-button-bar
       @update:model-value="(value: Date | Date[] | (Date | null)[] | null | undefined) => updateField(value as (Date | undefined))"
     />
-    <Dropdown
+    <Select
       v-if="props.formField.field_type=='EnumSingleOption'"
       :id="props.formField.key"
       :model-value="(props.fieldContent as (string | undefined))"
@@ -94,26 +94,26 @@
     <div
       v-if="props.formField.field_type=='EventList'"
       :id="props.formField.key"
-      class="flex flex-column gap-1 border-1 p-2 surface-border border-round"
+      class="flex flex-col gap-1 border p-2 border-surface rounded-border"
     >
       <div
         v-for="(event, ev_index) in (props.fieldContent as EntityOrCommentEvent[])"
         :key="ev_index"
-        class="flex flex-column gap-2"
+        class="flex flex-col gap-2"
       >
-        <span class="flex flex-wrap align-items-center gap-3">
-          <Dropdown
+        <span class="flex flex-wrap items-center gap-4">
+          <Select
             v-model="event.type"
             placeholder="type d'évènement"
-            class="flex-grow-1"
+            class="grow"
             :options="props.formField.field_type_metadata?.event_types"
             option-value="value"
             option-label="label"
           />
           <!-- @update:model-value="new_type => (props.fieldContent as EntityOrCommentEvent[])[ev_index] = { type: new_type, date: event.date, details: event.details }" -->
-          <Calendar
+          <DatePicker
             v-model="event.date"
-            class="w-10rem"
+            class="w-40"
             placeholder="jj/mm/aaaa"
             date-format="dd/mm/yy"
             show-icon
@@ -137,7 +137,7 @@
           </Button>
         </span>
 
-        <span class="flex align-items-center gap-2">
+        <span class="flex items-center gap-2">
           <label for="">Détails (optionels): </label>
           <Textarea
             v-model="event.details"
@@ -148,7 +148,7 @@
           type="dashed"
         />
       </div>
-      <span class="flex justify-content-center">
+      <span class="flex justify-center">
         <Button
           rounded
           size="small"
@@ -171,7 +171,7 @@
 
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
-import Calendar from 'primevue/calendar'
+import DatePicker from 'primevue/datepicker'
 import type { EntityOrCommentEvent, FieldContentMap, FormField } from '~/lib'
 
 type FormProps<T extends FormField> = {

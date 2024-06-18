@@ -20,13 +20,13 @@
     v-model:visible="formVisible"
     modal
     closable
-    class="w-full max-w-30rem"
+    class="w-full max-w-md"
     :header="props.family.comment_form.title"
     :content-props="{ onClick: (event: Event) => { event.stopPropagation() } }"
   >
     <form
       v-if="curr_page == 0"
-      class="flex flex-grow-1 flex-column gap-3"
+      class="flex grow flex-col gap-4"
       @submit.prevent="curr_page+=1"
     >
       <AdminInputTextField
@@ -44,7 +44,7 @@
         />
       </div>
 
-      <span class="flex gap-1 justify-content-end">
+      <span class="flex gap-1 justify-end">
         <Button
           label="Suivant"
           type="submit"
@@ -56,12 +56,12 @@
     <form
       v-for="page in Array.from({ length: page_count }, (_, i) => i+1)"
       :key="`Page ${page}`"
-      class="flex flex-grow-1 flex-column gap-3 w-30rem"
+      class="flex grow flex-col gap-4 w-[30rem]"
       @submit.prevent="() => page == page_count ? onSave() : curr_page+=1"
     >
       <div
         v-if="curr_page == page"
-        class="flex flex-grow-1 flex-column gap-3 max-w-30rem"
+        class="flex grow flex-col gap-4 max-w-[30rem]"
       >
         <FormDynamicField
           v-for="field in props.family.comment_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
@@ -71,7 +71,7 @@
         />
 
         <span
-          class="flex gap-1 justify-content-end"
+          class="flex gap-1 justify-end"
         >
           <Button
             label="Précédent"

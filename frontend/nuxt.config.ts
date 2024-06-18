@@ -1,15 +1,32 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+import theme from './theme.mjs'
+
 export default defineNuxtConfig({
-  modules: ['nuxt-primevue', '@nuxt/eslint'],
+  modules: [
+    '@primevue/nuxt-module',
+    '@nuxt/eslint',
+    '@nuxtjs/tailwindcss',
+  ],
   ssr: false,
   devtools: { enabled: true },
   typescript: {
     typeCheck: true,
     strict: true,
   },
+  primevue: {
+    options: {
+      theme: {
+        preset: theme,
+        options: {
+          darkModeSelector: 'none',
+        },
+      },
+    },
+  },
   css: [
     '~/assets/main.css',
-    'primeflex/primeflex.css',
-    'primevue/resources/themes/aura-light-pink/theme.css',
+    '~/assets/richtext.css',
   ],
   eslint: {
     config: {

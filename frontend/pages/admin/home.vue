@@ -1,14 +1,14 @@
 <template>
   <div class="relative h-full w-full">
-    <div class="grid">
+    <div class="grid grid-cols-12 gap-4">
       <div
         v-for="(card, index) in cards"
         :key="index"
-        class="col-12 md:col-6 xl:col-2 relative"
+        class="col-span-12 md:col-span-6 xl:col-span-2 relative"
       >
         <Card :class="card.class + ' relative'">
           <template #title>
-            <div class="white-space-nowrap text-sm flex">
+            <div class="whitespace-nowrap text-sm flex">
               <AppIcon
                 :icon-name="card.iconName"
                 size="16px"
@@ -26,15 +26,16 @@
       </div>
     </div>
 
-    <div class="relative flex h-full w-full justify-content-center mt-2">
-      <div class="text-xl font-bold mb-3">
+    <div class="relative flex flex-col h-full w-full items-center justify-center">
+      <div class="text-xl font-bold ">
         Activités des 30 derniers jours
       </div>
+
       <Chart
         type="bar"
         :data="chartData"
         :options="chartOptions"
-        class="absolute top-0 left-0 h-full w-full mt-3 xl:mt-6 xl:h-25rem"
+        class="absolute top-0 left-0 h-full w-full max-h-96 xl:mt-12 xl:h-[25rem]"
       />
     </div>
   </div>
@@ -169,31 +170,31 @@ const cards = [
 
 <style>
 .card-green {
-  background-color: #6fac72;
-  color: white;
-  position: relative;
-  overflow: hidden;
+  background-color: #6fac72 !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
 .card-orange {
-  background-color: #ef9444;
-  color: white;
-  position: relative;
-  overflow: hidden;
+  background-color: #ef9444 !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
 .card-blue {
-  background-color: #E86BA7;
-  color: white;
-  position: relative;
-  overflow: hidden;
+  background-color: #E86BA7 !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
 .p-card-body {
-  padding: 0.75rem;
+  padding: 0.75rem !important;
 }
 
 .p-card-content {
-  margin-top: 0.25rem;
+  margin-top: 0.25rem !important;
 }
 </style>

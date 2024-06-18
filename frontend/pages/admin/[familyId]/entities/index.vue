@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="flex gap-4 align-items-end mb-3">
+    <span class="flex gap-6 items-end mb-4">
       <form @submit.prevent="refreshTable">
         <InputGroup
           style="height: 36px; "
@@ -12,7 +12,7 @@
 
           <Button
             type="button"
-            severity="warning"
+            severity="warn"
             label="Filtres"
             @click="(event: Event) => filters_overlay?.toggle(event)"
           >
@@ -36,7 +36,7 @@
         :options="optionalColumns"
         display="chip"
         placeholder="Sélectionner des colonnes"
-        class="w-full md:w-20rem"
+        class="w-full md:w-80"
       />
     </span>
 
@@ -56,7 +56,7 @@
       <Column
         field="display_name"
         header="Nom d'affichage"
-        class="max-w-25rem"
+        class="max-w-[25rem]"
       />
       <Column
         v-if="state.tablesSelectedColumns[table_key].includes('Catégorie')"
@@ -71,7 +71,7 @@
         v-if="state.tablesSelectedColumns[table_key].includes('Tags')"
         field="tags"
         header="Tags"
-        class="max-w-18rem"
+        class="max-w-72"
       >
         <template #body="slotProps">
           <DisplayedTag
@@ -118,7 +118,7 @@
       </Column>
     </DataTable>
 
-    <OverlayPanel
+    <Popover
       ref="tags_tooltip"
     >
       <DisplayedTag
@@ -127,21 +127,21 @@
         :tag="state.tagRecord[tag_id]"
         class="m-1"
       />
-    </OverlayPanel>
+    </Popover>
 
-    <OverlayPanel ref="filters_overlay">
+    <Popover ref="filters_overlay">
       <ViewerFilterConfig
         v-model:filteringTags="state.tablesQueryParams[table_key].tagFilteringList!"
         v-model:filteringCategories="state.tablesQueryParams[table_key].categoryFilteringList!"
-        class="w-25rem"
+        class="w-[25rem]"
         @filters-changed="refreshTable"
       />
-    </OverlayPanel>
+    </Popover>
   </div>
 </template>
 
 <script setup lang="ts">
-import type OverlayPanel from 'primevue/overlaypanel'
+import Popover from 'primevue/popover'
 import type { PageState } from 'primevue/paginator'
 import DisplayedTag from '~/components/DisplayedTag.vue'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
@@ -162,8 +162,8 @@ if (state.tags == null) {
 
 const familyTitle = state.families.filter(family => family.id == familyId)[0].title
 
-const filters_overlay = ref<OverlayPanel>()
-const tags_tooltip = ref<OverlayPanel>()
+const filters_overlay = ref<typeof Popover>()
+const tags_tooltip = ref<typeof Popover>()
 const tooltip_excess_tags: Ref<undefined | string[]> = ref(undefined)
 
 const firstRow = ref(0)

@@ -1,6 +1,6 @@
 <template>
   <form
-    class="flex flex-column gap-3 max-w-30rem mx-4"
+    class="flex flex-col gap-4 max-w-[30rem] mx-6"
     @submit.prevent="onSave"
   >
     <AdminInputTextField
@@ -21,17 +21,17 @@
       label="Titre du formulaire d'ajout de commentaire"
     />
 
-    <span class="flex align-items-center gap-2">
-      <Dropdown
+    <span class="flex items-center gap-2">
+      <Select
         id="sort_order"
         v-model="editedFamily.sort_order"
         :options="Array.from({ length: state.families.length + 1 }, (_, i) => i + 1)"
-        class="w-full md:w-14rem"
+        class="w-full md:w-56"
       />
       <label for="sort_order">Ordre d'affichage parmi les familles</label>
     </span>
 
-    <span class="flex gap-1 justify-content-end">
+    <span class="flex gap-1 justify-end">
       <NuxtLink to="/admin/families">
         <Button
           label="Annuler"

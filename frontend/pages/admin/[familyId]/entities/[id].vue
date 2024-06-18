@@ -1,133 +1,159 @@
 <template>
   <div
-    class="mx-4"
+    class="mx-6"
   >
-    <TabView>
-      <TabPanel header="Contenu et modération">
-        <form
-          class="flex flex-wrap gap-5"
-          @submit.prevent="onSave"
+    <Tabs value="0">
+      <TabList>
+        <Tab
+          value="0"
         >
-          <div class="flex flex-grow-1 flex-column gap-3 max-w-30rem">
-            <AdminInputTextField
-              id="display_name"
-              v-model="editedEntity.display_name"
-              label="Nom d'affichage"
-              :variant="hasBeenEdited('display_name')"
-            />
-            <FormCategorySelect
-              v-model="editedEntity.category_id"
-              :categories="categories"
-            />
-
-            <FormDynamicField
-              v-for="field in family.entity_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
-              :key="field.key"
-              v-model:fieldContent="(editedEntity.data as EntityOrCommentData)[field.key]"
-              :form-field="(field as FormField)"
-            />
-          </div>
-
-          <div class="flex flex-column flex-grow-1 gap-3 max-w-30rem">
-            Entitée crée le
-            {{ Intl.DateTimeFormat('fr-FR', {
-              dateStyle: 'long',
-              timeStyle: 'short',
-            }).format(new Date(fetchedEntity.created_at)) }}, mise à jour pour la dernière fois le
-            {{ Intl.DateTimeFormat('fr-FR', {
-              dateStyle: 'long',
-              timeStyle: 'short',
-            }).format(new Date(fetchedEntity.updated_at)) }}
-
-            <FormTagSelect
-              v-model="editedEntity.tags"
-              :tags="tags"
-            />
-
-            <AdminInputSwitchField
-              id="hidden"
-              v-model="editedEntity.hidden"
-              label="Cachée"
-              helper-text="Si activé, cette entité ne sera pas visible publiquement, même si modérée. Utile pour des entités que vous souhaitez cacher à long terme sans les supprimer."
-            />
-            <AdminInputSwitchField
-              id="moderated"
-              v-model="editedEntity.moderated"
-              label="Modérée"
-              helper-text="Si activé, cette entité quittera la liste des entités en attente et sera rendue publique."
-            />
-
-            <AdminInputTextField
-              id="moderation_notes"
-              v-model="editedEntity.moderation_notes"
-              label="Notes de modération"
-              text-length="long"
-              optional
-            />
-
-            <FormAdresses
-              v-model:locations="editedEntity.locations as UnprocessedLocation[]"
-            />
-
-            <span class="flex gap-1 justify-content-end">
-              <NuxtLink :to="`/admin/${familyId}/entities`">
-                <Button
-                  label="Annuler"
-                  severity="secondary"
-                  :loading="processingRequest"
-                  :disabled="processingRequest"
-                />
-              </NuxtLink>
-              <Button
-                label="Sauvegarder"
-                type="submit"
-                :loading="processingRequest"
-                :disabled="processingRequest || !editedEntity.display_name || !editedEntity.category_id"
-              />
-            </span>
-          </div>
-        </form>
-      </TabPanel>
-
-      <TabPanel header="Parenté">
-        <AdminEntityKinshipTable
-          :main-entity="fetchedEntity"
-          :categories="categories"
-          :tags="tags"
-          :family-id="familyId"
-          @update-kinship="async () => fetchedEntity = (await state.client.getEntity(entityId))"
-        />
-      </TabPanel>
-
-      <TabPanel header="Commentaires">
-        <span v-if="entityComments.length == 0">Aucun commentaire pour le moment</span>
-        <CommentsDisplayer
-          style="max-width: 60rem;"
-          :comment-form-fields="family.comment_form.fields"
-          :comments="entityComments"
-          :public="false"
-          @delete="onCommentDelete"
-          @edit="commentId => navigateTo(`/admin/${familyId}/comments/${commentId}?urlEntityId=${entityId}`)"
-        />
-        <Button
-          label="Nouveau commentaire"
-          rounded
-          outlined
-          class="ml-3 mt-3"
-          @click="navigateTo(`/admin/${familyId}/comments/new?urlEntityId=${entityId}`)"
+          Contenu et modération
+        </Tab>
+        <Tab
+          value="1"
         >
-          <template #default>
-            <div class="flex align-items-center">
-              <AppIcon
-                class="-ml-1 mr-1"
-                icon-name="commentAdd"
+          Parenté
+        </Tab>
+        <Tab
+          value="2"
+        >
+          Commentaires
+        </Tab>
+      </TabList>
+
+      <TabPanels>
+        <TabPanel value="0">
+          <form
+            class="flex flex-wrap gap-8"
+            @submit.prevent="onSave"
+          >
+            <div class="flex grow flex-col gap-4 max-w-[30rem]">
+              <AdminInputTextField
+                id="display_name"
+                v-model="editedEntity.display_name"
+                label="Nom d'affichage"
+                :variant="hasBeenEdited('display_name')"
               />
-              Ajouter un commentaire
+              <FormCategorySelect
+                v-model="editedEntity.category_id"
+                :categories="categories"
+              />
+
+              <FormDynamicField
+                v-for="field in family.entity_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
+                :key="field.key"
+                v-model:fieldContent="(editedEntity.data as EntityOrCommentData)[field.key]"
+                :form-field="(field as FormField)"
+              />
             </div>
-          </template>
-        </Button>
-      </TabPanel>
-    </TabView>
+
+            <div class="flex flex-col grow gap-4 max-w-[30rem]">
+              Entitée crée le
+              {{ Intl.DateTimeFormat('fr-FR', {
+                dateStyle: 'long',
+                timeStyle: 'short',
+              }).format(new Date(fetchedEntity.created_at)) }}, mise à jour pour la dernière fois le
+              {{ Intl.DateTimeFormat('fr-FR', {
+                dateStyle: 'long',
+                timeStyle: 'short',
+              }).format(new Date(fetchedEntity.updated_at)) }}
+
+              <FormTagSelect
+                v-model="editedEntity.tags"
+                :tags="tags"
+              />
+
+              <AdminInputSwitchField
+                id="hidden"
+                v-model="editedEntity.hidden"
+                label="Cachée"
+                helper-text="Si activé, cette entité ne sera pas visible publiquement, même si modérée. Utile pour des entités que vous souhaitez cacher à long terme sans les supprimer."
+              />
+              <AdminInputSwitchField
+                id="moderated"
+                v-model="editedEntity.moderated"
+                label="Modérée"
+                helper-text="Si activé, cette entité quittera la liste des entités en attente et sera rendue publique."
+              />
+
+              <AdminInputTextField
+                id="moderation_notes"
+                v-model="editedEntity.moderation_notes"
+                label="Notes de modération"
+                text-length="long"
+                optional
+              />
+
+              <FormAdresses
+                v-model:locations="editedEntity.locations as UnprocessedLocation[]"
+              />
+
+              <span class="flex gap-1 justify-end">
+                <NuxtLink :to="`/admin/${familyId}/entities`">
+                  <Button
+                    label="Annuler"
+                    severity="secondary"
+                    :loading="processingRequest"
+                    :disabled="processingRequest"
+                  />
+                </NuxtLink>
+                <Button
+                  label="Sauvegarder"
+                  type="submit"
+                  :loading="processingRequest"
+                  :disabled="processingRequest || !editedEntity.display_name || !editedEntity.category_id"
+                />
+              </span>
+            </div>
+          </form>
+        </TabPanel>
+
+        <TabPanel value="1">
+          <AdminEntityKinshipTable
+            :main-entity="fetchedEntity"
+            :categories="categories"
+            :tags="tags"
+            :family-id="familyId"
+            @update-kinship="async () => fetchedEntity = (await state.client.getEntity(entityId))"
+          />
+        </TabPanel>
+
+        <TabPanel value="2">
+          <Message
+            v-if="entityComments.length == 0"
+            severity="warn"
+          >
+            Aucun commentaire pour le moment
+          </Message>
+          <CommentsDisplayer
+            v-else
+            style="max-width: 60rem;"
+            :comment-form-fields="family.comment_form.fields"
+            :comments="entityComments"
+            :public="false"
+            @delete="onCommentDelete"
+            @edit="commentId => navigateTo(`/admin/${familyId}/comments/${commentId}?urlEntityId=${entityId}`)"
+          />
+          <Button
+            label="Nouveau commentaire"
+            rounded
+            outlined
+            class="ml-3 mt-3"
+            @click="navigateTo(`/admin/${familyId}/comments/new?urlEntityId=${entityId}`)"
+          >
+            <template #default>
+              <div class="flex align-items-center">
+                <AppIcon
+                  class="-ml-1 mr-1"
+                  icon-name="commentAdd"
+                />
+                Ajouter un commentaire
+              </div>
+            </template>
+          </Button>
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
   </div>
 </template>
 

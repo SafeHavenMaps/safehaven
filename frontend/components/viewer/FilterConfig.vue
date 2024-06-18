@@ -1,166 +1,174 @@
 <template>
-  <TabView>
-    <TabPanel header="Général">
-      <div>
-        <span class="font-medium text-900 block mb-2">Catégories</span>
+  <Tabs value="0">
+    <TabList>
+      <Tab value="0">
+        Général
+      </Tab>
+      <Tab value="1">
+        Avancé
+      </Tab>
+    </TabList>
 
+    <TabPanels>
+      <TabPanel value="0">
+        <div>
+          <span class="font-medium text-surface-900 block mb-2">Catégories</span>
+          <div
+            :style="{
+              maxHeight: props.maximumHeight,
+              overflowY: 'auto',
+            }"
+          >
+            <div
+              v-for="category in props.filteringCategories"
+              :key="category.id"
+              class="flex items-center mb-2"
+            >
+              <ToggleSwitch
+                v-model="category.active"
+                @update:model-value="() => categoryFiltersChanged()"
+              />
+              <div
+                class="round ml-2 mr-2"
+                :style="{
+                  backgroundColor: category.fill_color,
+                  borderColor: category.border_color,
+                }"
+              >
+                <AppIcon
+                  size="16px"
+                  dynamic
+                  :icon-name="category.icon_hash!"
+                />
+              </div>
+              {{ category.title }}
+            </div>
+          </div>
+          <Button
+            outlined
+            size="small"
+            class="m-1"
+            @click="invertFilteringCategories"
+          >
+            Inverser
+          </Button>
+          <Button
+            outlined
+            size="small"
+            class="m-1"
+            @click="resetFilteringCategories"
+          >
+            Réinitialiser
+          </Button>
+          <Button
+            outlined
+            size="small"
+            class="m-1"
+            @click="selectAllFilteringCategories"
+          >
+            Tout sélectionner
+          </Button>
+        </div>
         <div
+          class="filter-settings mt-2"
+        >
+          <span class="font-medium text-surface-900 block mb-2">Filtres</span>
+          <div
+            v-for="tag in props.filteringTags.filter(t => t.is_filter)"
+            :key="tag.id"
+            class="mb-2 p-1"
+          >
+            <div class="text-surface-800 mb-1">
+              {{ tag.filter_description }}
+            </div>
+
+            <SelectButton
+              v-model="tag.active"
+              :options="[true, null, false]"
+              option-label="title"
+              aria-labelledby="custom"
+              @change="tagFiltersChanged"
+            >
+              <template #option="slotProps">
+                <div class="button-content">
+                  <span>{{
+                    slotProps.option === false ? 'Caché'
+                    : slotProps.option === null
+                      ? 'Affiché' : 'Requis'
+                  }}</span>
+                </div>
+              </template>
+            </SelectButton>
+          </div>
+        </div>
+      </TabPanel>
+
+      <TabPanel value="1">
+        <span class="font-medium text-surface-900 block mb-2">Tags</span>
+        <InputGroup
+          class="mb-6 mt-2"
+        >
+          <InputText
+            v-model="tagSearch"
+            placeholder="Rechercher un tag"
+          />
+          <Button
+            v-tooltip.bottom="'Retirer la recherche'"
+            severity="warn"
+            @click="tagSearch = ''"
+          >
+            <template #icon>
+              <AppIcon icon-name="clear" />
+            </template>
+          </Button>
+          <Button
+            v-tooltip.bottom="'Retirer tous les filtres'"
+            severity="danger"
+            @click="resetFilters()"
+          >
+            <template #icon>
+              <AppIcon icon-name="filterOff" />
+            </template>
+          </Button>
+        </InputGroup>
+        <div
+          class="filter-settings"
           :style="{
             maxHeight: props.maximumHeight,
             overflowY: 'auto',
           }"
         >
           <div
-            v-for="category in props.filteringCategories"
-            :key="category.id"
-            class="flex align-items-center justify-between mb-2"
+            v-for="tag in shownAdvancedTags()"
+            :key="tag.id"
+            class="mb-2 p-1"
           >
-            <InputSwitch
-              v-model="category.active"
-              @update:model-value="(value:boolean) => categoryFiltersChanged()"
-            />
-            <div
-              class="round ml-2 mr-2"
-              :style="{
-                backgroundColor: category.fill_color,
-                borderColor: category.border_color,
-              }"
-            >
-              <AppIcon
-                size="16px"
-                dynamic
-                :icon-name="category.icon_hash!"
-              />
+            <div class="mb-1">
+              <DisplayedTag :tag="tag" />
             </div>
-            {{ category.title }}
+
+            <SelectButton
+              v-model="tag.active"
+              :options="[true, null, false]"
+              option-label="title"
+              aria-labelledby="custom"
+              @change="() => tagFiltersChanged()"
+            >
+              <template #option="slotProps">
+                <div class="button-content">
+                  <span>{{
+                    slotProps.option === false ? 'Caché'
+                    : slotProps.option === null
+                      ? 'Affiché' : 'Requis'
+                  }}</span>
+                </div>
+              </template>
+            </SelectButton>
           </div>
         </div>
-        <Button
-          outlined
-          size="small"
-          class="m-1"
-          @click="invertFilteringCategories"
-        >
-          Inverser
-        </Button>
-        <Button
-          outlined
-          size="small"
-          class="m-1"
-          @click="resetFilteringCategories"
-        >
-          Réinitialiser
-        </Button>
-        <Button
-          outlined
-          size="small"
-          class="m-1"
-          @click="selectAllFilteringCategories"
-        >
-          Tout sélectionner
-        </Button>
-      </div>
-      <div
-        class="filter-settings mt-2"
-      >
-        <span class="font-medium text-900 block mb-2">Filtres</span>
-        <div
-          v-for="tag in props.filteringTags.filter(t => t.is_filter)"
-          :key="tag.id"
-          class="mb-2 p-1"
-        >
-          <div class="text-800 mb-1">
-            {{ tag.filter_description }}
-          </div>
-
-          <SelectButton
-            v-model="tag.active"
-            :options="[true, null, false]"
-            option-label="title"
-            aria-labelledby="custom"
-            @change="tagFiltersChanged"
-          >
-            <template #option="slotProps">
-              <div class="button-content">
-                <span>{{
-                  slotProps.option === false ? 'Caché'
-                  : slotProps.option === null
-                    ? 'Affiché' : 'Requis'
-                }}</span>
-              </div>
-            </template>
-          </SelectButton>
-        </div>
-      </div>
-    </TabPanel>
-
-    <TabPanel
-      header="Avancé"
-    >
-      <span class="font-medium text-900 block mb-2">Tags</span>
-      <InputGroup
-        class="mb-4 mt-2"
-      >
-        <InputText
-          v-model="tagSearch"
-          placeholder="Rechercher un tag"
-        />
-        <Button
-          v-tooltip.bottom="'Retirer la recherche'"
-          severity="warning"
-          @click="tagSearch = ''"
-        >
-          <template #icon>
-            <AppIcon icon-name="clear" />
-          </template>
-        </Button>
-        <Button
-          v-tooltip.bottom="'Retirer tous les filtres'"
-          severity="danger"
-          @click="resetFilters()"
-        >
-          <template #icon>
-            <AppIcon icon-name="filterOff" />
-          </template>
-        </Button>
-      </InputGroup>
-      <div
-        class="filter-settings"
-        :style="{
-          maxHeight: props.maximumHeight,
-          overflowY: 'auto',
-        }"
-      >
-        <div
-          v-for="tag in shownAdvancedTags()"
-          :key="tag.id"
-          class="mb-2 p-1"
-        >
-          <div class="mb-1">
-            <DisplayedTag :tag="tag" />
-          </div>
-
-          <SelectButton
-            v-model="tag.active"
-            :options="[true, null, false]"
-            option-label="title"
-            aria-labelledby="custom"
-            @change="() => tagFiltersChanged()"
-          >
-            <template #option="slotProps">
-              <div class="button-content">
-                <span>{{
-                  slotProps.option === false ? 'Caché'
-                  : slotProps.option === null
-                    ? 'Affiché' : 'Requis'
-                }}</span>
-              </div>
-            </template>
-          </SelectButton>
-        </div>
-      </div>
-    </TabPanel>
-  </TabView>
+      </TabPanel>
+    </TabPanels>
+  </Tabs>
 </template>
 
 <script setup lang="ts">

@@ -1,10 +1,10 @@
 <template>
   <form
-    class="mx-4"
+    class="mx-6"
     @submit.prevent="onSave"
   >
-    <div class="flex flex-wrap gap-5">
-      <div class="flex flex-grow-1 flex-column gap-3 max-w-30rem ">
+    <div class="flex flex-wrap gap-8">
+      <div class="flex grow flex-col gap-4 max-w-[30rem] ">
         <AdminInputTextField
           id="display_name"
           v-model="editedEntity.display_name"
@@ -23,7 +23,7 @@
         />
       </div>
 
-      <div class="flex flex-column flex-grow-1 gap-3 max-w-30rem ">
+      <div class="flex flex-col grow gap-4 max-w-[30rem] ">
         <FormTagSelect
           v-model="editedEntity.tags"
           :tags="tags"
@@ -51,7 +51,7 @@
           optional
         />
 
-        <div class="flex align-items-center gap-2">
+        <div class="flex items-center gap-2">
           <label>Adresses</label>
           <Button
             size="small"
@@ -73,7 +73,7 @@
               <Button
                 outlined
                 rounded
-                severity="warning"
+                severity="warn"
                 @click="() => editAddress(slotProps.index)"
               >
                 <AppIcon icon-name="edit" />
@@ -114,7 +114,7 @@
           </template>
         </Dialog>
 
-        <span class="flex gap-1 justify-content-end">
+        <span class="flex gap-1 justify-end">
           <NuxtLink :to="`/admin/${familyId}/entities`">
             <Button
               label="Annuler"

@@ -10,11 +10,14 @@
     :style="{ width: '50rem' }"
     :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
   >
-    <div v-html="popupData.sanitizedContent" />
+    <div
+      class="rich-text-content"
+      v-html="popupData.sanitizedContent"
+    />
 
     <div v-if="popupData?.sanitizedCheckbox">
-      <span class="flex align-items-center gap-2">
-        <InputSwitch
+      <span class="flex items-center gap-2">
+        <ToggleSwitch
           v-model="validationCheckbox"
           input-id="validated_popup"
           class="flex-shrink-0"

@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-column gap-3">
-    <span class="flex align-items-center gap-2">
-      <InputSwitch
+  <div class="flex flex-col gap-4">
+    <span class="flex items-center gap-2">
+      <ToggleSwitch
         :model-value="props.modelValue.allow_all"
         :input-id="`${props.label}.allow_all`"
         @update:model-value="(value:boolean) => emit('update:model-value', { ...props.modelValue, allow_all: value })"
@@ -10,7 +10,7 @@
     </span>
     <div
       v-if="props.modelValue.allow_all"
-      class="flex flex-column gap-2"
+      class="flex flex-col gap-2"
     >
       <label :for="`${props.label}.force_exclude`">Sélectionner les {{ props.label }} à exclure (le cas échéant)</label>
       <MultiSelect
@@ -24,7 +24,7 @@
     </div>
     <div
       v-if="!props.modelValue.allow_all"
-      class="flex flex-column gap-2"
+      class="flex flex-col gap-2"
     >
       <label :for="`${props.label}.allow_list`">Sélectionner les {{ props.label }} à inclure</label>
       <MultiSelect

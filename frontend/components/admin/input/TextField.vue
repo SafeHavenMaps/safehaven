@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-column gap-2">
+  <div class="flex flex-col gap-2">
     <label :for="id">{{ label }} <RequiredIndicator v-if="!props.optional" /></label>
     <InputText
       v-if="textLength==undefined || textLength=='short'"

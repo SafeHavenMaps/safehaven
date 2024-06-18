@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-column gap-2">
+  <div class="flex flex-col gap-2">
     <span class="flex gap-2">
       <Button
         v-if="!hasChildren"
@@ -48,7 +48,7 @@
       <Column
         field="display_name"
         header="Nom de l'entité"
-        class="max-w-25rem"
+        class="max-w-[25rem]"
         sortable
       />
 

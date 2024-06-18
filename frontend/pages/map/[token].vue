@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-column">
+  <div class="h-full flex flex-col">
     <ViewerNavbar
       @filters-changed="refreshMap"
       @location-chosen="goToGpsCoordinates"
@@ -20,23 +20,27 @@
       />
     </div>
 
-    <Sidebar
+    <Drawer
       v-model:visible="state.hasActiveEntity"
       :modal="false"
       :dismissable="false"
       :style="fitContainer()"
       position="left"
-      class="w-full md:w-20rem lg:w-30rem"
+      class="!w-full md:!w-[30rem]"
+      :pt="{ mask: '!w-auto' }"
     >
       <template #header>
         <div
           v-if="state.activeEntity"
-          class="flex align-items-center gap-2"
+          class="flex items-center justify-start gap-2"
         >
-          <CategoryTag :category="state.activeEntity!.category" />
-          <h3 class="m-0">
+          <CategoryTag
+            :category="state.activeEntity!.category"
+          />
+          <div class="grow m-0">
             {{ state.activeEntity!.entity.display_name }}
-          </h3>
+          </div>
+          <div class="grow" />
         </div>
       </template>
       <ViewerCommentAddForm
@@ -49,7 +53,7 @@
         :categories="state.categories"
         @entity-selected="displayEntityId"
       />
-    </Sidebar>
+    </Drawer>
 
     <StartPopup />
   </div>

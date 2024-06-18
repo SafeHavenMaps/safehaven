@@ -1,19 +1,19 @@
 <template>
   <form
     method="post"
-    class="flex flex-column justify-content-center align-items-center h-full gap-5 hot-pink-bg"
+    class="flex flex-col justify-center items-center h-full gap-8 hot-pink-bg"
     @submit.prevent="login"
   >
     <img
       src="assets/logo_secondary.svg"
-      class="w-14rem -mt-8 -mb-2"
+      class="w-64 -mt-20 -mb-2"
     >
     <Card>
       <template #title>
         <span>Espace d'administration</span>
       </template>
       <template #content>
-        <div class="flex flex-column gap-3 max-w-17rem">
+        <div class="flex flex-col gap-4 max-w-[17rem]">
           <Message
             v-if="failed_attempt"
             severity="error"
@@ -58,7 +58,7 @@
           <Button
             label="Login"
             type="submit"
-            class="w-full justify-content-center"
+            class="w-full justify-center"
             :disabled="awaiting_auth_response"
           >
             <AppIcon

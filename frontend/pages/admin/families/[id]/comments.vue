@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-color-secondary">
+    <p class="text-muted-color">
       Une page additionelle est insérée automatiquement au début du formulaire,
       contenant le nom de l'auteur.ice ainsi qu'un champ libre.
     </p>
