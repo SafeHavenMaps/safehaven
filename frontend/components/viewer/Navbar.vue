@@ -29,43 +29,6 @@
     <template #end>
       <div class="align-items-center">
         <Button
-          label="Informations"
-          class="p-button-text mr-2"
-          @click="showInformation = true"
-        >
-          <template #icon>
-            <AppIcon icon-name="information" />
-          </template>
-        </Button>
-
-        <ViewerEntityAddForm
-          :family="state.activeFamily"
-          :categories="state.categories.filter(category => category.family_id == state.activeFamily.id)"
-        />
-
-        <Button
-          v-if="props.showCategorySwitcher"
-          label="Filtres"
-          class="p-button-help mr-2"
-          @click="openFilterPanel"
-        >
-          <template #icon>
-            <AppIcon
-              icon-name="filter"
-              class="-ml-1 mr-1"
-            />
-          </template>
-        </Button>
-        <Button
-          v-if="props.showSearch"
-          class="p-button-warning mr-2"
-          @click="openSearchPanel"
-        >
-          <template #icon>
-            <AppIcon icon-name="mapSearch" />
-          </template>
-        </Button>
-        <Button
           outlined
           severity="primary"
           small
@@ -139,17 +102,10 @@
                 <AppIcon icon-name="information" />
               </template>
             </Button>
-            <Button
-              label="Ajouter"
-              class="p-button-success mr-2"
-            >
-              <template #icon>
-                <AppIcon
-                  icon-name="addEntity"
-                  class="-ml-1 mr-1"
-                />
-              </template>
-            </Button>
+            <ViewerEntityAddForm
+              :family="state.activeFamily"
+              :categories="state.categories.filter(category => category.family_id == state.activeFamily.id)"
+            />
             <Button
               v-if="props.showCategorySwitcher"
               label="Filtres"
