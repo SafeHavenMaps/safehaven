@@ -28,18 +28,19 @@
     </div>
 
     <div class="flex flex-column flex-grow-1 gap-3 max-w-30rem">
-      Commentaire créé le
-      {{ Intl.DateTimeFormat('fr-FR', {
-        dateStyle: 'long',
-        timeStyle: 'short',
-      }).format(new Date(fetchedComment.created_at)) }}, mise à jour pour la dernière fois le
-      {{ Intl.DateTimeFormat('fr-FR', {
-        dateStyle: 'long',
-        timeStyle: 'short',
-      }).format(new Date(fetchedComment.updated_at)) }}
-
+      <span v-if="!isNew">Commentaire créé le
+        {{ Intl.DateTimeFormat('fr-FR', {
+          dateStyle: 'long',
+          timeStyle: 'short',
+        }).format(new Date(fetchedComment!.created_at)) }}, mise à jour pour la dernière fois le
+        {{ Intl.DateTimeFormat('fr-FR', {
+          dateStyle: 'long',
+          timeStyle: 'short',
+        }).format(new Date(fetchedComment!.updated_at)) }}
+      </span>
       <span>
         Rattaché à {{ parentEntityToDisplay.display_name }} <CategoryTag
+          v-if="parentEntityToDisplay.category_id"
           :category="state.categoryRecord[parentEntityToDisplay.category_id]"
         />
 
@@ -70,7 +71,7 @@
         helper-text="Si activé, cette entité quittera la liste des entités en attente et sera rendue publique."
       />
       <span class="flex gap-1 justify-content-end">
-        <NuxtLink :to="`/admin/${familyId}/comments`">
+        <NuxtLink :to="returnUrl">
           <Button
             label="Annuler"
             severity="secondary"
@@ -108,11 +109,23 @@ if (state.tags == undefined)
 
 const family = state.families.filter(family => family.id == familyId)[0]
 const commentId = useRoute().params.id as string
+const isNew = (commentId === 'new')
+const urlEntityId = useRoute().query.urlEntityId
+const returnUrl = urlEntityId == null ? `/admin/${familyId}/comments/pending` : `/admin/${familyId}/entities/${urlEntityId}?comments`
 
-const fetchedComment: AdminComment = await state.client.getComment(commentId)
+const fetchedComment: AdminComment | null = isNew ? null : await state.client.getComment(commentId)
 const parentEntityToDisplay = ref<{ category_id: string, display_name: string }>
-({ category_id: fetchedComment.category_id, display_name: fetchedComment.entity_display_name })
-const editedComment: Ref<AdminNewOrUpdateComment> = ref(JSON.parse(JSON.stringify(fetchedComment))) // deep copy
+({ category_id: fetchedComment?.category_id ?? '', display_name: fetchedComment?.entity_display_name ?? '' })
+const editedComment: Ref<AdminNewOrUpdateComment> = isNew
+  ? ref({
+    author: '',
+    data: {},
+    entity_id: '',
+    moderated: false,
+    text: '',
+    version: 1,
+  })
+  : ref(JSON.parse(JSON.stringify(fetchedComment))) // deep copy
 
 const processingRequest = ref(false)
 const toast = useToast()
@@ -123,27 +136,30 @@ const tags = state.tags
 
 const entitySelectVisible = ref(false)
 
+const urlEntityName = fetchedComment?.entity_display_name ?? (await state.client.getEntity(urlEntityId as string)).display_name
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-      `Édition du commentaire de ${fetchedComment.author}`,
-      'comment',
-      [],
-      [
-        { label: `${family.title}`, url: '/admin/families' },
-        { label: 'Commentaires', url: `/admin/${familyId}/comments` },
-        { label: `Édition du commentaire`, url: `/admin/${familyId}/comments/${commentId}` },
-      ],
+  isNew ? `Nouveau commentaire` : `Édition du commentaire de ${fetchedComment!.author}`,
+  'comment',
+  [],
+  [
+    { label: `${family.title}`, url: '/admin/families' },
+    { label: urlEntityId ? `Commentaires de l'entité ${urlEntityName}` : `Commentaires en attente`, url: returnUrl },
+    isNew
+      ? { label: `Nouveau commentaire`, url: `/admin/${familyId}/comments/new` }
+      : { label: `Édition d'un commentaire`, url: `/admin/${familyId}/comments/${commentId}` },
+  ],
 )
 
 function hasBeenEdited(field: keyof AdminNewOrUpdateComment) {
-  return editedComment.value[field] !== fetchedComment[field]
+  return isNew ? false : editedComment.value[field] !== fetchedComment![field]
 }
 
 async function onSave() {
   processingRequest.value = true
   try {
     await state.client.updateComment(commentId, editedComment.value)
-    navigateTo(`/admin/${familyId}/comments`)
+    navigateTo(returnUrl)
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Commentaire modifié avec succès', life: 3000 })
   }
   catch {

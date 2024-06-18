@@ -107,8 +107,25 @@
           :comments="entityComments"
           :public="false"
           @delete="onCommentDelete"
-          @edit="commentId => navigateTo(`/admin/${familyId}/entities/${entityId}/comments/${commentId}`)"
+          @edit="commentId => navigateTo(`/admin/${familyId}/comments/${commentId}?urlEntityId=${entityId}`)"
         />
+        <Button
+          label="Nouveau commentaire"
+          rounded
+          outlined
+          class="ml-3 mt-3"
+          @click="navigateTo(`/admin/${familyId}/comments/new?urlEntityId=${entityId}`)"
+        >
+          <template #default>
+            <div class="flex align-items-center">
+              <AppIcon
+                class="-ml-1 mr-1"
+                icon-name="commentAdd"
+              />
+              Ajouter un commentaire
+            </div>
+          </template>
+        </Button>
       </TabPanel>
     </TabView>
   </div>
