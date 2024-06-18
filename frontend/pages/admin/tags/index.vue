@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="flex gap-3">
+    <span class="flex gap-4">
       <IconField
         icon-position="left"
       >
@@ -19,7 +19,7 @@
 
         display="chip"
         placeholder="Sélectionner des colonnes"
-        class="w-full md:w-20rem"
+        class="w-full md:w-80"
       />
     </span>
     <DataTable
@@ -95,7 +95,6 @@
 </template>
 
 <script setup lang="ts">
-import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Tag } from '~/lib'
@@ -108,7 +107,7 @@ if (!(table_key in state.tablesSelectedColumns)) {
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    global: { value: null, matchMode: 'contains' },
   }
 }
 

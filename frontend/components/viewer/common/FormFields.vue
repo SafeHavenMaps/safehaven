@@ -24,6 +24,7 @@
 
     <div v-else-if="field.field_type == 'RichText'">
       <p
+        class="rich-text-content"
         v-html="getDataAsEscapedString(field.key)"
       />
     </div>
@@ -69,28 +70,30 @@
     </div>
 
     <div v-else-if="field.field_type == 'EventList'">
-      <Accordion :active-index="0">
-        <AccordionTab
+      <Accordion :value="0">
+        <AccordionPanel
           v-for="event in getSortedEventList(field.key)"
           :key="event"
         >
-          <template #header>
+          <AccordionHeader>
             <Tag
               :severity="event.severity"
               :value="event.title"
             />
-          </template>
+          </AccordionHeader>
 
-          <p>
-            <strong>Date :</strong> {{ event.date.toLocaleDateString() }}
-          </p>
+          <AccordionContent>
+            <p>
+              <strong>Date :</strong> {{ event.date.toLocaleDateString() }}
+            </p>
 
-          <p v-if="event.comment && event.comment.length > 0">
-            <strong>Commentaire :</strong>
-            <br>
-            {{ event.comment }}
-          </p>
-        </AccordionTab>
+            <p v-if="event.comment && event.comment.length > 0">
+              <strong>Commentaire :</strong>
+              <br>
+              {{ event.comment }}
+            </p>
+          </AccordionContent>
+        </AccordionPanel>
       </Accordion>
     </div>
   </Fieldset>

@@ -7,8 +7,8 @@
     dismissable-mask
     :closable="false"
     :header="props.title"
-    class="flex flex-column gap-2 mt-5"
-    @update:visible="value => emit('update:visible', value)"
+    class="flex flex-col gap-2 mt-8"
+    @update:visible="(value: any) => emit('update:visible', value)"
   >
     <form @submit.prevent="refreshSearch">
       <InputGroup
@@ -21,7 +21,7 @@
 
         <Button
           type="button"
-          severity="warning"
+          severity="warn"
           label="Filtres"
           @click="(event: Event) => filters_overlay?.toggle(event)"
         >
@@ -67,7 +67,7 @@
       </div>
     </div>
     <Divider type="dotted" />
-    <div class="flex justify-content-end gap-2">
+    <div class="flex justify-end gap-2">
       <Button
         type="button"
         label="Annuler"
@@ -85,18 +85,18 @@
       />
     </div>
 
-    <OverlayPanel ref="filters_overlay">
+    <Popover ref="filters_overlay">
       <ViewerFilterConfig
         v-model:filteringTags="tagFilteringList"
         v-model:filteringCategories="categoryFilteringList"
         @filters-changed="refreshSearch"
       />
-    </OverlayPanel>
+    </Popover>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import type OverlayPanel from 'primevue/overlaypanel'
+import type Popover from 'primevue/popover'
 import type { AdminCachedEntity, AdminPaginatedCachedEntities, Category, Tag } from '~/lib'
 import state from '~/lib/admin-state'
 
@@ -111,7 +111,7 @@ const props = withDefaults(defineProps<{
   title: 'Choix d\'une entité',
 })
 
-const filters_overlay = ref<OverlayPanel>()
+const filters_overlay = ref<typeof Popover>()
 
 const search_query = ref('')
 const categoryFilteringList = ref<(Category & { active: boolean })[]>([])

@@ -16,7 +16,7 @@
     v-model:visible="formVisible"
     modal
     closable
-    class="w-full max-w-30rem"
+    class="w-full max-w-md"
     :header="props.family.entity_form.title"
     :content-props="{ onClick: (event: Event) => { event.stopPropagation() } }"
   >
@@ -24,12 +24,12 @@
     <form
       v-for="page in Array.from({ length: entityPageCount+1 }, (_, i) => i)"
       :key="`EntityPage${page}`"
-      class="flex flex-grow-1 flex-column gap-3"
+      class="flex grow flex-col gap-4"
       @submit.prevent="curr_page += 1"
     >
       <div
         v-if="curr_page == page"
-        class="flex flex-grow-1 flex-column gap-3"
+        class="flex grow flex-col gap-4"
       >
         <template v-if="page == 0">
           <AdminInputTextField
@@ -56,7 +56,7 @@
           />
         </template>
 
-        <span class="flex gap-1 justify-content-end">
+        <span class="flex gap-1 justify-end">
           <Button
             v-if="page > 0"
             label="Précédent"
@@ -77,12 +77,12 @@
     <form
       v-for="page in Array.from({ length: commentPageCount+1 }, (_, i) => i)"
       :key="`CommentPage${page}`"
-      class="flex flex-grow-1 flex-column gap-3 max-w-30rem"
+      class="flex grow flex-col gap-4 max-w-[30rem]"
       @submit.prevent="curr_page < (entityPageCount + commentPageCount + 1) ? curr_page += 1 : onSave()"
     >
       <div
         v-if="curr_page == entityPageCount + 1 + page"
-        class="flex flex-grow-1 flex-column gap-3"
+        class="flex grow flex-col gap-4"
       >
         <template v-if="page == 0">
           <AdminInputTextField
@@ -107,7 +107,7 @@
           />
         </template>
 
-        <span class="flex gap-1 justify-content-end">
+        <span class="flex gap-1 justify-end">
           <Button
             label="Précédent"
             outlined

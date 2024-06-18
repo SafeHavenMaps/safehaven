@@ -40,3 +40,15 @@ body,
 .coco-text {
   color: #ffffff;
 }
+
+/*
+remove the arrow set in p-popover::before
+can be removed once the issue is fixed in primevue
+*/
+.p-popover::before,
+.p-popover::after,
+.p-confirmpopup::before,
+.p-confirmpopup::after {
+  content: none;
+  display: none;
+}

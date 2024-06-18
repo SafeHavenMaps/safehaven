@@ -18,17 +18,17 @@
       />
     </DataTable>
 
-    <div class="mt-3">
+    <div class="mt-4">
       <h3 class="mt-0">
         Activités des 30 derniers jours
       </h3>
 
-      <div class="relative flex h-full w-full justify-content-center">
+      <div class="relative flex h-full w-full justify-center">
         <Chart
           type="bar"
           :data="chartData"
           :options="chartOptions"
-          class="absolute top-0 left-0 h-full w-full h-13rem xl:h-16rem"
+          class="absolute top-0 left-0 h-full w-full h-52 xl:h-64"
         />
       </div>
     </div>

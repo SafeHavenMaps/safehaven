@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-column gap-2">
-    <span class="flex align-items-center gap-2">
-      <InputSwitch
+  <div class="flex flex-col gap-2">
+    <span class="flex items-center gap-2">
+      <ToggleSwitch
         :model-value="props.modelValue"
         :input-id="props.id"
         :disabled="props.disabled"

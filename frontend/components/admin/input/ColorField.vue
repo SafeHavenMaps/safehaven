@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-column gap-2">
-    <span class="flex align-items-center gap-2">
+  <div class="flex flex-col gap-2">
+    <span class="flex items-center gap-2">
       <InputText
         :id="props.id"
         :model-value="props.modelValue"

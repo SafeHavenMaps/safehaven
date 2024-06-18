@@ -1,12 +1,12 @@
 <template>
   <form
-    class="flex flex-column gap-3 max-w-30rem mx-4"
+    class="flex flex-col gap-4 max-w-[30rem] mx-6"
   >
     <AdminInputIconUpload
       :object-id="id"
       object-type="families"
     />
-    <span class="flex gap-1 justify-content-end">
+    <span class="flex gap-1 justify-end">
       <NuxtLink :to="`/admin/families`">
         <Button
           label="Retour à la liste"

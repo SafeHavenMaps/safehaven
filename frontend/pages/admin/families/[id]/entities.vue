@@ -1,28 +1,36 @@
 <template>
-  <TabView>
-    <TabPanel
-      header="Éditeur visuel"
-    >
-      <p class="text-color-secondary">
-        Une page additionelle est insérée automatiquement au début du formulaire,
-        contenant le titre de l'entité, sa position lontitude/lagitude et son addresse.
-      </p>
+  <Tabs value="0">
+    <TabList>
+      <Tab value="0">
+        Éditeur visuel
+      </Tab>
+      <Tab value="1">
+        Éditeur avancé
+      </Tab>
+    </TabList>
+    <TabPanels>
+      <TabPanel value="0">
+        <p class="text-muted-color">
+          Une page additionelle est insérée automatiquement au début du formulaire,
+          contenant le titre de l'entité, sa position lontitude/lagitude et son addresse.
+        </p>
 
-      <AdminFamiliesEditForm
-        class="-ml-3"
-        :original-form-fields="fetchedFamily.entity_form.fields"
-        :on-save-callback="onSave"
-        kind-name="entité"
-      />
-    </TabPanel>
-    <TabPanel header="Éditeur avancé">
-      <p class="text-color-secondary">
-        Édition directe du formulaire d'ajout en json, utile pour l'import/export.
-        Les changements ne sont pas synchonisés avec ceux de l'édition visuelle en absence de sauvegarde.
-      </p>
+        <AdminFamiliesEditForm
+          class="-ml-4"
+          :original-form-fields="fetchedFamily.entity_form.fields"
+          :on-save-callback="onSave"
+          kind-name="entité"
+        />
+      </TabPanel>
+      <TabPanel value="1">
+        <p class="text-muted-color">
+          Édition directe du formulaire d'ajout en json, utile pour l'import/export.
+          Les changements ne sont pas synchonisés avec ceux de l'édition visuelle en absence de sauvegarde.
+        </p>
       <!-- <AdminFamiliesEditFormJson /> -->
-    </TabPanel>
-  </TabView>
+      </TabPanel>
+    </TabPanels>
+  </Tabs>
 </template>
 
 <script setup lang="ts">

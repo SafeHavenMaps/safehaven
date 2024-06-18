@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .rich-text-content h1 {
+        @apply text-3xl font-bold mb-2;
+    }
+
+    .rich-text-content h2 {
+        @apply text-2xl font-bold mb-2;
+    }
+
+    .rich-text-content h3 {
+        @apply text-xl font-bold mb-2;
+    }
+
+    .rich-text-content h4 {
+        @apply text-lg font-bold mb-2;
+    }
+
+    .rich-text-content h5 {
+        @apply text-base font-bold mb-2;
+    }
+
+    .rich-text-content h6 {
+        @apply text-sm font-bold mb-1;
+    }
+
+    .rich-text-content p {
+        @apply mb-4 leading-tight;
+    }
+
+    .rich-text-content ul {
+        @apply list-disc pl-5 mb-4;
+    }
+
+    .rich-text-content a {
+        @apply underline text-blue-600 hover:text-blue-800;
+    }
+
+    .rich-text-content em,
+    .rich-text-content i {
+        @apply italic;
+    }
+
+    .rich-text-content strong,
+    .rich-text-content b {
+        @apply font-bold;
+    }
+
+    .rich-text-content u {
+        @apply underline;
+    }
+
+    .rich-text-content s {
+        @apply line-through;
+    }
+
+    .rich-text-content q,
+    .rich-text-content blockquote {
+        @apply border-l-4 border-gray-300 pl-2 italic;
+    }
+}

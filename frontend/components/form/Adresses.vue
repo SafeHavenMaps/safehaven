@@ -1,6 +1,6 @@
 <template>
-  <div class="flex align-items-center gap-2">
-    <label>Adresses <RequiredIndicator /></label>
+  <div class="flex items-center gap-2">
+    <label>Adresses</label>
     <Button
       size="small"
       outlined
@@ -18,11 +18,11 @@
     />
     <Column>
       <template #body="slotProps">
-        <div class="flex justify-content-end">
+        <div class="flex justify-end">
           <Button
             outlined
             rounded
-            severity="warning"
+            severity="warn"
             class="mr-1"
             @click="() => editAddress(slotProps.index)"
           >

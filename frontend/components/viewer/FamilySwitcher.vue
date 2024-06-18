@@ -6,7 +6,7 @@
     aria-labelledby="custom"
   >
     <template #option="slotProps">
-      <div class="button-content flex align-items-center justify-between">
+      <div class="button-content flex items-center justify-between">
         <AppIcon
           :icon-name="slotProps.option.icon_hash"
           dynamic

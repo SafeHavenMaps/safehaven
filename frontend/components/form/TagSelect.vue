@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-column gap-2">
+  <div class="flex flex-col gap-2">
     <label for="tag_id">Tags</label>
     <div class="flex flex-wrap gap-1">
       <DisplayedTag

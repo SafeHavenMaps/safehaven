@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="flex gap-3">
+    <span class="flex gap-4">
       <IconField
         icon-position="left"
       >
@@ -32,7 +32,7 @@
         sortable
       >
         <template #body="slotProps">
-          <div class="flex flex align-items-center justify-content-begin gap-2">
+          <div class="flex flex items-center justify-content-begin gap-2">
             <AdminUserAvatar
               :username="slotProps.data.name"
               size="normal"
@@ -80,7 +80,6 @@
 </template>
 
 <script setup lang="ts">
-import { FilterMatchMode } from 'primevue/api'
 import type { DataTableFilterMetaData } from 'primevue/datatable'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { User } from '~/lib'
@@ -92,7 +91,7 @@ if (!(table_key in state.tablesSelectedColumns)) {
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    global: { value: null, matchMode: 'contains' },
   }
 }
 

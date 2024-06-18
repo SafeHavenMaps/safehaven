@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-column gap-2">
+  <div class="flex flex-col gap-2">
     <label for="category_id">Catégorie <RequiredIndicator /></label>
-    <Dropdown
+    <Select
       id="category_id"
       :model-value="props.modelValue"
       :options="categories"
@@ -20,7 +20,7 @@
       <template #option="slotProps">
         <CategoryTag :category="slotProps.option" />
       </template>
-    </Dropdown>
+    </Select>
     <small v-if="props.helperText">{{ props.helperText }}</small>
   </div>
 </template>

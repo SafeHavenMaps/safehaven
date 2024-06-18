@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="col-12">
+    <div class="col-span-12">
       <div
-        class="flex flex-column sm:flex-row sm:align-items-stretch p-4 gap-3"
+        class="flex flex-col sm:flex-row sm:items-stretch p-6 gap-4"
       >
         <div
-          class="md:w-10rem flex flex-column"
+          class="md:w-40 flex flex-col"
         >
           <SingleEntityMap
             v-if="props.entity.web_mercator_x && props.entity.web_mercator_y"
@@ -24,30 +24,30 @@
           </div>
         </div>
 
-        <div class="flex flex-column md:flex-row justify-content-between md:align-items-center flex-1 gap-4">
-          <div class="flex flex-row md:flex-column justify-content-between align-items-start gap-2">
+        <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+          <div class="flex flex-row md:flex-col justify-between items-start gap-2">
             <div>
               <CategoryTag
                 :category="state.getCategory(props.entity.category_id)"
                 :size="2"
               />
-              <div class="text-lg font-medium text-900 mt-2">
+              <div class="text-lg font-medium text-surface-900 mt-2">
                 {{ props.entity.display_name }}
               </div>
             </div>
             <div
-              class="surface-100 p-1"
+              class="bg-surface-100 p-1"
               style="border-radius: 30px"
             >
               {{ props.entity.plain_text_location }}
             </div>
           </div>
 
-          <div class="flex flex-column md:align-items-end gap-5">
+          <div class="flex flex-col md:items-end gap-8">
             <div class="flex flex-row-reverse md:flex-row gap-2">
               <Button
                 label="Voir en détail"
-                class="flex-auto md:flex-initial white-space-nowrap"
+                class="flex-auto md:flex-initial whitespace-nowrap"
                 @click="changeActiveEntity(props.entity)"
               >
                 <template #icon>

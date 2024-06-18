@@ -1,6 +1,6 @@
 <template>
   <form
-    class="flex flex-column gap-3 max-w-30rem mx-4"
+    class="flex flex-col gap-4 max-w-[30rem] mx-6"
     @submit.prevent="onSave"
   >
     <AdminInputTextField
@@ -59,7 +59,7 @@
       :options="tags"
     />
 
-    <span class="flex gap-1 justify-content-end">
+    <span class="flex gap-1 justify-end">
       <NuxtLink to="/admin/access-tokens">
         <Button
           label="Annuler"

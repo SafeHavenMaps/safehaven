@@ -1,6 +1,6 @@
 <template>
   <span
-    class="flex gap-2 align-items-center"
+    class="flex gap-2 items-center"
   >
     <Button
       label="Modifier l'icône"
@@ -12,10 +12,10 @@
     v-model:visible="visible"
     modal
     header="Modifier l'icône"
-    class="w-30rem"
+    class="w-[30rem]"
   >
-    <span class="flex gap-2 align-items-center">
-      <div class="flex flex-column gap-1 align-items-center">
+    <span class="flex gap-2 items-center">
+      <div class="flex flex-col gap-1 items-center">
         <FileUpload
           mode="basic"
           name="file"
@@ -37,7 +37,7 @@
       >
         <b>OU</b>
       </Divider>
-      <div class="flex flex-column gap-1 align-items-center">
+      <div class="flex flex-col gap-1 items-center">
         <InputText
           v-model="downloadFromUrl"
           placeholder="http://url.com/icon.svg"

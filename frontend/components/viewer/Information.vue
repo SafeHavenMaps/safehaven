@@ -1,40 +1,56 @@
+<!-- eslint-disable vue/no-v-html -->
+
 <template>
-  <TabView>
-    <TabPanel
-      :header="state.title"
-    >
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <div v-html="siteInfo" />
-    </TabPanel>
-    <TabPanel header="SafeHaven">
-      <div class="flex align-items-center justify-content-center">
-        <div class="logo hot-pink-bg p-3 flex align-items-center justify-content-center">
-          <img
-            src="assets/logo_secondary.svg"
-            alt="SafeHaven"
-          >
+  <Tabs value="0">
+    <TabList>
+      <Tab value="0">
+        {{ state.title }}
+      </Tab>
+      <Tab value="1">
+        SafeHaven
+      </Tab>
+    </TabList>
+
+    <TabPanels>
+      <TabPanel value="0">
+        <div
+          class="rich-text-content"
+          v-html="siteInfo"
+        />
+      </TabPanel>
+
+      <TabPanel value="1">
+        <div class="flex items-center justify-center">
+          <div class="logo hot-pink-bg p-4 flex items-center justify-center">
+            <img
+              src="assets/logo_secondary.svg"
+              alt="SafeHaven"
+            >
+          </div>
         </div>
-      </div>
-      <p class="text-center">
-        SafeHaven est une solution opensource de création de carte collaborative.<br>Vous pouvez facilement créer votre carte !
-      </p>
-      <p class="text-center">
-        <a
-          :href="safeHavenRepoUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Button
-            label="Découvrir sur GitHub"
+
+        <p class="text-center !m-4">
+          SafeHaven est une solution opensource de création de carte collaborative.<br>Vous pouvez facilement créer votre carte !
+        </p>
+
+        <p class="text-center !m-4">
+          <a
+            :href="safeHavenRepoUrl"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <template #icon>
-              <AppIcon icon-name="github" />
-            </template>
-          </Button>
-        </a>
-      </p>
-    </TabPanel>
-  </TabView>
+            <Button
+              label="Découvrir sur GitHub"
+            >
+              <template #icon>
+                <AppIcon icon-name="github" />
+              </template>
+            </Button>
+          </a>
+        </p>
+      </TabPanel>
+    </TabPanels>
+  </Tabs>
 </template>
 
 <script setup lang="ts">
