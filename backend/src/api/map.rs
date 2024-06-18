@@ -196,26 +196,39 @@ async fn viewer_search_request(
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct NewEntityRequest {
+pub struct PublicNewEntityRequest {
     entity: PublicNewEntity,
+    comment: PublicNewComment,
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct PublicNewEntityResponse {
+    entity: PublicEntity,
+    comment: PublicComment,
 }
 
 #[utoipa::path(
     post,
     path = "/api/map/entities",
-    request_body = NewEntityRequest,
+    request_body = PublicNewEntityRequest,
     responses(
-        (status = 200, description = "Entity", body = PublicEntity),
+        (status = 200, description = "Entity", body = PublicNewEntityResponse),
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]
 async fn viewer_new_entity(
     DbConn(mut conn): DbConn,
     MapUserToken(_token): MapUserToken,
-    Json(request): Json<NewEntityRequest>,
-) -> Result<AppJson<PublicEntity>, AppError> {
+    Json(request): Json<PublicNewEntityRequest>,
+) -> Result<AppJson<PublicNewEntityResponse>, AppError> {
     let db_entity = PublicEntity::new(request.entity, &mut conn).await?;
-    Ok(AppJson(db_entity))
+    let mut new_comment = request.comment;
+    new_comment.entity_id = db_entity.id;
+    let db_comment = PublicComment::new(new_comment, &mut conn).await?;
+    Ok(AppJson(PublicNewEntityResponse {
+        entity: db_entity,
+        comment: db_comment,
+    }))
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]

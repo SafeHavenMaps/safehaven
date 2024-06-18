@@ -19,7 +19,7 @@
   >
     <form
       v-if="curr_page == 0"
-      class="flex flex-grow-1 flex-column gap-3 max-w-30rem"
+      class="flex flex-grow-1 flex-column gap-3 w-30rem"
       @submit.prevent="curr_page+=1"
     >
       <AdminInputTextField
@@ -47,7 +47,7 @@
     <form
       v-for="page in Array.from({ length: page_count }, (_, i) => i+1)"
       :key="`Page ${page}`"
-      class="flex flex-grow-1 flex-column gap-3 max-w-30rem"
+      class="flex flex-grow-1 flex-column gap-3 w-30rem"
       @submit.prevent="() => page == page_count ? onSave() : curr_page+=1"
     >
       <div
@@ -56,7 +56,6 @@
       >
         <FormDynamicField
           v-for="field in props.family.comment_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
-
           :key="field.key"
           v-model:fieldContent="(editedComment!.data as EntityOrCommentData)[field.key]"
           :form-field="(field as FormField)"
@@ -122,14 +121,11 @@ const toast = useToast()
 
 async function onSave() {
   processingRequest.value = true
-  console.log('oitre')
   try {
     await state.client.createComment({ comment: editedComment.value! })
     formVisible.value = false
-    console.log('oitredas')
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Commentaire modifié avec succès', life: 3000 })
     reset_refs(props.entity.id)
-    console.log('oitdsare')
   }
   catch {
     toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification du commentaire', life: 3000 })

@@ -2466,7 +2466,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewEntityRequest"
+                "$ref": "#/components/schemas/PublicNewEntityRequest"
               }
             }
           },
@@ -2478,7 +2478,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PublicEntity"
+                  "$ref": "#/components/schemas/PublicNewEntityResponse"
                 }
               }
             }
@@ -3690,17 +3690,6 @@
           }
         }
       },
-      "NewEntityRequest": {
-        "type": "object",
-        "required": [
-          "entity"
-        ],
-        "properties": {
-          "entity": {
-            "$ref": "#/components/schemas/PublicNewEntity"
-          }
-        }
-      },
       "NewOrUpdateAccessToken": {
         "type": "object",
         "required": [
@@ -4088,6 +4077,36 @@
             "items": {
               "$ref": "#/components/schemas/UnprocessedLocation"
             }
+          }
+        }
+      },
+      "PublicNewEntityRequest": {
+        "type": "object",
+        "required": [
+          "entity",
+          "comment"
+        ],
+        "properties": {
+          "comment": {
+            "$ref": "#/components/schemas/PublicNewComment"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/PublicNewEntity"
+          }
+        }
+      },
+      "PublicNewEntityResponse": {
+        "type": "object",
+        "required": [
+          "entity",
+          "comment"
+        ],
+        "properties": {
+          "comment": {
+            "$ref": "#/components/schemas/PublicComment"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/PublicEntity"
           }
         }
       },

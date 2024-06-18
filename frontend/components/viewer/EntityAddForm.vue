@@ -1,0 +1,237 @@
+<template>
+  <Button
+    label="Ajouter"
+    class="mr-2"
+    severity="info"
+    @click="formVisible = true"
+  >
+    <template #icon>
+      <AppIcon
+        icon-name="addEntity"
+        class="-ml-1 mr-1"
+      />
+    </template>
+  </Button>
+
+  <Dialog
+    v-model:visible="formVisible"
+    modal
+    closable
+    :header="props.family.entity_form.title"
+    :content-props="{ onClick: (event) => { event.stopPropagation() } }"
+  >
+    <!-- Entity Form Pages -->
+    <form
+      v-for="page in Array.from({ length: entityPageCount+1 }, (_, i) => i)"
+      :key="`EntityPage${page}`"
+      class="flex flex-grow-1 flex-column gap-3 w-30rem"
+      @submit.prevent="curr_page += 1"
+    >
+      <div
+        v-if="curr_page == page"
+        class="flex flex-grow-1 flex-column gap-3"
+      >
+        <template v-if="page == 0">
+          <AdminInputTextField
+            id="display_name"
+            v-model="editedEntity.display_name"
+            label="Nom de l'entité"
+          />
+
+          <FormCategorySelect
+            v-model="editedEntity.category_id"
+            :categories="props.categories"
+          />
+
+          <FormAdresses
+            v-model:locations="editedEntity!.locations"
+          />
+        </template>
+        <template v-else>
+          <FormDynamicField
+            v-for="field in entityFieldsSortedByPage(page)"
+            :key="field.key"
+            v-model:fieldContent="(editedEntity.data as EntityOrCommentData)[field.key]"
+            :form-field="(field as FormField)"
+          />
+        </template>
+
+        <span class="flex gap-1 justify-content-end">
+          <Button
+            v-if="page > 0"
+            label="Précédent"
+            outlined
+            @click="curr_page -= 1"
+          />
+          <Button
+            :label="curr_page == entityPageCount ? 'Suivant' : 'Suivant'"
+            type="submit"
+            outlined
+            :disabled="!isEntityPageValid(page)"
+          />
+        </span>
+      </div>
+    </form>
+
+    <!-- Comment Form Pages -->
+    <form
+      v-for="page in Array.from({ length: commentPageCount+1 }, (_, i) => i)"
+      :key="`CommentPage${page}`"
+      class="flex flex-grow-1 flex-column gap-3 max-w-30rem"
+      @submit.prevent="curr_page < (entityPageCount + commentPageCount + 1) ? curr_page += 1 : onSave()"
+    >
+      <div
+        v-if="curr_page == entityPageCount + 1 + page"
+        class="flex flex-grow-1 flex-column gap-3"
+      >
+        <template v-if="page == 0">
+          <AdminInputTextField
+            id="author"
+            v-model="editedComment.author"
+            label="Auteur"
+          />
+
+          <AdminInputTextField
+            id="text"
+            v-model="editedComment.text"
+            label="Texte du commentaire"
+            text-length="editor"
+          />
+        </template>
+        <template v-else>
+          <FormDynamicField
+            v-for="field in commentFieldsSortedByPage(page)"
+            :key="field.key"
+            v-model:fieldContent="(editedComment.data as EntityOrCommentData)[field.key]"
+            :form-field="(field as FormField)"
+          />
+        </template>
+
+        <span class="flex gap-1 justify-content-end">
+          <Button
+            label="Précédent"
+            outlined
+            @click="curr_page -= 1"
+          />
+          <Button
+            :label="curr_page == (entityPageCount + commentPageCount + 1) ? 'Sauvegarder' : 'Suivant'"
+            type="submit"
+            :outlined="curr_page != (entityPageCount + commentPageCount + 1)"
+            :loading="processingRequest"
+            :disabled="processingRequest || !isCommentPageValid(page)"
+          />
+        </span>
+      </div>
+    </form>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import { ref, defineProps } from 'vue'
+import { useToast } from 'primevue/usetoast'
+import type { Category, EntityOrCommentData, Family, FormField, PublicNewComment, PublicNewEntity } from '~/lib'
+import state from '~/lib/viewer-state'
+
+const formVisible = ref(false)
+
+const props = defineProps<{
+  family: Family
+  categories: Category[]
+}>()
+
+const editedEntity = ref<PublicNewEntity>({
+  category_id: '',
+  data: {},
+  display_name: '',
+  locations: [],
+})
+
+const editedComment = ref<PublicNewComment>({
+  author: '',
+  data: {},
+  entity_id: '65cfc1e7-1af1-4fb9-9827-29d97fd1a0e0',
+  text: '',
+})
+
+const curr_page = ref(0)
+const entityPageCount = ref(0)
+const commentPageCount = ref(0)
+
+function reset_refs() {
+  editedEntity.value = {
+    category_id: '',
+    data: {},
+    display_name: '',
+    locations: [],
+  }
+  editedComment.value = {
+    author: '',
+    data: {},
+    entity_id: '65cfc1e7-1af1-4fb9-9827-29d97fd1a0e0',
+    text: '',
+  }
+  curr_page.value = 0
+  entityPageCount.value = Math.max(
+    0,
+    ...props.family.entity_form.fields.map(field => field.form_page),
+  )
+  commentPageCount.value = Math.max(
+    0,
+    ...props.family.comment_form.fields.map(field => field.form_page),
+  )
+}
+reset_refs()
+
+watch(
+  () => props.family,
+  (__, _) => {
+    reset_refs()
+  },
+)
+
+const processingRequest = ref(false)
+const toast = useToast()
+
+function entityFieldsSortedByPage(page: number) {
+  return props.family.entity_form.fields
+    .filter(field => field.form_page === page)
+    .sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
+}
+
+function commentFieldsSortedByPage(page: number) {
+  return props.family.comment_form.fields
+    .filter(field => field.form_page === page)
+    .sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
+}
+
+function isEntityPageValid(page: number) {
+  if (page === 0) {
+    return editedEntity.value.display_name && editedEntity.value.category_id
+  }
+  return true
+}
+
+function isCommentPageValid(page: number) {
+  if (page === 0) {
+    return editedComment.value.author && editedComment.value.text
+  }
+  return true
+}
+
+async function onSave() {
+  processingRequest.value = true
+  try {
+    await state.client.createEntity({
+      entity: editedEntity.value,
+      comment: editedComment.value,
+    })
+    formVisible.value = false
+    toast.add({ severity: 'success', summary: 'Succès', detail: 'Entité et commentaire ajoutés avec succès', life: 3000 })
+    reset_refs()
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur lors de l\'ajout de l\'entité ou du commentaire', life: 3000 })
+  }
+  processingRequest.value = false
+}
+</script>

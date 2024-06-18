@@ -6,8 +6,8 @@ use crate::{
             AdminUserIdentity, LoginRequest, LoginResponse,
         },
         map::{
-            self, FetchedEntity, NewCommentRequest, NewEntityRequest,
-            SearchRequest as MapSearchRequest, ViewRequest,
+            self, FetchedEntity, NewCommentRequest, PublicNewEntityRequest,
+            PublicNewEntityResponse, SearchRequest as MapSearchRequest, ViewRequest,
         },
         root::{self, BootstrapResponse, SafeMode, StatusResponse},
         ErrorResponse,
@@ -162,6 +162,7 @@ use utoipa::OpenApi;
         EntitiesAndClusters,
         UnprocessedLocation,
         AdminSearchRequest,
+        PublicNewEntityResponse,
         // comments
         AdminComment,
         PublicNewComment,
@@ -183,7 +184,7 @@ use utoipa::OpenApi;
         ViewRequest,
         MapSearchRequest,
         NewCommentRequest,
-        NewEntityRequest,
+        PublicNewEntityRequest,
         FetchedEntity,
     ))
 )]
