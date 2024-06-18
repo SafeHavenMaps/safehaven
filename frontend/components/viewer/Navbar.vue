@@ -49,7 +49,7 @@
               v-if="props.showFamilySwitcher"
             />
 
-            <div class="flex gap-2">
+            <div class="flex flex-column gap-2">
               <Button
                 label="Info"
                 outlined
@@ -70,7 +70,7 @@
                 v-if="props.showCategorySwitcher"
                 label="Filtres"
                 severity="primary"
-                @click="openFilterPanel"
+                @click="filterPopupVisible = true"
               >
                 <template #icon>
                   <AppIcon
@@ -82,6 +82,7 @@
 
               <Button
                 v-if="props.showSearch"
+                label="Recherche"
                 severity="primary"
                 @click="openSearchPanel"
               >
@@ -147,6 +148,18 @@
       @filters-changed="filtersChanged"
     />
   </OverlayPanel>
+
+  <Dialog
+    v-model:visible="filterPopupVisible"
+    header="Filtres"
+    modal
+  >
+    <ViewerFilterConfig
+      v-model:filteringTags="state.filteringTags"
+      v-model:filteringCategories="state.filteringCategories"
+      @filters-changed="filtersChanged"
+    />
+  </Dialog>
 
   <OverlayPanel ref="searchOp">
     <div class="flex flex-column gap-3 w-25rem">
@@ -287,6 +300,8 @@ const overflowPanel = ref<OverlayPanel>()
 const placeSearch: Ref<string> = ref('')
 const entitySearch: Ref<string> = ref('')
 const showInformation = ref(false)
+
+const filterPopupVisible = ref(false)
 
 const currentLocationsResults: Ref<NominatimResult[]> = ref([])
 const currentEntitiesResults: Ref<ViewerPaginatedCachedEntitiesWithLocation | null> = ref(null)
