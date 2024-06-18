@@ -6,17 +6,16 @@ use axum::http::request::Parts;
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 use axum_extra::extract::cookie::{Cookie, CookieJar, Expiration, SameSite};
-use chrono::{TimeDelta, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
-// Consts
 const EPHEMERAL_TOKEN_COOKIE_NAME: &str = "ephemeral_token";
 const REFRESH_TOKEN_COOKIE_NAME: &str = "refresh_token";
 
-const REFRESH_TOKEN_MAX_INACTIVE_DAYS: i64 = 3;
-const REFRESH_TOKEN_MAX_INACTIVE_DAYS_REMEMBER_ME: i64 = 31;
+const EPHEMERAL_TOKEN_DURATION: time::Duration = time::Duration::hours(1);
+const REFRESH_TOKEN_DURATION: time::Duration = time::Duration::hours(8);
+const REFRESH_TOKEN_REMEMBER_ME_DURATION: time::Duration = time::Duration::days(7);
 
 #[derive(Clone, Serialize, ToSchema)]
 pub struct AdminUserIdentity {
@@ -31,6 +30,14 @@ impl AdminUserIdentity {
             admin_id: claims.admin_id,
             username: claims.username.clone(),
             is_admin: claims.is_admin,
+        }
+    }
+
+    fn from_user(user: &User) -> Self {
+        Self {
+            admin_id: user.id,
+            username: user.name.clone(),
+            is_admin: user.is_admin,
         }
     }
 }
@@ -70,111 +77,112 @@ struct AdminRefreshTokenClaims {
     pub iat: usize,
 }
 
-pub async fn authentication_middleware(
-    State(app_state): State<AppState>,
-    DbConn(mut conn): DbConn,
-    cookies: CookieJar,
-    mut request: Request,
-    next: Next,
-) -> Result<Response, Response> {
-    // Get the token from the cookies
-    let token = cookies
-        .get(EPHEMERAL_TOKEN_COOKIE_NAME)
-        .ok_or_else(|| AppError::Unauthorized.into_response())?
-        .value();
+async fn authenticate_request(
+    app_state: &AppState,
+    input_cookies: CookieJar,
+    new_cookies: &mut Option<CookieJar>,
+    mut conn: sqlx::pool::PoolConnection<sqlx::Postgres>,
+) -> Result<AdminUserIdentity, AppError> {
+    // If an ephemeral token is present, try to use it
+    // An invalid ephemeral token is equivalent to no token at all
+    if let Some(ephemeral_token_str) = input_cookies.get(EPHEMERAL_TOKEN_COOKIE_NAME) {
+        // Decode the ephemeral token
+        let token_data = jsonwebtoken::decode::<AdminEphemeralTokenClaims>(
+            ephemeral_token_str.value(),
+            &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
+            &jsonwebtoken::Validation::default(),
+        );
 
-    // 1) Decode the ephemeral token:
-    //   - If valid, continue on
-    //   - If invalid,
-    //    If
-
-    // Decode the ephemeral token
-    let token_data = jsonwebtoken::decode::<AdminEphemeralTokenClaims>(
-        token,
-        &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
-        &jsonwebtoken::Validation::default(),
-    );
-
-    let (ephemeral_claims, update_cookie) = match token_data {
         // If the token is valid we just return the claims
-        Ok(data) => (data.claims, false),
+        if let Ok(data) = token_data {
+            tracing::debug!("valid ephemeral token");
+            return Ok(AdminUserIdentity::from_claims(&data.claims));
+        }
+    }
 
-        // If the ephemeral token is invalid try to use the refresh token to generate a new one
-        Err(_) => {
-            // get the refresh token
-            let refresh_token = cookies
-                .get(REFRESH_TOKEN_COOKIE_NAME)
-                .ok_or_else(|| AppError::Unauthorized.into_response())?
-                .value();
+    // If no ephemeral token is present, or the ephemeral token is invalid,
+    // generate one using the refresh token.
 
-            // decode and validate refresh token claims
-            let Ok(jsonwebtoken::TokenData { claims, .. }) =
-                jsonwebtoken::decode::<AdminRefreshTokenClaims>(
-                    refresh_token,
-                    &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
-                    &jsonwebtoken::Validation::default(),
-                )
-            else {
-                // If the refresh token is invalid return an error
-                let purged_jar = expire_cookies(&app_state, cookies);
-                return Ok((purged_jar, AppError::Unauthorized).into_response());
-            };
+    // Get the refresh token jwt. if missing or invalid, the user is unauthorized
+    let refresh_claims = {
+        let refresh_token = input_cookies
+            .get(REFRESH_TOKEN_COOKIE_NAME)
+            .ok_or(AppError::Unauthorized)
+            .inspect_err(|_| tracing::debug!("missing refresh token"))?
+            .value();
 
-            // get the user and create corresponding claims
-            match User::get(claims.admin_id, &mut conn).await {
-                Ok(user) => {
-                    let new_ephemeral_claims = create_user_claim(&user);
-                    (new_ephemeral_claims, true)
-                }
-                // if the user is not found, clear the cookie jar
-                Err(AppError::Database(sqlx::Error::RowNotFound)) => {
-                    let purged_jar = expire_cookies(&app_state, cookies);
-                    return Ok((purged_jar, AppError::Unauthorized).into_response());
-                }
-                Err(err) => return Err(err.into_response()),
+        // decode and validate refresh token claims
+        match jsonwebtoken::decode::<AdminRefreshTokenClaims>(
+            refresh_token,
+            &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
+            &jsonwebtoken::Validation::default(),
+        ) {
+            Ok(jsonwebtoken::TokenData { claims, .. }) => claims,
+            Err(_) => {
+                tracing::debug!("invalid refresh token");
+                // If the refresh token is invalid, clear it and return an error
+                *new_cookies = Some(expire_cookies(app_state, input_cookies));
+                return Err(AppError::Unauthorized);
             }
         }
     };
 
-    // put the token claims in the request
-    request
-        .extensions_mut()
-        .insert(AdminUserIdentity::from_claims(&ephemeral_claims));
+    // get the user and create corresponding claims
+    let user = match User::get(refresh_claims.admin_id, &mut conn).await {
+        Ok(user) => user,
+        // if the user is not found, clear the cookie jar: the user was deleted
+        Err(AppError::Database(sqlx::Error::RowNotFound)) => {
+            tracing::debug!("cannot find the refresh token user");
+            *new_cookies = Some(expire_cookies(app_state, input_cookies));
+            return Err(AppError::Unauthorized);
+        }
+        Err(err) => {
+            tracing::debug!("user get error: {:?}", err);
+            return Err(err);
+        }
+    };
 
-    // Execute the chain
-    let response = next.run(request).await;
+    // Regenerate and update tokens
+    tracing::debug!("refreshing auth cookies");
+    *new_cookies = Some(set_auth_cookies(
+        app_state,
+        input_cookies,
+        &user,
+        refresh_claims.remember_me,
+    ));
+    Ok(AdminUserIdentity::from_user(&user))
+}
 
-    Ok(if update_cookie {
-        // If a new ephemerala token is generated we need to send it back to the client
-        let ephemeral_cookie = create_ephemeral_cookie(ephemeral_claims, &app_state);
-        let new_cookies = cookies.add(ephemeral_cookie);
+pub async fn authentication_middleware(
+    State(app_state): State<AppState>,
+    DbConn(conn): DbConn,
+    cookies: CookieJar,
+    mut request: Request,
+    next: Next,
+) -> Response {
+    // attempt to authenticate the request
+    let mut new_cookies = None;
+    let response = match authenticate_request(&app_state, cookies, &mut new_cookies, conn).await {
+        Err(err) => return err.into_response(),
+        Ok(user_identity) => {
+            // attach user identity to the request
+            request.extensions_mut().insert(user_identity);
+
+            // Get the response from the middleware chain
+            next.run(request).await
+        }
+    };
+
+    // attach cookies to the response, regardless of success
+    if let Some(new_cookies) = new_cookies {
         (new_cookies, response).into_response()
     } else {
-        // Otherwise just return the response
         response
-    })
-}
-
-pub fn expire_cookies(app_state: &AppState, cookies: CookieJar) -> CookieJar {
-    [EPHEMERAL_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME]
-        .into_iter()
-        .fold(cookies, |jar, cookie_name| {
-            jar.remove(create_admin_cookie(cookie_name, app_state))
-        })
-}
-
-fn create_user_claim(user: &User) -> AdminEphemeralTokenClaims {
-    AdminEphemeralTokenClaims {
-        admin_id: user.id,
-        username: user.name.clone(),
-        is_admin: user.is_admin,
-        iat: Utc::now().timestamp() as usize,
-        exp: (Utc::now() + TimeDelta::hours(1)).timestamp() as usize,
     }
 }
 
 // this helper is used to add and remove cookies
-fn create_admin_cookie<'a>(
+fn admin_cookie<'a>(
     base: impl Into<Cookie<'a>>,
     app_state: &AppState,
 ) -> cookie::CookieBuilder<'a> {
@@ -185,47 +193,59 @@ fn create_admin_cookie<'a>(
         .same_site(SameSite::Strict)
 }
 
-fn create_ephemeral_cookie<'a>(
-    claims: AdminEphemeralTokenClaims,
-    app_state: &AppState,
-) -> Cookie<'a> {
-    let token = app_state.generate_refresh_token(claims);
-    create_admin_cookie((EPHEMERAL_TOKEN_COOKIE_NAME, token), app_state).build()
-}
-
-fn create_refresh_cookie<'a>(user_id: Uuid, app_state: &AppState, remember_me: bool) -> Cookie<'a> {
-    // sadly, the cookie library uses `time` and the jwt library uses `chrono`
-    let inactive_days = if remember_me {
-        REFRESH_TOKEN_MAX_INACTIVE_DAYS_REMEMBER_ME
-    } else {
-        REFRESH_TOKEN_MAX_INACTIVE_DAYS
-    };
-    let time_now = time::OffsetDateTime::now_utc();
-    let token_exp = time_now + time::Duration::days(inactive_days);
-
-    let token = app_state.generate_refresh_token(AdminRefreshTokenClaims {
-        admin_id: user_id,
-        iat: time_now.unix_timestamp() as usize,
-        exp: token_exp.unix_timestamp() as usize,
-        remember_me,
-    });
-
-    create_admin_cookie((REFRESH_TOKEN_COOKIE_NAME, token), app_state)
-        .expires(if remember_me {
-            Expiration::DateTime(time_now + time::Duration::days(inactive_days))
-        } else {
-            Expiration::Session
-        })
-        .build()
-}
-
-pub fn login(
+pub fn set_auth_cookies(
     app_state: &AppState,
     cookies: CookieJar,
     auth_user: &User,
     remember_me: bool,
 ) -> CookieJar {
-    let auth_cookie = create_ephemeral_cookie(create_user_claim(auth_user), app_state);
-    let refresh_cookie = create_refresh_cookie(auth_user.id, app_state, remember_me);
-    cookies.add(auth_cookie).add(refresh_cookie)
+    let user_id = auth_user.id;
+    let time_now = time::OffsetDateTime::now_utc();
+
+    let ephemeral_token_exp = time_now + EPHEMERAL_TOKEN_DURATION;
+    let refresh_token_exp = time_now
+        + if remember_me {
+            REFRESH_TOKEN_REMEMBER_ME_DURATION
+        } else {
+            REFRESH_TOKEN_DURATION
+        };
+
+    let ephemeral_cookie = {
+        let token = app_state.generate_token(AdminEphemeralTokenClaims {
+            admin_id: auth_user.id,
+            username: auth_user.name.clone(),
+            is_admin: auth_user.is_admin,
+            iat: time_now.unix_timestamp() as usize,
+            exp: ephemeral_token_exp.unix_timestamp() as usize,
+        });
+        admin_cookie((EPHEMERAL_TOKEN_COOKIE_NAME, token), app_state)
+            .expires(Expiration::DateTime(ephemeral_token_exp))
+            .build()
+    };
+
+    let refresh_cookie = {
+        let token = app_state.generate_token(AdminRefreshTokenClaims {
+            admin_id: user_id,
+            iat: time_now.unix_timestamp() as usize,
+            exp: refresh_token_exp.unix_timestamp() as usize,
+            remember_me,
+        });
+
+        admin_cookie((REFRESH_TOKEN_COOKIE_NAME, token), app_state)
+            .expires(if remember_me {
+                Expiration::DateTime(refresh_token_exp)
+            } else {
+                Expiration::Session
+            })
+            .build()
+    };
+    cookies.add(ephemeral_cookie).add(refresh_cookie)
+}
+
+pub fn expire_cookies(app_state: &AppState, cookies: CookieJar) -> CookieJar {
+    [EPHEMERAL_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME]
+        .into_iter()
+        .fold(cookies, |jar, cookie_name| {
+            jar.remove(admin_cookie(cookie_name, app_state))
+        })
 }
