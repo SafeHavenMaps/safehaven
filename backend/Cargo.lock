@@ -1931,6 +1931,7 @@ dependencies = [
  "chrono",
  "clap",
  "clap_derive",
+ "cookie",
  "crc32fast",
  "figment",
  "jsonwebtoken",
