@@ -116,7 +116,7 @@ pub async fn authentication_middleware(
                 )
             else {
                 // If the refresh token is invalid return an error
-                let purged_jar = expire_cookies(cookies);
+                let purged_jar = expire_cookies(&app_state, cookies);
                 return Ok((purged_jar, AppError::Unauthorized).into_response());
             };
 
@@ -128,7 +128,7 @@ pub async fn authentication_middleware(
                 }
                 // if the user is not found, clear the cookie jar
                 Err(AppError::Database(sqlx::Error::RowNotFound)) => {
-                    let purged_jar = expire_cookies(cookies);
+                    let purged_jar = expire_cookies(&app_state, cookies);
                     return Ok((purged_jar, AppError::Unauthorized).into_response());
                 }
                 Err(err) => return Err(err.into_response()),
@@ -155,10 +155,12 @@ pub async fn authentication_middleware(
     })
 }
 
-pub fn expire_cookies(cookies: CookieJar) -> CookieJar {
-    cookies
-        .remove(EPHEMERAL_TOKEN_COOKIE_NAME)
-        .remove(REFRESH_TOKEN_COOKIE_NAME)
+pub fn expire_cookies(app_state: &AppState, cookies: CookieJar) -> CookieJar {
+    [EPHEMERAL_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME]
+        .into_iter()
+        .fold(cookies, |jar, cookie_name| {
+            jar.remove(create_admin_cookie(cookie_name, app_state))
+        })
 }
 
 fn create_user_claim(user: &User) -> AdminEphemeralTokenClaims {
@@ -171,18 +173,24 @@ fn create_user_claim(user: &User) -> AdminEphemeralTokenClaims {
     }
 }
 
+// this helper is used to add and remove cookies
+fn create_admin_cookie<'a>(
+    base: impl Into<Cookie<'a>>,
+    app_state: &AppState,
+) -> cookie::CookieBuilder<'a> {
+    Cookie::build(base)
+        .path("/api/admin/")
+        .secure(app_state.config.secure_cookie)
+        .http_only(true)
+        .same_site(SameSite::Strict)
+}
+
 fn create_ephemeral_cookie<'a>(
     claims: AdminEphemeralTokenClaims,
     app_state: &AppState,
 ) -> Cookie<'a> {
     let token = app_state.generate_refresh_token(claims);
-
-    Cookie::build((EPHEMERAL_TOKEN_COOKIE_NAME, token))
-        .path("/api/admin/")
-        .secure(app_state.config.secure_cookie)
-        .http_only(true)
-        .same_site(SameSite::Strict)
-        .build()
+    create_admin_cookie((EPHEMERAL_TOKEN_COOKIE_NAME, token), app_state).build()
 }
 
 fn create_refresh_cookie<'a>(user_id: Uuid, app_state: &AppState, remember_me: bool) -> Cookie<'a> {
@@ -202,11 +210,7 @@ fn create_refresh_cookie<'a>(user_id: Uuid, app_state: &AppState, remember_me: b
         remember_me,
     });
 
-    Cookie::build((REFRESH_TOKEN_COOKIE_NAME, token))
-        .path("/api/admin/")
-        .secure(app_state.config.secure_cookie)
-        .http_only(true)
-        .same_site(SameSite::Strict)
+    create_admin_cookie((REFRESH_TOKEN_COOKIE_NAME, token), app_state)
         .expires(if remember_me {
             Expiration::DateTime(time_now + time::Duration::days(inactive_days))
         } else {

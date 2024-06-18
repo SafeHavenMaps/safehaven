@@ -210,6 +210,6 @@ async fn admin_login(
         (status = 404, description = "User or password not found", body = ErrorResponse),
     )
 )]
-async fn admin_logout(cookies: CookieJar) -> Response {
-    auth::expire_cookies(cookies).into_response()
+async fn admin_logout(State(app_state): State<AppState>, cookies: CookieJar) -> Response {
+    auth::expire_cookies(&app_state, cookies).into_response()
 }

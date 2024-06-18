@@ -22,6 +22,7 @@ scrypt = "0.11"
 time = "0.3.36"
 chrono = { version = "0.4", features = ["serde"] }
 axum = { version = "0.7", features = ["macros", "multipart"] }
+cookie = "0.18.1"
 axum-extra = { version = "0.9", features = ["typed-header", "cookie"] }
 tokio = { version = "1.36", features = ["full"] }
 figment = { version = "0.10", features = ["toml", "env"] }
