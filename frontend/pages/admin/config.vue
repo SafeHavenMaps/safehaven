@@ -35,6 +35,51 @@
           :invalid="!editedConfig.general.logo_url || !validator.isURL(editedConfig.general.logo_url)"
         />
 
+        <AdminInputSwitchField
+          id="popup_enabled"
+          v-model="popupEnabled"
+          label="Afficher un popup au lancement de l'application"
+        />
+
+        <AdminInputTextField
+          v-if="popupEnabled"
+          id="popup"
+          v-model="editedConfig.general.popup"
+          label="Popup d'Accueil"
+          :variant="hasBeenEdited('general', 'popup')"
+          text-length="editor"
+        />
+
+        <AdminInputSwitchField
+          v-if="popupEnabled"
+          id="popup_check_enabled"
+          v-model="popupCheckboxEnabled"
+          label="Mettre une case à cocher dans le popup d'accueil"
+        />
+
+        <AdminInputTextField
+          v-if="popupEnabled && popupCheckboxEnabled"
+          id="popup"
+          v-model="editedConfig.general.popup_check_text"
+          label="Case à Cocher de la Popup d'Accueil"
+          :variant="hasBeenEdited('general', 'popup_check_text')"
+        />
+
+        <AdminInputSwitchField
+          id="redirect_url_enabled"
+          v-model="customRedirection"
+          label="Rediriger les tokens invalides vers une URL personnalisée"
+        />
+
+        <AdminInputTextField
+          v-if="customRedirection"
+          id="redirect_url"
+          v-model="editedConfig.general.redirect_url"
+          label="URL de Redirection"
+          :variant="hasBeenEdited('general', 'redirect_url')"
+          :invalid="!editedConfig.general.redirect_url || !validator.isURL(editedConfig.general.redirect_url)"
+        />
+
         <span class="flex gap-1 justify-content-end">
           <Button
             label="Annuler"
@@ -220,6 +265,29 @@ const editedConfig: Ref<SafeHavenOptions> = ref(JSON.parse(JSON.stringify(fetche
 
 const processingRequest = ref(false)
 const toast = useToast()
+
+const popupEnabled = ref(!!editedConfig.value.general.popup)
+const popupCheckboxEnabled = ref(!!editedConfig.value.general.popup_check_text)
+const customRedirection = ref(!!editedConfig.value.general.redirect_url)
+
+watch(popupEnabled, (value) => {
+  if (!value) {
+    editedConfig.value.general.popup = null
+    popupCheckboxEnabled.value = false
+  }
+})
+
+watch(popupCheckboxEnabled, (value) => {
+  if (!value) {
+    editedConfig.value.general.popup_check_text = null
+  }
+})
+
+watch(customRedirection, (value) => {
+  if (!value) {
+    editedConfig.value.general.redirect_url = null
+  }
+})
 
 function hasBeenEdited<T extends keyof SafeHavenOptions>(field: T, subField?: keyof SafeHavenOptions[T]) {
   if (subField) {
