@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-column gap-2">
-    <label :for="id">{{ label }}</label>
+    <label :for="id">{{ label }} <RequiredIndicator v-if="!props.optional" /></label>
     <InputNumber
       :id="props.id"
       :model-value="props.modelValue"
@@ -20,6 +20,7 @@ const props = defineProps<{
   variant?: boolean
   invalid?: boolean
   helperText?: string
+  optional?: boolean
 }>()
 
 const emit = defineEmits(['update:modelValue'])

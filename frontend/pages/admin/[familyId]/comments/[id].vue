@@ -12,7 +12,7 @@
       />
 
       <div class="flex flex-column gap-2">
-        <label for="comment_text">Texte du commentaire</label>
+        <label for="comment_text">Texte du commentaire <RequiredIndicator /></label>
         <ViewerRichTextEditor
           id="comment_text"
           v-model="editedComment.text"
