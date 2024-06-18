@@ -35,11 +35,10 @@
       @update:model-value="updateField"
     />
     <!-- add fieldmetadata validation -->
-    <Editor
+    <ViewerRichTextEditor
       v-if="props.formField.field_type=='RichText'"
       :id="props.formField.key"
-      :model-value="props.fieldContent as (string | undefined)"
-      editor-style="height:220px"
+      :model-value="(props.fieldContent as (string | undefined))"
       @update:model-value="updateField"
     />
     <InputNumber
@@ -172,7 +171,6 @@
 
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
-import Editor from 'primevue/editor'
 import Calendar from 'primevue/calendar'
 import type { EntityOrCommentEvent, FieldContentMap, FormField } from '~/lib'
 

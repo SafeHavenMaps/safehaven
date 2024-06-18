@@ -1,13 +1,11 @@
 import DOMPurify from 'dompurify'
 
 function purify_strict(txt: string): string {
-  DOMPurify.sanitize(txt, { ALLOWED_TAGS: ['b', 'q', 'i', 'strong', 'em', 'br', 'p'], ALLOWED_ATTR: [] })
-  return DOMPurify.sanitize(txt).replaceAll('\n', '<br />')
+  return DOMPurify.sanitize(txt, { ALLOWED_TAGS: ['b', 'q', 'i', 'strong', 'em', 'br', 'p', 'sup', 'sub', 's', 'u'], ALLOWED_ATTR: [] })
 }
 
 function purify_lenient(txt: string): string {
-  DOMPurify.sanitize(txt)
-  return DOMPurify.sanitize(txt).replaceAll('\n', '<br />')
+  return DOMPurify.sanitize(txt)
 }
 
 export { purify_strict, purify_lenient }

@@ -22,6 +22,12 @@
       />
     </div>
 
+    <div v-else-if="field.field_type == 'RichText'">
+      <p
+        v-html="getDataAsEscapedString(field.key)"
+      />
+    </div>
+
     <div v-else-if="field.field_type == 'Date'">
       <p>
         {{ new Date(getKeyValue(field.key)).toLocaleDateString() }}

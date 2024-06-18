@@ -34,12 +34,14 @@
         label="Auteur"
       />
 
-      <AdminInputTextField
-        id="text"
-        v-model="editedComment!.text"
-        label="Texte du commentaire"
-        text-length="editor"
-      />
+      <div class="flex flex-column gap-2">
+        <label for="comment_text">Texte du commentaire</label>
+        <ViewerRichTextEditor
+          id="comment_text"
+          v-model="editedComment!.text"
+          label="Texte du commentaire"
+        />
+      </div>
 
       <span class="flex gap-1 justify-content-end">
         <Button

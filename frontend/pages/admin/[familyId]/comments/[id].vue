@@ -11,13 +11,14 @@
         :variant="hasBeenEdited('author')"
       />
 
-      <AdminInputTextField
-        id="text"
-        v-model="editedComment.text"
-        label="Texte du commentaire"
-        :variant="hasBeenEdited('text')"
-        text-length="editor"
-      />
+      <div class="flex flex-column gap-2">
+        <label for="comment_text">Texte du commentaire</label>
+        <ViewerRichTextEditor
+          id="comment_text"
+          v-model="editedComment.text"
+          label="Texte du commentaire"
+        />
+      </div>
 
       <FormDynamicField
         v-for="field in family.comment_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
