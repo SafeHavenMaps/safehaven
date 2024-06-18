@@ -149,7 +149,7 @@ const editedEntity = ref<PublicNewEntity>({
 const editedComment = ref<PublicNewComment>({
   author: '',
   data: {},
-  entity_id: '65cfc1e7-1af1-4fb9-9827-29d97fd1a0e0',
+  entity_id: '00000000-0000-4000-8000-000000000000',
   text: '',
 })
 
@@ -167,7 +167,7 @@ function reset_refs() {
   editedComment.value = {
     author: '',
     data: {},
-    entity_id: '65cfc1e7-1af1-4fb9-9827-29d97fd1a0e0',
+    entity_id: '00000000-0000-4000-8000-000000000000',
     text: '',
   }
   curr_page.value = 0

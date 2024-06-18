@@ -18,13 +18,13 @@
       </InputGroup>
     </form>
 
-    <div v-if="!results.length">
+    <div v-if="!results.length && resultsSearched">
       <Message severity="error">
         Aucun résultat trouvé
       </Message>
     </div>
     <div
-      v-else-if="locationSelected"
+      v-else-if="locationSelected && resultsSearched"
       class="h-20rem"
     >
       <SingleEntityMap
@@ -51,6 +51,7 @@ const emits = defineEmits(['select'])
 const locationInput = ref(props.modelValue?.plain_text || '')
 const locationSelected = ref(props.modelValue)
 const results = ref<Result[]>([])
+const resultsSearched = ref(false)
 
 const transformedCoordinates = computed(() => {
   if (!props.modelValue) return [0, 0]
@@ -61,7 +62,7 @@ const transformedCoordinates = computed(() => {
 
 async function searchNominatim() {
   results.value = await freeFormSearch(locationInput.value)
-
+  resultsSearched.value = true
   if (results.value.length !== 0) {
     locationSelected.value = {
       lat: results.value[0].lat,
