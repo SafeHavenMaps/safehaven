@@ -1,7 +1,7 @@
 <template>
   <Button
     label="Ajouter"
-    severity="info"
+    severity="success"
     @click="formVisible = true"
   >
     <template #icon>
@@ -17,7 +17,7 @@
     modal
     closable
     :header="props.family.entity_form.title"
-    :content-props="{ onClick: (event) => { event.stopPropagation() } }"
+    :content-props="{ onClick: (event: Event) => { event.stopPropagation() } }"
   >
     <!-- Entity Form Pages -->
     <form

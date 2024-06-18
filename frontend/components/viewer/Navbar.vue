@@ -44,7 +44,7 @@
         </Button>
 
         <OverlayPanel ref="overflowPanel">
-          <div class="flex flex-column  gap-3">
+          <div class="flex flex-column gap-3">
             <ViewerFamilySwitcher
               v-if="props.showFamilySwitcher"
             />
@@ -52,7 +52,8 @@
             <div class="flex gap-2">
               <Button
                 label="Info"
-                class="p-button-text"
+                outlined
+                severity="primary"
                 @click="showInformation = true"
               >
                 <template #icon>
@@ -68,7 +69,7 @@
               <Button
                 v-if="props.showCategorySwitcher"
                 label="Filtres"
-                class="p-button-help"
+                severity="primary"
                 @click="openFilterPanel"
               >
                 <template #icon>
@@ -81,7 +82,7 @@
 
               <Button
                 v-if="props.showSearch"
-                class="p-button-warning"
+                severity="primary"
                 @click="openSearchPanel"
               >
                 <template #icon>
@@ -113,7 +114,7 @@
           <Button
             v-if="props.showCategorySwitcher"
             label="Filtres"
-            class="p-button-help"
+            severity="primary"
             @click="openFilterPanel"
           >
             <template #icon>
@@ -126,7 +127,7 @@
 
           <Button
             v-if="props.showSearch"
-            class="p-button-warning"
+            severity="primary"
             @click="openSearchPanel"
           >
             <template #icon>
