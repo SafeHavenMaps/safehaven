@@ -35,6 +35,30 @@
             {{ category.title }}
           </div>
         </div>
+        <Button
+          outlined
+          size="small"
+          class="m-1"
+          @click="invertFilteringCategories"
+        >
+          Inverser
+        </Button>
+        <Button
+          outlined
+          size="small"
+          class="m-1"
+          @click="resetFilteringCategories"
+        >
+          Réinitialiser
+        </Button>
+        <Button
+          outlined
+          size="small"
+          class="m-1"
+          @click="selectAllFilteringCategories"
+        >
+          Tout sélectionner
+        </Button>
       </div>
       <div
         class="filter-settings mt-2"
@@ -169,6 +193,27 @@ function shownAdvancedTags() {
   }
 
   return base.filter(tag => tag.title.toLowerCase().includes(tagSearch.value.toLowerCase()))
+}
+
+function invertFilteringCategories() {
+  props.filteringCategories.forEach((category) => {
+    category.active = !category.active
+  })
+  categoryFiltersChanged()
+}
+
+function resetFilteringCategories() {
+  props.filteringCategories.forEach((category) => {
+    category.active = category.default_status
+  })
+  categoryFiltersChanged()
+}
+
+function selectAllFilteringCategories() {
+  props.filteringCategories.forEach((category) => {
+    category.active = true
+  })
+  categoryFiltersChanged()
 }
 
 function tagFiltersChanged() {
