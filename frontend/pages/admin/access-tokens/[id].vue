@@ -8,13 +8,16 @@
       v-model="editedAccessToken.title"
       label="Titre"
       :variant="hasBeenEdited('title')"
+      :invalid="!editedAccessToken.title"
     />
+
     <AdminInputTextField
       id="token"
       v-model="editedAccessToken.token"
       label="Jeton"
       :variant="hasBeenEdited('token')"
       helper-text="(utilisé dans l'url d'accès après /map/ ou /search/)"
+      :invalid="!editedAccessToken.token"
     />
 
     <AdminInputSwitchField
@@ -69,7 +72,7 @@
         label="Sauvegarder"
         type="submit"
         :loading="processingRequest"
-        :disabled="processingRequest || !editedAccessToken.title || !editedAccessToken.token"
+        :disabled="isDisabled()"
       />
     </span>
   </form>
@@ -85,9 +88,36 @@ definePageMeta({
 })
 
 const accessTokenId = useRoute().params.id as string
+const isNew = (accessTokenId === 'new')
 
-const fetchedAccessToken = await state.client.getAccessToken(accessTokenId)
-const editedAccessToken: Ref<NewOrUpdateAccessToken> = ref(JSON.parse(JSON.stringify(fetchedAccessToken))) // deep copy
+const fetchedAccessToken = isNew ? null : await state.client.getAccessToken(accessTokenId)
+const editedAccessToken: Ref<NewOrUpdateAccessToken> = ref(
+  isNew
+    ? {
+        active: true,
+        permissions: {
+          can_access_comments: false,
+          categories_policy: {
+            allow_all: true,
+            allow_list: [],
+            force_exclude: [],
+          },
+          families_policy: {
+            allow_all: true,
+            allow_list: [],
+            force_exclude: [],
+          },
+          tags_policy: {
+            allow_all: true,
+            allow_list: [],
+            force_exclude: [],
+          },
+        },
+        title: '',
+        token: '',
+      }
+    : JSON.parse(JSON.stringify(fetchedAccessToken)),
+)
 
 const families = state.families
 const categories = await state.client.listCategories()
@@ -98,26 +128,44 @@ const toast = useToast()
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  `Édition du jeton ${fetchedAccessToken.title}`,
+  isNew ? `Édition d'un nouveau jeton` : `Édition du jeton ${fetchedAccessToken!.title}`,
   'accessToken',
   [],
   [
     { label: 'Jetons d\'accès', url: '/admin/access-tokens' },
-    { label: `Édition du jeton ${fetchedAccessToken.title}`, url: `/admin/access-tokens/${accessTokenId}` },
+    (
+      isNew
+        ? { label: `Édition d'un nouveau jeton`, url: `/admin/access-tokens/new` }
+        : { label: `Édition du jeton ${fetchedAccessToken!.title}`, url: `/admin/access-tokens/${accessTokenId}` }
+    ),
   ],
 )
 
+function isDisabled() {
+  return processingRequest.value
+    || !editedAccessToken.value.title
+    || !editedAccessToken.value.token
+}
+
 function hasBeenEdited(field: keyof NewOrUpdateAccessToken) {
-  return editedAccessToken.value[field] !== fetchedAccessToken[field]
+  return isNew ? false : editedAccessToken.value[field] !== fetchedAccessToken![field]
 }
 
 async function onSave() {
   processingRequest.value = true
   try {
     updatePolicies(editedAccessToken.value.permissions)
-    await state.client.updateAccessToken(accessTokenId, editedAccessToken.value)
+
+    if (isNew) {
+      await state.client.createAccessToken(editedAccessToken.value)
+      toast.add({ severity: 'success', summary: 'Succès', detail: 'Jeton créé avec succès', life: 3000 })
+    }
+    else {
+      await state.client.updateAccessToken(accessTokenId, editedAccessToken.value)
+      toast.add({ severity: 'success', summary: 'Succès', detail: 'Jeton modifié avec succès', life: 3000 })
+    }
+
     navigateTo('/admin/access-tokens')
-    toast.add({ severity: 'success', summary: 'Succès', detail: 'Jeton modifié avec succès', life: 3000 })
   }
   catch {
     toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification du jeton', life: 3000 })
