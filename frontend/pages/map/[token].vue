@@ -37,14 +37,12 @@
           <h3 class="m-0">
             {{ state.activeEntity!.entity.display_name }}
           </h3>
-
-          <ViewerCommentAddForm
-            :family="state.activeEntity!.family"
-            :entity="state.activeEntity!.entity"
-          />
         </div>
       </template>
-
+      <ViewerCommentAddForm
+        :family="state.activeEntity!.family"
+        :entity="state.activeEntity!.entity"
+      />
       <ViewerCommonEntityDisplayer
         v-if="state.activeEntity"
         :entity="state.activeEntity!"

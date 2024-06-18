@@ -6,7 +6,13 @@
     @click="formVisible=true"
   >
     <template #default>
-      <AppIcon icon-name="commentAdd" />
+      <div class="flex align-items-center">
+        <AppIcon
+          class="-ml-1 mr-1"
+          icon-name="commentAdd"
+        />
+        Ajouter un commentaire
+      </div>
     </template>
   </Button>
 
