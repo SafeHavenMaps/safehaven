@@ -74,11 +74,11 @@
             />
           </div>
 
-          <div>
-            <h3 class="text-lg font-semibold mb-3 mt-2">
-              {{ props.entity?.entity.locations.length > 1 ? 'Adresses' : 'Adresse' }}
-            </h3>
-            <ul class="list-disc list-inside ml-4">
+          <Fieldset
+            v-if="props.entity?.entity.locations.length > 0"
+            :legend="props.entity?.entity.locations.length > 1 ? 'Adresses' : 'Adresse' "
+          >
+            <ul class="list-disc list-inside">
               <li
                 v-for="location in props.entity?.entity.locations"
                 :key="location.plain_text"
@@ -86,11 +86,11 @@
                 {{ location.plain_text }}
               </li>
             </ul>
-          </div>
+          </Fieldset>
 
           <!--
-          We display the DiscreteScore fields first, as they give context on the entity.
-        -->
+            We display the DiscreteScore fields first, as they give context on the entity.
+          -->
           <Fieldset
             v-if="hasScores"
             legend="Notes"
