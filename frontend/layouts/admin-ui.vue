@@ -26,7 +26,7 @@
         <Breadcrumb
           :home="{ label: '', url: '' }"
           :model="currentBreadcrumbs"
-          class="breadcrumb !p-1"
+          class="breadcrumb !p-2"
         >
           <template #item="{ item, props }">
             <NuxtLink
@@ -48,7 +48,7 @@
 
         <Card class="ml-0 mt-1 grow w-full scroll-container">
           <template #title>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 font-semibold">
               <AppIcon
                 :icon-name="cardIconName"
                 class=""

@@ -32,7 +32,7 @@
       label="Permission d'accès aux commentaires"
     />
 
-    <Divider />
+    <Divider class="!my-2" />
 
     <AdminInputPolicyPermissionField
       v-model="editedAccessToken.permissions.families_policy"
@@ -41,7 +41,7 @@
       :options="families"
     />
 
-    <Divider />
+    <Divider class="!my-2" />
 
     <AdminInputPolicyPermissionField
       v-model="editedAccessToken.permissions.categories_policy"
@@ -50,7 +50,7 @@
       :options="categories"
     />
 
-    <Divider />
+    <Divider class="!my-2" />
 
     <AdminInputPolicyPermissionField
       v-model="editedAccessToken.permissions.tags_policy"

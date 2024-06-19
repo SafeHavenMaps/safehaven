@@ -9,7 +9,7 @@
           :src="state.logo ?? defaultLogo"
         >
         <div class="pl-4">
-          <div class="my-0 font-extrabold">
+          <div class="my-0 text-lg font-extrabold">
             {{ state.title }}
           </div>
           <div class="text-xs italic">
@@ -77,7 +77,6 @@
                 <template #icon>
                   <AppIcon
                     icon-name="filter"
-                    class="-ml-1 mr-1"
                   />
                 </template>
               </Button>
@@ -123,7 +122,6 @@
             <template #icon>
               <AppIcon
                 icon-name="filter"
-                class="-ml-1 mr-1"
               />
             </template>
           </Button>

@@ -7,7 +7,6 @@
     <template #icon>
       <AppIcon
         icon-name="addEntity"
-        class="-ml-1 mr-1"
       />
     </template>
   </Button>
