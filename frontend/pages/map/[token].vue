@@ -27,7 +27,7 @@
       :style="fitContainer()"
       position="left"
       class="!w-full sm:!w-[30rem]"
-      :pt="{ mask: '!w-full sm:!w-auto' }"
+      :pt="{ mask: '!w-full sm:!w-auto', pcCloseButton: 'shrink-0' }"
     >
       <template #header>
         <div
@@ -37,7 +37,7 @@
           <CategoryTag
             :category="state.activeEntity!.category"
           />
-          <div class="grow font-bold m-0">
+          <div class="grow font-bold text-lg m-0">
             {{ state.activeEntity!.entity.display_name }}
           </div>
           <div class="grow" />
