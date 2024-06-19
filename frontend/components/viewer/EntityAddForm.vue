@@ -1,16 +1,4 @@
 <template>
-  <Button
-    label="Ajouter"
-    severity="info"
-    @click="formVisible = true"
-  >
-    <template #icon>
-      <AppIcon
-        icon-name="addEntity"
-      />
-    </template>
-  </Button>
-
   <Dialog
     v-model:visible="formVisible"
     modal
@@ -130,6 +118,20 @@ import { ref, defineProps } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import type { Category, EntityOrCommentData, Family, FormField, PublicNewComment, PublicNewEntity } from '~/lib'
 import state from '~/lib/viewer-state'
+
+defineExpose({ open, close, toggle })
+
+function open() {
+  formVisible.value = true
+}
+
+function close() {
+  formVisible.value = false
+}
+
+function toggle() {
+  formVisible.value = !formVisible.value
+}
 
 const formVisible = ref(false)
 

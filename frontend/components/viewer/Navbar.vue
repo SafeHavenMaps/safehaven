@@ -63,16 +63,23 @@
                 </template>
               </Button>
 
-              <ViewerEntityAddForm
-                :family="state.activeFamily"
-                :categories="state.categories.filter(category => category.family_id == state.activeFamily.id)"
-              />
+              <Button
+                label="Ajouter"
+                severity="info"
+                @click="openAddModal()"
+              >
+                <template #icon>
+                  <AppIcon
+                    icon-name="addEntity"
+                  />
+                </template>
+              </Button>
 
               <Button
                 v-if="props.showCategorySwitcher"
                 label="Filtres"
                 severity="primary"
-                @click="filterPopupVisible = true"
+                @click="openFilterPopup()"
               >
                 <template #icon>
                   <AppIcon
@@ -108,10 +115,17 @@
             </template>
           </Button>
 
-          <ViewerEntityAddForm
-            :family="state.activeFamily"
-            :categories="state.categories.filter(category => category.family_id == state.activeFamily.id)"
-          />
+          <Button
+            label="Ajouter"
+            severity="info"
+            @click="openAddModal()"
+          >
+            <template #icon>
+              <AppIcon
+                icon-name="addEntity"
+              />
+            </template>
+          </Button>
 
           <Button
             v-if="props.showCategorySwitcher"
@@ -280,6 +294,12 @@
   >
     <ViewerInformation />
   </Dialog>
+
+  <ViewerEntityAddForm
+    ref="entityAddForm"
+    :family="state.activeFamily"
+    :categories="state.categories.filter(category => category.family_id == state.activeFamily.id)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -290,6 +310,7 @@ import defaultLogo from '~/assets/logo_square.svg'
 import type { Result as NominatimResult } from '~/lib/nominatim'
 import { freeFormSearch } from '~/lib/nominatim'
 import type { ViewerCachedEntity, ViewerPaginatedCachedEntitiesWithLocation } from '~/lib'
+import type { ViewerEntityAddForm } from '#build/components'
 
 const oneSearchMade = ref(false)
 
@@ -304,6 +325,8 @@ const props = withDefaults(defineProps<Props>(), {
   showSearch: true,
   showFamilySwitcher: true,
 })
+
+const entityAddForm = ref<typeof ViewerEntityAddForm>()
 
 const emit = defineEmits<{
   filtersChanged: []
@@ -347,6 +370,16 @@ async function searchLocation() {
 
 async function searchEntity() {
   currentEntitiesResults.value = await state.searchEntitiesWithLocations(entitySearch.value)
+}
+
+function openFilterPopup() {
+  filterPopupVisible.value = true
+  overflowPanel!.value!.hide()
+}
+
+function openAddModal() {
+  entityAddForm.value!.open()
+  overflowPanel.value!.hide()
 }
 
 function locationChosen(result: NominatimResult) {
