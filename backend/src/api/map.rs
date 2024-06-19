@@ -7,7 +7,7 @@ use crate::models::entity_cache::{
 };
 use axum::extract::{Path, State};
 use axum::{
-    routing::{get, post, Router},
+    routing::{post, Router},
     Json,
 };
 use serde::{Deserialize, Serialize};
@@ -21,7 +21,7 @@ pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/view", post(viewer_view_request))
         .route("/search", post(viewer_search_request))
-        .route("/entities/:id", get(viewer_fetch_entity))
+        .route("/entities/:id", post(viewer_fetch_entity))
         .route("/entities", post(viewer_new_entity))
         .route("/comments", post(viewer_new_comment))
 }
@@ -265,8 +265,15 @@ pub struct FetchedEntity {
     pub children: Vec<PublicListedEntity>,
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct FetchEntityRequest {
+    pub active_categories: Vec<Uuid>,
+    pub active_required_tags: Vec<Uuid>,
+    pub active_hidden_tags: Vec<Uuid>,
+}
+
 #[utoipa::path(
-    get,
+    post,
     path = "/api/map/entities/{id}",
     responses(
         (status = 200, description = "Entity", body = FetchedEntity),
@@ -278,10 +285,9 @@ async fn viewer_fetch_entity(
     DbConn(mut conn): DbConn,
     MapUserToken(token): MapUserToken,
     Path(id): Path<Uuid>,
+    Json(request): Json<FetchEntityRequest>,
 ) -> Result<AppJson<FetchedEntity>, AppError> {
     let entity = PublicEntity::get(id, &mut conn).await?;
-    let parents = PublicEntity::get_parents(id, &mut conn).await?;
-    let children = PublicEntity::get_children(id, &mut conn).await?;
 
     let can_read_entity = (token.perms.families_policy.allow_all
         || token
@@ -301,8 +307,12 @@ async fn viewer_fetch_entity(
                 .iter()
                 .all(|tag| token.perms.tags_policy.allow_list.contains(tag)));
 
+    let parents = PublicEntity::get_parents(id, &mut conn).await?;
+    let children = PublicEntity::get_children(id, &mut conn).await?;
+
     let filtered_children: Vec<PublicListedEntity> = children
         .into_iter()
+        // filter against permissions
         .filter(|child| {
             (token.perms.categories_policy.allow_all
                 || token
@@ -316,10 +326,27 @@ async fn viewer_fetch_entity(
                         .iter()
                         .all(|tag| token.perms.tags_policy.allow_list.contains(tag)))
         })
+        // filter against request
+        .filter(|child| {
+            request
+                .active_categories
+                .iter()
+                .any(|cat| *cat == child.category_id)
+                && (request.active_required_tags.is_empty()
+                    || request
+                        .active_required_tags
+                        .iter()
+                        .any(|tag| child.tags.contains(tag)))
+                && !request
+                    .active_hidden_tags
+                    .iter()
+                    .any(|tag| child.tags.contains(tag))
+        })
         .collect();
 
     let filtered_parents: Vec<PublicListedEntity> = parents
         .into_iter()
+        // filter against permissions
         .filter(|parent| {
             (token.perms.categories_policy.allow_all
                 || token
@@ -332,6 +359,22 @@ async fn viewer_fetch_entity(
                         .tags
                         .iter()
                         .all(|tag| token.perms.tags_policy.allow_list.contains(tag)))
+        })
+        // filter against request
+        .filter(|parent| {
+            request
+                .active_categories
+                .iter()
+                .any(|cat| *cat == parent.category_id)
+                && (request.active_required_tags.is_empty()
+                    || request
+                        .active_required_tags
+                        .iter()
+                        .any(|tag| parent.tags.contains(tag)))
+                && !request
+                    .active_hidden_tags
+                    .iter()
+                    .any(|tag| parent.tags.contains(tag))
         })
         .collect();
 

@@ -2497,7 +2497,7 @@
       }
     },
     "/api/map/entities/{id}": {
-      "get": {
+      "post": {
         "tags": [
           "map"
         ],
@@ -2513,6 +2513,17 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FetchEntityRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Entity",

@@ -281,11 +281,21 @@ export class AppState {
   }
 
   async selectedCachedEntity(cacheEntity: DisplayableCachedEntity) {
-    this._activeEntity = await this.client.fetchEntity(cacheEntity.entity_id)
+    this._activeEntity = await this.client.fetchEntity(
+      cacheEntity.entity_id,
+      this.activeFilteringCategories,
+      this.activeRequiredTags,
+      this.activeHiddenTags,
+    )
   }
 
   async selectEntity(id: string) {
-    this._activeEntity = await this.client.fetchEntity(id)
+    this._activeEntity = await this.client.fetchEntity(
+      id,
+      this.activeFilteringCategories,
+      this.activeRequiredTags,
+      this.activeHiddenTags,
+    )
   }
 
   async searchEntitiesWithLocations(query: string) {

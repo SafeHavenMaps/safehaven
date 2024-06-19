@@ -73,9 +73,19 @@ export default function useClient() {
       return data
     },
 
-    async fetchEntity(id: string): Promise<FetchedEntity> {
-      const { data, error } = await rawClient.GET('/api/map/entities/{id}', {
+    async fetchEntity(
+      id: string,
+      activeCategories: string[],
+      activeRequiredTags: string[],
+      activeHiddenTags: string[],
+    ): Promise<FetchedEntity> {
+      const { data, error } = await rawClient.POST('/api/map/entities/{id}', {
         params: { path: { id } },
+        body: {
+          active_categories: activeCategories,
+          active_required_tags: activeRequiredTags,
+          active_hidden_tags: activeHiddenTags,
+        },
       })
       if (error) throw error
 
