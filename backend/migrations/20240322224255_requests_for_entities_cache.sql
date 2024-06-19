@@ -201,7 +201,6 @@ BEGIN
             ec.id,
             ec.entity_id,
             ec.category_id,
-            ec.categories_ids,
             ec.tags_ids,
             ec.family_id,
             ec.display_name,
