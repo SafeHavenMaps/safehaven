@@ -1,7 +1,7 @@
 <template>
   <Button
     label="Ajouter"
-    severity="success"
+    severity="info"
     @click="formVisible = true"
   >
     <template #icon>

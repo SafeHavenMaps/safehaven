@@ -26,7 +26,7 @@
         <Breadcrumb
           :home="{ label: '', url: '' }"
           :model="currentBreadcrumbs"
-          class="breadcrumb !p-2"
+          class="breadcrumb !p-1"
         >
           <template #item="{ item, props }">
             <NuxtLink
@@ -46,21 +46,22 @@
           </template>
         </Breadcrumb>
 
-        <Card class="m-4 ml-0 mt-1 grow w-full scroll-container">
+        <Card class="ml-0 mt-1 grow w-full scroll-container">
           <template #title>
-            <div class="flex items-center">
+            <div class="flex items-center gap-2">
               <AppIcon
                 :icon-name="cardIconName"
-                class="mr-2"
+                class=""
               />
               {{ cardTitle }}
               <div
                 v-for="(action, index) in currentActions"
                 :key="index"
+                class="flex items-end"
               >
                 <Button
                   outlined
-                  class="ml-2 py-0 px-1"
+                  class="!py-0 !px-1"
                   :label="action.label"
                   :severity="action.severity"
                   @click="navigateTo(action.url)"
