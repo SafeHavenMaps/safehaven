@@ -4423,19 +4423,11 @@
           "id",
           "entity_id",
           "category_id",
-          "categories_ids",
           "tags_ids",
           "family_id",
           "display_name"
         ],
         "properties": {
-          "categories_ids": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
           "category_id": {
             "type": "string",
             "format": "uuid"

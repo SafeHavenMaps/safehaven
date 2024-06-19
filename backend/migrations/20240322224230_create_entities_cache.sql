@@ -27,8 +27,7 @@ direct_locations AS (
         e.hidden,
         location.value as location,
         location.ordinality AS location_index,
-        array_remove(array_agg(DISTINCT et.tag_id) || array_agg(DISTINCT cet.tag_id), NULL) AS tags_ids,
-        array_agg(DISTINCT e2.category_id) FILTER (WHERE e2.category_id IS NOT NULL) AS child_categories_ids
+        array_remove(array_agg(DISTINCT et.tag_id), NULL) AS tags_ids
     FROM entities e
     JOIN categories c ON e.category_id = c.id
     LEFT JOIN entity_tags et ON e.id = et.entity_id
@@ -55,7 +54,6 @@ SELECT
     ST_Transform(ST_SetSRID(ST_MakePoint((dl.location ->> 'long')::double precision, (dl.location ->> 'lat')::double precision), 4326), 3857) AS web_mercator_location,
     dl.location ->> 'plain_text' AS plain_text_location,
     dl.tags_ids,
-    array_append(dl.child_categories_ids, dl.category_id) AS categories_ids,
     NULL AS parent_id,
     NULL AS parent_display_name,
     dl.hidden,
@@ -77,7 +75,6 @@ SELECT
     ST_Transform(ST_SetSRID(ST_MakePoint((tl.value ->> 'long')::double precision, (tl.value ->> 'lat')::double precision), 4326), 3857) AS web_mercator_location,
     tl.value ->> 'plain_text' AS plain_text_location,
     dl.tags_ids,
-    array_append(dl.child_categories_ids, dl.category_id) AS categories_ids,
     tl.parent_id,
     tl.parent_display_name,
     dl.hidden,

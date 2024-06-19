@@ -28,7 +28,7 @@
           type="bar"
           :data="chartData"
           :options="chartOptions"
-          class="absolute top-0 left-0 h-full w-full h-52 xl:h-64"
+          class="absolute top-0 left-0 w-full h-52 xl:h-64"
         />
       </div>
     </div>
