@@ -319,7 +319,7 @@ initAdminLayout(
   'user',
   [],
   [
-    { label: 'Configuration', url: '/admin/configuration' },
+    { label: 'Configuration', url: '/admin/config' },
   ],
 )
 

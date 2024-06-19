@@ -24,7 +24,9 @@ export default function useClient() {
 
     async bootstrap(token: string) {
       const { data, error } = await rawClient.GET('/api/bootstrap/{token}', {
-        params: { path: { token }, query: { referrer: document.referrer } },
+        params: { path: { token }, query: {
+          referrer: document.referrer ?? '',
+        } },
       })
       if (error) throw error
 
