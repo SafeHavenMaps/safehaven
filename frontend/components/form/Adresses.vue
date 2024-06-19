@@ -1,8 +1,6 @@
 <template>
-  <div class="flex items-center gap-2">
-    <label>Adresses</label>
+  <div class="flex items-center gap-2 mt-1 -mb-1">
     <Button
-      size="small"
       outlined
       severity="success"
       label="Ajouter une adresse"
@@ -10,10 +8,13 @@
     />
   </div>
 
-  <DataTable :value="props.locations">
+  <DataTable
+    v-if="props.locations.length"
+    :value="props.locations"
+  >
     <Column
       field="plain_text"
-      header="Adresse"
+      header="Adresses"
       sortable
     />
     <Column>
