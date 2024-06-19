@@ -158,7 +158,7 @@
           class="flex items-center gap-2"
         >
           <CategoryTag :category="state.activeEntity!.category" />
-          <h3 class="m-0">
+          <h3 class="grow font-bold text-lg m-0">
             {{ state.activeEntity!.entity.display_name }}
           </h3>
         </div>

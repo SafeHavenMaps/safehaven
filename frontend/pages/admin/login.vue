@@ -8,7 +8,7 @@
       src="assets/logo_secondary.svg"
       class="w-60 -mt-20 -mb-3"
     >
-    <Card>
+    <Card class="p-3 m-2">
       <template #title>
         Espace d'administration
       </template>
