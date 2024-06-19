@@ -11,7 +11,7 @@
         :variant="hasBeenEdited('author')"
       />
 
-      <div class="flex flex-column gap-2">
+      <div class="flex flex-col gap-2">
         <label for="comment_text">Texte du commentaire <RequiredIndicator /></label>
         <ViewerRichTextEditor
           id="comment_text"

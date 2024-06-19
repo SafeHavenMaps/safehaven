@@ -33,7 +33,6 @@
       :rows-per-page-options="[5, 10, 20, 50]"
       removable-sort
       :global-filter-fields="['title', 'token']"
-      class=" "
       filter-match-mode="contains"
     >
       <Column

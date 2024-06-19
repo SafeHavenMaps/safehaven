@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <h3 class="mt-0">
+    <h3 class="mt-0 font-semibold text-lg mb-2">
       Origines des liens
     </h3>
 
@@ -19,7 +19,7 @@
     </DataTable>
 
     <div class="mt-4">
-      <h3 class="mt-0">
+      <h3 class="mt-0 font-semibold text-lg mb-4">
         Activités des 30 derniers jours
       </h3>
 

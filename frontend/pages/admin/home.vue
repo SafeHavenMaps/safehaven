@@ -1,5 +1,5 @@
 <template>
-  <div class="relative h-full w-full">
+  <div class="h-full w-full">
     <div class="grid grid-cols-12 gap-4">
       <div
         v-for="(card, index) in cards"
@@ -18,7 +18,7 @@
             </div>
           </template>
           <template #content>
-            <div class="text-4xl font-bold relative z-10">
+            <div class="text-4xl font-bold z-10">
               {{ card.stat }}
             </div>
           </template>
@@ -26,8 +26,8 @@
       </div>
     </div>
 
-    <div class="relative flex flex-col h-full w-full items-center justify-center">
-      <div class="text-xl font-bold ">
+    <div class="flex flex-col h-full w-full items-center ">
+      <div class="text-xl font-bold mt-8">
         Activités des 30 derniers jours
       </div>
 
@@ -35,7 +35,7 @@
         type="bar"
         :data="chartData"
         :options="chartOptions"
-        class="absolute top-0 left-0 h-full w-full max-h-96 xl:mt-12 xl:h-[25rem]"
+        class="h-full w-full max-h-96 xl:mt-12 xl:h-[25rem] !mt-6"
       />
     </div>
   </div>

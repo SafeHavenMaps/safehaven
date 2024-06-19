@@ -79,10 +79,10 @@
           </div>
 
           <div>
-            <h3>
+            <h3 class="text-lg font-semibold mb-3 -mt-3">
               {{ props.entity?.entity.locations.length > 1 ? 'Adresses' : 'Adresse' }}
             </h3>
-            <ul>
+            <ul class="list-disc list-inside ml-4">
               <li
                 v-for="location in props.entity?.entity.locations"
                 :key="location.plain_text"
@@ -104,7 +104,7 @@
               :key="`${score.key}-${props.entity!.entity.id}`"
               class="m-0"
             >
-              <h4 class="m-0">
+              <h4 class="m-0 font-medium">
                 {{ score.display_name }}
               </h4>
               <ViewerCommonScoreJauge :score="score.average" />

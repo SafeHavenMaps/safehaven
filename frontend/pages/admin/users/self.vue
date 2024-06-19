@@ -3,9 +3,9 @@
     class="flex flex-col gap-4 max-w-[30rem] mx-6"
     @submit.prevent="onSave"
   >
-    <span> Nom d'utilisateur⋅ice: {{ state.username }} </span>
+    <span class="font-medium">Nom d'utilisateur⋅ice: <span class="font-normal"> {{ state.username }} </span></span>
 
-    <span> Statut: {{ state.is_admin ? 'Administrateur⋅ice' : 'Modérateur⋅ice' }} </span>
+    <span class="font-medium"> Statut: <span class="font-normal"> {{ state.is_admin ? 'Administrateur⋅ice' : 'Modérateur⋅ice' }} </span></span>
 
     <AdminInputSwitchField
       id="editPassword"
@@ -18,7 +18,10 @@
       class="flex-col gap-4"
       :class="{ flex: editPassword }"
     >
-      <label for="password">
+      <label
+        for="password"
+        class="font-medium"
+      >
         Nouveau mot de passe :
       </label>
       <Password
@@ -30,7 +33,10 @@
         input-class="w-full"
         :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
       />
-      <label for="password">
+      <label
+        for="password"
+        class="font-medium"
+      >
         Confirmer le nouveau mot de passe :
       </label>
       <Password
