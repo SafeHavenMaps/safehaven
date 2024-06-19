@@ -20,7 +20,7 @@
         <ToggleSwitch
           v-model="validationCheckbox"
           input-id="validated_popup"
-          class="flex-shrink-0"
+          class="shrink-0"
         />
         <label
           for="validated_popup"
