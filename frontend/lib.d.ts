@@ -4,6 +4,11 @@
 import type { Coordinate } from 'ol/coordinate'
 import type * as api from '~/lib/api'
 
+export type AppError = {
+  error_code: string
+  details?: string
+}
+
 export type InitConfig = api.components['schemas']['StatusResponse']
 export type CartographyInitConfig = api.components['schemas']['CartographyInitConfig']
 

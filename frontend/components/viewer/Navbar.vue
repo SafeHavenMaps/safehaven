@@ -312,7 +312,7 @@ import { freeFormSearch } from '~/lib/nominatim'
 import type { ViewerCachedEntity, ViewerPaginatedCachedEntitiesWithLocation } from '~/lib'
 import type { ViewerEntityAddForm } from '#build/components'
 
-const oneSearchMade = ref(false)
+const toast = useToast()
 
 export interface Props {
   showCategorySwitcher?: boolean
@@ -341,9 +341,8 @@ const overflowPanel = ref<typeof Popover>()
 const placeSearch: Ref<string> = ref('')
 const entitySearch: Ref<string> = ref('')
 const showInformation = ref(false)
-
+const oneSearchMade = ref(false)
 const filterPopupVisible = ref(false)
-
 const currentLocationsResults: Ref<NominatimResult[]> = ref([])
 const currentEntitiesResults: Ref<ViewerPaginatedCachedEntitiesWithLocation | null> = ref(null)
 
@@ -364,12 +363,32 @@ function openOverflowPanel(event: Event) {
 }
 
 async function searchLocation() {
-  currentLocationsResults.value = await freeFormSearch(placeSearch.value)
-  oneSearchMade.value = true
+  try {
+    currentLocationsResults.value = await freeFormSearch(placeSearch.value)
+    oneSearchMade.value = true
+  }
+  catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: 'Impossible de charger les résultats',
+      life: 3000,
+    })
+  }
 }
 
 async function searchEntity() {
-  currentEntitiesResults.value = await state.searchEntitiesWithLocations(entitySearch.value)
+  try {
+    currentEntitiesResults.value = await state.searchEntitiesWithLocations(entitySearch.value)
+  }
+  catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: 'Impossible de charger les résultats',
+      life: 3000,
+    })
+  }
 }
 
 function openFilterPopup() {

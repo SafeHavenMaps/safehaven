@@ -80,8 +80,6 @@
       </div>
     </div>
 
-    <Toast />
-
     <ConfirmPopup group="delete">
       <template #message="slotProps">
         <div class="flex flex-row items-center w-full gap-2 p-4 mb-2 pb-0">

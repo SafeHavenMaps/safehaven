@@ -196,6 +196,8 @@ import type { PageState } from 'primevue/paginator'
 import type { ViewerPaginatedCachedEntities } from '~/lib'
 import state from '~/lib/viewer-state'
 
+const toast = useToast()
+
 // Init state with url token
 const route = useRoute()
 const token = route.params.token as string
@@ -228,15 +230,35 @@ function onPage(event: PageState) {
 }
 
 async function refreshResult() {
-  currentEntitiesResults.value = await state.searchEntities(
-    query.value,
-    currentPage.value,
-    pageSize.value,
-  )
+  try {
+    currentEntitiesResults.value = await state.searchEntities(
+      query.value,
+      currentPage.value,
+      pageSize.value,
+    )
+  }
+  catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: 'Impossible de charger les résultats',
+      life: 3000,
+    })
+  }
 }
 
 async function displayEntityId(entityId: string) {
-  await state.selectEntity(entityId)
+  try {
+    await state.selectEntity(entityId)
+  }
+  catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: 'Impossible de charger les résultats',
+      life: 3000,
+    })
+  }
 }
 
 async function showFamilySwitcher(event: Event) {

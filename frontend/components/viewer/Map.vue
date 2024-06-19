@@ -57,8 +57,10 @@
 import type Map from 'ol/Map'
 import type { Coordinate } from 'ol/coordinate'
 import { transform } from 'ol/proj.js'
-import type { DisplayableCachedEntity, DisplayableCluster } from '~/lib'
+import type { AppError, DisplayableCachedEntity, DisplayableCluster } from '~/lib'
 import state from '~/lib/viewer-state'
+
+const toast = useToast()
 
 const props = defineProps<{
   center: Coordinate
@@ -88,7 +90,18 @@ function isEntityHighlighted(entity: DisplayableCachedEntity) {
 
 async function forceRefresh() {
   const { extent, currentZoom } = getExtentAndZoom()
-  await state.refreshView(extent, currentZoom)
+  try {
+    await state.refreshView(extent, currentZoom)
+  }
+  catch (error) {
+    if ((error as AppError).error_code !== 'token_validation_error')
+      toast.add({
+        severity: 'error',
+        summary: 'Erreur',
+        detail: 'Impossible de rafraîchir la carte',
+        life: 3000,
+      })
+  }
 }
 
 watch(
@@ -129,7 +142,17 @@ async function handleClusterClick(cluster: DisplayableCluster) {
 }
 
 async function handleEntityClick(entity: DisplayableCachedEntity) {
-  state.selectedCachedEntity(entity)
+  try {
+    await state.selectedCachedEntity(entity)
+  }
+  catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: `Impossible de charger l'entité sélectionnée`,
+      life: 3000,
+    })
+  }
 }
 </script>
 

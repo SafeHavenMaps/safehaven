@@ -56,6 +56,8 @@
     </Drawer>
 
     <StartPopup />
+
+    <Toast />
   </div>
 </template>
 
@@ -65,10 +67,22 @@ import type { ViewerCachedEntity, DisplayableCachedEntity } from '~/lib'
 import state from '~/lib/viewer-state'
 import ViewerMap from '~/components/viewer/Map.vue'
 
+const toast = useToast()
+
 // Init state with url token
 const route = useRoute()
 const token = route.params.token as string
-await state.bootstrapWithToken(token) // TODO: Redirect to 404 if token is invalid
+try {
+  await state.bootstrapWithToken(token)
+}
+catch {
+  toast.add({
+    severity: 'error',
+    summary: 'Erreur',
+    detail: 'Impossible de charger la carte',
+    life: 3000,
+  })
+}
 
 const mapRef = ref<typeof ViewerMap>()
 
@@ -92,11 +106,31 @@ async function refreshMap() {
 }
 
 async function displayEntityId(entityId: string) {
-  await state.selectEntity(entityId)
+  try {
+    await state.selectEntity(entityId)
+  }
+  catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: `Impossible de charger l'entité sélectionnée`,
+      life: 3000,
+    })
+  }
 }
 
 async function goToEntity(entity: ViewerCachedEntity) {
-  await state.selectEntity(entity.entity_id)
+  try {
+    await state.selectEntity(entity.entity_id)
+  }
+  catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: `Impossible de charger l'entité sélectionnée`,
+      life: 3000,
+    })
+  }
 
   mapRef.value?.goToWebMercatorCoordinates([
     entity.web_mercator_x,

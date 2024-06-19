@@ -1,5 +1,6 @@
 <template>
   <NuxtLoadingIndicator />
+
   <NuxtLayout>
     <NuxtPage v-if="state.loaded" />
     <NuxtPage v-else>
@@ -9,6 +10,8 @@
       <p>Please try again later</p>
     </NuxtPage>
   </NuxtLayout>
+
+  <Toast />
 </template>
 
 <script setup lang="ts">
