@@ -23,17 +23,17 @@
 
         <NuxtLink
           to="/admin"
-          class="ml-3"
+          class="ml-1 "
         >
           <img
-            height="46"
-            width="46"
+            height="40"
+            width="40"
             alt="icon"
             :src="safehaven_logo"
           >
         </NuxtLink>
         <div class="navbar-text pl-4">
-          <div class="my-0 font-extrabold">
+          <div class="my-0 text-lg font-extrabold">
             SafeHaven
           </div>
           <div class="text-xs italic">

@@ -3,7 +3,9 @@
   <NuxtLayout>
     <NuxtPage v-if="state.loaded" />
     <NuxtPage v-else>
-      <h1>API is not available</h1>
+      <h1 class="text-xl">
+        API is not available
+      </h1>
       <p>Please try again later</p>
     </NuxtPage>
   </NuxtLayout>

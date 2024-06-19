@@ -40,9 +40,9 @@
         }).format(new Date(fetchedComment!.updated_at)) }}
       </span>
       <span>
-        Rattaché à {{ parentEntityToDisplay.display_name }} <CategoryTag
-          v-if="parentEntityToDisplay.category_id"
-          :category="state.categoryRecord[parentEntityToDisplay.category_id]"
+        Rattaché à {{ parentEntityToDisplay?.display_name }} <CategoryTag
+          v-if="parentEntityToDisplay?.category_id"
+          :category="state.categoryRecord[parentEntityToDisplay!.category_id]"
         />
 
       </span>
@@ -60,7 +60,7 @@
         :family-id="familyId"
         :previous-entity-id="editedComment.entity_id"
         @save_entity="entity => {
-          editedComment.entity_id = entity.id
+          editedComment.entity_id = entity.entity_id
           parentEntityToDisplay = entity
         }"
       />
@@ -115,13 +115,23 @@ const urlEntityId = useRoute().query.urlEntityId
 const returnUrl = urlEntityId == null ? `/admin/${familyId}/comments/pending` : `/admin/${familyId}/entities/${urlEntityId}?comments`
 
 const fetchedComment: AdminComment | null = isNew ? null : await state.client.getComment(commentId)
-const parentEntityToDisplay = ref<{ category_id: string, display_name: string }>
-({ category_id: fetchedComment?.category_id ?? '', display_name: fetchedComment?.entity_display_name ?? '' })
+const parentEntityToDisplay = ref<{ category_id: string, display_name: string }>()
+if (fetchedComment) {
+  parentEntityToDisplay.value = { category_id: fetchedComment.category_id, display_name: fetchedComment.entity_display_name }
+}
+else if (urlEntityId) {
+  const fetchedParent = await state.client.getEntity(urlEntityId as string)
+  parentEntityToDisplay.value = { category_id: fetchedParent.category_id, display_name: fetchedParent.display_name }
+}
+else {
+  parentEntityToDisplay.value = { category_id: '', display_name: '' }
+}
+
 const editedComment: Ref<AdminNewOrUpdateComment> = isNew
   ? ref({
     author: '',
     data: {},
-    entity_id: '',
+    entity_id: urlEntityId ?? '',
     moderated: false,
     text: '',
     version: 1,
@@ -137,7 +147,6 @@ const tags = state.tags
 
 const entitySelectVisible = ref(false)
 
-const urlEntityName = fetchedComment?.entity_display_name ?? (await state.client.getEntity(urlEntityId as string)).display_name
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
   isNew ? `Nouveau commentaire` : `Édition du commentaire de ${fetchedComment!.author}`,
@@ -145,7 +154,7 @@ initAdminLayout(
   [],
   [
     { label: `${family.title}`, url: '/admin/families' },
-    { label: urlEntityId ? `Commentaires de l'entité ${urlEntityName}` : `Commentaires en attente`, url: returnUrl },
+    { label: urlEntityId ? `Commentaires de l'entité ${parentEntityToDisplay.value.display_name}` : `Commentaires en attente`, url: returnUrl },
     isNew
       ? { label: `Nouveau commentaire`, url: `/admin/${familyId}/comments/new` }
       : { label: `Édition d'un commentaire`, url: `/admin/${familyId}/comments/${commentId}` },
@@ -159,7 +168,7 @@ function hasBeenEdited(field: keyof AdminNewOrUpdateComment) {
 async function onSave() {
   processingRequest.value = true
   try {
-    await state.client.updateComment(commentId, editedComment.value)
+    isNew ? await state.client.createComment(editedComment.value) : await state.client.updateComment(commentId, editedComment.value)
     navigateTo(returnUrl)
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Commentaire modifié avec succès', life: 3000 })
   }

@@ -6,11 +6,11 @@
   >
     <img
       src="assets/logo_secondary.svg"
-      class="w-64 -mt-20 -mb-2"
+      class="w-60 -mt-20 -mb-3"
     >
     <Card>
       <template #title>
-        <span>Espace d'administration</span>
+        Espace d'administration
       </template>
       <template #content>
         <div class="flex flex-col gap-4 max-w-[17rem]">
