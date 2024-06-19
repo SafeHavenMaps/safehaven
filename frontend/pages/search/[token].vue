@@ -175,16 +175,11 @@
     <Dialog
       v-model:visible="showCriterias"
       maximizable
+      header="Filtres"
       :style="{ width: '50rem' }"
       :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
       modal
     >
-      <template #header>
-        <h3 class="m-0">
-          Filtres
-        </h3>
-      </template>
-
       <ViewerFilterConfig
         v-model:filteringTags="state.filteringTags"
         v-model:filteringCategories="state.filteringCategories"
