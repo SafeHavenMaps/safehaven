@@ -26,8 +26,8 @@
       :dismissable="false"
       :style="fitContainer()"
       position="left"
-      class="!w-full md:!w-[30rem]"
-      :pt="{ mask: '!w-auto' }"
+      class="!w-full sm:!w-[30rem]"
+      :pt="{ mask: '!w-full sm:!w-auto' }"
     >
       <template #header>
         <div
