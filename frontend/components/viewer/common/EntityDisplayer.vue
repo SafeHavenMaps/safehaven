@@ -67,19 +67,15 @@
             v-if="(props.entity?.tags.length ?? 0) > 0"
             class="mt-1 flex flex-wrap gap-1"
           >
-            <Divider type="dotted" />
-
             <DisplayedTag
               v-for="tag in props.entity?.tags"
               :key="tag.id"
               :tag="tag"
             />
-
-            <Divider type="dotted" />
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-3 -mt-3">
+            <h3 class="text-lg font-semibold mb-3 mt-2">
               {{ props.entity?.entity.locations.length > 1 ? 'Adresses' : 'Adresse' }}
             </h3>
             <ul class="list-disc list-inside ml-4">

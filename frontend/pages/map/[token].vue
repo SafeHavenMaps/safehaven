@@ -37,7 +37,7 @@
           <CategoryTag
             :category="state.activeEntity!.category"
           />
-          <div class="grow m-0">
+          <div class="grow font-bold m-0">
             {{ state.activeEntity!.entity.display_name }}
           </div>
           <div class="grow" />
