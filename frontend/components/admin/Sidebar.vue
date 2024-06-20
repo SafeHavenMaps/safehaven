@@ -1,5 +1,6 @@
 <template>
   <PanelMenu
+    v-model:expandedKeys="expandedKeys"
     :model="menuItems"
     class="navigation-tree mt-6"
     style="width: 17rem;"
@@ -77,6 +78,7 @@ catch {
 }
 
 const currentRoute = useRoute()
+const expandedKeys = ref({})
 
 const menuItems = computed(() => {
   return nodes.value.map((node) => {
@@ -86,7 +88,11 @@ const menuItems = computed(() => {
 })
 
 function classForLink(active: boolean) {
-  const classes = ['flex', 'items-center', 'cursor-pointer', 'text-color', 'px-4', 'py-2', 'gap-2']
+  const classes = [
+    'flex', 'items-center',
+    'cursor-pointer', 'text-color',
+    'px-4', 'py-2', 'gap-2',
+  ]
 
   if (active) {
     classes.push('active-link')
