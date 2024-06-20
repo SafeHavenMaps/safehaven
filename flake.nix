@@ -48,10 +48,14 @@
         checkProject = pkgs.writeShellScriptBin "check_project" ''
           set -e
 
-          export SQLX_OFFLINE=1
-
           pushd backend
             echo "::group::sqlx migrations checks"
+              echo "Create the database"
+              cargo sqlx database create
+
+              echo "Run the migrations"
+              cargo sqlx migrate run
+
               echo "Check the migrations"
               cargo sqlx prepare --check
             echo "::endgroup::"
