@@ -1,6 +1,6 @@
 <template>
   <PanelMenu
-    :model="getMenuItems()"
+    :model="menuItems"
     class="navigation-tree mt-6"
     style="width: 17rem;"
   >
@@ -68,17 +68,22 @@
 <script setup lang="ts">
 import state from '~/lib/admin-state'
 
-await state.fetchFamilies()
-await state.getEntitiesCommentsCounts()
+try {
+  await state.fetchFamilies()
+  await state.getEntitiesCommentsCounts()
+}
+catch {
+  // Do nothing
+}
 
-function getMenuItems() {
-  const currentRoute = useRoute().fullPath
+const currentRoute = useRoute()
 
+const menuItems = computed(() => {
   return nodes.value.map((node) => {
-    node.active = (!!node.route && currentRoute.startsWith(`/admin/${node.route}`))
+    node.active = (!!node.route && currentRoute.fullPath.startsWith(`/admin/${node.route}`))
     return node
   })
-}
+})
 
 function classForLink(active: boolean) {
   const classes = ['flex', 'items-center', 'cursor-pointer', 'text-color', 'px-4', 'py-2', 'gap-2']

@@ -176,3 +176,5 @@ export type EntityOrCommentData = Record<string, FieldContentMap[FormField['fiel
 export type FamilyRecord = Record<string, Family>
 export type CategoryRecord = Record<string, Category>
 export type TagRecord = Record<string, Tag>
+
+export type HomePageStats = api.components['schemas']['HomePageStats']

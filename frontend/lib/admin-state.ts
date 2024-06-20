@@ -82,9 +82,19 @@ export class AppState {
   }
 
   get options(): SafeHavenOptions {
-    const raw_options = this.optionsData!
+    const raw_options: SafeHavenOptions = this.optionsData ?? {
+      general: {
+        subtitle: 'Carte associative',
+        title: 'SafeHaven',
+      },
+      safe_mode: {},
+      cartography_init: {},
+      cartography_cluster: {},
+    }
+
     if (raw_options.general.information != undefined)
       raw_options.general.information = purify_lenient(raw_options.general.information)
+
     return raw_options
   }
 
@@ -116,7 +126,7 @@ export class AppState {
   }
 
   get families(): Family[] {
-    return this.familiesData!
+    return this.familiesData ?? []
   }
 
   async fetchFamily(id: string) {
@@ -212,11 +222,11 @@ export class AppState {
   }
 
   get countsByFamily() {
-    return this.countsByFamilyData
+    return this.countsByFamilyData ?? {}
   }
 
   get countsByCategory() {
-    return this.countsByCategoryData
+    return this.countsByCategoryData ?? {}
   }
 }
 

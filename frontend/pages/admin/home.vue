@@ -44,6 +44,7 @@
 <script setup lang="ts">
 import Chart from 'primevue/chart'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
+import type { HomePageStats } from '~/lib'
 import state from '~/lib/admin-state'
 
 definePageMeta({
@@ -60,14 +61,30 @@ initAdminLayout(
   ],
 )
 
-const stats = await state.client.getStats()
+const stats = ref<HomePageStats>({
+  total_entities: 0,
+  total_comments: 0,
+  pending_entities: 0,
+  pending_comments: 0,
+  total_visits_30_days: 0,
+  total_visits_7_days: 0,
+  visits_30_days: {},
+})
+
+try {
+  const statsResponse = await state.client.getStats()
+  stats.value = statsResponse
+}
+catch {
+  // Do nothing
+}
 
 const chartData = {
-  labels: Object.keys(stats.visits_30_days).map(date => new Date(date).toLocaleDateString()),
+  labels: Object.keys(stats.value!.visits_30_days).map(date => new Date(date).toLocaleDateString()),
   datasets: [
     {
       label: 'Visites',
-      data: Object.values(stats.visits_30_days),
+      data: Object.values(stats.value!.visits_30_days),
       fill: true,
       borderColor: '#e86ba7',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -133,37 +150,37 @@ const cards = [
     class: 'card-green',
     iconName: 'entity',
     title: 'Entités',
-    stat: stats.total_entities,
+    stat: stats.value.total_entities,
   },
   {
     class: 'card-green',
     iconName: 'comment',
     title: 'Commentaires',
-    stat: stats.total_comments,
+    stat: stats.value.total_comments,
   },
   {
     class: 'card-orange',
     iconName: 'addEntity',
     title: 'Entités',
-    stat: stats.pending_entities,
+    stat: stats.value.pending_entities,
   },
   {
     class: 'card-orange',
     iconName: 'addComment',
     title: 'Commentaires',
-    stat: stats.pending_comments,
+    stat: stats.value.pending_comments,
   },
   {
     class: 'card-blue',
     iconName: 'clock',
     title: 'Visites (30j)',
-    stat: stats.total_visits_30_days,
+    stat: stats.value.total_visits_30_days,
   },
   {
     class: 'card-blue',
     iconName: 'clock',
     title: 'Visites (7j)',
-    stat: stats.total_visits_7_days,
+    stat: stats.value.total_visits_7_days,
   },
 ]
 </script>

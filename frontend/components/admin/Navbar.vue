@@ -56,7 +56,7 @@
       >
         <template #default>
           <AdminUserAvatar
-            :username="state.username!"
+            :username="state.username ?? 'not logged'"
             size="normal"
           />
         </template>
@@ -80,11 +80,15 @@ import safehaven_logo from '~/assets/logo_square_white.svg'
 const emit = defineEmits(['toggleSidebar'])
 
 const accountMenu = ref<typeof Menu | null>(null)
-
 const navbarRef: Ref<HTMLElement | null> = ref(null)
 
-await state.fetchConfig()
-await state.check_login()
+try {
+  await state.fetchConfig()
+  await state.check_login()
+}
+catch {
+  // Do nothing
+}
 
 const items = [
   {

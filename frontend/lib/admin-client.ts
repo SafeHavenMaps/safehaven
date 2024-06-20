@@ -28,16 +28,27 @@ import type {
 
 // client as a closure
 export default function useClient() {
-  const rawClient = createClient<paths>({ baseUrl: '/',
+  let alreadyLoggedOut = false
+
+  const rawClient = createClient<paths>({
+    baseUrl: '/',
     credentials: 'include', // Ensures cookies are sent with the request
   })
 
   // We declare logout first as it used as a callback by the middleware
   async function logout() {
-    const { error } = await rawClient.DELETE('/api/admin/session')
-    if (error) throw error
+    if (alreadyLoggedOut) return
+    alreadyLoggedOut = true
+
+    try {
+      await rawClient.DELETE('/api/admin/session')
+    }
+    catch {
+      // Ignore errors
+    }
     const currentUrl = window.location.href
-    await navigateTo(`/admin/login?redirect=${encodeURIComponent(currentUrl)}`)
+    // Do not redirect using navigateTo, use browser's native redirect
+    window.location.href = `/admin/login?redirect=${encodeURIComponent(currentUrl)}`
   }
 
   // Install auth middleware to the stack.
@@ -53,6 +64,7 @@ export default function useClient() {
         body: { password: password, username: username, remember_me: remember_me },
       })
       if (error) throw error
+      alreadyLoggedOut = false
       return data.is_admin
     },
 
