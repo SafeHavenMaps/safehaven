@@ -169,6 +169,7 @@
                   v-model="field.mandatory"
                   label="Requis"
                   :variant="hasFieldAttributeBeenEdited(index, 'mandatory')"
+                  :disabled="field.field_type=='Boolean'"
                 />
 
                 <AdminInputSwitchField
@@ -680,6 +681,9 @@ function onFieldTypeChange(field: FormField) {
       if (!field.field_type_metadata || !('format' in field.field_type_metadata)) {
         field.field_type_metadata = { format: 'none' }
       }
+      break
+    case 'Boolean':
+      field.mandatory = true
       break
     case 'EnumSingleOption':
     case 'EnumMultiOption':

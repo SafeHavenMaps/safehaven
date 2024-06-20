@@ -6,10 +6,10 @@
     <span class="flex gap-2 items-center">
       <ToggleSwitch
         :id="props.formField.key"
-        :model-value="(props.fieldContent as (boolean | undefined))"
+        :model-value="(props.fieldContent as boolean)"
         @update:model-value="updateField"
       />
-      <label :for="props.formField.key">{{ props.formField.display_name }}</label>
+      <label :for="props.formField.key">{{ props.formField.display_name }}<RequiredIndicator /> </label>
     </span>
     <small v-if="props.formField.help">{{ props.formField.help }}</small>
   </div>
@@ -21,33 +21,40 @@
     <InputText
       v-if="props.formField.field_type=='SingleLineText'"
       :id="props.formField.key"
+      v-tooltip="formatTooltip[props.formField.field_type_metadata!.format]"
       :model-value="props.fieldContent as (string | undefined)"
       :variant="props.hasBeenEdited ? 'filled': 'outlined'"
-      :invalid="(props.formField.mandatory && !props.fieldContent) || false"
+      :invalid="!isValid && hasLostFocus"
       @update:model-value="updateField"
+      @blur="onLostFocus"
     />
     <Textarea
       v-if="props.formField.field_type=='MultiLineText'"
       :id="props.formField.key"
       :model-value="props.fieldContent as (string | undefined)"
       :variant="props.hasBeenEdited ? 'filled': 'outlined'"
-      :invalid="(props.formField.mandatory && !props.fieldContent) || false"
+      :invalid="!isValid && hasLostFocus"
+
       @update:model-value="updateField"
+      @blur="onLostFocus"
     />
     <!-- add fieldmetadata validation -->
     <ViewerRichTextEditor
       v-if="props.formField.field_type=='RichText'"
       :id="props.formField.key"
       :model-value="(props.fieldContent as (string | undefined))"
+      :invalid="!isValid && hasLostFocus"
       @update:model-value="updateField"
+      @blur="onLostFocus"
     />
     <InputNumber
       v-if="props.formField.field_type=='Number'"
       :id="props.formField.key"
       :model-value="(props.fieldContent as (number | undefined))"
       :variant="props.hasBeenEdited ? 'filled': 'outlined'"
-      :invalid="(props.formField.mandatory && !props.fieldContent)"
+      :invalid="!isValid && hasLostFocus"
       @update:model-value="updateField"
+      @blur="onLostFocus"
     />
     <SelectButton
       v-if="props.formField.field_type=='DiscreteScore'"
@@ -60,41 +67,49 @@
       option-value="value"
       option-label="label"
       @update:model-value="updateField"
+      @blur="onLostFocus"
     />
     <DatePicker
       v-if="props.formField.field_type=='Date'"
       :id="props.formField.key"
       :model-value="props.fieldContent as (Date | undefined)"
       :variant="props.hasBeenEdited ? 'filled': 'outlined'"
-      :invalid="(props.formField.mandatory && !props.fieldContent)"
+      :invalid="!isValid && hasLostFocus"
       date-format="dd/mm/yy"
       show-icon
       icon-display="input"
       show-button-bar
       @update:model-value="(value: Date | Date[] | (Date | null)[] | null | undefined) => updateField(value as (Date | undefined))"
+      @blur="onLostFocus"
     />
     <Select
       v-if="props.formField.field_type=='EnumSingleOption'"
       :id="props.formField.key"
       :model-value="(props.fieldContent as (string | undefined))"
       :options="props.formField.field_type_metadata?.options"
+      :invalid="!isValid && hasLostFocus"
       option-value="value"
       option-label="label"
       @update:model-value="updateField"
+      @blur="onLostFocus"
     />
     <MultiSelect
       v-if="props.formField.field_type=='EnumMultiOption'"
       :id="props.formField.key"
       :model-value="(props.fieldContent as (string[] | undefined))"
       :options="props.formField.field_type_metadata?.options"
+      :invalid="!isValid && hasLostFocus"
       option-value="value"
       option-label="label"
       @update:model-value="updateField"
+      @blur="onLostFocus"
     />
     <div
       v-if="props.formField.field_type=='EventList'"
       :id="props.formField.key"
       class="flex flex-col gap-1 border p-2 border-surface rounded-border"
+      :invalid="!isValid && hasLostFocus"
+      @blur="onLostFocus"
     >
       <div
         v-for="(event, ev_index) in (props.fieldContent as EntityOrCommentEvent[])"
@@ -172,6 +187,7 @@
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
 import DatePicker from 'primevue/datepicker'
+import validator from 'validator'
 import type { EntityOrCommentEvent, FieldContentMap, FormField } from '~/lib'
 
 type FormProps<T extends FormField> = {
@@ -182,13 +198,52 @@ type FormProps<T extends FormField> = {
 
 const props = defineProps<FormProps<FormField>>()
 
-const emit = defineEmits(['update:fieldContent'])
+const emit = defineEmits(['update:fieldContent', 'isValid'])
+const hasLostFocus = ref(false)
+const isValid = computed(() => {
+  // if the field is missing, it's only valid if optional
+  if (props.fieldContent == null || props.fieldContent === '')
+    return !props.formField.mandatory
+
+  if (!props.formField.field_type_metadata || !('format' in props.formField.field_type_metadata))
+    return true
+
+  switch (props.formField.field_type_metadata.format) {
+    case 'url':
+      return validator.isURL(props.fieldContent as string)
+    case 'email':
+      return validator.isEmail(props.fieldContent as string)
+    case 'phone':
+      return false // For now we will avoid making assumptions on phone number formats
+    default:
+      return false
+  }
+})
+
+emit('isValid', isValid)
 
 function updateField(value: undefined | FieldContentMap[FormField['field_type']]) {
   emit('update:fieldContent', value)
+  emit('isValid', isValid)
 }
 
-if (props.formField.field_type == 'EventList' && props.fieldContent == undefined) {
-  emit('update:fieldContent', [{ date: undefined, type: undefined, details: undefined }])
+function initializeValue() {
+  switch (props.formField.field_type) {
+    case 'EventList':
+      emit('update:fieldContent', [{ date: undefined, type: undefined, details: undefined }])
+      break
+    case 'Boolean':
+      emit('update:fieldContent', false)
+  }
 }
+
+if (props.fieldContent == undefined) {
+  initializeValue()
+}
+
+function onLostFocus() {
+  hasLostFocus.value = true
+}
+
+const formatTooltip: Record<string, string | null> = { url: 'url valide attendu', email: 'email valide attendu', phone: 'Numéro de téléphone attendu', none: null }
 </script>

@@ -3,7 +3,7 @@
     v-model:visible="formVisible"
     modal
     closable
-    class="w-full max-w-md"
+    class="w-full  max-w-[30rem]"
     :header="props.family.entity_form.title"
     :content-props="{ onClick: (event: Event) => { event.stopPropagation() } }"
   >
@@ -40,6 +40,7 @@
             :key="field.key"
             v-model:fieldContent="(editedEntity.data as EntityOrCommentData)[field.key]"
             :form-field="(field as FormField)"
+            @is-valid="isValid => entityFieldValid[field.key]= isValid"
           />
         </template>
 
@@ -91,6 +92,7 @@
             :key="field.key"
             v-model:fieldContent="(editedComment.data as EntityOrCommentData)[field.key]"
             :form-field="(field as FormField)"
+            @is-valid="isValid => commentFieldValid[field.key]= isValid"
           />
         </template>
 
@@ -175,6 +177,22 @@ const curr_page = ref(0)
 const entityPageCount = ref(0)
 const commentPageCount = ref(0)
 
+const entityFieldValid = ref(
+  props.family.entity_form.fields
+    .reduce((acc, field) => {
+      acc[field.key] = !field.mandatory
+      return acc
+    }, {} as Record<string, boolean>),
+)
+
+const commentFieldValid = ref(
+  props.family.comment_form.fields
+    .reduce((acc, field) => {
+      acc[field.key] = !field.mandatory
+      return acc
+    }, {} as Record<string, boolean>),
+)
+
 function reset_refs() {
   editedEntity.value = {
     category_id: '',
@@ -227,14 +245,14 @@ function isEntityPageValid(page: number) {
   if (page === 0) {
     return editedEntity.value.display_name && editedEntity.value.category_id
   }
-  return true
+  return entityFieldsSortedByPage(page).every(field => entityFieldValid.value[field.key])
 }
 
 function isCommentPageValid(page: number) {
   if (page === 0) {
     return editedComment.value.author && editedComment.value.text
   }
-  return true
+  return commentFieldsSortedByPage(page).every(field => commentFieldValid.value[field.key])
 }
 
 function hCaptchaVerify(token: string) {

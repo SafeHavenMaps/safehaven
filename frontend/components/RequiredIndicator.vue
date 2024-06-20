@@ -1,3 +1,6 @@
 <template>
-  <span style="color: darkred;">*</span>
+  <span
+    v-tooltip.bottom="'Champ requis'"
+    style="color: darkred;"
+  >*</span>
 </template>

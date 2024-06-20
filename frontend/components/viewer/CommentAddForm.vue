@@ -20,7 +20,7 @@
     v-model:visible="formVisible"
     modal
     closable
-    class="w-full max-w-md"
+    class="w-full max-w-[30rem]"
     :header="props.family.comment_form.title"
     :content-props="{ onClick: (event: Event) => { event.stopPropagation() } }"
   >
@@ -49,14 +49,14 @@
           label="Suivant"
           type="submit"
           outlined
-          :disabled="!editedComment!.author || !editedComment!.text"
+          :disabled="!isCommentPageValid(0)"
         />
       </span>
     </form>
     <form
       v-for="page in Array.from({ length: page_count }, (_, i) => i+1)"
       :key="`Page ${page}`"
-      class="flex grow flex-col gap-4 w-[30rem]"
+      class="flex grow flex-col gap-4 max-w-[30rem]"
       @submit.prevent="() => page == page_count ? onSave() : curr_page+=1"
     >
       <div
@@ -64,10 +64,11 @@
         class="flex grow flex-col gap-4 max-w-[30rem]"
       >
         <FormDynamicField
-          v-for="field in props.family.comment_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
+          v-for="field in commentFieldsSortedByPage(page)"
           :key="field.key"
           v-model:fieldContent="(editedComment!.data as EntityOrCommentData)[field.key]"
           :form-field="(field as FormField)"
+          @is-valid="isValid => commentFieldValid[field.key]= isValid"
         />
 
         <span
@@ -83,7 +84,7 @@
             type="submit"
             :outlined="page != page_count"
             :loading="processingRequest"
-            :disabled="processingRequest || !editedComment!.author || !editedComment!.text"
+            :disabled="processingRequest || !isCommentPageValid(page)"
           />
         </span>
       </div>
@@ -119,10 +120,21 @@ const props = defineProps<{
   entity: PublicEntity
 }>()
 
+const processingRequest = ref(false)
+const toast = useToast()
+
 const editedComment = ref<PublicNewComment>()
 
 const curr_page = ref(0)
 const page_count = ref(0)
+
+const commentFieldValid = ref(
+  props.family.comment_form.fields
+    .reduce((acc, field) => {
+      acc[field.key] = !field.mandatory
+      return acc
+    }, {} as Record<string, boolean>),
+)
 
 function reset_refs(new_entity_id: string) {
   editedComment.value = {
@@ -142,9 +154,20 @@ watch(
     reset_refs(newEntity.id)
   },
 )
-const processingRequest = ref(false)
+
+function commentFieldsSortedByPage(page: number) {
+  return props.family.comment_form.fields
+    .filter(field => field.form_page === page)
+    .sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
+}
+
+function isCommentPageValid(page: number) {
+  if (page === 0) {
+    return editedComment.value!.author && editedComment.value!.text
+  }
+  return commentFieldsSortedByPage(page).every(field => commentFieldValid.value[field.key])
+}
 const showCaptcha = ref(false)
-const toast = useToast()
 
 function hCaptchaVerify(token: string) {
   realOnSave(token)
