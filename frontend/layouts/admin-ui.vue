@@ -10,7 +10,7 @@
     >
       <div
         ref="sidebarRef"
-        class="sidebar"
+        class="sidebar overflow-y-auto"
         :class="{ collapsed: sidebarCollapsed }"
       >
         <div class="sidebar-title mb-1">
