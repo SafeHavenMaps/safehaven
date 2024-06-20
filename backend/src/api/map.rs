@@ -1,4 +1,5 @@
 use crate::api::{AppError, AppJson, AppState, DbConn, MapUserToken};
+use crate::helpers::hcaptcha::{self, HCaptchaValidationError};
 use crate::models::comment::{PublicComment, PublicNewComment};
 use crate::models::entity::{PublicEntity, PublicListedEntity, PublicNewEntity};
 use crate::models::entity_cache::{
@@ -199,12 +200,47 @@ async fn viewer_search_request(
 pub struct PublicNewEntityRequest {
     entity: PublicNewEntity,
     comment: PublicNewComment,
+    hcaptcha_token: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct PublicNewEntityResponse {
     entity: PublicEntity,
     comment: PublicComment,
+}
+
+async fn check_captcha(state: AppState, response: Option<String>) -> Result<(), AppError> {
+    let dyn_config = state.dyn_config.read().await;
+
+    if dyn_config.safe_mode.enabled {
+        match response {
+            Some(response) => {
+                hcaptcha::check_hcaptcha(
+                    response,
+                    dyn_config.safe_mode.hcaptcha_secret.clone(),
+                    None,
+                )
+                .await
+                .map_err(|e| match e {
+                    HCaptchaValidationError::NetworkError() => {
+                        AppError::Validation("HCaptcha network error".to_string())
+                    }
+                    HCaptchaValidationError::HCaptchaError(errors) => {
+                        AppError::Validation(format!("HCaptcha errors: {:?}", errors))
+                    }
+                })?;
+            }
+            None => {
+                return Err(AppError::Validation(
+                    "HCaptcha token is required".to_string(),
+                ));
+            }
+        }
+
+        return Err(AppError::Unauthorized);
+    }
+
+    Ok(())
 }
 
 #[utoipa::path(
@@ -218,9 +254,12 @@ pub struct PublicNewEntityResponse {
 )]
 async fn viewer_new_entity(
     DbConn(mut conn): DbConn,
+    State(state): State<AppState>,
     MapUserToken(_token): MapUserToken,
     Json(request): Json<PublicNewEntityRequest>,
 ) -> Result<AppJson<PublicNewEntityResponse>, AppError> {
+    check_captcha(state, request.hcaptcha_token).await?;
+
     let db_entity = PublicEntity::new(request.entity, &mut conn).await?;
 
     let mut new_comment = request.comment;
@@ -237,6 +276,7 @@ async fn viewer_new_entity(
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct NewCommentRequest {
     comment: PublicNewComment,
+    hcaptcha_token: Option<String>,
 }
 
 #[utoipa::path(
@@ -250,9 +290,11 @@ pub struct NewCommentRequest {
 )]
 async fn viewer_new_comment(
     DbConn(mut conn): DbConn,
+    State(state): State<AppState>,
     MapUserToken(_token): MapUserToken,
     Json(request): Json<NewCommentRequest>,
 ) -> Result<AppJson<PublicComment>, AppError> {
+    check_captcha(state, request.hcaptcha_token).await?;
     let db_comment = PublicComment::new(request.comment, &mut conn).await?;
     Ok(AppJson(db_comment))
 }

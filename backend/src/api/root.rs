@@ -23,14 +23,13 @@ pub fn routes() -> Router<AppState> {
 pub struct StatusResponse {
     status: &'static str,
     general: GeneralOptions,
-    safe_mode: Option<SafeMode>,
+    safe_mode: SafeMode,
 }
 
 #[derive(Serialize, ToSchema)]
 pub struct SafeMode {
-    recaptcha_v3_sitekey: String,
-    popup_title: String,
-    popup_message: String,
+    enabled: bool,
+    hcaptcha_sitekey: String,
 }
 
 #[utoipa::path(
@@ -46,15 +45,9 @@ pub async fn status(State(app_state): State<AppState>) -> AppJson<StatusResponse
     AppJson(StatusResponse {
         status: "ok",
         general: app_state.dyn_config.read().await.general.clone(),
-        safe_mode: match safe_mode.enabled {
-            true => Some(SafeMode {
-                recaptcha_v3_sitekey: safe_mode.recaptcha_v3_sitekey,
-                popup_title: safe_mode.popup_title.unwrap_or("Safe mode".to_string()),
-                popup_message: safe_mode
-                    .popup_message
-                    .unwrap_or("Click to continue".to_string()),
-            }),
-            false => None,
+        safe_mode: SafeMode {
+            enabled: safe_mode.enabled,
+            hcaptcha_sitekey: safe_mode.hcaptcha_sitekey.clone(),
         },
     })
 }

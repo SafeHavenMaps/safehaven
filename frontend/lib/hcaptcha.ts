@@ -1,6 +1,6 @@
-export function installRecaptchaV3(siteKey: string) {
+export function installHCaptcha() {
   const script = document.createElement('script')
-  script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`
+  script.src = `https://js.hcaptcha.com/1/api.js?hl=fr`
   script.async = true
   script.defer = true
   document.head.appendChild(script)

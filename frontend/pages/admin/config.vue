@@ -10,6 +10,9 @@
       <Tab value="2">
         Carte - Cluster
       </Tab>
+      <Tab value="3">
+        Mode Sécurisé
+      </Tab>
     </TabList>
     <TabPanels>
       <TabPanel value="0">
@@ -212,32 +215,32 @@
         </form>
       </TabPanel>
       <TabPanel
-        v-if="false"
         value="3"
       >
         <form
           class="flex flex-col gap-4 max-w-[30rem] mx-6"
           @submit.prevent="onSave('safe_mode', editedConfig.safe_mode)"
         >
-          <AdminInputTextField
-            id="popup_message"
-            v-model="editedConfig.safe_mode.popup_message"
-            label="Message Pop-up"
-            :variant="hasBeenEdited('safe_mode', 'popup_message')"
+          <AdminInputSwitchField
+            id="safe_mode_enabled"
+            v-model="editedConfig.safe_mode.enabled as boolean"
+            label="Activer le mode sécurisé"
           />
 
           <AdminInputTextField
-            id="popup_title"
-            v-model="editedConfig.safe_mode.popup_title"
-            label="Titre Pop-up"
-            :variant="hasBeenEdited('safe_mode', 'popup_title')"
+            v-if="editedConfig.safe_mode.enabled"
+            id="hcaptcha_sitekey"
+            v-model="editedConfig.safe_mode.hcaptcha_sitekey"
+            label="Clé de Site hCaptcha"
+            :variant="hasBeenEdited('safe_mode', 'hcaptcha_sitekey')"
           />
 
           <AdminInputTextField
-            id="recaptcha_v3_sitekey"
-            v-model="editedConfig.safe_mode.recaptcha_v3_sitekey"
-            label="Clé de Site Recaptcha v3"
-            :variant="hasBeenEdited('safe_mode', 'recaptcha_v3_sitekey')"
+            v-if="editedConfig.safe_mode.enabled"
+            id="hcaptcha_sitekey"
+            v-model="editedConfig.safe_mode.hcaptcha_secret"
+            label="Clé de Site hCaptcha"
+            :variant="hasBeenEdited('safe_mode', 'hcaptcha_secret')"
           />
 
           <span class="flex gap-1 justify-end">

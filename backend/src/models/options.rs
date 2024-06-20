@@ -70,21 +70,15 @@ impl Default for GeneralOptions {
 
 #[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
 #[serde(default)]
-/// Safe mode configuration, when enabled, the application will require recaptcha validation for
+/// Safe mode configuration, when enabled, the application will require hcaptcha validation for
 /// almost every action making it harder to spam the application or dump the database content
 pub struct SafeModeConfig {
     /// Enable safe mode
     pub enabled: bool,
-    /// Title of the popup shown for first recaptcha validation
-    pub popup_title: Option<String>,
-    /// Message of the popup shown for first recaptcha validation
-    pub popup_message: Option<String>,
-    /// Secret key for recaptcha v3
-    pub recaptcha_v3_secret: String,
-    /// Site key for recaptcha v3
-    pub recaptcha_v3_sitekey: String,
-    /// Threshold for recaptcha v3
-    pub recaptcha_v3_threshold: f64,
+    /// Secret key for hcaptcha
+    pub hcaptcha_secret: String,
+    /// Site key for hcaptcha
+    pub hcaptcha_sitekey: String,
 }
 
 impl OptionConfig for SafeModeConfig {
@@ -97,11 +91,8 @@ impl Default for SafeModeConfig {
     fn default() -> Self {
         Self {
             enabled: false,
-            popup_title: None,
-            popup_message: None,
-            recaptcha_v3_secret: "".to_string(),
-            recaptcha_v3_sitekey: "".to_string(),
-            recaptcha_v3_threshold: 0.5,
+            hcaptcha_sitekey: "".to_string(),
+            hcaptcha_secret: "".to_string(),
         }
     }
 }

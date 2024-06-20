@@ -15,10 +15,15 @@
 </template>
 
 <script setup lang="ts">
+import { installHCaptcha } from './lib/hcaptcha'
 import { useHead } from '#imports'
 import state from '~/lib/viewer-state'
 
 await state.init()
+
+if (state.hasSafeMode) {
+  installHCaptcha()
+}
 
 useHead({
   title: state.title,

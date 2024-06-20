@@ -35,3 +35,7 @@ clap = { version = "4", features = ["derive"] }
 clap_derive = { version = "4" }
 number_range = "0.3.2"
 crc32fast = "1.4.0"
+reqwest = { version = "0.12", features = [
+    "json",
+    "rustls-tls",
+], default-features = false }

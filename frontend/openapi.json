@@ -3698,6 +3698,10 @@
         "properties": {
           "comment": {
             "$ref": "#/components/schemas/PublicNewComment"
+          },
+          "hcaptcha_token": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -4103,6 +4107,10 @@
           },
           "entity": {
             "$ref": "#/components/schemas/PublicNewEntity"
+          },
+          "hcaptcha_token": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -4147,58 +4155,36 @@
       "SafeMode": {
         "type": "object",
         "required": [
-          "recaptcha_v3_sitekey",
-          "popup_title",
-          "popup_message"
+          "enabled",
+          "hcaptcha_sitekey"
         ],
         "properties": {
-          "popup_message": {
-            "type": "string"
+          "enabled": {
+            "type": "boolean"
           },
-          "popup_title": {
-            "type": "string"
-          },
-          "recaptcha_v3_sitekey": {
+          "hcaptcha_sitekey": {
             "type": "string"
           }
         }
       },
       "SafeModeConfig": {
         "type": "object",
-        "description": "Safe mode configuration, when enabled, the application will require recaptcha validation for\nalmost every action making it harder to spam the application or dump the database content",
+        "description": "Safe mode configuration, when enabled, the application will require hcaptcha validation for\nalmost every action making it harder to spam the application or dump the database content",
         "properties": {
           "enabled": {
             "type": "boolean",
             "description": "Enable safe mode",
             "default": false
           },
-          "popup_message": {
+          "hcaptcha_secret": {
             "type": "string",
-            "description": "Message of the popup shown for first recaptcha validation",
-            "default": null,
-            "nullable": true
-          },
-          "popup_title": {
-            "type": "string",
-            "description": "Title of the popup shown for first recaptcha validation",
-            "default": null,
-            "nullable": true
-          },
-          "recaptcha_v3_secret": {
-            "type": "string",
-            "description": "Secret key for recaptcha v3",
+            "description": "Secret key for hcaptcha",
             "default": ""
           },
-          "recaptcha_v3_sitekey": {
+          "hcaptcha_sitekey": {
             "type": "string",
-            "description": "Site key for recaptcha v3",
+            "description": "Site key for hcaptcha",
             "default": ""
-          },
-          "recaptcha_v3_threshold": {
-            "type": "number",
-            "format": "double",
-            "description": "Threshold for recaptcha v3",
-            "default": 0.5
           }
         }
       },
@@ -4260,19 +4246,15 @@
         "type": "object",
         "required": [
           "status",
-          "general"
+          "general",
+          "safe_mode"
         ],
         "properties": {
           "general": {
             "$ref": "#/components/schemas/GeneralOptions"
           },
           "safe_mode": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SafeMode"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/SafeMode"
           },
           "status": {
             "type": "string"
