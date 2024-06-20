@@ -105,6 +105,7 @@ const familyNodes = computed(() => [{
   label: 'Gestion',
   icon: 'listEdit',
   route: 'families',
+  key: 'families-mgmt',
   active: false,
 }].concat(
   state.families.map((item) => {
@@ -151,12 +152,14 @@ const nodes = computed(() => [
     icon: 'home',
     route: 'home',
     active: false,
+    key: 'home',
   },
   {
     label: 'Configuration',
     icon: 'config',
     route: 'config',
     active: false,
+    key: 'config',
   },
   {
     label: 'Utilisateur⋅ices',
@@ -164,12 +167,14 @@ const nodes = computed(() => [
     route: 'users',
     admin_only: true,
     active: false,
+    key: 'users',
   },
   {
     label: 'Jetons d\'accès',
     icon: 'accessToken',
     route: 'access-tokens',
     active: false,
+    key: 'access-tokens',
   },
   {
     label: 'Familles',
@@ -177,12 +182,14 @@ const nodes = computed(() => [
     pending_count: Object.values(state.countsByFamily).reduce((summed_count, counts) => summed_count + counts[1] + counts[3], 0),
     items: familyNodes.value,
     active: false,
+    key: 'families',
   },
   {
     label: 'Tags',
     icon: 'tag',
     route: 'tags',
     active: false,
+    key: 'tags',
   },
 ].filter(node => !node.admin_only || state.is_admin))
 </script>
