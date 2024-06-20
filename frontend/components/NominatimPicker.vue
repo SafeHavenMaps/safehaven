@@ -25,9 +25,9 @@
     </div>
     <div
       v-else-if="locationSelected && resultsSearched"
-      class="h-80"
     >
       <SingleEntityMap
+        class="!h-80"
         :coordinates="transformedCoordinates"
         :locked="false"
         fill-color="#9999FF"
@@ -35,7 +35,7 @@
         :icon-hash="null"
         :zoom="10"
       />
-      <small class="text-secondary">Addresse : {{ results[0].display_name }}</small>
+      <small class="text-secondary flex ">Addresse : {{ results[0].display_name }}</small>
     </div>
   </div>
 </template>

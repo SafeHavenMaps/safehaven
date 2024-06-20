@@ -126,7 +126,7 @@ export class AppState {
   }
 
   get families(): Family[] {
-    return this.familiesData ?? []
+    return this.familiesData!
   }
 
   async fetchFamily(id: string) {

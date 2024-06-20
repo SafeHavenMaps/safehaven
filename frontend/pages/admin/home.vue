@@ -160,13 +160,13 @@ const cards = [
   },
   {
     class: 'card-orange',
-    iconName: 'addEntity',
+    iconName: 'pendingEntity',
     title: 'Entités',
     stat: stats.value.pending_entities,
   },
   {
     class: 'card-orange',
-    iconName: 'addComment',
+    iconName: 'pendingComment',
     title: 'Commentaires',
     stat: stats.value.pending_comments,
   },
