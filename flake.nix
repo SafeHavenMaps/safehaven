@@ -228,9 +228,6 @@
               startDevEnv
               # Backend
               sqlx-cli
-              openssl
-              pkg-config
-              postgresql
               # Front
               fixedNode
               # Nix formatting
