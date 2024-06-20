@@ -255,7 +255,7 @@ BEGIN
                 OR (full_text_search_ts @@ plainto_tsquery(search_query))
             )
             AND ec.family_id = input_family_id
-            AND (active_categories_ids && ec.categories_ids)
+            AND (ec.category_id = ANY(active_categories_ids))
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
             AND NOT (ec.tags_ids && excluded_tags_ids)
         ORDER BY
