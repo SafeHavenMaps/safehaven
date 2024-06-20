@@ -109,6 +109,23 @@
           />
         </span>
       </div>
+      <div
+        v-if="showCaptcha"
+        class="flex flex-col justify-center items-center "
+      >
+        <div class="text-center font-bold">
+          Une petite seconde, on doit vérifier que vous n'êtes pas un robot...
+        </div>
+
+        <div class="m-3">
+          <vue-hcaptcha
+            :sitekey="state.hCaptchaSiteKey"
+            @verify="hCaptchaVerify"
+            @expired="hCaptchaExpired"
+            @error="hCaptchaError"
+          />
+        </div>
+      </div>
     </form>
   </Dialog>
 </template>
@@ -191,6 +208,7 @@ watch(
 )
 
 const processingRequest = ref(false)
+const showCaptcha = ref(false)
 const toast = useToast()
 
 function entityFieldsSortedByPage(page: number) {
@@ -219,12 +237,44 @@ function isCommentPageValid(page: number) {
   return true
 }
 
+function hCaptchaVerify(token: string) {
+  realOnSave(token)
+}
+
+function hCaptchaExpired() {
+  toast.add({
+    severity: 'error',
+    summary: 'Erreur',
+    detail: 'Le captcha a expiré',
+    life: 3000,
+  })
+}
+
+function hCaptchaError() {
+  toast.add({
+    severity: 'error',
+    summary: 'Erreur',
+    detail: 'Erreur de validation du captcha',
+    life: 3000,
+  })
+}
+
 async function onSave() {
+  if (state.hasSafeMode) {
+    showCaptcha.value = true
+  }
+  else {
+    await realOnSave(null)
+  }
+}
+
+async function realOnSave(token: string | null) {
   processingRequest.value = true
   try {
     await state.client.createEntity({
       entity: editedEntity.value,
       comment: editedComment.value,
+      hcaptcha_token: token,
     })
     formVisible.value = false
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Entité et commentaire ajoutés avec succès', life: 3000 })

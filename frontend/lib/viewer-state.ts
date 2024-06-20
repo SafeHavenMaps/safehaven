@@ -120,6 +120,10 @@ export class AppState {
     return this.initConfig!.safe_mode
   }
 
+  get hCaptchaSiteKey() {
+    return this.initConfig?.safe_mode.hcaptcha_sitekey
+  }
+
   get title() {
     return this.initConfig!.general.title!
   }

@@ -60,7 +60,7 @@
       @submit.prevent="() => page == page_count ? onSave() : curr_page+=1"
     >
       <div
-        v-if="curr_page == page"
+        v-if="!showCaptcha && curr_page == page"
         class="flex grow flex-col gap-4 max-w-[30rem]"
       >
         <FormDynamicField
@@ -86,6 +86,23 @@
             :disabled="processingRequest || !editedComment!.author || !editedComment!.text"
           />
         </span>
+      </div>
+      <div
+        v-if="showCaptcha"
+        class="flex flex-col justify-center items-center "
+      >
+        <div class="text-center font-bold">
+          Une petite seconde, on doit vérifier que vous n'êtes pas un robot...
+        </div>
+
+        <div class="m-3">
+          <vue-hcaptcha
+            :sitekey="state.hCaptchaSiteKey"
+            @verify="hCaptchaVerify"
+            @expired="hCaptchaExpired"
+            @error="hCaptchaError"
+          />
+        </div>
       </div>
     </form>
   </Dialog>
@@ -126,18 +143,63 @@ watch(
   },
 )
 const processingRequest = ref(false)
+const showCaptcha = ref(false)
 const toast = useToast()
 
+function hCaptchaVerify(token: string) {
+  realOnSave(token)
+}
+
+function hCaptchaExpired() {
+  toast.add({
+    severity: 'error',
+    summary: 'Erreur',
+    detail: 'Le captcha a expiré',
+    life: 3000,
+  })
+}
+
+function hCaptchaError() {
+  toast.add({
+    severity: 'error',
+    summary: 'Erreur',
+    detail: 'Erreur de validation du captcha',
+    life: 3000,
+  })
+}
+
 async function onSave() {
+  if (state.hasSafeMode) {
+    showCaptcha.value = true
+  }
+  else {
+    await realOnSave(null)
+  }
+}
+
+async function realOnSave(token: string | null) {
   processingRequest.value = true
   try {
-    await state.client.createComment({ comment: editedComment.value! })
+    await state.client.createComment({
+      comment: editedComment.value!,
+      hcaptcha_token: token,
+    })
     formVisible.value = false
-    toast.add({ severity: 'success', summary: 'Succès', detail: 'Commentaire modifié avec succès', life: 3000 })
+    toast.add({
+      severity: 'success',
+      summary: 'Succès',
+      detail: 'Commentaire modifié avec succès',
+      life: 3000,
+    })
     reset_refs(props.entity.id)
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de modification du commentaire', life: 3000 })
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: 'Erreur de modification du commentaire',
+      life: 3000,
+    })
   }
   processingRequest.value = false
 }
