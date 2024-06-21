@@ -54,55 +54,57 @@
       </span>
     </form>
     <form
-      v-for="page in Array.from({ length: page_count }, (_, i) => i+1)"
+      v-for="page in Array.from({ length: page_count+1 }, (_, i) => i+1)"
       :key="`Page ${page}`"
       class="flex grow flex-col gap-4 max-w-[30rem]"
       @submit.prevent="() => page == page_count ? onSave() : curr_page+=1"
     >
       <div
-        v-if="!showCaptcha && curr_page == page"
+        v-if="curr_page == page"
         class="flex grow flex-col gap-4 max-w-[30rem]"
       >
-        <FormDynamicField
-          v-for="field in commentFieldsSortedByPage(page)"
-          :key="field.key"
-          v-model:fieldContent="(editedComment!.data as EntityOrCommentData)[field.key]"
-          :form-field="(field as FormField)"
-          @is-valid="isValid => commentFieldValid[field.key]= isValid"
-        />
+        <template v-if="page < page_count + 1">
+          <FormDynamicField
+            v-for="field in commentFieldsSortedByPage(page)"
+            :key="field.key"
+            v-model:fieldContent="(editedComment!.data as EntityOrCommentData)[field.key]"
+            :form-field="(field as FormField)"
+            @is-valid="isValid => commentFieldValid[field.key]= isValid"
+          />
 
-        <span
-          class="flex gap-1 justify-end"
+          <span
+            class="flex gap-1 justify-end"
+          >
+            <Button
+              label="Précédent"
+              outlined
+              @click="curr_page -= 1"
+            />
+            <Button
+              :label="page == page_count ? 'Sauvegarder' : 'Suivant'"
+              type="submit"
+              :outlined="page != page_count"
+              :loading="processingRequest"
+              :disabled="processingRequest || !isCommentPageValid(page)"
+            />
+          </span>
+        </template>
+        <div
+          v-else
+          class="flex flex-col justify-center items-center "
         >
-          <Button
-            label="Précédent"
-            outlined
-            @click="curr_page -= 1"
-          />
-          <Button
-            :label="page == page_count ? 'Sauvegarder' : 'Suivant'"
-            type="submit"
-            :outlined="page != page_count"
-            :loading="processingRequest"
-            :disabled="processingRequest || !isCommentPageValid(page)"
-          />
-        </span>
-      </div>
-      <div
-        v-if="showCaptcha"
-        class="flex flex-col justify-center items-center "
-      >
-        <div class="text-center font-bold">
-          Une petite seconde, on doit vérifier que vous n'êtes pas un robot...
-        </div>
+          <div class="text-center font-bold">
+            Une petite seconde, on doit vérifier que vous n'êtes pas un robot...
+          </div>
 
-        <div class="m-3">
-          <vue-hcaptcha
-            :sitekey="state.hCaptchaSiteKey"
-            @verify="hCaptchaVerify"
-            @expired="hCaptchaExpired"
-            @error="hCaptchaError"
-          />
+          <div class="m-3">
+            <vue-hcaptcha
+              :sitekey="state.hCaptchaSiteKey"
+              @verify="hCaptchaVerify"
+              @expired="hCaptchaExpired"
+              @error="hCaptchaError"
+            />
+          </div>
         </div>
       </div>
     </form>
@@ -155,6 +157,13 @@ watch(
   },
 )
 
+watch(
+  () => formVisible.value,
+  (__, _) => {
+    curr_page.value = Math.min(curr_page.value, page_count.value)
+  },
+)
+
 function commentFieldsSortedByPage(page: number) {
   return props.family.comment_form.fields
     .filter(field => field.form_page === page)
@@ -167,7 +176,6 @@ function isCommentPageValid(page: number) {
   }
   return commentFieldsSortedByPage(page).every(field => commentFieldValid.value[field.key])
 }
-const showCaptcha = ref(false)
 
 function hCaptchaVerify(token: string) {
   realOnSave(token)
@@ -192,8 +200,8 @@ function hCaptchaError() {
 }
 
 async function onSave() {
-  if (state.hasSafeMode) {
-    showCaptcha.value = true
+  if (state.hasSafeModeEnabled) {
+    curr_page.value += 1
   }
   else {
     await realOnSave(null)

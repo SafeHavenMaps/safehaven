@@ -112,8 +112,8 @@ export class AppState {
     return this.initConfig?.status === 'ok'
   }
 
-  get hasSafeMode() {
-    return !!this.initConfig?.safe_mode
+  get hasSafeModeEnabled() {
+    return !!this.initConfig?.safe_mode.enabled
   }
 
   get safeMode() {

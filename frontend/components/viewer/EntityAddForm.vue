@@ -63,7 +63,7 @@
 
     <!-- Comment Form Pages -->
     <form
-      v-for="page in Array.from({ length: commentPageCount+1 }, (_, i) => i)"
+      v-for="page in Array.from({ length: commentPageCount+2 }, (_, i) => i)"
       :key="`CommentPage${page}`"
       class="flex grow flex-col gap-4 max-w-[30rem]"
       @submit.prevent="curr_page < (entityPageCount + commentPageCount + 1) ? curr_page += 1 : onSave()"
@@ -86,7 +86,7 @@
             text-length="editor"
           />
         </template>
-        <template v-else>
+        <template v-else-if="page < (commentPageCount + 1)">
           <FormDynamicField
             v-for="field in commentFieldsSortedByPage(page)"
             :key="field.key"
@@ -96,7 +96,10 @@
           />
         </template>
 
-        <span class="flex gap-1 justify-end">
+        <span
+          v-if="page < (commentPageCount + 1)"
+          class="flex gap-1 justify-end"
+        >
           <Button
             label="Précédent"
             outlined
@@ -110,22 +113,22 @@
             :disabled="processingRequest || !isCommentPageValid(page)"
           />
         </span>
-      </div>
-      <div
-        v-if="showCaptcha"
-        class="flex flex-col justify-center items-center "
-      >
-        <div class="text-center font-bold">
-          Une petite seconde, on doit vérifier que vous n'êtes pas un robot...
-        </div>
+        <div
+          v-if="page == (commentPageCount + 1)"
+          class="flex flex-col justify-center items-center "
+        >
+          <div class="text-center font-bold">
+            Une petite seconde, on doit vérifier que vous n'êtes pas un robot...
+          </div>
 
-        <div class="m-3">
-          <vue-hcaptcha
-            :sitekey="state.hCaptchaSiteKey"
-            @verify="hCaptchaVerify"
-            @expired="hCaptchaExpired"
-            @error="hCaptchaError"
-          />
+          <div class="m-3">
+            <vue-hcaptcha
+              :sitekey="state.hCaptchaSiteKey"
+              @verify="hCaptchaVerify"
+              @expired="hCaptchaExpired"
+              @error="hCaptchaError"
+            />
+          </div>
         </div>
       </div>
     </form>
@@ -194,6 +197,7 @@ const commentFieldValid = ref(
 )
 
 function reset_refs() {
+  console.log('hein pq fail le captcha switch la famille')
   editedEntity.value = {
     category_id: '',
     data: {},
@@ -225,8 +229,14 @@ watch(
   },
 )
 
+watch(
+  () => formVisible.value,
+  (__, _) => {
+    curr_page.value = Math.min(curr_page.value, entityPageCount.value + commentPageCount.value + 1)
+  },
+)
+
 const processingRequest = ref(false)
-const showCaptcha = ref(false)
 const toast = useToast()
 
 function entityFieldsSortedByPage(page: number) {
@@ -278,8 +288,8 @@ function hCaptchaError() {
 }
 
 async function onSave() {
-  if (state.hasSafeMode) {
-    showCaptcha.value = true
+  if (state.hasSafeModeEnabled) {
+    curr_page.value += 1
   }
   else {
     await realOnSave(null)
