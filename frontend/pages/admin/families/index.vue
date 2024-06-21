@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="flex gap-4">
+    <span class="flex gap-4 flex-wrap">
       <IconField
         icon-position="left"
       >
@@ -105,8 +105,9 @@ import state from '~/lib/admin-state'
 const optionalColumns = ref(['Entités'])
 
 const table_key = `dt-state-families`
+const isSmallScreen = useMediaQuery('(max-width: 768px)')
 if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = []
+  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Entités']
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {

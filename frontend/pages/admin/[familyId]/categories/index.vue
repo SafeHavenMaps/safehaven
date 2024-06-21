@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="flex gap-4">
+    <span class="flex gap-4 flex-wrap">
       <IconField icon-position="left">
         <InputIcon>
           <AppIcon
@@ -103,10 +103,11 @@ async function refreshTable() {
 }
 refreshTable()
 
+const isSmallScreen = useMediaQuery('(max-width: 768px)')
 const optionalColumns = ref(['Affichage par défaut', 'Entités'])
 const table_key = `dt-state-categories-${familyId}`
 if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = ['Affichage par défaut']
+  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Affichage par défaut']
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {

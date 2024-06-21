@@ -1,10 +1,8 @@
 <template>
   <div>
-    <span class="flex gap-6 items-end mb-4">
+    <span class="flex gap-6 items-end mb-4 flex-wrap">
       <form @submit.prevent="refreshTable">
-        <InputGroup
-          style="height: 36px; "
-        >
+        <InputGroup class="h-10">
           <InputText
             v-model="state.tablesQueryParams[table_key].search_query"
             placeholder="Tapez votre recherche ici"
@@ -36,7 +34,7 @@
         :options="optionalColumns"
         display="chip"
         placeholder="Sélectionner des colonnes"
-        class="w-full md:w-80"
+        class="w-full md:w-80 h-10"
       />
     </span>
 
@@ -167,10 +165,12 @@ const tags_tooltip = ref<typeof Popover>()
 const tooltip_excess_tags: Ref<undefined | string[]> = ref(undefined)
 
 const firstRow = ref(0)
+const isSmallScreen = useMediaQuery('(max-width: 768px)')
+console.log(isSmallScreen.value)
 const optionalColumns = ref(['Catégorie', 'Tags', 'Visibilité'])
 const table_key = `dt-state-entities-${familyId}`
 if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = ['Catégorie', 'Visibilité', 'Tags']
+  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Catégorie', 'Tags', 'Visibilité']
 }
 
 if (!(table_key in state.tablesQueryParams)) {

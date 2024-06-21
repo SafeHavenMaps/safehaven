@@ -1,7 +1,9 @@
 <template>
   <div>
-    <span class="flex gap-4">
-      <IconField icon-position="left">
+    <span class="flex gap-4 flex-wrap">
+      <IconField
+        icon-position="left"
+      >
         <InputIcon>
           <AppIcon
             icon-name="search"
@@ -124,10 +126,11 @@ async function refreshTable() {
 }
 refreshTable()
 
+const isSmallScreen = useMediaQuery('(max-width: 768px)')
 const optionalColumns = ref(['Catégorie', 'Créé le', 'Mis à jour le', 'Visibilité'])
 const table_key = `dt-state-entities-${familyId}`
 if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = ['Catégorie', 'Créé le']
+  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Catégorie', 'Créé le']
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {

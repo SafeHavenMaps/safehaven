@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxt/eslint',
     '@nuxtjs/tailwindcss',
+    '@vueuse/nuxt',
   ],
   ssr: false,
   devtools: { enabled: true },

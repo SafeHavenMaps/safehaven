@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="flex gap-4">
+    <span class="flex gap-4 flex-wrap">
       <IconField
         icon-position="left"
       >
@@ -100,10 +100,11 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Tag } from '~/lib'
 import state from '~/lib/admin-state'
 
+const isSmallScreen = useMediaQuery('(max-width: 768px)')
 const optionalColumns = ref(['Filtrage', 'Valeur de filtre par défaut', 'Description de filtre'])
 const table_key = `dt-state-tags`
 if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = ['Filtrage', 'Valeur de filtre par défaut']
+  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Filtrage', 'Valeur de filtre par défaut']
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {

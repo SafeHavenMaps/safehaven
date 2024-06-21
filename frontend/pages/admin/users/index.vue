@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="flex gap-4">
+    <span class="flex gap-4 flex-wrap">
       <IconField
         icon-position="left"
       >
@@ -13,6 +13,14 @@
           placeholder="Recherche"
         />
       </IconField>
+      <MultiSelect
+        v-model="state.tablesSelectedColumns[table_key]"
+        :options="optionalColumns"
+
+        display="chip"
+        placeholder="Sélectionner des colonnes"
+        class="w-full md:w-80"
+      />
     </span>
     <DataTable
       v-model="state.tablesSelectedColumns[table_key]"
@@ -42,6 +50,7 @@
         </template>
       </Column>
       <Column
+        v-if="state.tablesSelectedColumns[table_key].includes('Droits')"
         header="Droits"
         field="is_admin"
         sortable
@@ -55,8 +64,9 @@
       </Column>
 
       <Column
+        v-if="state.tablesSelectedColumns[table_key].includes('Connection')"
         field="last_login"
-        header="Dernière connexion"
+        header="Dernière connection"
       >
         <template #body="slotProps">
           {{ new Date(slotProps.data.last_login).toLocaleString() }}
@@ -85,9 +95,11 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { User } from '~/lib'
 import state from '~/lib/admin-state'
 
+const isSmallScreen = useMediaQuery('(max-width: 768px)')
+const optionalColumns = ref(['Droits', 'Connection'])
 const table_key = `dt-users`
 if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = []
+  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Droits', 'Connection']
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {
