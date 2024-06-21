@@ -236,8 +236,6 @@ async fn check_captcha(state: AppState, response: Option<String>) -> Result<(), 
                 ));
             }
         }
-
-        return Err(AppError::Unauthorized);
     }
 
     Ok(())
