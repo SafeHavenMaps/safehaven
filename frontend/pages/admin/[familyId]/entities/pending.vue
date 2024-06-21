@@ -93,7 +93,7 @@
             model-name="de l'entité"
             :name="slotProps.data.display_name"
             @delete="onDelete"
-            @edit="id => navigateTo(`/admin/${familyId}/entities/${id}`)"
+            @edit="id => navigateTo(`/admin/${familyId}/entities/${id}?entitiesUrl=entities/pending`)"
           />
         </template>
       </Column>
@@ -148,7 +148,7 @@ initAdminLayout(
       icon: 'add',
       label: 'Nouvelle entité',
       severity: 'success',
-      url: `/admin/${familyId}/entities/new`,
+      url: `/admin/${familyId}/entities/new?entitiesUrl=entities/pending`,
     },
   ],
   [

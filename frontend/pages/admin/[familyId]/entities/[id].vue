@@ -89,7 +89,7 @@
               />
 
               <span class="flex gap-1 justify-end">
-                <NuxtLink :to="`/admin/${familyId}/entities`">
+                <NuxtLink :to="`/admin/${familyId}/${entitiesUrl}`">
                   <Button
                     label="Annuler"
                     severity="secondary"
@@ -198,6 +198,7 @@ const editedEntity: Ref<AdminNewOrUpdateEntity> = ref(JSON.parse(JSON.stringify(
 
 const processingRequest = ref(false)
 const toast = useToast()
+const entitiesUrl = useRoute().query.entitiesUrl
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
@@ -206,8 +207,8 @@ initAdminLayout(
   [],
   [
     { label: `${family.title}`, url: '/admin/families' },
-    { label: 'Entités', url: `/admin/${familyId}/entities` },
-    { label: `Édition de l'entité ${fetchedEntity.value.display_name}`, url: `/admin/${familyId}/entities/${entityId}` },
+    { label: 'Entités', url: `/admin/${familyId}/${entitiesUrl}` },
+    { label: `Édition de l'entité ${fetchedEntity.value.display_name}`, url: `/admin/${familyId}/entities/${entityId}?=${entitiesUrl}` },
   ],
 )
 
@@ -219,7 +220,7 @@ async function onSave() {
   processingRequest.value = true
   try {
     await state.client.updateEntity(entityId, editedEntity.value)
-    navigateTo(`/admin/${familyId}/entities`)
+    navigateTo(`/admin/${familyId}/${entitiesUrl}`)
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Entité modifiée avec succès', life: 3000 })
   }
   catch {
