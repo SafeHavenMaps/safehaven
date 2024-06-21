@@ -79,12 +79,14 @@
             label="Auteur"
           />
 
-          <AdminInputTextField
-            id="text"
-            v-model="editedComment.text"
-            label="Texte du commentaire"
-            text-length="editor"
-          />
+          <div class="flex flex-col gap-2">
+            <label for="comment_text">Texte du commentaire<RequiredIndicator /></label>
+            <ViewerRichTextEditor
+              id="comment_text"
+              v-model="editedComment!.text"
+              label="Texte du commentaire"
+            />
+          </div>
         </template>
         <template v-else-if="page < (commentPageCount + 1)">
           <FormDynamicField
