@@ -214,9 +214,9 @@ const isValid = computed(() => {
     case 'email':
       return validator.isEmail(props.fieldContent as string)
     case 'phone':
-      return false // For now we will avoid making assumptions on phone number formats
+      return true // For now we will avoid making assumptions on phone number formats
     default:
-      return false
+      return true
   }
 })
 

@@ -255,7 +255,6 @@ async fn check_captcha(state: AppState, response: Option<String>) -> Result<(), 
 async fn viewer_new_entity(
     DbConn(mut conn): DbConn,
     State(state): State<AppState>,
-    MapUserToken(_token): MapUserToken,
     Json(request): Json<PublicNewEntityRequest>,
 ) -> Result<AppJson<PublicNewEntityResponse>, AppError> {
     check_captcha(state, request.hcaptcha_token).await?;
@@ -291,7 +290,6 @@ pub struct NewCommentRequest {
 async fn viewer_new_comment(
     DbConn(mut conn): DbConn,
     State(state): State<AppState>,
-    MapUserToken(_token): MapUserToken,
     Json(request): Json<NewCommentRequest>,
 ) -> Result<AppJson<PublicComment>, AppError> {
     check_captcha(state, request.hcaptcha_token).await?;
