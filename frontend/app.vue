@@ -18,10 +18,14 @@
 import { useHead } from '#imports'
 import state from '~/lib/viewer-state'
 
+useDarkMode().apply()
 await state.init()
 
 useHead({
   title: state.title,
-  link: [{ rel: 'icon', href: state.logo ?? '/default_favicon.ico' }],
+  link: [{
+    rel: 'icon',
+    href: state.logo ?? '/default_favicon.ico',
+  }],
 })
 </script>

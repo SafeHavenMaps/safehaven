@@ -47,6 +47,17 @@
 
     <template #end>
       <Button
+        severity="secondary"
+        outlined
+        style="color: white; border-color: white;"
+        @click="toggleDarkMode()"
+      >
+        <template #icon>
+          <AppIcon icon-name="lightDark" />
+        </template>
+      </Button>
+
+      <Button
         rounded
         severity="secondary"
         class="p-0 mx-2"
@@ -78,6 +89,7 @@ import state from '~/lib/admin-state'
 import safehaven_logo from '~/assets/logo_square_white.svg'
 
 const emit = defineEmits(['toggleSidebar'])
+const darkMode = useDarkMode()
 
 const accountMenu = ref<typeof Menu | null>(null)
 const navbarRef: Ref<HTMLElement | null> = ref(null)
@@ -112,6 +124,10 @@ const items = [
 
 function toggleAccountMenu(event: Event) {
   accountMenu.value?.toggle(event)
+}
+
+function toggleDarkMode() {
+  darkMode.toggle()
 }
 </script>
 

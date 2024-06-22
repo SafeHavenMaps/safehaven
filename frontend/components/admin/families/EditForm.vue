@@ -10,7 +10,8 @@
         :key="`Page ${page}`"
         :legend="page==page_count ? 'Nouvelle page' : `Page ${page}`"
         :toggleable="true"
-        style="background-color: #FAF8FF;"
+        class="page-fieldset"
+        style=""
         :pt="{
           legend: {
             class: '!border !border-surface',
@@ -26,10 +27,9 @@
           v-for="(field, index) in getFieldsForPage(page)"
           :key="field.key"
           :draggable="true"
-          class="draggable-item !my-2"
+          class="field-fieldset draggable-item !my-2"
           :legend="field.display_name"
           :toggleable="true"
-          style="background-color: #FAEFFF;"
           :pt="{
             legend: {
               class: '!border !border-surface !flex !items-center !justify-between !pl-3',
@@ -804,5 +804,21 @@ const fieldStringTypeOptions = [
 
 .draggable-item:active {
   cursor: grabbing;
+}
+
+html::not(.sh-dark) .page-fieldset {
+  background-color: #FAF8FF;
+}
+
+html::not(.sh-dark) .field-fieldset {
+  background-color: #FAEFFF;
+}
+
+html.sh-dark .page-fieldset {
+  background-color: #453741;
+}
+
+html.sh-dark .field-fieldset {
+  background-color: #241f22;
 }
 </style>

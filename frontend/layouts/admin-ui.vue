@@ -179,14 +179,20 @@ onMounted(() => {
 
 <style>
 html, body {
-  background-color: #f7f7f7 !important;
   margin: 0 !important;
   padding: 0 !important;
   height: 100% !important;
 }
 
+html::not(.sh-dark) {
+  background-color: #f7f7f7 !important;
+}
+
+html.sh-dark {
+  background-color: #282828 !important;
+}
+
 .admin-navbar {
-  background-color: #E86BA7 !important;
   border-radius: 0 !important;
   border-left-width: 0 !important;
   border-right-width: 0 !important;
@@ -196,6 +202,14 @@ html, body {
   top: 0 !important;
   left: 0 !important;
   width: 100% !important;
+}
+
+html.sh-dark .admin-navbar {
+  background-color: #8a4467 !important;
+}
+
+html::not(.sh-dark) .admin-navbar {
+  background-color: #E86BA7 !important;
 }
 
 .content-container {
@@ -208,11 +222,18 @@ html, body {
   left: 0 !important;
   top: 74px;
   width: 17.7rem !important;
-  background-color: #f7f7f7 !important;
   z-index: 1001 !important;
   transition: transform 0.3s ease-in-out !important;
   transform: translateX(0) !important;
   padding: 1rem !important;
+}
+
+html::not(.sh-dark) .sidebar {
+  background-color: #f7f7f7 !important;
+}
+
+html.sh-dark .sidebar {
+  background-color: #282828 !important;
 }
 
 .sidebar.collapsed {
@@ -222,7 +243,6 @@ html, body {
 .sidebar-title {
   font-size: 1.25rem !important;
   font-weight: 600 !important;
-  color: rgb(51, 65, 85) !important;
 }
 
 .main-content {

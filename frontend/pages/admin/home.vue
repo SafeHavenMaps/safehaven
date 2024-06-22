@@ -32,7 +32,7 @@
       </div>
 
       <Chart
-        type="bar"
+        type="line"
         :data="chartData"
         :options="chartOptions"
         class="h-full w-full max-h-96 xl:mt-12 xl:h-[25rem] !mt-6"
@@ -80,7 +80,7 @@ catch {
 }
 
 const chartData = {
-  labels: Object.keys(stats.value!.visits_30_days).map(date => new Date(date).toLocaleDateString()),
+  labels: Object.keys(stats.value!.visits_30_days).map(date => new Date(date)),
   datasets: [
     {
       label: 'Visites',
@@ -130,10 +130,12 @@ const chartOptions = {
   maintainAspectRatio: false,
   scales: {
     x: {
-      display: false,
+      display: true,
+      type: 'time',
     },
     y: {
       display: true,
+      min: 0,
     },
   },
 }

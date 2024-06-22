@@ -20,7 +20,7 @@ export default defineNuxtConfig({
       theme: {
         preset: theme,
         options: {
-          darkModeSelector: 'none',
+          darkModeSelector: '.sh-dark',
         },
       },
     },

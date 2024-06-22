@@ -25,7 +25,7 @@
 
       <div class="relative flex h-full w-full justify-center">
         <Chart
-          type="bar"
+          type="line"
           :data="chartData"
           :options="chartOptions"
           class="absolute top-0 left-0 w-full h-52 xl:h-64"
@@ -52,7 +52,7 @@ const stats = await state.client.getAccessTokenStats(accessTokenId)
 const origins = Object.entries(stats.origins).map(([referrer, count]) => ({ referrer, count }))
 
 const chartData = {
-  labels: Object.keys(stats.visits_30_days).map(date => new Date(date).toLocaleDateString()),
+  labels: Object.keys(stats.visits_30_days).map(date => new Date(date)),
   datasets: [
     {
       label: 'Visites',
@@ -102,10 +102,12 @@ const chartOptions = {
   maintainAspectRatio: false,
   scales: {
     x: {
-      display: false,
+      display: true,
+      type: 'time',
     },
     y: {
       display: true,
+      min: 0,
     },
   },
 }

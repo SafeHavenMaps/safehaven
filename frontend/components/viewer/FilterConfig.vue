@@ -12,7 +12,7 @@
     <TabPanels>
       <TabPanel value="0">
         <div>
-          <span class="font-medium text-surface-900 block mb-2">Catégories</span>
+          <span class="font-medium block mb-2">Catégories</span>
           <div
             :style="{
               maxHeight: props.maximumHeight,
@@ -72,13 +72,13 @@
         <div
           class="filter-settings mt-2"
         >
-          <span class="font-medium text-surface-900 block mb-2">Filtres</span>
+          <span class="font-medium block mb-2">Filtres</span>
           <div
             v-for="tag in props.filteringTags.filter(t => t.is_filter)"
             :key="tag.id"
             class="mb-2 p-1"
           >
-            <div class="text-surface-800 mb-1">
+            <div class="mb-1">
               {{ tag.filter_description }}
             </div>
 
@@ -104,7 +104,7 @@
       </TabPanel>
 
       <TabPanel value="1">
-        <span class="font-medium text-surface-900 block mb-2">Tags</span>
+        <span class="font-medium block mb-2">Tags</span>
         <InputGroup
           class="mb-6 mt-2"
         >

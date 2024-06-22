@@ -98,6 +98,17 @@
                   <AppIcon icon-name="mapSearch" />
                 </template>
               </Button>
+
+              <Button
+                severity="secondary"
+                outlined
+                label="Mode sombre/clair"
+                @click="toggleDarkMode()"
+              >
+                <template #icon>
+                  <AppIcon icon-name="lightDark" />
+                </template>
+              </Button>
             </div>
           </div>
         </Popover>
@@ -147,6 +158,16 @@
           >
             <template #icon>
               <AppIcon icon-name="mapSearch" />
+            </template>
+          </Button>
+
+          <Button
+            severity="secondary"
+            outlined
+            @click="toggleDarkMode()"
+          >
+            <template #icon>
+              <AppIcon icon-name="lightDark" />
             </template>
           </Button>
         </div>
@@ -260,7 +281,7 @@
                   @click="locationChosen(result)"
                 >
                   <span>{{ result.title }}</span><br>
-                  <span class="text-xs text-surface-800">{{ result.subtitle }}</span>
+                  <span class="text-xs">{{ result.subtitle }}</span>
                 </div>
               </div>
             </div>
@@ -275,7 +296,7 @@
 
             <Divider type="dotted" />
 
-            <div class="text-xs text-surface-800">
+            <div class="text-xs">
               Recherche avec Nominatim © OpenStreetMap Contributor
             </div>
           </TabPanel>
@@ -313,6 +334,7 @@ import type { ViewerCachedEntity, ViewerPaginatedCachedEntitiesWithLocation } fr
 import type { ViewerEntityAddForm } from '#build/components'
 
 const toast = useToast()
+const darkMode = useDarkMode()
 
 export interface Props {
   showCategorySwitcher?: boolean
@@ -413,6 +435,10 @@ function entityChosen(result: ViewerCachedEntity) {
 
 function filtersChanged() {
   emit('filtersChanged')
+}
+
+function toggleDarkMode() {
+  darkMode.toggle()
 }
 </script>
 

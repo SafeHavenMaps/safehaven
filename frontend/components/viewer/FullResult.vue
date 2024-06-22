@@ -31,7 +31,7 @@
                 :category="state.getCategory(props.entity.category_id)"
                 :size="2"
               />
-              <div class="text-lg font-medium text-surface-900 mt-2">
+              <div class="text-lg font-medium mt-2">
                 {{ props.entity.display_name }}
               </div>
             </div>
