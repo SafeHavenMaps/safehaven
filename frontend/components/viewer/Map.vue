@@ -28,10 +28,10 @@
           :callback-item="entity"
           :width="24"
           :height="38"
-          :fill="entity.category.fill_color"
-          :stroke="entity.category.border_color"
+          :fill-color="entity.category.fill_color"
+          :border-color="entity.category.border_color"
+          :icon-hash="entity.category.icon_hash"
           :highlighted="isEntityHighlighted(entity)"
-          :icon-url="`/api/icons/${entity.category.icon_hash}`"
           @click="handleEntityClick"
         />
       </ol-overlay>

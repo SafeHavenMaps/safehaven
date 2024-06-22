@@ -12,7 +12,7 @@
             :coordinates="[props.entity.web_mercator_x, props.entity.web_mercator_y]"
             :fill-color="state.getCategory(props.entity.category_id).fill_color"
             :border-color="state.getCategory(props.entity.category_id).fill_color"
-            :icon-hash="state.getCategory(props.entity.category_id).icon_hash"
+            :category-id="props.entity.category_id"
             :zoom="13"
             :locked="true"
           />

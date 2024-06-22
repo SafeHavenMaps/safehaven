@@ -30,9 +30,7 @@
         class="!h-80"
         :coordinates="transformedCoordinates"
         :locked="false"
-        fill-color="#9999FF"
-        border-color="#222222"
-        :icon-hash="null"
+        category-id="default"
         :zoom="10"
       />
       <small class="text-secondary flex ">Addresse : {{ results[0].display_name }}</small>

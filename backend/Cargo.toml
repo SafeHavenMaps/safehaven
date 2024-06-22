@@ -39,3 +39,5 @@ reqwest = { version = "0.12", features = [
     "json",
     "rustls-tls",
 ], default-features = false }
+tiny-skia = { version = "0.11.4", features = ["png-format"] }
+resvg = "0.42.0"
