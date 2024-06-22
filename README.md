@@ -1,4 +1,4 @@
-<img src=".github/assets/banner.webp" alt="SafeHaven Banner"/>
+<p align="center"><img src=".github/assets/banner.webp" alt="SafeHaven Banner"/></p>
 
 An open-source project to create a map of safe spaces for people in need.
 
