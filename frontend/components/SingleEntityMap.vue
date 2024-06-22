@@ -28,10 +28,7 @@
           :callback-item="null"
           :width="24"
           :height="38"
-          :fill="props.fillColor"
-          :stroke="props.borderColor"
           :highlighted="false"
-          :icon-url="iconUrl"
         />
       </ol-overlay>
     </ol-map>
@@ -43,16 +40,10 @@ import type { Coordinate } from 'ol/coordinate'
 
 const props = defineProps<{
   coordinates: Coordinate
-  fillColor: string
-  borderColor: string
-  iconHash: string | null | undefined
+  categoryId: string
   zoom: number
   locked: boolean
 }>()
-
-const iconUrl = computed(() => {
-  return props.iconHash ? `/api/icons/${props.iconHash}` : null
-})
 </script>
 
 <style scoped lang="scss">
