@@ -188,10 +188,10 @@ export class AppState {
     this.initConfig = await this.client.checkStatus()
   }
 
-  async bootstrapWithToken(token: string) {
+  async bootstrapWithToken(token: string, preventFullReload: boolean = false) {
     this.client.onAuthenticationFailed(async () => {
       try {
-        await this.bootstrapWithToken(token)
+        await this.bootstrapWithToken(token, true)
       }
       catch {
         if (state.redirectUrl) {
@@ -201,6 +201,8 @@ export class AppState {
     })
 
     const data = await this.client.bootstrap(token)
+
+    if (preventFullReload) return
 
     this.familiesData = data.families
       .sort((a, b) => a.sort_order - b.sort_order)

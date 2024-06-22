@@ -98,7 +98,7 @@ async fn bootstrap(
 
     let signed_token = app_state.generate_token(MapUserTokenClaims {
         iat: Utc::now().timestamp() as usize,
-        exp: (Utc::now() + TimeDelta::try_minutes(5).expect("valid duration")).timestamp() as usize,
+        exp: (Utc::now() + TimeDelta::try_minutes(1).expect("valid duration")).timestamp() as usize,
         perms: perms.clone(),
     });
     tracing::trace!("Generated access token");
