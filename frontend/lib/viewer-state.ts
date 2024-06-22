@@ -55,6 +55,19 @@ export class AppState {
   public filteringTags: (Tag & { active: boolean | null })[] = []
   public filteringCategories: (Category & { active: boolean })[] = []
 
+  get mapSource() {
+    return {
+      light: {
+        url: this.cartographyInitConfig.light_map_url,
+        attribution: this.cartographyInitConfig.light_map_attributions,
+      },
+      dark: {
+        url: this.cartographyInitConfig.dark_map_url,
+        attribution: this.cartographyInitConfig.dark_map_attributions,
+      },
+    }
+  }
+
   get activeFilteringCategories() {
     return this.filteringCategories.filter(c => c.active).map(c => c.id)
   }

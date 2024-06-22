@@ -15,7 +15,11 @@
       />
 
       <ol-tile-layer>
-        <ol-source-osm />
+        <ol-source-xyz
+          :url="tileUrl"
+          :attributions="tileAttr"
+          :attributions-collapsible="false"
+        />
       </ol-tile-layer>
 
       <ol-overlay
@@ -61,6 +65,32 @@ import type { AppError, DisplayableCachedEntity, DisplayableCluster } from '~/li
 import state from '~/lib/viewer-state'
 
 const toast = useToast()
+const darkMode = useDarkMode()
+
+const tileUrl = ref(
+  darkMode.isDark.value
+    ? state.mapSource.dark.url
+    : state.mapSource.light.url,
+)
+
+const tileAttr = ref(
+  darkMode.isDark.value
+    ? state.mapSource.dark.url
+    : state.mapSource.light.url,
+)
+
+watch(
+  darkMode.isDark,
+  () => {
+    tileUrl.value = darkMode.isDark.value
+      ? state.mapSource.dark.url
+      : state.mapSource.light.url
+
+    tileAttr.value = darkMode.isDark.value
+      ? state.mapSource.dark.attribution
+      : state.mapSource.light.attribution
+  },
+)
 
 const props = defineProps<{
   center: Coordinate
@@ -156,7 +186,7 @@ async function handleEntityClick(entity: DisplayableCachedEntity) {
 }
 </script>
 
-<style scoped lang="scss">
+<style>
 #map_container,
 #map {
   width: 100%;
