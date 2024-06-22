@@ -199,7 +199,6 @@ const commentFieldValid = ref(
 )
 
 function reset_refs() {
-  console.log('hein pq fail le captcha switch la famille')
   editedEntity.value = {
     category_id: '',
     data: {},

@@ -3280,6 +3280,26 @@
             "description": "Longitude of the map center (WGS84)",
             "default": 2.0
           },
+          "dark_map_attributions": {
+            "type": "string",
+            "description": "Dark mode map attributions",
+            "default": "Map data © OpenStreetMap contributors"
+          },
+          "dark_map_url": {
+            "type": "string",
+            "description": "Dark mode map url",
+            "default": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          },
+          "light_map_attributions": {
+            "type": "string",
+            "description": "Light mode map attributions",
+            "default": "Map data © OpenStreetMap contributors"
+          },
+          "light_map_url": {
+            "type": "string",
+            "description": "Light mode map url",
+            "default": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          },
           "zoom": {
             "type": "integer",
             "format": "int32",

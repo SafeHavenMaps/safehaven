@@ -107,6 +107,14 @@ pub struct CartographyInitConfig {
     pub center_lng: f64,
     /// Zoom level of the map (from 2 to 20)
     pub zoom: u8,
+    /// Light mode map url
+    pub light_map_url: String,
+    /// Dark mode map url
+    pub dark_map_url: String,
+    /// Light mode map attributions
+    pub light_map_attributions: String,
+    /// Dark mode map attributions
+    pub dark_map_attributions: String,
 }
 
 impl OptionConfig for CartographyInitConfig {
@@ -121,6 +129,10 @@ impl Default for CartographyInitConfig {
             center_lat: 47.0,
             center_lng: 2.0,
             zoom: 5,
+            light_map_url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png".to_string(),
+            light_map_attributions: "Map data © OpenStreetMap contributors".to_string(),
+            dark_map_url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png".to_string(),
+            dark_map_attributions: "Map data © OpenStreetMap contributors".to_string(),
         }
     }
 }

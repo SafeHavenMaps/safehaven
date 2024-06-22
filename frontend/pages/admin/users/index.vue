@@ -40,7 +40,7 @@
         sortable
       >
         <template #body="slotProps">
-          <div class="flex flex items-center justify-content-begin gap-2">
+          <div class="flex items-center justify-content-begin gap-2">
             <AdminUserAvatar
               :username="slotProps.data.name"
               size="normal"

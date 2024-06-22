@@ -144,6 +144,34 @@
             :variant="hasBeenEdited('cartography_init', 'zoom')"
           />
 
+          <AdminInputTextField
+            id="light_map_url"
+            v-model="editedConfig.cartography_init.light_map_url"
+            label="URL des tuiles de carte, thème clair"
+            :variant="hasBeenEdited('cartography_init', 'light_map_url')"
+          />
+
+          <AdminInputTextField
+            id="light_map_attributions"
+            v-model="editedConfig.cartography_init.light_map_attributions"
+            label="Attributions pour les tuiles de carte, thème clair"
+            :variant="hasBeenEdited('cartography_init', 'light_map_attributions')"
+          />
+
+          <AdminInputTextField
+            id="dark_map_url"
+            v-model="editedConfig.cartography_init.dark_map_url"
+            label="URL des tuiles de carte, thème sombre"
+            :variant="hasBeenEdited('cartography_init', 'dark_map_url')"
+          />
+
+          <AdminInputTextField
+            id="dark_map_attributions"
+            v-model="editedConfig.cartography_init.dark_map_attributions"
+            label="Attributions pour les tuiles de carte, thème sombre"
+            :variant="hasBeenEdited('cartography_init', 'dark_map_attributions')"
+          />
+
           <span class="flex gap-1 justify-end">
             <Button
               label="Annuler"
