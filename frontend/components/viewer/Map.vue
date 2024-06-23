@@ -75,8 +75,8 @@ const tileUrl = ref(
 
 const tileAttr = ref(
   darkMode.isDark.value
-    ? state.mapSource.dark.url
-    : state.mapSource.light.url,
+    ? state.mapSource.dark.attribution
+    : state.mapSource.light.attribution,
 )
 
 watch(
