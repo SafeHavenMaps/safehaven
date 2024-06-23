@@ -131,6 +131,7 @@
       <ViewerFilterConfig
         v-model:filteringTags="state.tablesQueryParams[table_key].tagFilteringList!"
         v-model:filteringCategories="state.tablesQueryParams[table_key].categoryFilteringList!"
+        v-model:filteringEnums="state.tablesQueryParams[table_key].enumsFilteringList!"
         class="w-[25rem]"
         @filters-changed="refreshTable"
       />
@@ -182,6 +183,22 @@ if (!(table_key in state.tablesQueryParams)) {
       .filter(category => category.family_id == familyId)
       .map(category => ({ ...category, active: true })),
     tagFilteringList: state.tags.map(tag => ({ ...tag, active: null })),
+    enumsFilteringList: state.familyById(familyId).entity_form.fields
+      .filter(f => f.indexed && (f.field_type === 'EnumMultiOption' || f.field_type === 'EnumSingleOption'))
+      .map((f) => {
+        return {
+          key: f.key,
+          title: f.display_name,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          values: (f.field_type_metadata as any).options.map((v: any) => {
+            return {
+              label: v.label,
+              value: v.value,
+            }
+          }),
+          active: [],
+        }
+      }),
   }
 }
 else {
@@ -213,6 +230,12 @@ async function refreshTable() {
       active_categories_ids: state.tablesQueryParams[table_key].categoryFilteringList!.filter(t => t.active).map(t => t.id),
       required_tags_ids: state.tablesQueryParams[table_key].tagFilteringList!.filter(t => t.active).map(t => t.id),
       excluded_tags_ids: state.tablesQueryParams[table_key].tagFilteringList!.filter(t => t.active === false).map(t => t.id),
+      enums_constraints: Object
+        .fromEntries(
+          state.tablesQueryParams[table_key].enumsFilteringList!
+            .filter(f => f.active.length > 0)
+            .map(f => [f.key, f.active]),
+        ),
     },
   )
 }

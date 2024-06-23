@@ -5,7 +5,13 @@
         Général
       </Tab>
       <Tab value="1">
-        Avancé
+        Tags
+      </Tab>
+      <Tab
+        v-if="hasFilteringEnums"
+        value="2"
+      >
+        Contraintes
       </Tab>
     </TabList>
 
@@ -167,28 +173,48 @@
           </div>
         </div>
       </TabPanel>
+
+      <TabPanel
+        v-if="hasFilteringEnums"
+        value="2"
+      >
+        <div
+          v-for="item in props.filteringEnums"
+          :key="item.key"
+        >
+          <span class="font-medium block mb-2 mt-4">{{ item.title }}</span>
+          <MultiSelect
+            v-model="item.active"
+            class="w-full"
+            :options="item.values"
+            option-label="label"
+            option-value="value"
+            @change="enumsFiltersChanged"
+          />
+        </div>
+      </TabPanel>
     </TabPanels>
   </Tabs>
 </template>
 
 <script setup lang="ts">
-import type { Category, Tag } from '~/lib'
+import type { Category, Tag, EnumFilter } from '~/lib'
 
 export interface Props {
   maximumHeight?: string
   filteringTags: (Tag & { active: boolean | null })[]
   filteringCategories: (Category & { active: boolean })[]
+  filteringEnums: EnumFilter[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
   maximumHeight: '350px',
 })
 
+const hasFilteringEnums = computed(() => props.filteringEnums.length > 0)
+
 const emit = defineEmits<{
   (event: 'filtersChanged'): void
-  // update:modelValue events uneeded as props are not reassigned only mutated through references
-  // (event: 'update:modelValue:filteringCategories', categories: (Category & { active: boolean })[]): void
-  // (event: 'update:modelValue:filteringTags', tags: (Tag & { active: boolean | null })[]): void
 }>()
 
 const tagSearch = ref('')
@@ -229,6 +255,10 @@ function tagFiltersChanged() {
 }
 
 function categoryFiltersChanged() {
+  emit('filtersChanged')
+}
+
+function enumsFiltersChanged() {
   emit('filtersChanged')
 }
 

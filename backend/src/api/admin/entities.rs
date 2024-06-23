@@ -32,6 +32,7 @@ pub struct AdminSearchRequest {
     pub active_categories_ids: Vec<Uuid>,
     pub required_tags_ids: Vec<Uuid>,
     pub excluded_tags_ids: Vec<Uuid>,
+    pub enums_constraints: Value,
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -84,6 +85,7 @@ pub async fn admin_entities_search(
                 active_categories_ids: search_req.active_categories_ids,
                 required_tags_ids: search_req.required_tags_ids,
                 excluded_tags_ids: search_req.excluded_tags_ids,
+                enums_constraints: search_req.enums_constraints,
             },
             &mut conn,
         )

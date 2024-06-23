@@ -89,6 +89,7 @@
       <ViewerFilterConfig
         v-model:filteringTags="tagFilteringList"
         v-model:filteringCategories="categoryFilteringList"
+        v-model:filteringEnums="enumsFilteringList"
         @filters-changed="refreshSearch"
       />
     </Popover>
@@ -97,7 +98,13 @@
 
 <script setup lang="ts">
 import type Popover from 'primevue/popover'
-import type { AdminCachedEntity, AdminPaginatedCachedEntities, Category, Tag } from '~/lib'
+import type {
+  AdminCachedEntity,
+  AdminPaginatedCachedEntities,
+  Category,
+  Tag,
+  EnumFilter,
+} from '~/lib'
 import state from '~/lib/admin-state'
 
 const props = withDefaults(defineProps<{
@@ -116,6 +123,7 @@ const filters_overlay = ref<typeof Popover>()
 const search_query = ref('')
 const categoryFilteringList = ref<(Category & { active: boolean })[]>([])
 const tagFilteringList = ref<(Tag & { active: boolean | null })[]>([])
+const enumsFilteringList: EnumFilter[] = []
 
 const currentEntitiesResults: Ref<AdminPaginatedCachedEntities | null> = ref(null)
 const chosenEntity = ref<AdminCachedEntity | { id: string | undefined }>({ id: props.previousEntityId })
@@ -136,6 +144,7 @@ async function refreshSearch() {
       active_categories_ids: categoryFilteringList!.value.filter(t => t.active).map(t => t.id),
       required_tags_ids: tagFilteringList!.value.filter(t => t.active).map(t => t.id),
       excluded_tags_ids: tagFilteringList!.value.filter(t => t.active === false).map(t => t.id),
+      enums_constraints: [], // We do not support enums filtering on Entity selection
     },
   )
 }

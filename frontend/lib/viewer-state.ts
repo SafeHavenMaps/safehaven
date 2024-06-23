@@ -12,6 +12,7 @@ import type {
   DisplayableCluster,
   FetchedEntity,
   InitConfig,
+  EnumFilter,
 } from '~/lib'
 
 type ViewData = {
@@ -54,6 +55,7 @@ export class AppState {
 
   public filteringTags: (Tag & { active: boolean | null })[] = []
   public filteringCategories: (Category & { active: boolean })[] = []
+  public filteringEnums: EnumFilter[] = []
 
   get mapSource() {
     return {
@@ -74,6 +76,15 @@ export class AppState {
 
   get activeRequiredTags() {
     return this.filteringTags.filter(t => t.active).map(t => t.id)
+  }
+
+  get activeFilteringEnums(): Record<string, string[]> {
+    return Object
+      .fromEntries(
+        this.filteringEnums
+          .filter(f => f.active.length > 0)
+          .map(f => [f.key, f.active]),
+      )
   }
 
   get canAccessComments() {
@@ -111,12 +122,30 @@ export class AppState {
 
   set activeFamily(family: Family) {
     this.activeFamilyId = family.id
+
     this.filteringCategories = this.categories
       .filter(c => c.family_id === family.id && c.allowed)
       .map((c) => {
         return {
           ...c,
           active: c.default_status,
+        }
+      })
+
+    this.filteringEnums = family.entity_form.fields
+      .filter(f => f.indexed && (f.field_type === 'EnumMultiOption' || f.field_type === 'EnumSingleOption'))
+      .map((f) => {
+        return {
+          key: f.key,
+          title: f.display_name,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          values: (f.field_type_metadata as any).options.map((v: any) => {
+            return {
+              label: v.label,
+              value: v.value,
+            }
+          }),
+          active: [],
         }
       })
   }
@@ -324,6 +353,7 @@ export class AppState {
       this.activeFilteringCategories,
       this.activeRequiredTags,
       this.activeHiddenTags,
+      this.activeFilteringEnums,
     )
   }
 
@@ -336,6 +366,7 @@ export class AppState {
       this.activeHiddenTags,
       page,
       pageSize,
+      this.activeFilteringEnums,
     )
   }
 
@@ -357,6 +388,7 @@ export class AppState {
       this.activeFilteringCategories,
       this.activeRequiredTags,
       this.activeHiddenTags,
+      this.activeFilteringEnums,
     )
 
     // Step 1: Identify and filter out entities that are no longer present

@@ -12,6 +12,7 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::fmt::Display;
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -38,6 +39,7 @@ pub struct ViewRequest {
     active_categories: Vec<Uuid>,
     active_required_tags: Vec<Uuid>,
     active_hidden_tags: Vec<Uuid>,
+    enums_constraints: Value,
 }
 
 impl Display for ViewRequest {
@@ -125,6 +127,7 @@ pub async fn viewer_view_request(
         active_categories: request.active_categories,
         active_required_tags: request.active_required_tags,
         active_hidden_tags: request.active_hidden_tags,
+        enums_constraints: request.enums_constraints,
     };
 
     Ok(AppJson(
@@ -142,6 +145,7 @@ pub struct SearchRequest {
     active_required_tags: Vec<Uuid>,
     active_hidden_tags: Vec<Uuid>,
     require_locations: bool,
+    enums_constraints: Value,
 }
 
 impl Display for SearchRequest {
@@ -189,6 +193,7 @@ async fn viewer_search_request(
         active_required_tags: request.active_required_tags,
         active_hidden_tags: request.active_hidden_tags,
         require_locations: request.require_locations,
+        enums_constraints: request.enums_constraints,
     };
 
     Ok(AppJson(

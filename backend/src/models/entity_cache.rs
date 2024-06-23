@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::api::AppError;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use sqlx::{query_as, PgConnection};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -202,6 +203,8 @@ pub struct FindEntitiesRequest {
     pub active_categories: Vec<Uuid>,
     pub active_required_tags: Vec<Uuid>,
     pub active_hidden_tags: Vec<Uuid>,
+
+    pub enums_constraints: Value,
 }
 
 pub struct SearchEntitiesRequest {
@@ -225,6 +228,8 @@ pub struct SearchEntitiesRequest {
     pub active_hidden_tags: Vec<Uuid>,
 
     pub require_locations: bool,
+
+    pub enums_constraints: Value,
 }
 
 impl ViewerCachedEntity {
@@ -253,7 +258,25 @@ impl ViewerCachedEntity {
                 cluster_id,
                 cluster_center_x,
                 cluster_center_y
-            FROM fetch_entities_within_view($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+            FROM fetch_entities_within_view(
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                $6,
+                $7,
+                $8,
+                $9,
+                $10,
+                $11,
+                $12,
+                $13,
+                $14,
+                $15,
+                $16,
+                $17
+            )
             "#,
             request.xmin,
             request.ymin,
@@ -270,7 +293,8 @@ impl ViewerCachedEntity {
             request.cluster_params.map(|(_, min)| min).unwrap_or(0),
             &request.active_categories,
             &request.active_required_tags,
-            &request.active_hidden_tags
+            &request.active_hidden_tags,
+            &request.enums_constraints
         )
         .fetch_all(conn)
         .await
@@ -353,7 +377,23 @@ impl ViewerCachedEntity {
                 total_results as "total_results!",
                 total_pages as "total_pages!",
                 response_current_page as "response_current_page!"
-            FROM search_entities($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+            FROM search_entities(
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                $6,
+                $7,
+                $8,
+                $9,
+                $10,
+                $11,
+                $12,
+                $13,
+                $14,
+                $15
+            )
             "#,
             request.search_query,
             request.family_id,
@@ -368,7 +408,8 @@ impl ViewerCachedEntity {
             &request.active_categories,
             &request.active_required_tags,
             &request.active_hidden_tags,
-            request.require_locations
+            request.require_locations,
+            &request.enums_constraints
         )
         .fetch_all(conn)
         .await
@@ -386,6 +427,7 @@ pub struct AdminSearchEntitiesRequest {
     pub active_categories_ids: Vec<Uuid>,
     pub required_tags_ids: Vec<Uuid>,
     pub excluded_tags_ids: Vec<Uuid>,
+    pub enums_constraints: Value,
 }
 
 impl AdminCachedEntity {
@@ -407,7 +449,16 @@ impl AdminCachedEntity {
                 total_pages as "total_pages!",
                 response_current_page as "response_current_page!",
                 hidden as "hidden!"
-            FROM search_entities_admin($1, $2, $3, $4, $5, $6, $7)
+            FROM search_entities_admin(
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                $6,
+                $7,
+                $8
+            )
             "#,
             request.search_query,
             request.family_id,
@@ -415,7 +466,8 @@ impl AdminCachedEntity {
             request.page_size,
             &request.active_categories_ids,
             &request.required_tags_ids,
-            &request.excluded_tags_ids
+            &request.excluded_tags_ids,
+            &request.enums_constraints
         )
         .fetch_all(conn)
         .await

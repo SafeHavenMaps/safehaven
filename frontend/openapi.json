@@ -3131,7 +3131,8 @@
           "search",
           "active_categories_ids",
           "required_tags_ids",
-          "excluded_tags_ids"
+          "excluded_tags_ids",
+          "enums_constraints"
         ],
         "properties": {
           "active_categories_ids": {
@@ -3141,6 +3142,7 @@
               "format": "uuid"
             }
           },
+          "enums_constraints": {},
           "excluded_tags_ids": {
             "type": "array",
             "items": {
@@ -4218,7 +4220,8 @@
           "active_categories",
           "active_required_tags",
           "active_hidden_tags",
-          "require_locations"
+          "require_locations",
+          "enums_constraints"
         ],
         "properties": {
           "active_categories": {
@@ -4242,6 +4245,7 @@
               "format": "uuid"
             }
           },
+          "enums_constraints": {},
           "family_id": {
             "type": "string",
             "format": "uuid"
@@ -4379,7 +4383,8 @@
           "zoom_level",
           "active_categories",
           "active_required_tags",
-          "active_hidden_tags"
+          "active_hidden_tags",
+          "enums_constraints"
         ],
         "properties": {
           "active_categories": {
@@ -4403,6 +4408,7 @@
               "format": "uuid"
             }
           },
+          "enums_constraints": {},
           "family_id": {
             "type": "string",
             "format": "uuid"

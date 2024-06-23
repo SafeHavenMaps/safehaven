@@ -201,7 +201,10 @@ export default function useClient() {
       return data
     },
 
-    async searchEntities(pagination: { page: number, page_size: number }, search_request: AdminSearchRequestBody): Promise<AdminPaginatedCachedEntities> {
+    async searchEntities(
+      pagination: { page: number, page_size: number },
+      search_request: AdminSearchRequestBody,
+    ): Promise<AdminPaginatedCachedEntities> {
       const { data, error } = await this.rawClient.POST('/api/admin/entities/search', {
         params: { query: pagination },
         body: search_request,

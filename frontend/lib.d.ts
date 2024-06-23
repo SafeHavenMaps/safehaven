@@ -178,3 +178,13 @@ export type CategoryRecord = Record<string, Category>
 export type TagRecord = Record<string, Tag>
 
 export type HomePageStats = api.components['schemas']['HomePageStats']
+
+export type EnumFilter = {
+  key: string
+  title: string
+  values: {
+    label: string
+    value: string
+  }[]
+  active: string[]
+}

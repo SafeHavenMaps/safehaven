@@ -14,6 +14,7 @@ import type {
   CategoryRecord,
   FamilyRecord,
   TagRecord,
+  EnumFilter,
 } from '~/lib'
 
 interface Identifiable {
@@ -45,6 +46,7 @@ export class AppState {
     pageSize: number
     categoryFilteringList?: (Category & { active: boolean })[]
     tagFilteringList?: (Tag & { active: boolean | null })[]
+    enumsFilteringList: EnumFilter[]
   }> = {}
 
   private compareIds(array1: Identifiable[] | null, array2: Identifiable[] | null): boolean {
@@ -127,6 +129,10 @@ export class AppState {
 
   get families(): Family[] {
     return this.familiesData!
+  }
+
+  familyById(id: string): Family {
+    return this.familyRecord[id]
   }
 
   async fetchFamily(id: string) {

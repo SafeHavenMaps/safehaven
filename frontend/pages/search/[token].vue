@@ -183,6 +183,7 @@
       <ViewerFilterConfig
         v-model:filteringTags="state.filteringTags"
         v-model:filteringCategories="state.filteringCategories"
+        v-model:filteringEnums="state.filteringEnums"
       />
     </Dialog>
 
@@ -271,7 +272,11 @@ async function showCriteriasModal() {
 </script>
 
 <style>
-html, body {
+html:not(.sh-dark) {
   background-color: #f7f7f7;
+}
+
+html.sh-dark {
+  background-color: #282828;
 }
 </style>

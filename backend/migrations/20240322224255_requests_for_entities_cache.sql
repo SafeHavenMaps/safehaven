@@ -17,7 +17,9 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
 
     active_categories_ids UUID[],
     required_tags_ids UUID[],
-    excluded_tags_ids UUID[]
+    excluded_tags_ids UUID[],
+
+    enum_constraints JSONB
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -65,6 +67,18 @@ BEGIN
             AND (ec.category_id = ANY(active_categories_ids))
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
             AND NOT (ec.tags_ids && excluded_tags_ids)
+            -- Enum constraints
+            AND (
+                enum_constraints IS NULL OR
+                enum_constraints = '{}'::jsonb OR
+                (
+                    SELECT bool_and(
+                        ec.enums->key ?| array(SELECT jsonb_array_elements_text(value))
+                    )
+                    FROM jsonb_each(enum_constraints) AS constraints(key, value)
+                    WHERE key IS NOT NULL AND ec.enums ? key
+                )
+            )
     ),
     parent_entities AS (
         SELECT
@@ -143,7 +157,9 @@ CREATE OR REPLACE FUNCTION search_entities(
     required_tags_ids UUID[],
     excluded_tags_ids UUID[],
 
-    require_locations BOOL
+    require_locations BOOL,
+
+    enum_constraints JSONB
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -185,6 +201,18 @@ BEGIN
             AND NOT (ec.tags_ids && excluded_tags_ids)
             -- If we do not require locations, we only return entities with locations
             AND (NOT require_locations OR ec.web_mercator_location IS NOT NULL)
+            -- Enum constraints
+            AND (
+                enum_constraints IS NULL OR
+                enum_constraints = '{}'::jsonb OR
+                (
+                    SELECT bool_and(
+                        ec.enums->key ?| array(SELECT jsonb_array_elements_text(value))
+                    )
+                    FROM jsonb_each(enum_constraints) AS constraints(key, value)
+                    WHERE key IS NOT NULL AND ec.enums ? key
+                )
+            )
         ORDER BY
             ts_rank(full_text_search_ts, plainto_tsquery(search_query)) DESC,
             (ec.web_mercator_location IS NOT NULL) DESC -- prioritize entities with locations
@@ -229,7 +257,9 @@ CREATE OR REPLACE FUNCTION search_entities_admin(
 
     active_categories_ids UUID[],
     required_tags_ids UUID[],
-    excluded_tags_ids UUID[]
+    excluded_tags_ids UUID[],
+
+    enum_constraints JSONB
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -256,8 +286,21 @@ BEGIN
             )
             AND ec.family_id = input_family_id
             AND (ec.category_id = ANY(active_categories_ids))
+            -- Categories and tags constraints
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
             AND NOT (ec.tags_ids && excluded_tags_ids)
+            -- Enum constraints
+            AND (
+                enum_constraints IS NULL OR
+                enum_constraints = '{}'::jsonb OR
+                (
+                    SELECT bool_and(
+                        ec.enums->key ?| array(SELECT jsonb_array_elements_text(value))
+                    )
+                    FROM jsonb_each(enum_constraints) AS constraints(key, value)
+                    WHERE key IS NOT NULL AND ec.enums ? key
+                )
+            )
         ORDER BY
             ts_rank(full_text_search_ts, plainto_tsquery(search_query)) DESC
     ),

@@ -36,7 +36,7 @@
               </div>
             </div>
             <div
-              class="bg-surface-100 p-1"
+              class="p-1"
               style="border-radius: 30px"
             >
               {{ props.entity.plain_text_location }}

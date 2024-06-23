@@ -54,6 +54,7 @@ export default function useClient() {
       activeCategories: string[],
       activeRequiredTags: string[],
       activeHiddenTags: string[],
+      enumsConstraints: Record<string, Array<unknown>>,
     ) {
       const { data, error } = await rawClient.POST('/api/map/view', {
         body: {
@@ -66,6 +67,7 @@ export default function useClient() {
           active_categories: activeCategories,
           active_required_tags: activeRequiredTags,
           active_hidden_tags: activeHiddenTags,
+          enums_constraints: enumsConstraints,
         },
       })
       if (error) throw error
@@ -98,6 +100,7 @@ export default function useClient() {
       activeCategories: string[],
       activeRequiredTags: string[],
       activeHiddenTags: string[],
+      enumsConstraints: Record<string, Array<unknown>>,
     ): Promise<ViewerPaginatedCachedEntitiesWithLocation> {
       const { data, error } = await rawClient.POST('/api/map/search', {
         body: {
@@ -109,6 +112,7 @@ export default function useClient() {
           active_required_tags: activeRequiredTags,
           active_hidden_tags: activeHiddenTags,
           require_locations: true,
+          enums_constraints: enumsConstraints,
         },
       })
       if (error) throw error
@@ -131,6 +135,7 @@ export default function useClient() {
       activeHiddenTags: string[],
       page: number,
       pageSize: number,
+      enumsConstraints: Record<string, Array<unknown>>,
     ): Promise<ViewerPaginatedCachedEntities> {
       const { data, error } = await rawClient.POST('/api/map/search', {
         body: {
@@ -142,6 +147,7 @@ export default function useClient() {
           active_required_tags: activeRequiredTags,
           active_hidden_tags: activeHiddenTags,
           require_locations: false,
+          enums_constraints: enumsConstraints,
         },
       })
       if (error) throw error
