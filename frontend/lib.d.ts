@@ -24,9 +24,11 @@ export type PublicNewEntity = api.components['schemas']['PublicNewEntity']
 export type PublicNewEntityRequest = api.components['schemas']['PublicNewEntityRequest']
 export type PublicNewEntityResponse = api.components['schemas']['PublicNewEntityResponse']
 export type Cluster = api.components['schemas']['Cluster']
-type PaginatedVec<T> = api.components['schemas']['PaginatedVec'] & { entities: T[] }
+type PaginatedVec<T> = Omit<api.components['schemas']['PaginatedVec'], 'entities'> & { entities: T[] }
+
 export type ViewerCachedEntity = api.components['schemas']['ViewerCachedEntity']
-export type ViewerPaginatedCachedEntities = PaginatedVec<ViewerCachedEntity>
+export type ViewerSearchedCachedEntity = api.components['schemas']['ViewerSearchedCachedEntity']
+export type ViewerPaginatedCachedEntities = PaginatedVec<ViewerSearchedCachedEntity>
 export type ViewerCachedEntityWithLocation = ViewerCachedEntity & {
   web_mercator_x: number
   web_mercator_y: number

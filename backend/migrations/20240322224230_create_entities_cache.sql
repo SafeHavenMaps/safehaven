@@ -152,6 +152,7 @@ CREATE INDEX entities_caches_enums_idx ON entities_caches USING GIN (enums);
 CREATE INDEX entities_caches_gps_location_idx ON entities_caches USING GIST((ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)));
 CREATE INDEX entities_caches_web_mercator_location_idx ON entities_caches USING GIST(web_mercator_location);
 CREATE INDEX entities_caches_full_text_search_idx ON entities_caches USING GIST(full_text_search_ts);
+CREATE INDEX entities_caches_display_name_gist_trgm ON entities_caches USING GIST(display_name gist_trgm_ops);
 
 -- Function to refresh the materialized view
 CREATE OR REPLACE FUNCTION refresh_entities_caches() RETURNS void AS $$

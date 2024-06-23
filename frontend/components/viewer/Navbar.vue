@@ -321,7 +321,10 @@
   <ViewerEntityAddForm
     ref="entityAddForm"
     :family="state.activeFamily"
-    :categories="state.categories.filter(category => category.family_id == state.activeFamily.id)"
+    :categories="
+      state.categories
+        .filter(category => category.family_id == state.activeFamily.id)
+    "
   />
 </template>
 
@@ -332,7 +335,7 @@ import state from '~/lib/viewer-state'
 import defaultLogo from '~/assets/logo_square.svg'
 import type { Result as NominatimResult } from '~/lib/nominatim'
 import { freeFormSearch } from '~/lib/nominatim'
-import type { ViewerCachedEntity, ViewerPaginatedCachedEntitiesWithLocation } from '~/lib'
+import type { ViewerPaginatedCachedEntitiesWithLocation, ViewerSearchedCachedEntity } from '~/lib'
 import type { ViewerEntityAddForm } from '#build/components'
 
 const toast = useToast()
@@ -355,7 +358,7 @@ const entityAddForm = ref<typeof ViewerEntityAddForm>()
 const emit = defineEmits<{
   filtersChanged: []
   locationChosen: [Coordinate]
-  entityChosen: [ViewerCachedEntity]
+  entityChosen: [ViewerSearchedCachedEntity]
 }>()
 
 const filterOp = ref<typeof Popover>()
@@ -426,11 +429,14 @@ function openAddModal() {
 }
 
 function locationChosen(result: NominatimResult) {
-  const gpsCoordinates: Coordinate = [result.lon, result.lat]
+  const gpsCoordinates: Coordinate = [
+    result.lon,
+    result.lat,
+  ]
   emit('locationChosen', gpsCoordinates)
 }
 
-function entityChosen(result: ViewerCachedEntity) {
+function entityChosen(result: ViewerSearchedCachedEntity) {
   emit('entityChosen', result)
   searchOp!.value!.hide()
 }

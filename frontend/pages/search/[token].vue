@@ -135,7 +135,7 @@
           <template #list>
             <ViewerFullResult
               v-for="entity in currentEntitiesResults!.entities"
-              :key="entity.id"
+              :key="`${entity.id}-${researchIncrement}`"
               :entity="entity"
               class="p-col-12"
             />
@@ -208,6 +208,8 @@ const query = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
 
+const researchIncrement = ref(0)
+
 const showCriterias = ref(false)
 
 const currentEntitiesResults: Ref<ViewerPaginatedCachedEntities | null> = ref(null)
@@ -232,6 +234,8 @@ function onPage(event: PageState) {
 
 async function refreshResult() {
   try {
+    currentEntitiesResults.value = null
+    researchIncrement.value++
     currentEntitiesResults.value = await state.searchEntities(
       query.value,
       currentPage.value,

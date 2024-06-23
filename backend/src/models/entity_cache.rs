@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::api::AppError;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::{query_as, PgConnection};
+use sqlx::{query_as, types::Json, PgConnection};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -23,6 +23,18 @@ pub struct ViewerCachedEntity {
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
+pub struct ViewerSearchedCachedEntity {
+    pub id: Uuid,
+    pub entity_id: Uuid,
+    pub category_id: Uuid,
+    pub tags_ids: Vec<Uuid>,
+    pub family_id: Uuid,
+    pub display_name: String,
+    pub parents: Vec<ParentRepresentation>,
+    pub locations: Vec<LocationRepresentation>,
+}
+
+#[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct AdminCachedEntity {
     pub id: Uuid,
     pub entity_id: Uuid,
@@ -33,6 +45,19 @@ pub struct AdminCachedEntity {
     pub hidden: bool,
 }
 
+#[derive(Deserialize, Serialize, Debug, ToSchema)]
+pub struct ParentRepresentation {
+    id: Uuid,
+    display_name: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, ToSchema)]
+pub struct LocationRepresentation {
+    x: f64,
+    y: f64,
+    plain_text: String,
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 struct PaginatedCachedEntity {
     pub id: Uuid,
@@ -41,11 +66,8 @@ struct PaginatedCachedEntity {
     pub tags_ids: Vec<Uuid>,
     pub family_id: Uuid,
     pub display_name: String,
-    pub parent_id: Option<Uuid>,
-    pub parent_display_name: Option<String>,
-    pub web_mercator_x: Option<f64>,
-    pub web_mercator_y: Option<f64>,
-    pub plain_text_location: Option<String>,
+    pub parents: Json<Vec<ParentRepresentation>>,
+    pub locations: Json<Vec<LocationRepresentation>>,
     pub total_results: i64,
     pub total_pages: i64,
     pub response_current_page: i64,
@@ -61,18 +83,15 @@ impl From<Vec<PaginatedCachedEntity>> for ViewerCachedEntitiesWithPagination {
             .map_or(0, |e| e.response_current_page);
 
         for paginated_entity in paginated_entities {
-            let entity = ViewerCachedEntity {
+            let entity = ViewerSearchedCachedEntity {
                 id: paginated_entity.id,
                 entity_id: paginated_entity.entity_id,
                 category_id: paginated_entity.category_id,
                 tags_ids: paginated_entity.tags_ids,
                 family_id: paginated_entity.family_id,
                 display_name: paginated_entity.display_name,
-                parent_id: paginated_entity.parent_id,
-                parent_display_name: paginated_entity.parent_display_name,
-                web_mercator_x: paginated_entity.web_mercator_x,
-                web_mercator_y: paginated_entity.web_mercator_y,
-                plain_text_location: paginated_entity.plain_text_location,
+                parents: paginated_entity.parents.0,
+                locations: paginated_entity.locations.0,
             };
             entities.push(entity);
         }
@@ -139,7 +158,7 @@ pub struct PaginatedVec<T> {
     pub response_current_page: i64,
 }
 
-pub type ViewerCachedEntitiesWithPagination = PaginatedVec<ViewerCachedEntity>;
+pub type ViewerCachedEntitiesWithPagination = PaginatedVec<ViewerSearchedCachedEntity>;
 pub type AdminCachedEntitiesWithPagination = PaginatedVec<AdminCachedEntity>;
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -369,11 +388,8 @@ impl ViewerCachedEntity {
                 tags_ids as "tags_ids!",
                 family_id as "family_id!",
                 display_name as "display_name!",
-                parent_id,
-                parent_display_name,
-                web_mercator_x as "web_mercator_x",
-                web_mercator_y as "web_mercator_y",
-                plain_text_location as "plain_text_location",
+                parents as "parents!: Json<Vec<ParentRepresentation>>",
+                locations as "locations!: Json<Vec<LocationRepresentation>>",
                 total_results as "total_results!",
                 total_pages as "total_pages!",
                 response_current_page as "response_current_page!"

@@ -8,11 +8,11 @@
           class="md:w-40 flex flex-col"
         >
           <SingleEntityMap
-            v-if="props.entity.web_mercator_x && props.entity.web_mercator_y"
-            :coordinates="[props.entity.web_mercator_x, props.entity.web_mercator_y]"
+            v-if="props.entity.locations.length > 0"
+            :coordinates="locations"
             :fill-color="state.getCategory(props.entity.category_id).fill_color"
             :border-color="state.getCategory(props.entity.category_id).fill_color"
-            :category-id="props.entity.category_id"
+            :icon-hash="state.getCategory(props.entity.category_id).icon_hash"
             :zoom="13"
             :locked="true"
           />
@@ -35,11 +35,19 @@
                 {{ props.entity.display_name }}
               </div>
             </div>
+
             <div
               class="p-1"
               style="border-radius: 30px"
             >
-              {{ props.entity.plain_text_location }}
+              <ul>
+                <li
+                  v-for="(loc, idx) in props.entity.locations"
+                  :key="idx"
+                >
+                  {{ loc.plain_text }}
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -71,6 +79,8 @@ type ReceivedEntity = ViewerPaginatedCachedEntities['entities'][0]
 const props = defineProps<{
   entity: ReceivedEntity
 }>()
+
+const locations = computed(() => props.entity.locations.map(loc => [loc.x, loc.y]))
 
 function changeActiveEntity(entity: ReceivedEntity) {
   state.selectEntity(entity.entity_id)

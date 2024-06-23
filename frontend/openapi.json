@@ -3682,6 +3682,27 @@
           }
         }
       },
+      "LocationRepresentation": {
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "plain_text"
+        ],
+        "properties": {
+          "plain_text": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number",
+            "format": "double"
+          },
+          "y": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
       "LoginRequest": {
         "type": "object",
         "required": [
@@ -3893,6 +3914,22 @@
           "total_results": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "ParentRepresentation": {
+        "type": "object",
+        "required": [
+          "id",
+          "display_name"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -4495,6 +4532,59 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          }
+        }
+      },
+      "ViewerSearchedCachedEntity": {
+        "type": "object",
+        "required": [
+          "id",
+          "entity_id",
+          "category_id",
+          "tags_ids",
+          "family_id",
+          "display_name",
+          "parents",
+          "locations"
+        ],
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "family_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationRepresentation"
+            }
+          },
+          "parents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParentRepresentation"
+            }
+          },
+          "tags_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       }

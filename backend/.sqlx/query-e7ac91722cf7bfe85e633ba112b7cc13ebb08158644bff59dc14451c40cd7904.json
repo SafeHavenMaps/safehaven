@@ -1,0 +1,96 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT \n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                parents as \"parents!: Json<Vec<ParentRepresentation>>\",\n                locations as \"locations!: Json<Vec<LocationRepresentation>>\",\n                total_results as \"total_results!\",\n                total_pages as \"total_pages!\",\n                response_current_page as \"response_current_page!\"\n            FROM search_entities(\n                $1,\n                $2,\n                $3,\n                $4,\n                $5,\n                $6,\n                $7,\n                $8,\n                $9,\n                $10,\n                $11,\n                $12,\n                $13,\n                $14,\n                $15\n            )\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "entity_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "category_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "tags_ids!",
+        "type_info": "UuidArray"
+      },
+      {
+        "ordinal": 4,
+        "name": "family_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "display_name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "parents!: Json<Vec<ParentRepresentation>>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "locations!: Json<Vec<LocationRepresentation>>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 8,
+        "name": "total_results!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "total_pages!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "response_current_page!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid",
+        "Bool",
+        "Bool",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray",
+        "Int8",
+        "Int8",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray",
+        "Bool",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "e7ac91722cf7bfe85e633ba112b7cc13ebb08158644bff59dc14451c40cd7904"
+}

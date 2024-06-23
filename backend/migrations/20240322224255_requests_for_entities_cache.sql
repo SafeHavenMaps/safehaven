@@ -167,25 +167,29 @@ CREATE OR REPLACE FUNCTION search_entities(
     tags_ids UUID[],
     family_id UUID,
     display_name TEXT,
-    parent_id UUID,
-    parent_display_name TEXT,
-    web_mercator_x DOUBLE PRECISION,
-    web_mercator_y DOUBLE PRECISION,
-    plain_text_location TEXT,
+    parents JSONB,
+    locations JSONB,
     total_results BIGINT,
     total_pages BIGINT,
     response_current_page BIGINT
 ) AS $$
 BEGIN
-    RETURN QUERY
-    WITH filtered_entities AS (
-        SELECT ec.*
+    RETURN QUERY WITH
+    filtered_entities AS (
+        SELECT
+            ec.*,
+            CASE
+                WHEN search_query IS NOT NULL AND search_query = '' AND
+                    (ec.display_name ILIKE '%' || lower(search_query) || '%')
+                THEN 1 ELSE 0
+            END AS exact_match_score
         FROM entities_caches ec
         WHERE
             (
-                search_query IS NULL
-                OR search_query = ''
-                OR (full_text_search_ts @@ plainto_tsquery(search_query))
+                search_query IS NULL OR search_query = '' OR (
+                    ec.display_name ILIKE '%' || lower(search_query) || '%'
+                        OR (full_text_search_ts @@ plainto_tsquery(search_query))
+                    )
             )
             AND ec.family_id = input_family_id
             AND NOT ec.hidden
@@ -199,8 +203,6 @@ BEGIN
             AND (ec.category_id = ANY(active_categories_ids))
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
             AND NOT (ec.tags_ids && excluded_tags_ids)
-            -- If we do not require locations, we only return entities with locations
-            AND (NOT require_locations OR ec.web_mercator_location IS NOT NULL)
             -- Enum constraints
             AND (
                 enum_constraints IS NULL OR
@@ -213,34 +215,83 @@ BEGIN
                     WHERE key IS NOT NULL AND ec.enums ? key
                 )
             )
-        ORDER BY
-            ts_rank(full_text_search_ts, plainto_tsquery(search_query)) DESC,
-            (ec.web_mercator_location IS NOT NULL) DESC -- prioritize entities with locations
     ),
-    distinct_entities AS (
-        SELECT DISTINCT ON (ec.entity_id) ec.*
-        FROM filtered_entities ec
+    aggregated_entities AS (
+        SELECT
+            fe.entity_id,
+            fe.category_id,
+            fe.tags_ids,
+            fe.family_id,
+            fe.display_name,
+            COALESCE (
+                jsonb_agg(
+                    DISTINCT jsonb_build_object(
+                        'id', fe.parent_id,
+                        'display_name', fe.parent_display_name
+                    )
+                ) FILTER (
+                    WHERE fe.parent_id IS NOT NULL
+                        AND fe.parent_id IS NOT NULL
+                        AND fe.parent_display_name IS NOT NULL
+                ),
+                '[]'::jsonb
+            ) AS parents,
+            COALESCE (
+                jsonb_agg(
+                    DISTINCT jsonb_build_object(
+                        'x', ST_X(fe.web_mercator_location),
+                        'y', ST_Y(fe.web_mercator_location),
+                        'plain_text', fe.plain_text_location
+                    )
+                ) FILTER (
+                    WHERE web_mercator_location IS NOT NULL
+                        AND fe.plain_text_location IS NOT NULL),
+                '[]'::jsonb
+            ) AS locations,
+            fe.exact_match_score,
+            fe.full_text_search_ts
+        FROM filtered_entities fe
+        GROUP BY
+            fe.entity_id,
+            fe.category_id,
+            fe.tags_ids,
+            fe.family_id,
+            fe.display_name,
+            fe.exact_match_score,
+            fe.full_text_search_ts
+    ),
+    ranked_entities AS (
+        SELECT
+            ae.*,
+            RANK() OVER (
+                ORDER BY
+                exact_match_score DESC,
+                CASE
+                    WHEN search_query IS NOT NULL AND search_query <> '' THEN
+                        ts_rank(full_text_search_ts, plainto_tsquery(search_query))
+                    ELSE 0
+                END DESC
+            ) AS rank
+        FROM aggregated_entities ae
+        WHERE ((NOT require_locations) OR jsonb_array_length(ae.locations) > 0)
     ),
     total_count AS (
-        SELECT COUNT(*) AS total_results FROM distinct_entities
+        SELECT COUNT(*) AS total_results FROM ranked_entities
     ),
     paginated_results AS (
         SELECT
-            ec.id,
-            ec.entity_id,
-            ec.category_id,
-            ec.tags_ids,
-            ec.family_id,
-            ec.display_name,
-            ec.parent_id,
-            ec.parent_display_name,
-            ST_X(ec.web_mercator_location) AS web_mercator_x,
-            ST_Y(ec.web_mercator_location) AS web_mercator_y,
-            ec.plain_text_location,
+            re.entity_id AS id,
+            re.entity_id,
+            re.category_id,
+            re.tags_ids,
+            re.family_id,
+            re.display_name,
+            re.parents,
+            re.locations,
             tc.total_results,
             CEIL(tc.total_results / page_size::FLOAT)::BIGINT AS total_pages,
             current_page as response_current_page
-        FROM distinct_entities ec, total_count tc
+        FROM ranked_entities re, total_count tc
         LIMIT page_size
         OFFSET (current_page - 1) * page_size
     )
@@ -276,16 +327,20 @@ CREATE OR REPLACE FUNCTION search_entities_admin(
 BEGIN
     RETURN QUERY
     WITH filtered_entities AS (
-        SELECT ec.*
+        SELECT 
+            ec.*,
+            CASE
+                WHEN ec.display_name ILIKE '%' || lower(search_query) || '%' THEN 1 ELSE 0
+            END AS exact_match_score
         FROM entities_caches ec
         WHERE
             (
-                search_query IS NULL
-                OR search_query = ''
+                search_query IS NULL OR search_query = ''
+                OR ec.display_name ILIKE '%' || lower(search_query)  || '%'
                 OR (full_text_search_ts @@ plainto_tsquery(search_query))
             )
             AND ec.family_id = input_family_id
-            AND (ec.category_id = ANY(active_categories_ids))
+            AND ec.category_id = ANY(active_categories_ids)
             -- Categories and tags constraints
             AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
             AND NOT (ec.tags_ids && excluded_tags_ids)
@@ -301,30 +356,34 @@ BEGIN
                     WHERE key IS NOT NULL AND ec.enums ? key
                 )
             )
-        ORDER BY
-            ts_rank(full_text_search_ts, plainto_tsquery(search_query)) DESC
     ),
-    distinct_entities AS (
-        SELECT DISTINCT ON (ec.entity_id) ec.*
-        FROM filtered_entities ec
+    ranked_entities AS (
+        SELECT 
+            fe.*,
+            RANK() OVER (
+                ORDER BY exact_match_score DESC,
+                    ts_rank(full_text_search_ts, plainto_tsquery(search_query)) DESC
+            ) AS rank
+        FROM filtered_entities fe
     ),
     total_count AS (
-        SELECT COUNT(*) AS total_results FROM distinct_entities
+        SELECT COUNT(*) AS total_results FROM ranked_entities
     ),
     paginated_results AS (
         SELECT
-            ec.id,
-            ec.entity_id,
-            ec.category_id,
-            ec.tags_ids,
-            ec.family_id,
-            ec.display_name,
-            ec.hidden,
+            re.entity_id AS id,
+            re.entity_id,
+            re.category_id,
+            re.tags_ids,
+            re.family_id,
+            re.display_name,
+            re.hidden,
 
             tc.total_results,
             CEIL(tc.total_results / page_size::FLOAT)::BIGINT AS total_pages,
             current_page as response_current_page
-        FROM distinct_entities ec, total_count tc
+        FROM ranked_entities re, total_count tc
+        ORDER BY rank
         LIMIT page_size
         OFFSET (current_page - 1) * page_size
     )

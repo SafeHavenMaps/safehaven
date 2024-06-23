@@ -52,10 +52,12 @@ const results = ref<Result[]>([])
 const resultsSearched = ref(false)
 
 const transformedCoordinates = computed(() => {
-  if (!props.modelValue) return [0, 0]
+  if (!props.modelValue) return [[0, 0]]
 
-  return transform(
-    [props.modelValue!.long, props.modelValue!.lat], 'EPSG:4326', 'EPSG:3857')
+  return [
+    transform([
+      props.modelValue!.long, props.modelValue!.lat,
+    ], 'EPSG:4326', 'EPSG:3857')]
 })
 
 async function searchNominatim() {

@@ -53,13 +53,6 @@
         >
           <div>{{ result.display_name }}</div>
 
-          <div
-            v-if="result.parent_display_name"
-            class="text-xs"
-          >
-            {{ result.parent_display_name }}
-          </div>
-
           <div class="mt-1">
             <CategoryTag :category="state.categoryRecord[result.category_id]" />
           </div>
