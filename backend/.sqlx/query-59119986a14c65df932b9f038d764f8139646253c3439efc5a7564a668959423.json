@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT \n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                total_results as \"total_results!\",\n                total_pages as \"total_pages!\",\n                response_current_page as \"response_current_page!\",\n                hidden as \"hidden!\"\n            FROM search_entities_admin($1, $2, $3, $4, $5, $6, $7)\n            ",
+  "query": "\n            SELECT \n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                tags_ids as \"tags_ids!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                total_results as \"total_results!\",\n                total_pages as \"total_pages!\",\n                response_current_page as \"response_current_page!\",\n                hidden as \"hidden!\"\n            FROM search_entities_admin(\n                $1,\n                $2,\n                $3,\n                $4,\n                $5,\n                $6,\n                $7,\n                $8\n            )\n            ",
   "describe": {
     "columns": [
       {
@@ -62,7 +62,8 @@
         "Int8",
         "UuidArray",
         "UuidArray",
-        "UuidArray"
+        "UuidArray",
+        "Jsonb"
       ]
     },
     "nullable": [
@@ -78,5 +79,5 @@
       null
     ]
   },
-  "hash": "d1bc450195745ce80eced6173d14af52c4ff2ef67865760a467b93c4956f0804"
+  "hash": "59119986a14c65df932b9f038d764f8139646253c3439efc5a7564a668959423"
 }
