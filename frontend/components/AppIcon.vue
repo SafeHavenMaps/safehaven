@@ -74,6 +74,8 @@ const iconDict: Record<string, string> = {
   clock: mdi.mdiClockOutline,
   menu: mdi.mdiMenu,
   stats: mdi.mdiChartBar,
+  mapPage: mdi.mdiMap,
+  searchPage: mdi.mdiListBox,
 }
 </script>
 

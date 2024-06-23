@@ -1,6 +1,9 @@
 <template>
   <div class="h-full flex flex-col">
     <ViewerNavbar
+      :token="token"
+      :show-map-button="false"
+      :show-search-button="true"
       @filters-changed="refreshMap"
       @location-chosen="goToGpsCoordinates"
       @entity-chosen="goToEntity"

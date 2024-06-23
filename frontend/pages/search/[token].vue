@@ -1,9 +1,12 @@
 <template>
   <div class="h-full flex flex-col">
     <ViewerNavbar
+      :token="token"
       :show-category-switcher="false"
       :show-search="false"
       :show-family-switcher="false"
+      :show-map-button="true"
+      :show-search-button="false"
     />
 
     <Card class="m-2 p-2">

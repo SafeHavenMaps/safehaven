@@ -8,7 +8,7 @@
           alt="icon"
           :src="state.logo ?? defaultLogo"
         >
-        <div class="pl-4">
+        <div class="pl-2 xl:pl-4">
           <div class="my-0 text-lg font-extrabold">
             {{ state.title }}
           </div>
@@ -16,6 +16,40 @@
             {{ state.subtitle }}
           </div>
         </div>
+
+        <Button
+          v-if="props.showMapButton"
+          v-tooltip.bottom="'Passage en mode carte'"
+          outlined
+          severity="primary"
+          small
+          class="!p-1 !mr-2 !ml-4"
+          @click="() => navigateTo('/map/' + props.token)"
+        >
+          <template #default>
+            <AppIcon
+              icon-name="mapPage"
+              size="24px"
+            />
+          </template>
+        </Button>
+
+        <Button
+          v-if="props.showSearchButton"
+          v-tooltip.bottom="'Passage en mode liste'"
+          outlined
+          severity="primary"
+          small
+          class="!p-1 !mr-2 !ml-4"
+          @click="() => navigateTo('/search/' + props.token)"
+        >
+          <template #default>
+            <AppIcon
+              icon-name="searchPage"
+              size="24px"
+            />
+          </template>
+        </Button>
       </div>
     </template>
 
@@ -117,7 +151,7 @@
           class="hidden lg:flex justify-end items-center gap-2"
         >
           <Button
-            label="Informations"
+            label="Info"
             class="p-button-text"
             @click="showInformation = true"
           >
@@ -345,6 +379,9 @@ export interface Props {
   showCategorySwitcher?: boolean
   showSearch?: boolean
   showFamilySwitcher?: boolean
+  showMapButton?: boolean
+  showSearchButton?: boolean
+  token: string
 }
 
 const props = withDefaults(defineProps<Props>(), {

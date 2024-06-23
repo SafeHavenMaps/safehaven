@@ -118,7 +118,17 @@ function isEntityHighlighted(entity: DisplayableCachedEntity) {
   return state.activeEntity?.entity.id === entity.entity_id
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let delayingTimeout: any | null = null
+
 async function forceRefresh() {
+  if (delayingTimeout) {
+    clearTimeout(delayingTimeout)
+  }
+  delayingTimeout = setTimeout(internalRefresh, 100)
+}
+
+async function internalRefresh() {
   const { extent, currentZoom } = getExtentAndZoom()
   try {
     await state.refreshView(extent, currentZoom)
@@ -138,6 +148,10 @@ watch(
   () => state.activeFamily,
   forceRefresh,
 )
+
+onMounted(() => {
+  internalRefresh()
+})
 
 function getExtentAndZoom() {
   const extent = map!.getView().getViewStateAndExtent().extent
