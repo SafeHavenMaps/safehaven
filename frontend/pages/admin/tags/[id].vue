@@ -130,13 +130,6 @@ function hasBeenEdited(field: keyof NewOrUpdateTag) {
 }
 
 async function onSave() {
-  if (editedTag.value.border_color.length == 6) {
-    editedTag.value.border_color = `#${editedTag.value.border_color}`
-  }
-  if (editedTag.value.fill_color.length == 6) {
-    editedTag.value.fill_color = `#${editedTag.value.fill_color}`
-  }
-
   try {
     processingRequest.value = true
     if (isNew) {

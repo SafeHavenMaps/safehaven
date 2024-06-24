@@ -35,11 +35,12 @@ const emit = defineEmits(['update:modelValue', 'update:invalid'])
 
 function isHexColor(colorText: string | undefined) {
   if (colorText == undefined) return false
-  if (colorText[0] == '#') return colorText.length === 7 && [...colorText.slice(1)].every(c => '0123456789abcdefABCDEF'.includes(c))
-  return colorText.length === 6 && [...colorText].every(c => '0123456789abcdefABCDEF'.includes(c))
+  return colorText.length === 7 && [...colorText.slice(1)].every(c => '0123456789abcdefABCDEF'.includes(c))
 }
 
 function updateValue(value: string | undefined) {
+  if (value && value[0] !== '#')
+    value = '#' + value
   emit('update:modelValue', value)
   emit('update:invalid', !isHexColor(value))
 }

@@ -123,13 +123,6 @@ function hasBeenEdited(field: keyof NewOrUpdateCategory) {
 async function onSave() {
   processingRequest.value = true
   try {
-    if (editedCategory.value.border_color.length == 6) {
-      editedCategory.value.border_color = `#${editedCategory.value.border_color}`
-    }
-    if (editedCategory.value.fill_color.length == 6) {
-      editedCategory.value.fill_color = `#${editedCategory.value.fill_color}`
-    }
-
     if (isNew) {
       const { id } = await state.createCategory(editedCategory.value)
       navigateTo(`/admin/${familyId}/categories/new-icon-${id}`)

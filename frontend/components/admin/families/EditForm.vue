@@ -760,13 +760,6 @@ async function onSave() {
         field.user_facing = true
         field.display_weight = pseudo_display_index
       }
-      if (field.field_type == 'EventList') {
-        field.field_type_metadata?.event_types.forEach((event_type) => {
-          if (event_type.color.length == 6) {
-            event_type.color = `#${event_type.color}`
-          }
-        })
-      }
     }
   }
   // Send the request to the server and process the response
