@@ -160,7 +160,7 @@
                   option-label="label"
                   option-value="value"
                   :options="[{ value: 'notDisplayed', label: 'Non-affiché publiquement' }, ...Array.from({ length: max_display_index }, (_, i) => ({ value: i + 1, label: i + 1 }))]"
-                  @update:model-value="(new_index : 'notDisplayed' | number) => onDisplayIndexChange(field.key, new_index) "
+                  @update:model-value="(new_index : 'notDisplayed' | number) => onDisplayIndexChange(field, new_index) "
                 /> <!--  field.user_facing -->
               </span>
               <span class="flex items-center gap-8">
@@ -177,6 +177,8 @@
                   v-model="field.indexed"
                   label="Recherchable"
                   :variant="hasFieldAttributeBeenEdited(index, 'indexed')"
+                  :disabled="display_indexes[field.key]=='notDisplayed'
+                    || !indexableTypes.includes(field.field_type)"
                 />
               </span>
             </div>
@@ -562,6 +564,8 @@ edited_form_fields.value.forEach((field) => {
   }
 })
 
+const indexableTypes = ['SingleLineText', 'MultiLineText', 'EnumSingleOption', 'EnumMultiOption']
+
 function hasFieldAttributeBeenEdited(index: number, attribute: keyof FormField) {
   return index < props.originalFormFields.length
     && edited_form_fields.value[index][attribute] !== props.originalFormFields[index][attribute]
@@ -643,8 +647,8 @@ function onKeyChange(field_to_modify: FormField, new_key: string) {
   display_indexes.value[new_key] = display_index
 }
 
-function onDisplayIndexChange(key: string, new_display_index: 'notDisplayed' | number | null) {
-  const old_display_index = display_indexes.value[key]
+function onDisplayIndexChange(field: FormField, new_display_index: 'notDisplayed' | number | null) {
+  const old_display_index = display_indexes.value[field.key]
   if (old_display_index === new_display_index) return
   if (old_display_index === 'notDisplayed') {
     max_display_index.value += 1
@@ -658,6 +662,7 @@ function onDisplayIndexChange(key: string, new_display_index: 'notDisplayed' | n
     })
   }
   if (new_display_index === 'notDisplayed' || new_display_index === null) {
+    field.indexed = false
     max_display_index.value -= 1
   }
   else {
@@ -670,9 +675,9 @@ function onDisplayIndexChange(key: string, new_display_index: 'notDisplayed' | n
   }
   if (new_display_index === null)
   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete display_indexes.value[key]
+    delete display_indexes.value[field.key]
   else
-    display_indexes.value[key] = new_display_index
+    display_indexes.value[field.key] = new_display_index
 }
 
 function onFieldTypeChange(field: FormField) {
@@ -700,12 +705,15 @@ function onFieldTypeChange(field: FormField) {
       field.field_type_metadata = null
       break
   }
+  if (!indexableTypes.includes(field.field_type)) {
+    field.indexed = false
+  }
 }
 
 function onFieldDelete(key: string) {
   const index = edited_form_fields.value.findIndex(field => field.key === key)
+  onDisplayIndexChange(edited_form_fields.value[index], 'notDisplayed')
   edited_form_fields.value.splice(index, 1)
-  onDisplayIndexChange(key, 'notDisplayed')
   updatePageCount()
 }
 
