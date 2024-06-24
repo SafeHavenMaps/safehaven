@@ -18,10 +18,26 @@
     />
 
     <AdminInputTextField
+      id="entity_form_title"
+      v-model="editedFamily.entity_form.help"
+      label="Texte d'aide du formulaire d'ajout d'entité"
+      :variant="editedFamily.entity_form.help !== fetchedFamily.entity_form.help"
+      text-length="long"
+    />
+
+    <AdminInputTextField
       id="comment_form_title"
       v-model="editedFamily.comment_form.title"
       label="Titre du formulaire d'ajout de commentaire"
       :variant="editedFamily.comment_form.title !== fetchedFamily.comment_form.title"
+    />
+
+    <AdminInputTextField
+      id="comment_form_help"
+      v-model="editedFamily.comment_form.help"
+      label="Texte d'aide du formulaire d'ajout de commentaire"
+      :variant="editedFamily.comment_form.help !== fetchedFamily.comment_form.help"
+      text-length="long"
     />
 
     <span class="flex items-center gap-2">

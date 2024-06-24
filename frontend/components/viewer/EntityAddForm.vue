@@ -19,6 +19,7 @@
         class="flex grow flex-col gap-4"
       >
         <template v-if="page == 0">
+          <span v-if="props.family.entity_form.help">{{ props.family.entity_form.help }}</span>
           <AdminInputTextField
             id="display_name"
             v-model="editedEntity.display_name"
@@ -73,6 +74,7 @@
         class="flex grow flex-col gap-4"
       >
         <template v-if="page == 0">
+          <span v-if="props.family.comment_form.help">{{ props.family.comment_form.help }}</span>
           <AdminInputTextField
             id="author"
             v-model="editedComment.author"

@@ -29,6 +29,7 @@
       class="flex grow flex-col gap-4"
       @submit.prevent="curr_page+=1"
     >
+      <span v-if="props.family.comment_form.help">{{ props.family.comment_form.help }}</span>
       <AdminInputTextField
         id="author"
         v-model="editedComment!.author"

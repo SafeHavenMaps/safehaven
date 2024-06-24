@@ -3597,6 +3597,11 @@
               "$ref": "#/components/schemas/Field"
             }
           },
+          "help": {
+            "type": "string",
+            "description": "The help text is used to show additional information about the form in the UI",
+            "nullable": true
+          },
           "title": {
             "type": "string"
           }

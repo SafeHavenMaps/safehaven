@@ -8,6 +8,8 @@ use uuid::Uuid;
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct Form {
     pub title: String,
+    /// The help text is used to show additional information about the form in the UI
+    pub help: Option<String>,
     pub fields: Vec<Field>,
 }
 
