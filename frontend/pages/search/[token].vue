@@ -205,7 +205,17 @@ const toast = useToast()
 // Init state with url token
 const route = useRoute()
 const token = route.params.token as string
-await state.bootstrapWithToken(token) // TODO: Redirect to 404 if token is invalid
+try {
+  await state.bootstrapWithToken(token)
+}
+catch {
+  toast.add({
+    severity: 'error',
+    summary: 'Erreur',
+    detail: 'Impossible de charger la carte',
+    life: 3000,
+  })
+}
 
 const query = ref('')
 const currentPage = ref(1)

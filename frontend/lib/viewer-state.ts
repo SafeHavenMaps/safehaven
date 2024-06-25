@@ -24,7 +24,7 @@ type AllowedCategory = Category & { allowed: boolean }
 type AllowedTag = Tag & { allowed: boolean }
 
 export class AppState {
-  initialized = false
+  public initialized = false
 
   private _client: ReturnType<typeof useClient> | null = null
 
@@ -217,10 +217,14 @@ export class AppState {
     this.initConfig = await this.client.checkStatus()
   }
 
-  async bootstrapWithToken(token: string, preventFullReload: boolean = false) {
+  async bootstrapWithToken(token: string) {
+    if (this.initialized) return
+
+    const data = await this.client.bootstrap(token)
+
     this.client.onAuthenticationFailed(async () => {
       try {
-        await this.bootstrapWithToken(token, true)
+        await this.client.bootstrap(token)
       }
       catch {
         if (state.redirectUrl) {
@@ -228,10 +232,6 @@ export class AppState {
         }
       }
     })
-
-    const data = await this.client.bootstrap(token)
-
-    if (preventFullReload) return
 
     this.familiesData = data.families
       .sort((a, b) => a.sort_order - b.sort_order)
