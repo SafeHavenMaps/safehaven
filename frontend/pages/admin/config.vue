@@ -2,7 +2,7 @@
   <Tabs value="0">
     <TabList>
       <Tab value="0">
-        General
+        Général
       </Tab>
       <Tab value="1">
         Carte - Initialisation
@@ -20,6 +20,8 @@
           class="flex flex-col gap-4 max-w-[30rem] mx-6"
           @submit.prevent="onSave('general', editedConfig.general)"
         >
+          {{ isOptionValid({ group: 'general', name: 'popup' }) }}
+          {{ editedConfig.general.popup }}
           <AdminInputTextField
             id="title"
             v-model="editedConfig.general.title"
@@ -45,7 +47,7 @@
           <AdminInputTextField
             id="logo_url"
             v-model="editedConfig.general.logo_url"
-            label="URL du Logo"
+            label="URL du logo"
             :variant="hasBeenEdited('general', 'logo_url')"
             :invalid="!editedConfig.general.logo_url || !validator.isURL(editedConfig.general.logo_url)"
           />
@@ -60,7 +62,7 @@
             v-if="popupEnabled"
             id="popup"
             v-model="editedConfig.general.popup"
-            label="Popup d'Accueil"
+            label="Popup d'accueil"
             :variant="hasBeenEdited('general', 'popup')"
             text-length="editor"
           />
@@ -76,7 +78,7 @@
             v-if="popupEnabled && popupCheckboxEnabled"
             id="popup"
             v-model="editedConfig.general.popup_check_text"
-            label="Case à Cocher de la Popup d'Accueil"
+            label="Texte accompagnant la case à cocher de la popup d'accueil"
             :variant="hasBeenEdited('general', 'popup_check_text')"
           />
 
@@ -90,7 +92,7 @@
             v-if="customRedirection"
             id="redirect_url"
             v-model="editedConfig.general.redirect_url"
-            label="URL de Redirection"
+            label="URL de redirection"
             :variant="hasBeenEdited('general', 'redirect_url')"
             :invalid="!editedConfig.general.redirect_url || !validator.isURL(editedConfig.general.redirect_url)"
           />
@@ -112,7 +114,7 @@
               v-if="state.is_admin"
               label="Sauvegarder"
               type="submit"
-              :disabled="processingRequest"
+              :disabled="processingRequest || !isOptionGroupValid('general')"
             />
           </span>
         </form>
@@ -189,7 +191,7 @@
               v-if="state.is_admin"
               label="Sauvegarder"
               type="submit"
-              :disabled="processingRequest"
+              :disabled="processingRequest || !isOptionGroupValid('cartography_init')"
             />
           </span>
         </form>
@@ -202,21 +204,21 @@
           <AdminInputNumberField
             id="characteristic_distance"
             v-model="editedConfig.cartography_cluster.characteristic_distance"
-            label="Distance Caractéristique"
+            label="Distance caractéristique"
             :variant="hasBeenEdited('cartography_cluster', 'characteristic_distance')"
           />
 
           <AdminInputNumberField
             id="declustering_speed"
             v-model="editedConfig.cartography_cluster.declustering_speed"
-            label="Vitesse de Dégroupement"
+            label="Vitesse de dégroupement"
             :variant="hasBeenEdited('cartography_cluster', 'declustering_speed')"
           />
 
           <AdminInputNumberField
             id="minimal_cluster_size"
             v-model="editedConfig.cartography_cluster.minimal_cluster_size"
-            label="Taille Minimale du Cluster"
+            label="Taille minimale du cluster"
             :variant="hasBeenEdited('cartography_cluster', 'minimal_cluster_size')"
           />
 
@@ -237,7 +239,7 @@
               v-if="state.is_admin"
               label="Sauvegarder"
               type="submit"
-              :disabled="processingRequest"
+              :disabled="processingRequest || !isOptionGroupValid('cartography_cluster')"
             />
           </span>
         </form>
@@ -288,7 +290,7 @@
               v-if="state.is_admin"
               label="Sauvegarder"
               type="submit"
-              :disabled="processingRequest"
+              :disabled="processingRequest || !isOptionGroupValid('safe_mode')"
             />
           </span>
         </form>
@@ -302,6 +304,7 @@ import validator from 'validator'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { ConfigurationOption, SafeHavenOptions } from '~/lib'
 import state from '~/lib/admin-state'
+import { isValidNumber, isValidRichText, isValidText, isValidUrl } from '~/lib/validation'
 
 await state.fetchConfig()
 let fetchedConfig = state.options
@@ -315,20 +318,29 @@ const popupCheckboxEnabled = ref(!!editedConfig.value.general.popup_check_text)
 const customRedirection = ref(!!editedConfig.value.general.redirect_url)
 
 watch(popupEnabled, (value) => {
-  if (!value) {
+  if (value) {
+    editedConfig.value.general.popup = ''
+  }
+  else {
     editedConfig.value.general.popup = null
     popupCheckboxEnabled.value = false
   }
 })
 
 watch(popupCheckboxEnabled, (value) => {
-  if (!value) {
+  if (value) {
+    editedConfig.value.general.popup_check_text = ''
+  }
+  else {
     editedConfig.value.general.popup_check_text = null
   }
 })
 
 watch(customRedirection, (value) => {
-  if (!value) {
+  if (value) {
+    editedConfig.value.general.redirect_url = ''
+  }
+  else {
     editedConfig.value.general.redirect_url = null
   }
 })
@@ -353,6 +365,92 @@ initAdminLayout(
     { label: 'Configuration', url: '/admin/config' },
   ],
 )
+
+// Define the OptionValidation type as a union of specific group-name pairs
+type OptionValidation =
+  { group: 'general', name: keyof SafeHavenOptions['general'] }
+  | { group: 'safe_mode', name: keyof SafeHavenOptions['safe_mode'] }
+  | { group: 'cartography_init', name: keyof SafeHavenOptions['cartography_init'] }
+  | { group: 'cartography_cluster', name: keyof SafeHavenOptions['cartography_cluster'] }
+
+// Function to validate individual options based on the group and name properties
+function isOptionValid(option: OptionValidation): boolean {
+  const config = editedConfig.value
+
+  switch (option.group) {
+    case 'general':
+      switch (option.name) {
+        case 'title':
+        case 'subtitle':
+          return isValidText(config.general[option.name])
+        case 'information':
+          return isValidRichText(config.general[option.name])
+        case 'popup':
+          return config.general[option.name] === null || isValidText(config.general[option.name])
+        case 'popup_check_text':
+          return config.general[option.name] === null || isValidText(config.general[option.name])
+        case 'logo_url':
+          return !config.general[option.name] || isValidUrl(config.general[option.name])
+        case 'redirect_url':
+          return config.general[option.name] === null || isValidUrl(config.general[option.name])
+      }
+      break
+
+    case 'safe_mode':
+      switch (option.name) {
+        case 'enabled':
+          return config.safe_mode[option.name] != null
+        case 'hcaptcha_sitekey':
+        case 'hcaptcha_secret':
+          return !config.safe_mode.enabled || isValidText(config.safe_mode[option.name])
+      }
+      break
+
+    case 'cartography_init':
+      switch (option.name) {
+        case 'center_lat':
+        case 'center_lng':
+        case 'zoom':
+          return isValidNumber(config.cartography_init[option.name])
+        case 'light_map_url':
+        case 'dark_map_url':
+          return isValidUrl(config.cartography_init[option.name])
+        case 'light_map_attributions':
+        case 'dark_map_attributions':
+          return isValidText(config.cartography_init[option.name])
+      }
+      break
+
+    case 'cartography_cluster':
+      switch (option.name) {
+        case 'characteristic_distance':
+        case 'declustering_speed':
+        case 'minimal_cluster_size':
+          return isValidNumber(config.cartography_cluster[option.name])
+      }
+      break
+  }
+}
+
+function isOptionGroupValid(group: OptionValidation['group']): boolean {
+  switch (group) {
+    case 'general':
+      return (['title', 'popup', 'popup_check_text', 'logo_url', 'redirect_url'] as Array<keyof SafeHavenOptions['general']>)
+        .every(name => isOptionValid({ group: 'general', name }))
+
+    case 'safe_mode':
+      return (['hcaptcha_sitekey', 'hcaptcha_secret'] as Array<keyof SafeHavenOptions['safe_mode']>)
+        .every(name => isOptionValid({ group: 'safe_mode', name }))
+
+    case 'cartography_init':
+      return (['center_lat', 'center_lng', 'zoom', 'light_map_url', 'dark_map_url'] as Array<keyof SafeHavenOptions['cartography_init']>)
+        .every(name => isOptionValid({ group: 'cartography_init', name }))
+
+    case 'cartography_cluster':
+      return (['characteristic_distance', 'declustering_speed', 'minimal_cluster_size'] as Array<keyof SafeHavenOptions['cartography_cluster']>)
+        .every(name => isOptionValid({ group: 'cartography_cluster', name }))
+  }
+}
 
 async function onSave(name: keyof SafeHavenOptions, config: ConfigurationOption) {
   processingRequest.value = true
