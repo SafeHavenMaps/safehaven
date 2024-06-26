@@ -41,9 +41,11 @@
         <InputText
           v-model="downloadFromUrl"
           placeholder="http://url.com/icon.svg"
+          :invalid="!isValidUrl(downloadFromUrl)"
         />
         <Button
           label="Sauvegarder"
+          :disabled="!isValidUrl(downloadFromUrl)"
           @click="downloadImage"
         />
         <small>Télecharger depuis une url </small>
@@ -55,6 +57,7 @@
 <script setup lang="ts">
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
+import { isValidUrl } from '~/lib/validation'
 
 const toast = useToast()
 const props = defineProps<{
@@ -67,14 +70,6 @@ const uploadToUrl = `/api/admin/${props.objectType}/${props.objectId}/icon`
 const downloadFromUrl = ref('')
 
 const downloadImage = async () => {
-  try {
-    new URL(downloadFromUrl.value)
-  }
-  catch (_error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Please enter a valid image URL.', life: 3000 })
-    return
-  }
-
   try {
     const response = await fetch(downloadFromUrl.value)
     if (!response.ok) {

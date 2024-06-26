@@ -8,7 +8,6 @@
       v-model="editedCategory.title"
       label="Titre"
       :variant="hasBeenEdited('title')"
-      :invalid="!editedCategory.title"
     />
 
     <AdminInputSwitchField
@@ -21,7 +20,6 @@
     <AdminInputColorField
       id="border_color"
       v-model="editedCategory.border_color"
-      :invalid="!validator.isHexColor(editedCategory.border_color)"
       label="Couleur de bordure"
       :variant="hasBeenEdited('border_color')"
     />
@@ -29,7 +27,6 @@
     <AdminInputColorField
       id="fill_color"
       v-model="editedCategory.fill_color"
-      :invalid="!validator.isHexColor(editedCategory.fill_color)"
       label="Couleur de remplissage"
       :variant="hasBeenEdited('fill_color')"
     />
@@ -58,10 +55,10 @@
 </template>
 
 <script setup lang="ts">
-import validator from 'validator'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdateCategory } from '~/lib'
 import state from '~/lib/admin-state'
+import { isValidHexColor, isValidText } from '~/lib/validation'
 
 definePageMeta({
   layout: 'admin-ui',
@@ -93,9 +90,9 @@ const toast = useToast()
 
 function isDisabled() {
   return processingRequest.value
-    || !editedCategory.value.title
-    || !validator.isHexColor(editedCategory.value.border_color)
-    || !validator.isHexColor(editedCategory.value.fill_color)
+    || !isValidText(editedCategory.value.title)
+    || !isValidHexColor(editedCategory.value.border_color)
+    || !isValidHexColor(editedCategory.value.fill_color)
 }
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!

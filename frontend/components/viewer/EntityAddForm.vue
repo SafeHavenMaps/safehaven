@@ -144,6 +144,7 @@ import { ref, defineProps } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import type { Category, EntityOrCommentData, Family, FormField, PublicNewComment, PublicNewEntity } from '~/lib'
 import state from '~/lib/viewer-state'
+import { isValidRichText, isValidText } from '~/lib/validation'
 
 defineExpose({ open, close, toggle })
 
@@ -256,14 +257,14 @@ function commentFieldsSortedByPage(page: number) {
 
 function isEntityPageValid(page: number) {
   if (page === 0) {
-    return editedEntity.value.display_name && editedEntity.value.category_id
+    return isValidText(editedEntity.value.display_name) && isValidText(editedEntity.value.category_id)
   }
   return entityFieldsSortedByPage(page).every(field => entityFieldValid.value[field.key])
 }
 
 function isCommentPageValid(page: number) {
   if (page === 0) {
-    return editedComment.value.author && editedComment.value.text
+    return isValidText(editedComment.value.author) && isValidRichText(editedComment.value.text)
   }
   return commentFieldsSortedByPage(page).every(field => commentFieldValid.value[field.key])
 }

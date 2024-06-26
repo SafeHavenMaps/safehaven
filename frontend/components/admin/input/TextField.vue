@@ -6,7 +6,7 @@
       :id="props.id"
       :model-value="props.modelValue"
       :variant="props.variant ? 'filled': 'outlined'"
-      :invalid="(!props.optional && !props.modelValue) || props.invalid"
+      :invalid="(!props.optional && !isValidText(props.modelValue)) || props.invalid"
       @update:model-value="updateValue"
     />
     <Textarea
@@ -14,7 +14,7 @@
       :id="props.id"
       :model-value="props.modelValue"
       :variant="props.variant ? 'filled': 'outlined'"
-      :invalid="(!props.optional && !props.modelValue) || props.invalid"
+      :invalid="(!props.optional && !isValidText(props.modelValue)) || props.invalid"
       @update:model-value="updateValue"
     />
     <Editor
@@ -22,6 +22,7 @@
       :id="props.id"
       :model-value="props.modelValue!"
       editor-style="height:320px"
+      :invalid="(!props.optional && !isValidRichText(props.modelValue)) || props.invalid"
       @update:model-value="updateValue"
     />
     <small v-if="props.helperText">{{ props.helperText }}</small>
@@ -30,6 +31,7 @@
 
 <script setup lang="ts">
 import Editor from 'primevue/editor'
+import { isValidRichText, isValidText } from '~/lib/validation'
 
 const props = defineProps<{
   id: string

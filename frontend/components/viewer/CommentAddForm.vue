@@ -114,6 +114,7 @@
 
 <script setup lang="ts">
 import type { EntityOrCommentData, Family, FormField, PublicEntity, PublicNewComment } from '~/lib'
+import { isValidRichText, isValidText } from '~/lib/validation'
 import state from '~/lib/viewer-state'
 
 const formVisible = ref(false)
@@ -173,7 +174,7 @@ function commentFieldsSortedByPage(page: number) {
 
 function isCommentPageValid(page: number) {
   if (page === 0) {
-    return editedComment.value!.author && editedComment.value!.text
+    return isValidText(editedComment.value!.author) && isValidRichText(editedComment.value!.text)
   }
   return commentFieldsSortedByPage(page).every(field => commentFieldValid.value[field.key])
 }

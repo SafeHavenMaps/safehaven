@@ -79,6 +79,7 @@
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdatedUser } from '~/lib'
 import state from '~/lib/admin-state'
+import { isValidText } from '~/lib/validation'
 
 const userId = useRoute().params.id as string
 
@@ -102,8 +103,8 @@ definePageMeta({
 
 function isDisabled() {
   return processingRequest.value
-    || (editPassword.value && (newPassword.value != newPasswordConfirm.value || !newPassword.value))
-    || !user.value.name
+    || (editPassword.value && (newPassword.value != newPasswordConfirm.value || !!isValidText(newPassword.value)))
+    || !isValidText(user.value.name)
 }
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!

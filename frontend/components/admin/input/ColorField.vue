@@ -5,7 +5,7 @@
         :id="props.id"
         :model-value="props.modelValue"
         :variant="props.variant ? 'filled': 'outlined'"
-        :invalid="props.invalid"
+        :invalid="!isValidHexColor(props.modelValue)"
         @update:model-value="updateValue"
       />
       <ColorPicker
@@ -22,26 +22,21 @@
 </template>
 
 <script setup lang="ts">
+import { isValidHexColor } from '~/lib/validation'
+
 const props = defineProps<{
   id: string
   label: string
   modelValue: string | undefined
   variant?: boolean
-  invalid: boolean
   helperText?: string
 }>()
 
 const emit = defineEmits(['update:modelValue', 'update:invalid'])
 
-function isHexColor(colorText: string | undefined) {
-  if (colorText == undefined) return false
-  return colorText.length === 7 && [...colorText.slice(1)].every(c => '0123456789abcdefABCDEF'.includes(c))
-}
-
 function updateValue(value: string | undefined) {
   if (value && value[0] !== '#')
     value = '#' + value
   emit('update:modelValue', value)
-  emit('update:invalid', !isHexColor(value))
 }
 </script>

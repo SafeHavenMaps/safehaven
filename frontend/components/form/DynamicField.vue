@@ -189,6 +189,7 @@
 import DatePicker from 'primevue/datepicker'
 import validator from 'validator'
 import type { EntityOrCommentEvent, FieldContentMap, FormField } from '~/lib'
+import { isValidNumber, isValidRichText, isValidText } from '~/lib/validation'
 
 type FormProps<T extends FormField> = {
   fieldContent: FieldContentMap[T['field_type']]
@@ -201,10 +202,26 @@ const props = defineProps<FormProps<FormField>>()
 const emit = defineEmits(['update:fieldContent', 'isValid'])
 const hasLostFocus = ref(false)
 const isValid = computed(() => {
-  // if the field is missing, it's only valid if optional
-  if (props.fieldContent == null || props.fieldContent === '')
+  // if the field is missing or empty, it's only valid if optional
+  let isValidUnformatted = !(props.fieldContent == null)
+  switch (props.formField.field_type) {
+    case 'SingleLineText':
+    case 'MultiLineText':
+      isValidUnformatted = isValidText(props.fieldContent as string)
+      break
+    case 'RichText':
+      isValidUnformatted = isValidRichText(props.fieldContent as string)
+      break
+    case 'DiscreteScore':
+    case 'Number':
+      isValidUnformatted = isValidNumber(props.fieldContent as number)
+      break
+  }
+
+  if (!isValidUnformatted)
     return !props.formField.mandatory
 
+  // otherwise if it has a required format we need to check it against this format
   if (!props.formField.field_type_metadata || !('format' in props.formField.field_type_metadata))
     return true
 

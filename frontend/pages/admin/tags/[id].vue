@@ -8,7 +8,6 @@
       v-model="editedTag.title"
       label="Titre"
       :variant="hasBeenEdited('title')"
-      :invalid="!editedTag.title"
     />
 
     <AdminInputSwitchField
@@ -32,7 +31,6 @@
       label="Description du filtre"
       :variant="hasBeenEdited('filter_description')"
       helper-text="(description exposée aux utilisateurices)"
-      :invalid="editedTag.is_filter && !editedTag.filter_description"
     />
 
     <AdminInputColorField
@@ -40,7 +38,6 @@
       v-model="editedTag.border_color"
       label="Couleur de bordure"
       :variant="hasBeenEdited('border_color')"
-      :invalid="!validator.isHexColor(editedTag.border_color)"
     />
 
     <AdminInputColorField
@@ -48,7 +45,6 @@
       v-model="editedTag.fill_color"
       label="Couleur de remplissage"
       :variant="hasBeenEdited('fill_color')"
-      :invalid="!validator.isHexColor(editedTag.fill_color)"
     />
 
     <span class="flex gap-1 justify-end">
@@ -71,10 +67,10 @@
 </template>
 
 <script setup lang="ts">
-import validator from 'validator'
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdateTag } from '~/lib'
 import state from '~/lib/admin-state'
+import { isValidHexColor, isValidText } from '~/lib/validation'
 
 definePageMeta({
   layout: 'admin-ui',
@@ -101,10 +97,10 @@ const toast = useToast()
 
 function isDisabled() {
   return processingRequest.value
-    || !editedTag.value.title
-    || (editedTag.value.is_filter && !editedTag.value.filter_description)
-    || !validator.isHexColor(editedTag.value.border_color)
-    || !validator.isHexColor(editedTag.value.fill_color)
+    || !isValidText(editedTag.value.title)
+    || (editedTag.value.is_filter && !isValidText(editedTag.value.filter_description))
+    || !isValidHexColor(editedTag.value.border_color)
+    || !isValidHexColor(editedTag.value.fill_color)
 }
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!

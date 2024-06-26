@@ -8,7 +8,6 @@
       v-model="editedAccessToken.title"
       label="Titre"
       :variant="hasBeenEdited('title')"
-      :invalid="!editedAccessToken.title"
     />
 
     <AdminInputTextField
@@ -17,7 +16,6 @@
       label="Jeton"
       :variant="hasBeenEdited('token')"
       helper-text="(utilisé dans l'url d'accès après /map/ ou /search/)"
-      :invalid="!editedAccessToken.token"
     />
 
     <AdminInputSwitchField
@@ -82,6 +80,7 @@
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdateAccessToken, Permissions } from '~/lib'
 import state from '~/lib/admin-state'
+import { isValidText } from '~/lib/validation'
 
 definePageMeta({
   layout: 'admin-ui',
@@ -143,8 +142,8 @@ initAdminLayout(
 
 function isDisabled() {
   return processingRequest.value
-    || !editedAccessToken.value.title
-    || !editedAccessToken.value.token
+    || !isValidText(editedAccessToken.value.title)
+    || !isValidText(editedAccessToken.value.token)
 }
 
 function hasBeenEdited(field: keyof NewOrUpdateAccessToken) {
