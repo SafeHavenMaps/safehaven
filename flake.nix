@@ -139,25 +139,64 @@
               }
             }
           }
-
         '';
 
-        processConfigFile = pkgs.writeText "process.yaml" ''
-          version: "0.5"
-          processes:
-            backend:
-              command: cargo run -- serve
-              working_dir: ./backend
-            frontend:
-              command: npm run dev
-              working_dir: ./frontend
-            reverse:
-              command: ${pkgs.nginx}/bin/nginx -c ${nginxConfigFile}
-        '';
+        processConfigFile = includeDatabase: (
+          let
+            processes =
+              {
+                backend = {
+                  command = "cargo run -- serve";
+                  working_dir = "./backend";
+                };
+                frontend = {
+                  command = "npm run dev";
+                  working_dir = "./frontend";
+                };
+                reverse = {
+                  command = "${pkgs.nginx}/bin/nginx -c ${nginxConfigFile}";
+                };
+              }
+              // (
+                if includeDatabase
+                then {
+                  database = {
+                    command = "postgres -D ./.pgdata";
+                  };
+                }
+                else {}
+              );
+          in
+            pkgs.writeText "process.yaml" (builtins.toJSON {
+              version = "0.5";
+              processes = processes;
+            })
+        );
 
         startDevEnv = pkgs.writeShellScriptBin "start_dev_env" ''
           set -e
-          ${pkgs.process-compose}/bin/process-compose -f ${processConfigFile}
+
+          if [ "$1" = "db" ]; then
+            if [ ! -d "./.pgdata" ]; then
+              echo "Preparing the database"
+
+              initdb -D ./.pgdata -U postgres
+
+              echo 'local all all trust'              >  ./.pgdata/pg_hba.conf
+              echo 'host all all 127.0.0.1/32 trust'  >> ./.pgdata/pg_hba.conf
+              echo 'host all all ::1/128 trust'       >> ./.pgdata/pg_hba.conf
+
+              echo "unix_socket_directories = '$PWD/.pgdata'" >> ./.pgdata/postgresql.conf
+
+              pg_ctl -D ./.pgdata -l ./.pgdata/logfile start
+              createdb -h localhost -U postgres safehaven
+              pg_ctl -D ./.pgdata stop
+            fi
+
+            ${pkgs.process-compose}/bin/process-compose -f ${processConfigFile true}
+          else
+            ${pkgs.process-compose}/bin/process-compose -f ${processConfigFile false}
+          fi
         '';
 
         # Version when compiling the packages
@@ -234,6 +273,8 @@
               alejandra.defaultPackage.${system}
               # Process composing
               process-compose
+              # PostgreSQL and PostGIS
+              (postgresql_16.withPackages (p: with p; [postgis]))
             ];
             DATABASE_URL = "postgres://postgres:postgres@localhost:5432/safehaven";
           };
