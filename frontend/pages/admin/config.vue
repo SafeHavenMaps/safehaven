@@ -20,8 +20,6 @@
           class="flex flex-col gap-4 max-w-[30rem] mx-6"
           @submit.prevent="onSave('general', editedConfig.general)"
         >
-          {{ isOptionValid({ group: 'general', name: 'popup' }) }}
-          {{ editedConfig.general.popup }}
           <AdminInputTextField
             id="title"
             v-model="editedConfig.general.title"
@@ -47,9 +45,10 @@
           <AdminInputTextField
             id="logo_url"
             v-model="editedConfig.general.logo_url"
+            optional
             label="URL du logo"
             :variant="hasBeenEdited('general', 'logo_url')"
-            :invalid="!editedConfig.general.logo_url || !validator.isURL(editedConfig.general.logo_url)"
+            :invalid="!isOptionValid({ group: 'general', name: 'logo_url' })"
           />
 
           <AdminInputSwitchField
@@ -376,7 +375,6 @@ type OptionValidation =
 // Function to validate individual options based on the group and name properties
 function isOptionValid(option: OptionValidation): boolean {
   const config = editedConfig.value
-
   switch (option.group) {
     case 'general':
       switch (option.name) {
@@ -409,9 +407,11 @@ function isOptionValid(option: OptionValidation): boolean {
     case 'cartography_init':
       switch (option.name) {
         case 'center_lat':
+          return isValidNumber(config.cartography_init[option.name], { min: -90, max: 90 })
         case 'center_lng':
+          return isValidNumber(config.cartography_init[option.name], { min: -180, max: 180 })
         case 'zoom':
-          return isValidNumber(config.cartography_init[option.name])
+          return isValidNumber(config.cartography_init[option.name], { min: 1, max: 30 })
         case 'light_map_url':
         case 'dark_map_url':
           return isValidUrl(config.cartography_init[option.name])
@@ -424,9 +424,11 @@ function isOptionValid(option: OptionValidation): boolean {
     case 'cartography_cluster':
       switch (option.name) {
         case 'characteristic_distance':
-        case 'declustering_speed':
-        case 'minimal_cluster_size':
           return isValidNumber(config.cartography_cluster[option.name])
+        case 'declustering_speed':
+          return isValidNumber(config.cartography_cluster[option.name])
+        case 'minimal_cluster_size':
+          return isValidNumber(config.cartography_cluster[option.name], { min: 0 })
       }
       break
   }
@@ -435,19 +437,19 @@ function isOptionValid(option: OptionValidation): boolean {
 function isOptionGroupValid(group: OptionValidation['group']): boolean {
   switch (group) {
     case 'general':
-      return (['title', 'popup', 'popup_check_text', 'logo_url', 'redirect_url'] as Array<keyof SafeHavenOptions['general']>)
+      return (Object.keys(editedConfig.value.general) as Array<keyof SafeHavenOptions['general']>)
         .every(name => isOptionValid({ group: 'general', name }))
 
     case 'safe_mode':
-      return (['hcaptcha_sitekey', 'hcaptcha_secret'] as Array<keyof SafeHavenOptions['safe_mode']>)
+      return (Object.keys(editedConfig.value.safe_mode) as Array<keyof SafeHavenOptions['safe_mode']>)
         .every(name => isOptionValid({ group: 'safe_mode', name }))
 
     case 'cartography_init':
-      return (['center_lat', 'center_lng', 'zoom', 'light_map_url', 'dark_map_url'] as Array<keyof SafeHavenOptions['cartography_init']>)
+      return (Object.keys(editedConfig.value.cartography_init) as Array<keyof SafeHavenOptions['cartography_init']>)
         .every(name => isOptionValid({ group: 'cartography_init', name }))
 
     case 'cartography_cluster':
-      return (['characteristic_distance', 'declustering_speed', 'minimal_cluster_size'] as Array<keyof SafeHavenOptions['cartography_cluster']>)
+      return (Object.keys(editedConfig.value.cartography_cluster) as Array<keyof SafeHavenOptions['cartography_cluster']>)
         .every(name => isOptionValid({ group: 'cartography_cluster', name }))
   }
 }

@@ -4,8 +4,9 @@ export function isValidText(s: string | undefined | null) {
   return typeof s == 'string' && s.trim().length > 0
 }
 
-export function isValidRichText(s: string | undefined | null) {
-  return typeof s == 'string' && s.trim().length > 0
+export function isValidRichText(richText: string | undefined | null) {
+  const textOrImageRegex = /img|>\s*[^<\s]/
+  return typeof richText == 'string' && textOrImageRegex.test(richText)
 }
 
 export function isValidUrl(s: string | undefined | null) {
@@ -23,6 +24,9 @@ export function isValidHexColor(colorText: string | undefined | null) {
     && [...colorText.slice(1)].every(c => '0123456789abcdefABCDEF'.includes(c))
 }
 
-export function isValidNumber(s: number | undefined | null) {
-  return !Number.isNaN(s)
+export function isValidNumber(n: number | undefined | null, limits?: { min?: number, max?: number }) {
+  return typeof n == 'number'
+    && !isNaN(n)
+    && (limits?.min == undefined || limits.min <= n)
+    && (limits?.max == undefined || limits.max >= n)
 }
