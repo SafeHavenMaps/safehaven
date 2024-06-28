@@ -32,8 +32,9 @@ use crate::{
         },
         family::{Family, Field, FieldType, Form, NewOrUpdateFamily},
         options::{
-            CartographyClusterConfig, CartographyInitConfig, ConfigurationOption, GeneralOptions,
-            SafeHavenOptions, SafeModeConfig,
+            CartographyClusterConfig, CartographyInitConfig, CartographySourceConfig,
+            ConfigurationOption, GeneralOptions, InitPopupOptions, SafeHavenOptions,
+            SafeModeConfig,
         },
         statistics::HomePageStats,
         tag::{NewOrUpdateTag, Tag},
@@ -132,8 +133,10 @@ use utoipa::OpenApi;
         SafeHavenOptions,
         ConfigurationOption,
         GeneralOptions,
+        InitPopupOptions,
         SafeModeConfig,
         CartographyInitConfig,
+        CartographySourceConfig,
         CartographyClusterConfig,
         // families
         Family,

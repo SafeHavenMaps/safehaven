@@ -1,5 +1,7 @@
 use crate::api::{AppError, AppJson, AppState, DbConn, MapUserTokenClaims};
-use crate::models::options::{CartographyInitConfig, GeneralOptions};
+use crate::models::options::{
+    CartographyInitConfig, CartographySourceConfig, GeneralOptions, InitPopupOptions,
+};
 use crate::models::{access_token::AccessToken, category::Category, family::Family, tag::Tag};
 use axum::extract::{Query, State};
 use axum::{
@@ -23,6 +25,9 @@ pub fn routes() -> Router<AppState> {
 pub struct StatusResponse {
     status: &'static str,
     general: GeneralOptions,
+    init_popup: InitPopupOptions,
+    cartography_init: CartographyInitConfig,
+    cartography_source: CartographySourceConfig,
     safe_mode: SafeMode,
 }
 
@@ -40,14 +45,17 @@ pub struct SafeMode {
     )
 )]
 pub async fn status(State(app_state): State<AppState>) -> AppJson<StatusResponse> {
-    let safe_mode = app_state.dyn_config.read().await.safe_mode.clone();
+    let config = app_state.dyn_config.read().await.clone();
 
     AppJson(StatusResponse {
         status: "ok",
-        general: app_state.dyn_config.read().await.general.clone(),
+        general: config.general,
+        init_popup: config.init_popup,
+        cartography_init: config.cartography_init,
+        cartography_source: config.cartography_source,
         safe_mode: SafeMode {
-            enabled: safe_mode.enabled,
-            hcaptcha_sitekey: safe_mode.hcaptcha_sitekey.clone(),
+            enabled: config.safe_mode.enabled,
+            hcaptcha_sitekey: config.safe_mode.hcaptcha_sitekey,
         },
     })
 }

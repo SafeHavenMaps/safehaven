@@ -89,6 +89,8 @@ export class AppState {
         subtitle: 'Carte associative',
         title: 'SafeHaven',
       },
+      cartography_source: {},
+      init_popup: {},
       safe_mode: {},
       cartography_init: {},
       cartography_cluster: {},

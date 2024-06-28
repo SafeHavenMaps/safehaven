@@ -3282,6 +3282,18 @@
             "description": "Longitude of the map center (WGS84)",
             "default": 2.0
           },
+          "zoom": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Zoom level of the map (from 2 to 20)",
+            "default": 5,
+            "minimum": 0
+          }
+        }
+      },
+      "CartographySourceConfig": {
+        "type": "object",
+        "properties": {
           "dark_map_attributions": {
             "type": "string",
             "description": "Dark mode map attributions",
@@ -3301,13 +3313,6 @@
             "type": "string",
             "description": "Light mode map url",
             "default": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          },
-          "zoom": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Zoom level of the map (from 2 to 20)",
-            "default": 5,
-            "minimum": 0
           }
         }
       },
@@ -3387,10 +3392,16 @@
             "$ref": "#/components/schemas/GeneralOptions"
           },
           {
+            "$ref": "#/components/schemas/InitPopupOptions"
+          },
+          {
             "$ref": "#/components/schemas/SafeModeConfig"
           },
           {
             "$ref": "#/components/schemas/CartographyInitConfig"
+          },
+          {
+            "$ref": "#/components/schemas/CartographySourceConfig"
           },
           {
             "$ref": "#/components/schemas/CartographyClusterConfig"
@@ -3620,16 +3631,6 @@
             "default": null,
             "nullable": true
           },
-          "popup": {
-            "type": "string",
-            "default": null,
-            "nullable": true
-          },
-          "popup_check_text": {
-            "type": "string",
-            "default": null,
-            "nullable": true
-          },
           "redirect_url": {
             "type": "string",
             "default": null,
@@ -3684,6 +3685,21 @@
           },
           "visits_30_days": {
             "$ref": "#/components/schemas/Json"
+          }
+        }
+      },
+      "InitPopupOptions": {
+        "type": "object",
+        "properties": {
+          "popup": {
+            "type": "string",
+            "default": null,
+            "nullable": true
+          },
+          "popup_check_text": {
+            "type": "string",
+            "default": null,
+            "nullable": true
           }
         }
       },
@@ -4197,8 +4213,10 @@
         "type": "object",
         "required": [
           "general",
+          "init_popup",
           "safe_mode",
           "cartography_init",
+          "cartography_source",
           "cartography_cluster"
         ],
         "properties": {
@@ -4208,8 +4226,14 @@
           "cartography_init": {
             "$ref": "#/components/schemas/CartographyInitConfig"
           },
+          "cartography_source": {
+            "$ref": "#/components/schemas/CartographySourceConfig"
+          },
           "general": {
             "$ref": "#/components/schemas/GeneralOptions"
+          },
+          "init_popup": {
+            "$ref": "#/components/schemas/InitPopupOptions"
           },
           "safe_mode": {
             "$ref": "#/components/schemas/SafeModeConfig"
@@ -4313,11 +4337,23 @@
         "required": [
           "status",
           "general",
+          "init_popup",
+          "cartography_init",
+          "cartography_source",
           "safe_mode"
         ],
         "properties": {
+          "cartography_init": {
+            "$ref": "#/components/schemas/CartographyInitConfig"
+          },
+          "cartography_source": {
+            "$ref": "#/components/schemas/CartographySourceConfig"
+          },
           "general": {
             "$ref": "#/components/schemas/GeneralOptions"
+          },
+          "init_popup": {
+            "$ref": "#/components/schemas/InitPopupOptions"
           },
           "safe_mode": {
             "$ref": "#/components/schemas/SafeMode"

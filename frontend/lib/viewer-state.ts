@@ -4,7 +4,6 @@ import type { Extent } from 'ol/extent'
 import { purify_lenient } from './dompurify'
 import useClient from '~/lib/viewer-client'
 import type {
-  CartographyInitConfig,
   Category,
   Family,
   Tag,
@@ -32,12 +31,11 @@ export class AppState {
     return this._client!
   }
 
-  private initConfig: InitConfig | null = null
+  public initConfig: InitConfig | null = null
 
   private familiesData: Family[] | null = null
   private categoriesData: AllowedCategory[] | null = null
   private tagsData: AllowedTag[] | null = null
-  private cartographyInitConfigData: CartographyInitConfig | null = null
   private canAccessCommentsData = false
 
   private familiesLookupTable: Record<string, Family> = {}
@@ -60,12 +58,12 @@ export class AppState {
   get mapSource() {
     return {
       light: {
-        url: this.cartographyInitConfig.light_map_url,
-        attribution: this.cartographyInitConfig.light_map_attributions,
+        url: this.initConfig?.cartography_source.light_map_url,
+        attribution: this.initConfig?.cartography_source.light_map_attributions,
       },
       dark: {
-        url: this.cartographyInitConfig.dark_map_url,
-        attribution: this.cartographyInitConfig.dark_map_attributions,
+        url: this.initConfig?.cartography_source.dark_map_url,
+        attribution: this.initConfig?.cartography_source.dark_map_attributions,
       },
     }
   }
@@ -187,15 +185,15 @@ export class AppState {
   }
 
   get getSanitizedPopup() {
-    if (!this.initConfig?.general.popup) {
+    if (!this.initConfig?.init_popup.popup) {
       return null
     }
 
     return {
       siteTitle: this.initConfig!.general.title!,
-      sanitizedContent: purify_lenient(this.initConfig!.general.popup!),
-      sanitizedCheckbox: this.initConfig!.general.popup_check_text
-        ? purify_lenient(this.initConfig!.general.popup_check_text!)
+      sanitizedContent: purify_lenient(this.initConfig!.init_popup.popup!),
+      sanitizedCheckbox: this.initConfig!.init_popup.popup_check_text
+        ? purify_lenient(this.initConfig!.init_popup.popup_check_text!)
         : null,
     }
   }
@@ -259,7 +257,6 @@ export class AppState {
           active: tag.default_filter_status ? null : false,
         }
       })
-    this.cartographyInitConfigData = data.cartography_init_config
 
     this.familiesData.forEach((family) => {
       this.familiesLookupTable[family.id] = family
@@ -296,10 +293,6 @@ export class AppState {
     return this.tagsData!
   }
 
-  get cartographyInitConfig(): CartographyInitConfig {
-    return this.cartographyInitConfigData!
-  }
-
   get hasActiveEntity() {
     return this.activeEntity !== null
   }
@@ -316,8 +309,8 @@ export class AppState {
     // We need to transform the coordinates
     return transform(
       [
-        state.cartographyInitConfig.center_lng!,
-        state.cartographyInitConfig.center_lat!,
+        state.initConfig!.cartography_init.center_lng!,
+        state.initConfig!.cartography_init.center_lat!,
       ],
       'EPSG:4326', // WGS84
       'EPSG:3857', // Web Mercator
@@ -325,7 +318,7 @@ export class AppState {
   }
 
   startZoom() {
-    return state.cartographyInitConfig.zoom
+    return state.initConfig!.cartography_init.zoom
   }
 
   async selectedCachedEntity(cacheEntity: DisplayableCachedEntity) {

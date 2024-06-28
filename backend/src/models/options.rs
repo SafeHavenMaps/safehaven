@@ -7,8 +7,10 @@ use crate::api::AppError;
 #[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
 pub struct SafeHavenOptions {
     pub general: GeneralOptions,
+    pub init_popup: InitPopupOptions,
     pub safe_mode: SafeModeConfig,
     pub cartography_init: CartographyInitConfig,
+    pub cartography_source: CartographySourceConfig,
     pub cartography_cluster: CartographyClusterConfig,
 }
 
@@ -16,8 +18,10 @@ pub struct SafeHavenOptions {
 #[serde(untagged)]
 pub enum ConfigurationOption {
     General(GeneralOptions),
+    InitPopup(InitPopupOptions),
     SafeMode(SafeModeConfig),
     CartographyInit(CartographyInitConfig),
+    CartographySource(CartographySourceConfig),
     CartographyCluster(CartographyClusterConfig),
 }
 
@@ -25,8 +29,10 @@ impl ConfigurationOption {
     pub fn option_name(&self) -> &'static str {
         match self {
             ConfigurationOption::General(_) => GeneralOptions::option_name(),
+            ConfigurationOption::InitPopup(_) => InitPopupOptions::option_name(),
             ConfigurationOption::SafeMode(_) => SafeModeConfig::option_name(),
             ConfigurationOption::CartographyInit(_) => CartographyInitConfig::option_name(),
+            ConfigurationOption::CartographySource(_) => CartographySourceConfig::option_name(),
             ConfigurationOption::CartographyCluster(_) => CartographyClusterConfig::option_name(),
         }
     }
@@ -43,8 +49,6 @@ pub struct GeneralOptions {
     pub subtitle: Option<String>,
     pub logo_url: Option<String>,
     pub information: Option<String>,
-    pub popup: Option<String>,
-    pub popup_check_text: Option<String>,
     pub redirect_url: Option<String>,
 }
 
@@ -61,9 +65,29 @@ impl Default for GeneralOptions {
             subtitle: Some("Carte associative".to_string()),
             logo_url: None,
             information: None,
+            redirect_url: None,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
+#[serde(default)]
+pub struct InitPopupOptions {
+    pub popup: Option<String>,
+    pub popup_check_text: Option<String>,
+}
+
+impl OptionConfig for InitPopupOptions {
+    fn option_name() -> &'static str {
+        "init_popup"
+    }
+}
+
+impl Default for InitPopupOptions {
+    fn default() -> Self {
+        Self {
             popup: None,
             popup_check_text: None,
-            redirect_url: None,
         }
     }
 }
@@ -107,14 +131,6 @@ pub struct CartographyInitConfig {
     pub center_lng: f64,
     /// Zoom level of the map (from 2 to 20)
     pub zoom: u8,
-    /// Light mode map url
-    pub light_map_url: String,
-    /// Dark mode map url
-    pub dark_map_url: String,
-    /// Light mode map attributions
-    pub light_map_attributions: String,
-    /// Dark mode map attributions
-    pub dark_map_attributions: String,
 }
 
 impl OptionConfig for CartographyInitConfig {
@@ -129,6 +145,32 @@ impl Default for CartographyInitConfig {
             center_lat: 47.0,
             center_lng: 2.0,
             zoom: 5,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
+#[serde(default)]
+pub struct CartographySourceConfig {
+    /// Light mode map url
+    pub light_map_url: String,
+    /// Dark mode map url
+    pub dark_map_url: String,
+    /// Light mode map attributions
+    pub light_map_attributions: String,
+    /// Dark mode map attributions
+    pub dark_map_attributions: String,
+}
+
+impl OptionConfig for CartographySourceConfig {
+    fn option_name() -> &'static str {
+        "cartography_source"
+    }
+}
+
+impl Default for CartographySourceConfig {
+    fn default() -> Self {
+        Self {
             light_map_url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png".to_string(),
             light_map_attributions: "Map data © OpenStreetMap contributors".to_string(),
             dark_map_url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png".to_string(),
@@ -229,20 +271,28 @@ impl SafeHavenOptions {
         let general = Self::fetch_option::<GeneralOptions>(conn)
             .await
             .expect("Failed to load general");
+        let init_popup = Self::fetch_option::<InitPopupOptions>(conn)
+            .await
+            .expect("Failed to load init popup");
         let safe_mode = Self::fetch_option::<SafeModeConfig>(conn)
             .await
             .expect("Failed to load safe mode");
         let cartography_init = Self::fetch_option::<CartographyInitConfig>(conn)
             .await
             .expect("Failed to load cartography init");
+        let cartography_source = Self::fetch_option::<CartographySourceConfig>(conn)
+            .await
+            .expect("Failed to load cartography source");
         let cartography_cluster = Self::fetch_option::<CartographyClusterConfig>(conn)
             .await
             .expect("Failed to load cartography cluster");
 
         Self {
             general,
+            init_popup,
             safe_mode,
             cartography_init,
+            cartography_source,
             cartography_cluster,
         }
     }

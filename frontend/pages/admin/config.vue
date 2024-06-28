@@ -5,12 +5,18 @@
         Général
       </Tab>
       <Tab value="1">
-        Carte - Initialisation
+        Popup
       </Tab>
       <Tab value="2">
-        Carte - Cluster
+        Carte - Initialisation
       </Tab>
       <Tab value="3">
+        Carte - Source
+      </Tab>
+      <Tab value="4">
+        Carte - Cluster
+      </Tab>
+      <Tab value="5">
         Mode Sécurisé
       </Tab>
     </TabList>
@@ -49,36 +55,6 @@
             label="URL du logo"
             :variant="hasBeenEdited('general', 'logo_url')"
             :invalid="!isOptionValid({ group: 'general', name: 'logo_url' })"
-          />
-
-          <AdminInputSwitchField
-            id="popup_enabled"
-            v-model="popupEnabled"
-            label="Afficher un popup au lancement de l'application"
-          />
-
-          <AdminInputTextField
-            v-if="popupEnabled"
-            id="popup"
-            v-model="editedConfig.general.popup"
-            label="Popup d'accueil"
-            :variant="hasBeenEdited('general', 'popup')"
-            text-length="editor"
-          />
-
-          <AdminInputSwitchField
-            v-if="popupEnabled"
-            id="popup_check_enabled"
-            v-model="popupCheckboxEnabled"
-            label="Mettre une case à cocher dans le popup d'accueil"
-          />
-
-          <AdminInputTextField
-            v-if="popupEnabled && popupCheckboxEnabled"
-            id="popup"
-            v-model="editedConfig.general.popup_check_text"
-            label="Texte accompagnant la case à cocher de la popup d'accueil"
-            :variant="hasBeenEdited('general', 'popup_check_text')"
           />
 
           <AdminInputSwitchField
@@ -122,6 +98,64 @@
       <TabPanel value="1">
         <form
           class="flex flex-col gap-4 max-w-[30rem] mx-6"
+          @submit.prevent="onSave('init_popup', editedConfig.init_popup)"
+        >
+          <AdminInputSwitchField
+            id="popup_enabled"
+            v-model="popupEnabled"
+            label="Afficher un popup au lancement de l'application"
+          />
+
+          <AdminInputTextField
+            v-if="popupEnabled"
+            id="popup"
+            v-model="editedConfig.init_popup.popup"
+            label="Popup d'accueil"
+            :variant="hasBeenEdited('init_popup', 'popup')"
+            text-length="editor"
+          />
+
+          <AdminInputSwitchField
+            v-if="popupEnabled"
+            id="popup_check_enabled"
+            v-model="popupCheckboxEnabled"
+            label="Mettre une case à cocher dans le popup d'accueil"
+          />
+
+          <AdminInputTextField
+            v-if="popupEnabled && popupCheckboxEnabled"
+            id="popup"
+            v-model="editedConfig.init_popup.popup_check_text"
+            label="Texte accompagnant la case à cocher de la popup d'accueil"
+            :variant="hasBeenEdited('init_popup', 'popup_check_text')"
+          />
+
+          <span class="flex gap-1 justify-end">
+            <Button
+              label="Annuler"
+              severity="secondary"
+              :disabled="processingRequest"
+              @click="onCancel('init_popup')"
+            />
+            <Button
+              v-if="state.is_admin"
+              label="Réinitialiser"
+              :disabled="processingRequest"
+              @click="onDelete('init_popup')"
+            />
+            <Button
+              v-if="state.is_admin"
+              label="Sauvegarder"
+              type="submit"
+              :disabled="processingRequest || !isOptionGroupValid('init_popup')"
+            />
+          </span>
+        </form>
+      </TabPanel>
+
+      <TabPanel value="2">
+        <form
+          class="flex flex-col gap-4 max-w-[30rem] mx-6"
           @submit.prevent="onSave('cartography_init', editedConfig.cartography_init)"
         >
           <AdminInputNumberField
@@ -143,34 +177,6 @@
             v-model="editedConfig.cartography_init.zoom"
             label="Niveau de Zoom"
             :variant="hasBeenEdited('cartography_init', 'zoom')"
-          />
-
-          <AdminInputTextField
-            id="light_map_url"
-            v-model="editedConfig.cartography_init.light_map_url"
-            label="URL des tuiles de carte, thème clair"
-            :variant="hasBeenEdited('cartography_init', 'light_map_url')"
-          />
-
-          <AdminInputTextField
-            id="light_map_attributions"
-            v-model="editedConfig.cartography_init.light_map_attributions"
-            label="Attributions pour les tuiles de carte, thème clair"
-            :variant="hasBeenEdited('cartography_init', 'light_map_attributions')"
-          />
-
-          <AdminInputTextField
-            id="dark_map_url"
-            v-model="editedConfig.cartography_init.dark_map_url"
-            label="URL des tuiles de carte, thème sombre"
-            :variant="hasBeenEdited('cartography_init', 'dark_map_url')"
-          />
-
-          <AdminInputTextField
-            id="dark_map_attributions"
-            v-model="editedConfig.cartography_init.dark_map_attributions"
-            label="Attributions pour les tuiles de carte, thème sombre"
-            :variant="hasBeenEdited('cartography_init', 'dark_map_attributions')"
           />
 
           <span class="flex gap-1 justify-end">
@@ -195,7 +201,64 @@
           </span>
         </form>
       </TabPanel>
-      <TabPanel value="2">
+
+      <TabPanel value="3">
+        <form
+          class="flex flex-col gap-4 max-w-[30rem] mx-6"
+          @submit.prevent="onSave('cartography_source', editedConfig.cartography_source)"
+        >
+          <AdminInputTextField
+            id="light_map_url"
+            v-model="editedConfig.cartography_source.light_map_url"
+            label="URL des tuiles de carte, thème clair"
+            :variant="hasBeenEdited('cartography_source', 'light_map_url')"
+          />
+
+          <AdminInputTextField
+            id="light_map_attributions"
+            v-model="editedConfig.cartography_source.light_map_attributions"
+            label="Attributions pour les tuiles de carte, thème clair"
+            :variant="hasBeenEdited('cartography_source', 'light_map_attributions')"
+          />
+
+          <AdminInputTextField
+            id="dark_map_url"
+            v-model="editedConfig.cartography_source.dark_map_url"
+            label="URL des tuiles de carte, thème sombre"
+            :variant="hasBeenEdited('cartography_source', 'dark_map_url')"
+          />
+
+          <AdminInputTextField
+            id="dark_map_attributions"
+            v-model="editedConfig.cartography_source.dark_map_attributions"
+            label="Attributions pour les tuiles de carte, thème sombre"
+            :variant="hasBeenEdited('cartography_source', 'dark_map_attributions')"
+          />
+
+          <span class="flex gap-1 justify-end">
+            <Button
+              label="Annuler"
+              severity="secondary"
+              :disabled="processingRequest"
+              @click="onCancel('cartography_source')"
+            />
+            <Button
+              v-if="state.is_admin"
+              label="Réinitialiser"
+              :disabled="processingRequest"
+              @click="onDelete('cartography_source')"
+            />
+            <Button
+              v-if="state.is_admin"
+              label="Sauvegarder"
+              type="submit"
+              :disabled="processingRequest || !isOptionGroupValid('cartography_source')"
+            />
+          </span>
+        </form>
+      </TabPanel>
+
+      <TabPanel value="4">
         <form
           class="flex flex-col gap-4 max-w-[30rem] mx-6"
           @submit.prevent="onSave('cartography_cluster', editedConfig.cartography_cluster)"
@@ -243,9 +306,8 @@
           </span>
         </form>
       </TabPanel>
-      <TabPanel
-        value="3"
-      >
+
+      <TabPanel value="5">
         <form
           class="flex flex-col gap-4 max-w-[30rem] mx-6"
           @submit.prevent="onSave('safe_mode', editedConfig.safe_mode)"
@@ -266,9 +328,9 @@
 
           <AdminInputTextField
             v-if="editedConfig.safe_mode.enabled"
-            id="hcaptcha_sitekey"
+            id="hcaptcha_secret"
             v-model="editedConfig.safe_mode.hcaptcha_secret"
-            label="Clé de Site hCaptcha"
+            label="Clé Secrète hCaptcha"
             :variant="hasBeenEdited('safe_mode', 'hcaptcha_secret')"
           />
 
@@ -312,26 +374,26 @@ const editedConfig: Ref<SafeHavenOptions> = ref(JSON.parse(JSON.stringify(fetche
 const processingRequest = ref(false)
 const toast = useToast()
 
-const popupEnabled = ref(!!editedConfig.value.general.popup)
-const popupCheckboxEnabled = ref(!!editedConfig.value.general.popup_check_text)
+const popupEnabled = ref(!!editedConfig.value.init_popup.popup)
+const popupCheckboxEnabled = ref(!!editedConfig.value.init_popup.popup_check_text)
 const customRedirection = ref(!!editedConfig.value.general.redirect_url)
 
 watch(popupEnabled, (value) => {
   if (value) {
-    editedConfig.value.general.popup = ''
+    editedConfig.value.init_popup.popup = ''
   }
   else {
-    editedConfig.value.general.popup = null
+    editedConfig.value.init_popup.popup = null
     popupCheckboxEnabled.value = false
   }
 })
 
 watch(popupCheckboxEnabled, (value) => {
   if (value) {
-    editedConfig.value.general.popup_check_text = ''
+    editedConfig.value.init_popup.popup_check_text = ''
   }
   else {
-    editedConfig.value.general.popup_check_text = null
+    editedConfig.value.init_popup.popup_check_text = null
   }
 })
 
@@ -368,8 +430,10 @@ initAdminLayout(
 // Define the OptionValidation type as a union of specific group-name pairs
 type OptionValidation =
   { group: 'general', name: keyof SafeHavenOptions['general'] }
+  | { group: 'init_popup', name: keyof SafeHavenOptions['init_popup'] }
   | { group: 'safe_mode', name: keyof SafeHavenOptions['safe_mode'] }
   | { group: 'cartography_init', name: keyof SafeHavenOptions['cartography_init'] }
+  | { group: 'cartography_source', name: keyof SafeHavenOptions['cartography_source'] }
   | { group: 'cartography_cluster', name: keyof SafeHavenOptions['cartography_cluster'] }
 
 // Function to validate individual options based on the group and name properties
@@ -383,14 +447,19 @@ function isOptionValid(option: OptionValidation): boolean {
           return isValidText(config.general[option.name])
         case 'information':
           return isValidRichText(config.general[option.name])
-        case 'popup':
-          return config.general[option.name] === null || isValidText(config.general[option.name])
-        case 'popup_check_text':
-          return config.general[option.name] === null || isValidText(config.general[option.name])
         case 'logo_url':
           return !config.general[option.name] || isValidUrl(config.general[option.name])
         case 'redirect_url':
           return config.general[option.name] === null || isValidUrl(config.general[option.name])
+      }
+      break
+
+    case 'init_popup':
+      switch (option.name) {
+        case 'popup':
+          return config.init_popup[option.name] === null || isValidText(config.init_popup[option.name])
+        case 'popup_check_text':
+          return config.init_popup[option.name] === null || isValidText(config.init_popup[option.name])
       }
       break
 
@@ -412,12 +481,17 @@ function isOptionValid(option: OptionValidation): boolean {
           return isValidNumber(config.cartography_init[option.name], { min: -180, max: 180 })
         case 'zoom':
           return isValidNumber(config.cartography_init[option.name], { min: 1, max: 30 })
+      }
+      break
+
+    case 'cartography_source':
+      switch (option.name) {
         case 'light_map_url':
         case 'dark_map_url':
-          return isValidUrl(config.cartography_init[option.name])
+          return isValidUrl(config.cartography_source[option.name])
         case 'light_map_attributions':
         case 'dark_map_attributions':
-          return isValidText(config.cartography_init[option.name])
+          return isValidText(config.cartography_source[option.name])
       }
       break
 
@@ -440,6 +514,10 @@ function isOptionGroupValid(group: OptionValidation['group']): boolean {
       return (Object.keys(editedConfig.value.general) as Array<keyof SafeHavenOptions['general']>)
         .every(name => isOptionValid({ group: 'general', name }))
 
+    case 'init_popup':
+      return (Object.keys(editedConfig.value.init_popup) as Array<keyof SafeHavenOptions['init_popup']>)
+        .every(name => isOptionValid({ group: 'init_popup', name }))
+
     case 'safe_mode':
       return (Object.keys(editedConfig.value.safe_mode) as Array<keyof SafeHavenOptions['safe_mode']>)
         .every(name => isOptionValid({ group: 'safe_mode', name }))
@@ -447,6 +525,10 @@ function isOptionGroupValid(group: OptionValidation['group']): boolean {
     case 'cartography_init':
       return (Object.keys(editedConfig.value.cartography_init) as Array<keyof SafeHavenOptions['cartography_init']>)
         .every(name => isOptionValid({ group: 'cartography_init', name }))
+
+    case 'cartography_source':
+      return (Object.keys(editedConfig.value.cartography_source) as Array<keyof SafeHavenOptions['cartography_source']>)
+        .every(name => isOptionValid({ group: 'cartography_source', name }))
 
     case 'cartography_cluster':
       return (Object.keys(editedConfig.value.cartography_cluster) as Array<keyof SafeHavenOptions['cartography_cluster']>)
