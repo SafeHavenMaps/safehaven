@@ -213,23 +213,23 @@ export class AppState {
   async init() {
     this._client = useClient()
     this.initConfig = await this.client.checkStatus()
+    this.client.onAuthenticationFailed(async () => {
+      // It is impossible to recover from this error, since the token is deemed invalid
+      // and the user needs to use a valid URL from now on. If the redirect url is set,
+      // we will redirect the user to the configured URL. Otherwise, we will show an error.
+      if (this.redirectUrl) {
+        window.location.href = this.redirectUrl
+      }
+      else {
+        window.location.href = '/404'
+      }
+    })
   }
 
   async bootstrapWithToken(token: string) {
     if (this.initialized) return
 
     const data = await this.client.bootstrap(token)
-
-    this.client.onAuthenticationFailed(async () => {
-      try {
-        await this.client.bootstrap(token)
-      }
-      catch {
-        if (state.redirectUrl) {
-          window.location.href = state.redirectUrl
-        }
-      }
-    })
 
     this.familiesData = data.families
       .sort((a, b) => a.sort_order - b.sort_order)

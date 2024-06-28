@@ -1,4 +1,5 @@
 pub mod admin;
+pub mod auth;
 pub mod icons;
 pub mod map;
 pub mod root;
@@ -6,7 +7,6 @@ pub mod root;
 use crate::{
     config::SafeHavenConfig,
     models::{
-        access_token::Permissions,
         options::SafeHavenOptions,
         user::{NewOrUpdatedUser, User},
     },
@@ -16,13 +16,8 @@ use axum::{
     extract::{FromRef, FromRequest, FromRequestParts},
     http::{request::Parts, StatusCode},
     response::{IntoResponse, Response},
-    RequestPartsExt,
 };
-use axum_extra::{
-    headers::{authorization::Bearer, Authorization},
-    TypedHeader,
-};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use sqlx::{
     postgres::{PgListener, PgPoolOptions},
     PgConnection, Pool, Postgres,
@@ -269,42 +264,5 @@ impl IntoResponse for AppError {
         );
 
         resp.into_response()
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct MapUserTokenClaims {
-    pub perms: Permissions,
-    pub exp: usize,
-    pub iat: usize,
-}
-
-pub struct MapUserToken(MapUserTokenClaims);
-
-#[async_trait]
-impl<S> FromRequestParts<S> for MapUserToken
-where
-    S: Send + Sync,
-    AppState: FromRef<S>,
-{
-    type Rejection = AppError;
-
-    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let app_state = AppState::from_ref(state);
-
-        // Extract the token from the authorization header
-        let TypedHeader(Authorization(bearer)) = parts
-            .extract::<TypedHeader<Authorization<Bearer>>>()
-            .await
-            .map_err(|_| AppError::TokenValidation)?;
-
-        let token_data = jsonwebtoken::decode::<MapUserTokenClaims>(
-            bearer.token(),
-            &jsonwebtoken::DecodingKey::from_secret(app_state.config.token_secret.as_ref()),
-            &jsonwebtoken::Validation::default(),
-        )
-        .map_err(|_| AppError::TokenValidation)?;
-
-        Ok(Self(token_data.claims))
     }
 }

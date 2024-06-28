@@ -31,8 +31,9 @@ export default function useClient() {
       if (error) throw error
 
       // Install auth middleware to the stack. If it fails, ejects it.
-      const authMiddleware = createAuthMiddleware(data.signed_token, async () => {
+      const authMiddleware = createAuthMiddleware(token, data.signed_token, async () => {
         rawClient.eject(authMiddleware)
+        // Definitive network error
         if (authenticationFailed) {
           await authenticationFailed()
         }

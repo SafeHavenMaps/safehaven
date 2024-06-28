@@ -85,6 +85,12 @@ catch {
     detail: 'Impossible de charger la carte',
     life: 3000,
   })
+  if (state.redirectUrl) {
+    window.location.href = state.redirectUrl
+  }
+  else {
+    window.location.href = '/404'
+  }
 }
 
 const mapRef = ref<typeof ViewerMap>()
