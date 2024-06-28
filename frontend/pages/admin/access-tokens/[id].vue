@@ -57,6 +57,27 @@
       :options="tags"
     />
 
+    <Divider class="!my-2" />
+
+    <AdminInputSwitchField
+      id="geographic_restriction"
+      v-model="geographicRestrictionsOn"
+      label="Restreindre géographiquement"
+    />
+    <span>
+      <Button
+        v-if="geographicRestrictionsOn"
+        label="Définir les restrictions"
+        @click="() => polygonDrawer!.show()"
+      />
+    </span>
+    <PolygonDrawer
+      v-if="geographicRestrictionsOn"
+      ref="polygonDrawer"
+      v-model:polygon-list="editedAccessToken.permissions.geographic_restrictions"
+      :max-polygons="3"
+    />
+
     <span class="flex gap-1 justify-end">
       <NuxtLink to="/admin/access-tokens">
         <Button
@@ -81,6 +102,7 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { NewOrUpdateAccessToken, Permissions } from '~/lib'
 import state from '~/lib/admin-state'
 import { isValidText } from '~/lib/validation'
+import type PolygonDrawerComponent from '~/components/PolygonDrawer.vue'
 
 definePageMeta({
   layout: 'admin-ui',
@@ -111,6 +133,7 @@ const editedAccessToken: Ref<NewOrUpdateAccessToken> = ref(
             allow_list: [],
             force_exclude: [],
           },
+          geographic_restrictions: null,
         },
         title: '',
         token: '',
@@ -121,6 +144,15 @@ const editedAccessToken: Ref<NewOrUpdateAccessToken> = ref(
 const families = state.families
 const categories = await state.client.listCategories()
 const tags = await state.client.listTags()
+
+const polygonDrawer = ref<InstanceType<typeof PolygonDrawerComponent>>()
+const geographicRestrictionsOn = ref(editedAccessToken.value.permissions.geographic_restrictions != null)
+watch(geographicRestrictionsOn, (newValue) => {
+  if (newValue)
+    editedAccessToken.value.permissions.geographic_restrictions = []
+  else
+    editedAccessToken.value.permissions.geographic_restrictions = null
+})
 
 const processingRequest = ref(false)
 const toast = useToast()
@@ -144,6 +176,10 @@ function isDisabled() {
   return processingRequest.value
     || !isValidText(editedAccessToken.value.title)
     || !isValidText(editedAccessToken.value.token)
+    || (
+      editedAccessToken.value.permissions.geographic_restrictions != null
+      && editedAccessToken.value.permissions.geographic_restrictions.length == 0
+    )
 }
 
 function hasBeenEdited(field: keyof NewOrUpdateAccessToken) {

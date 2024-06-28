@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::api::AppError;
+use crate::{api::AppError, helpers::postgis_polygons::MultiPolygon};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{query_as, types::Json, PgConnection};
@@ -206,6 +206,7 @@ pub struct FindEntitiesRequest {
     pub ymin: f64,
     pub xmax: f64,
     pub ymax: f64,
+    pub geographic_restriction: Option<MultiPolygon>,
     pub family_id: Uuid,
 
     pub allow_all_categories: bool,
@@ -228,6 +229,7 @@ pub struct FindEntitiesRequest {
 
 pub struct SearchEntitiesRequest {
     pub search_query: String,
+    pub geographic_restriction: Option<MultiPolygon>,
     pub family_id: Uuid,
 
     pub allow_all_categories: bool,
@@ -294,13 +296,17 @@ impl ViewerCachedEntity {
                 $14,
                 $15,
                 $16,
-                $17
+                $17,
+                $18
             )
             "#,
             request.xmin,
             request.ymin,
             request.xmax,
             request.ymax,
+            request
+                .geographic_restriction
+                .map(|g| g.to_polygon_string(Some(3857))),
             request.family_id,
             request.allow_all_categories,
             request.allow_all_tags,
@@ -408,10 +414,14 @@ impl ViewerCachedEntity {
                 $12,
                 $13,
                 $14,
-                $15
+                $15,
+                $16
             )
             "#,
             request.search_query,
+            request
+                .geographic_restriction
+                .map(|g| g.to_polygon_string(Some(3857))),
             request.family_id,
             request.allow_all_categories,
             request.allow_all_tags,

@@ -3754,6 +3754,12 @@
           }
         }
       },
+      "MultiPolygon": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Polygon"
+        }
+      },
       "NewCommentRequest": {
         "type": "object",
         "required": [
@@ -4002,6 +4008,14 @@
           },
           "families_policy": {
             "$ref": "#/components/schemas/PermissionPolicy"
+          },
+          "geographic_restrictions": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MultiPolygon"
+              }
+            ],
+            "nullable": true
           },
           "tags_policy": {
             "$ref": "#/components/schemas/PermissionPolicy"

@@ -60,6 +60,10 @@
               cargo sqlx prepare --check
             echo "::endgroup::"
 
+            echo "::group::Backend tests"
+              cargo test
+            echo "::endgroup::"
+
             echo "::group::Backend lint"
               cargo fmt -- --check
               cargo clippy -- -D warnings

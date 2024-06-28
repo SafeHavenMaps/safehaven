@@ -121,6 +121,7 @@ pub async fn viewer_view_request(
         ymin: request.ymin,
         xmax: request.xmax,
         ymax: request.ymax,
+        geographic_restriction: token.perms.geographic_restrictions.clone(),
         family_id: request.family_id,
         allow_all_categories: token.perms.categories_policy.allow_all,
         allow_all_tags: token.perms.tags_policy.allow_all,
@@ -185,6 +186,7 @@ async fn viewer_search_request(
 
     let request = SearchEntitiesRequest {
         search_query: request.search_query,
+        geographic_restriction: token.perms.geographic_restrictions.clone(),
         family_id: request.family_id,
         allow_all_categories: token.perms.categories_policy.allow_all,
         allow_all_tags: token.perms.tags_policy.allow_all,
