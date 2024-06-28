@@ -1,4 +1,4 @@
-use crate::api::AppError;
+use crate::{api::AppError, helpers::postgis_polygons::MultiPolygon};
 use serde::{Deserialize, Serialize};
 use serde_json::{to_value, Value};
 use sqlx::{types::Json, PgConnection};
@@ -10,6 +10,7 @@ pub struct Permissions {
     pub families_policy: PermissionPolicy,
     pub categories_policy: PermissionPolicy,
     pub tags_policy: PermissionPolicy,
+    pub geographic_restrictions: Option<MultiPolygon>,
     pub can_access_comments: bool,
 }
 

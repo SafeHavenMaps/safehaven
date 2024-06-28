@@ -2,15 +2,19 @@
   <div
     class="map-marker-container"
     :style="
-      { width: `${props.highlighted ? Math.round(1.25*props.width) : props.width}px`,
-        height: `${props.highlighted ? Math.round(1.25*props.height) : props.height}px` }"
+      {
+        width: `${props.highlighted ? Math.round(1.25*props.width) : props.width}px`,
+        height: `${props.highlighted ? Math.round(1.25*props.height) : props.height}px`,
+      }
+    "
   >
     <img
       :class="{ highlighted: !!props.highlighted }"
       :width="props.highlighted ? Math.round(1.25*props.width) : props.width"
       :height="props.highlighted ? Math.round(1.25*props.height) : props.height"
       :src="props.highlighted ? urls.upscaled_url : urls.url"
-      style="cursor: pointer"
+      style="cursor: pointer; user-select: none;"
+      draggable="false"
       class="map-marker"
       @click="handleClick"
     >

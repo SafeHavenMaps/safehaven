@@ -12,6 +12,7 @@ use crate::{
         root::{self, BootstrapResponse, SafeMode, StatusResponse},
         ErrorResponse,
     },
+    helpers::postgis_polygons::MultiPolygon,
     models::{
         access_token::{
             AccessToken, AccessTokenStats, NewOrUpdateAccessToken, PermissionPolicy, Permissions,
@@ -193,6 +194,8 @@ use utoipa::OpenApi;
         NewCommentRequest,
         PublicNewEntityRequest,
         FetchedEntity,
+        // helper postgis polygons
+        MultiPolygon,
     ))
 )]
 pub struct ApiDoc {}

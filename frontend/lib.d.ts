@@ -66,7 +66,10 @@ export type NewOrUpdateTag = api.components['schemas']['NewOrUpdateTag']
 export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAccessToken'] & { permissions: Permissions }
 export type PermissionPolicy = api.components['schemas']['PermissionPolicy']
 export type Permissions = api.components['schemas']['Permissions']
-export type AccessToken = api.components['schemas']['AccessToken'] & { permissions: Permissions }
+export type AccessToken = api.components['schemas']['AccessToken']
+  & {
+    permissions: Permissions & { geographic_restrictions: null | [number, number][][] }
+  }
 export type AccessTokenStats = api.components['schemas']['AccessTokenStats']
 
 export type User = api.components['schemas']['User']

@@ -3,6 +3,7 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
     input_ymin DOUBLE PRECISION,
     input_xmax DOUBLE PRECISION,
     input_ymax DOUBLE PRECISION,
+    geographic_restriction TEXT,
     input_family_id UUID,
 
     allow_all_categories BOOL,
@@ -54,6 +55,10 @@ BEGIN
             ST_Intersects(
                 ec.web_mercator_location,
                 ST_MakeEnvelope(input_xmin, input_ymin, input_xmax, input_ymax, 3857)
+            )
+            AND (
+                geographic_restriction IS NULL OR
+                ST_Intersects(ec.web_mercator_location, st_geomfromtext(geographic_restriction))
             )
             AND NOT ec.hidden
             AND ec.family_id = input_family_id
@@ -139,6 +144,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION search_entities(
     search_query TEXT,
+    geographic_restriction TEXT,
     input_family_id UUID,
 
     allow_all_categories BOOL,
@@ -190,6 +196,10 @@ BEGIN
                     ec.display_name ILIKE '%' || lower(search_query) || '%'
                         OR (full_text_search_ts @@ plainto_tsquery(search_query))
                     )
+            )
+            AND (
+                geographic_restriction IS NULL OR
+                ST_Intersects(ec.web_mercator_location, st_geomfromtext(geographic_restriction))
             )
             AND ec.family_id = input_family_id
             AND NOT ec.hidden
