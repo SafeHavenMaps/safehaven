@@ -212,9 +212,15 @@ catch {
   toast.add({
     severity: 'error',
     summary: 'Erreur',
-    detail: 'Impossible de charger la carte',
+    detail: 'Impossible de charger les données',
     life: 3000,
   })
+  if (state.redirectUrl) {
+    window.location.href = state.redirectUrl
+  }
+  else {
+    window.location.href = '/404'
+  }
 }
 
 const query = ref('')

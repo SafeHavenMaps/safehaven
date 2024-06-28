@@ -6,7 +6,7 @@
     @click="formVisible=true"
   >
     <template #default>
-      <div class="flex align-items-center">
+      <div class="flex items-center">
         <AppIcon
           class="-ml-1 mr-1"
           icon-name="commentAdd"

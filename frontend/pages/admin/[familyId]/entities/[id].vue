@@ -142,7 +142,7 @@
             @click="navigateTo(`/admin/${familyId}/comments/new?urlEntityId=${entityId}`)"
           >
             <template #default>
-              <div class="flex align-items-center">
+              <div class="flex items-center">
                 <AppIcon
                   class="-ml-1 mr-1"
                   icon-name="commentAdd"

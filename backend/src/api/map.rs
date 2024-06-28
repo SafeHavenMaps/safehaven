@@ -1,4 +1,4 @@
-use crate::api::{AppError, AppJson, AppState, DbConn, MapUserToken};
+use crate::api::{AppError, AppJson, AppState, DbConn};
 use crate::helpers::hcaptcha::{self, HCaptchaValidationError};
 use crate::models::comment::{PublicComment, PublicNewComment};
 use crate::models::entity::{PublicEntity, PublicListedEntity, PublicNewEntity};
@@ -7,6 +7,7 @@ use crate::models::entity_cache::{
     ViewerCachedEntitiesWithPagination, ViewerCachedEntity,
 };
 use axum::extract::{Path, State};
+use axum::middleware;
 use axum::{
     routing::{post, Router},
     Json,
@@ -17,15 +18,19 @@ use std::fmt::Display;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
-use super::MapUserTokenClaims;
+use super::auth::{viewer_authentication_middleware, MapUserTokenClaims};
 
-pub fn routes() -> Router<AppState> {
+pub fn routes(state: &AppState) -> Router<AppState> {
     Router::new()
         .route("/view", post(viewer_view_request))
         .route("/search", post(viewer_search_request))
         .route("/entities/:id", post(viewer_fetch_entity))
         .route("/entities", post(viewer_new_entity))
         .route("/comments", post(viewer_new_comment))
+        .route_layer(middleware::from_fn_with_state(
+            state.clone(),
+            viewer_authentication_middleware,
+        ))
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -92,7 +97,7 @@ fn is_token_allowed_for_family(token: &MapUserTokenClaims, family_id: &Uuid) -> 
 pub async fn viewer_view_request(
     State(app_state): State<AppState>,
     DbConn(mut conn): DbConn,
-    MapUserToken(token): MapUserToken,
+    token: MapUserTokenClaims,
     Json(request): Json<ViewRequest>,
 ) -> Result<AppJson<EntitiesAndClusters>, AppError> {
     tracing::trace!("Received view request {}", request);
@@ -169,7 +174,7 @@ impl Display for SearchRequest {
 )]
 async fn viewer_search_request(
     DbConn(mut conn): DbConn,
-    MapUserToken(token): MapUserToken,
+    token: MapUserTokenClaims,
     Json(request): Json<SearchRequest>,
 ) -> Result<AppJson<ViewerCachedEntitiesWithPagination>, AppError> {
     tracing::trace!("Received search request {}", request);
@@ -326,7 +331,7 @@ pub struct FetchEntityRequest {
 )]
 async fn viewer_fetch_entity(
     DbConn(mut conn): DbConn,
-    MapUserToken(token): MapUserToken,
+    token: MapUserTokenClaims,
     Path(id): Path<Uuid>,
     Json(request): Json<FetchEntityRequest>,
 ) -> Result<AppJson<FetchedEntity>, AppError> {
