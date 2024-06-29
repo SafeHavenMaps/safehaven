@@ -70,7 +70,7 @@ impl Default for GeneralOptions {
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, ToSchema, Debug)]
+#[derive(Deserialize, Serialize, Clone, ToSchema, Debug, Default)]
 #[serde(default)]
 pub struct InitPopupOptions {
     pub popup: Option<String>,
@@ -80,15 +80,6 @@ pub struct InitPopupOptions {
 impl OptionConfig for InitPopupOptions {
     fn option_name() -> &'static str {
         "init_popup"
-    }
-}
-
-impl Default for InitPopupOptions {
-    fn default() -> Self {
-        Self {
-            popup: None,
-            popup_check_text: None,
-        }
     }
 }
 
