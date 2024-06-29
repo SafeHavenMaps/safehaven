@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE tags\n            SET title = $2, is_filter = $3, filter_description = $4, default_filter_status = $5, version = $6, fill_color = $7, border_color = $8\n            WHERE id = $1\n            RETURNING id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color\n            ",
+  "query": "\n            INSERT INTO tags (title, is_filter, is_primary_filter, \n                filter_description, default_filter_status, fill_color, border_color)\n            VALUES ($1, $2, $3, $4, $5, $6, $7)\n            RETURNING id, title, is_filter, is_primary_filter, filter_description,\n                default_filter_status, version, fill_color, border_color\n            ",
   "describe": {
     "columns": [
       {
@@ -20,43 +20,48 @@
       },
       {
         "ordinal": 3,
+        "name": "is_primary_filter",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
         "name": "filter_description",
         "type_info": "Text"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "default_filter_status",
         "type_info": "Bool"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "version",
         "type_info": "Int4"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "fill_color",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "border_color",
         "type_info": "Varchar"
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid",
         "Varchar",
+        "Bool",
         "Bool",
         "Text",
         "Bool",
-        "Int4",
         "Varchar",
         "Varchar"
       ]
     },
     "nullable": [
+      false,
       false,
       false,
       false,
@@ -67,5 +72,5 @@
       false
     ]
   },
-  "hash": "337987193c638fe0cfbb86916b8313dd37b9202a4524643248aa8ec55f2835d4"
+  "hash": "3566e1d5ed46ca2481e39c212945686666e172577e0b4276be88e694e9947c96"
 }

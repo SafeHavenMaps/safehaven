@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color\n            FROM tags\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT id, title, is_filter, is_primary_filter, filter_description,\n                default_filter_status, version, fill_color, border_color\n            FROM tags\n            WHERE id = ANY($1)\n            ",
   "describe": {
     "columns": [
       {
@@ -20,36 +20,42 @@
       },
       {
         "ordinal": 3,
+        "name": "is_primary_filter",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
         "name": "filter_description",
         "type_info": "Text"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "default_filter_status",
         "type_info": "Bool"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "version",
         "type_info": "Int4"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "fill_color",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "border_color",
         "type_info": "Varchar"
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "UuidArray"
       ]
     },
     "nullable": [
+      false,
       false,
       false,
       false,
@@ -60,5 +66,5 @@
       false
     ]
   },
-  "hash": "9be7b308ba3d6cad8fe088df843b016181634f11269294ec4c00befcdf6d1caf"
+  "hash": "0b8f9725b067c32004395011b216542e3ba6ea5b58054bcacd91966857c42466"
 }
