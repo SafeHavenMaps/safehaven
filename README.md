@@ -4,7 +4,7 @@ An open-source project to create a map of safe spaces for people in need.
 
 ## Deploy
 
-We provide docker images to deploy SafeHaven. You can find the releases in the 
+We provide docker images that are ready to deploy SafeHaven. You can find the releases in the 
 [packages view of the SafeHavenMaps organisation](https://github.com/SafeHavenMaps/safehaven/pkgs/container/safehaven).
 
 ### Pre-requisites
@@ -28,8 +28,9 @@ ALTER DATABASE safehaven SET default_text_search_config = 'pg_catalog.french';
 ## Configure
 
 SafeHaven is initialized with a default user named `admin` with a random password, which can be retrieved from backend logs.
+The administration panel will provide you with the ability to create new users and manage the application.
 
-The administration panel will provide you with the ability to create new users and manage the application. A wiki will be available soon to help you with the configuration.
+To learn more about the configuration, you can visit [our documentation website](https://docs.safehavenmaps.org).
 
 ### Start the docker container:
 
@@ -39,22 +40,19 @@ docker run -d \
   -e SH__DATABASE__POOL_SIZE="5" \                                    # Set the number of connections to the database
   -e SH__SECURE_COOKIE="true" \                                       # Activate if you have a reverse proxy with HTTPS.
   -e SH__TOKEN_SECRET="SecretForValidatingAngSigningTokens" \         # Set a secret that will be used to sign sessions
-  ghcr.io/safehavenmaps/safehaven:latest                              # Change latest to the latest version, check the releases
+  ghcr.io/safehavenmaps/safehaven:1.0.0                               # Change latest to the latest version, check the releases
 ```
-
-## Current status
-
-This project is in beta. Expect bug.
 
 ## Contributing
 
-We welcome contributions from everyone. To spin up a development environment, follow these steps:
+We welcome contributions from everyone. 
+
+To spin up a development environment, follow these steps:
 
 **Pre-requisites:**
 
 - A working installation of Nix
   - Supports of Nix Flakes is required
-- A PostgreSQL database server with PostGIS extension enabled
 
 **Steps:**
 
@@ -68,3 +66,4 @@ We welcome contributions from everyone. To spin up a development environment, fo
 - Inside the root folder:
   - Run `regen_api` to regenerate the API
   - Run `start_dev_env` to start the stack using process-compose
+    - You can add the argument `db` to `start_dev_env` to start a PostgreSQL server if you do not have one.
