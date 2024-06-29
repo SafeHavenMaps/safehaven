@@ -62,17 +62,17 @@
             outlined
             size="small"
             class="m-1"
-            @click="resetFilteringCategories"
+            @click="selectAllFilteringCategories"
           >
-            Réinitialiser
+            Tout sélectionner
           </Button>
           <Button
             outlined
             size="small"
             class="m-1"
-            @click="selectAllFilteringCategories"
+            @click="resetFilteringCategories"
           >
-            Tout sélectionner
+            Réinitialiser
           </Button>
         </div>
         <div

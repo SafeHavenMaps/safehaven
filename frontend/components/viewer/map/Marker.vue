@@ -80,7 +80,7 @@ const handleClick = () => {
     transform: translateY(0%);
   }
   100% {
-    transform: translateY(-50%);
+    transform: translateY(-40%);
   }
 }
 </style>
