@@ -222,7 +222,11 @@ catch {
     window.location.href = state.redirectUrl
   }
   else {
-    window.location.href = '/404'
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Page Not Found',
+      fatal: true,
+    })
   }
 }
 
