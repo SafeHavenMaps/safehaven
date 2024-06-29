@@ -202,7 +202,7 @@ if (!(table_key in state.tablesQueryParams)) {
   }
 }
 else {
-  firstRow.value = state.tablesQueryParams[table_key].currentPage * state.tablesQueryParams[table_key].pageSize - 1
+  firstRow.value = (state.tablesQueryParams[table_key].currentPage - 1) * state.tablesQueryParams[table_key].pageSize
 }
 
 let forceFullRefresh = false

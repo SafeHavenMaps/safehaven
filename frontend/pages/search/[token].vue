@@ -128,10 +128,13 @@
       <template #content>
         <DataView
           :value="currentEntitiesResults!.entities"
+          :first="firstRow"
           :rows="pageSize"
+          :rows-per-page-options="[5, 10, 20, 50]"
           :total-records="currentEntitiesResults!.total_results"
           data-key="id"
           paginator
+          lazy
           layout="list"
           @page="onPage"
         >
@@ -226,6 +229,7 @@ catch {
 const query = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
+const firstRow = ref(0)
 
 const researchIncrement = ref(0)
 
@@ -242,12 +246,14 @@ function resultLabel() {
 async function submitSearch() {
   currentPage.value = 1
   pageSize.value = 20
+  firstRow.value = 0
   await refreshResult()
 }
 
 function onPage(event: PageState) {
   currentPage.value = event.page + 1
   pageSize.value = event.rows
+  firstRow.value = (currentPage.value - 1) * pageSize.value
   refreshResult()
 }
 
