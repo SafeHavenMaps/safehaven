@@ -24,13 +24,19 @@
       helper-text="(si décoché, toutes les entités portant ce tag seront exclues des résultats par défaut)"
     />
 
+    <AdminInputSwitchField
+      id="is_filter"
+      v-model="editedTag.is_primary_filter"
+      label="Filtre mis en avant"
+    />
+
     <AdminInputTextField
-      v-if="editedTag.is_filter"
+      v-if="editedTag.is_primary_filter"
       id="filter_description"
       v-model="editedTag.filter_description"
       label="Description du filtre"
       :variant="hasBeenEdited('filter_description')"
-      helper-text="(description exposée aux utilisateurices)"
+      helper-text="(description exposée aux utilisateurices lorsqu'il est mis en avant)"
     />
 
     <AdminInputColorField

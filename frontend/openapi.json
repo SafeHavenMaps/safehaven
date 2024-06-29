@@ -3859,6 +3859,7 @@
         "required": [
           "title",
           "is_filter",
+          "is_primary_filter",
           "default_filter_status",
           "fill_color",
           "border_color"
@@ -3878,6 +3879,9 @@
             "nullable": true
           },
           "is_filter": {
+            "type": "boolean"
+          },
+          "is_primary_filter": {
             "type": "boolean"
           },
           "title": {
@@ -4369,6 +4373,7 @@
           "id",
           "title",
           "is_filter",
+          "is_primary_filter",
           "default_filter_status",
           "fill_color",
           "border_color",
@@ -4393,6 +4398,9 @@
             "format": "uuid"
           },
           "is_filter": {
+            "type": "boolean"
+          },
+          "is_primary_filter": {
             "type": "boolean"
           },
           "title": {

@@ -80,7 +80,7 @@
         >
           <span class="font-medium block mb-2">Filtres</span>
           <div
-            v-for="tag in props.filteringTags.filter(t => t.is_filter)"
+            v-for="tag in props.filteringTags.filter(t => t.is_primary_filter)"
             :key="tag.id"
             class="mb-2 p-1"
           >
@@ -220,7 +220,7 @@ const emit = defineEmits<{
 const tagSearch = ref('')
 
 function shownAdvancedTags() {
-  const base = props.filteringTags.filter(t => !t.is_filter)
+  const base = props.filteringTags.filter(t => !t.is_primary_filter)
 
   if (tagSearch.value === '') {
     return base

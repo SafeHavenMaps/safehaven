@@ -9,6 +9,7 @@ pub struct Tag {
     pub id: Uuid,
     pub title: String,
     pub is_filter: bool,
+    pub is_primary_filter: bool,
     pub default_filter_status: bool,
     pub filter_description: Option<String>,
     pub fill_color: String,
@@ -20,6 +21,7 @@ pub struct Tag {
 pub struct NewOrUpdateTag {
     pub title: String,
     pub is_filter: bool,
+    pub is_primary_filter: bool,
     pub filter_description: Option<String>,
     pub default_filter_status: bool,
     pub version: Option<i32>,
@@ -32,16 +34,19 @@ impl Tag {
         sqlx::query_as!(
             Tag,
             r#"
-            INSERT INTO tags (title, is_filter, filter_description, default_filter_status, fill_color, border_color)
-            VALUES ($1, $2, $3, $4, $5, $6)
-            RETURNING id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color
+            INSERT INTO tags (title, is_filter, is_primary_filter, 
+                filter_description, default_filter_status, fill_color, border_color)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING id, title, is_filter, is_primary_filter, filter_description,
+                default_filter_status, version, fill_color, border_color
             "#,
             tag.title,
             tag.is_filter,
+            tag.is_primary_filter,
             tag.filter_description,
             tag.default_filter_status,
             tag.fill_color,
-            tag.border_color
+            tag.border_color,
         )
         .fetch_one(conn)
         .await
@@ -62,13 +67,16 @@ impl Tag {
             Tag,
             r#"
             UPDATE tags
-            SET title = $2, is_filter = $3, filter_description = $4, default_filter_status = $5, version = $6, fill_color = $7, border_color = $8
+            SET title = $2, is_filter = $3, is_primary_filter = $4, filter_description = $5, 
+                default_filter_status = $6, version = $7, fill_color = $8, border_color = $9
             WHERE id = $1
-            RETURNING id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color
+            RETURNING id, title, is_filter, is_primary_filter, filter_description, 
+                default_filter_status, version, fill_color, border_color
             "#,
             given_id,
             update.title,
             update.is_filter,
+            update.is_primary_filter,
             update.filter_description,
             update.default_filter_status,
             update.version,
@@ -99,7 +107,8 @@ impl Tag {
         sqlx::query_as!(
             Tag,
             r#"
-            SELECT id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color
+            SELECT id, title, is_filter, is_primary_filter, filter_description, 
+                default_filter_status, version, fill_color, border_color
             FROM tags
             WHERE id = $1
             "#,
@@ -114,7 +123,8 @@ impl Tag {
         sqlx::query_as!(
             Tag,
             r#"
-            SELECT id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color
+            SELECT id, title, is_filter, is_primary_filter, filter_description,
+                default_filter_status, version, fill_color, border_color
             FROM tags
             "#
         )
@@ -130,7 +140,8 @@ impl Tag {
         sqlx::query_as!(
             Tag,
             r#"
-            SELECT id, title, is_filter, filter_description, default_filter_status, version, fill_color, border_color
+            SELECT id, title, is_filter, is_primary_filter, filter_description,
+                default_filter_status, version, fill_color, border_color
             FROM tags
             WHERE id = ANY($1)
             "#,

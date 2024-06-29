@@ -251,6 +251,7 @@ export class AppState {
     })
     this.filteringTags = this.tagsData
       .filter(tag => tag.allowed)
+      .filter(tag => tag.is_filter)
       .map((tag) => {
         return {
           ...tag,
