@@ -25,13 +25,15 @@
     />
 
     <AdminInputSwitchField
+      v-if="editedTag.is_filter"
       id="is_filter"
       v-model="editedTag.is_primary_filter"
-      label="Filtre mis en avant"
+      label="Mettre en avant le filtre"
+      helper-text="(si coché, le filtre sera présent dans le panneau de filtrage en dessous du choix des catégories)"
     />
 
     <AdminInputTextField
-      v-if="editedTag.is_primary_filter"
+      v-if="editedTag.is_filter && editedTag.is_primary_filter"
       id="filter_description"
       v-model="editedTag.filter_description"
       label="Description du filtre"

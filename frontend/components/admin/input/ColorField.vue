@@ -15,6 +15,7 @@
         @update:model-value="updateValue"
       />
       <label for="props.id">{{ props.label }}</label>
+      <RequiredIndicator />
     </span>
 
     <small v-if="props.helperText">{{ props.helperText }}</small>
