@@ -57,7 +57,9 @@ pub async fn admin_options_update(
     let config: ConfigurationOption = match name.as_str() {
         "general" => ConfigurationOption::General(deserialize_option(value)?),
         "safe_mode" => ConfigurationOption::SafeMode(deserialize_option(value)?),
+        "init_popup" => ConfigurationOption::InitPopup(deserialize_option(value)?),
         "cartography_init" => ConfigurationOption::CartographyInit(deserialize_option(value)?),
+        "cartography_source" => ConfigurationOption::CartographySource(deserialize_option(value)?),
         "cartography_cluster" => {
             ConfigurationOption::CartographyCluster(deserialize_option(value)?)
         }
