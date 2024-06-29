@@ -25,8 +25,8 @@
         Nouveau mot de passe :
       </label>
       <Password
-        id="password"
         v-model="newPassword"
+        input-id="password"
         :disabled="!editPassword"
         toggle-mask
         class=" -mt-2"
@@ -34,14 +34,14 @@
         :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
       />
       <label
-        for="password"
+        for="passwordConfirm"
         class="font-medium"
       >
         Confirmer le nouveau mot de passe :
       </label>
       <Password
-        id="passwordConfirm"
         v-model="newPasswordConfirm"
+        input-id="passwordConfirm"
         :disabled="!editPassword"
         toggle-mask
         class="-mt-2"

@@ -36,8 +36,9 @@
             Mot de passe
           </label>
           <Password
-            id="password"
             v-model="password"
+            input-id="password"
+            input-class="w-full"
             :feedback="false"
             :invalid="failed_attempt"
             toggle-mask

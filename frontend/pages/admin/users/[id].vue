@@ -32,20 +32,20 @@
         Nouveau mot de passe :
       </label>
       <Password
-        id="password"
         v-model="newPassword"
+        input-id="password"
         :disabled="!isNew && !editPassword"
         toggle-mask
         class="-mt-2"
         input-class="w-full"
         :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
       />
-      <label for="password">
+      <label for="passwordConfirm">
         Confirmer le nouveau mot de passe :
       </label>
       <Password
-        id="passwordConfirm"
         v-model="newPasswordConfirm"
+        input-id="passwordConfirm"
         :disabled="!isNew && !editPassword"
         toggle-mask
         class="-mt-2"
