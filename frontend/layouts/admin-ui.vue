@@ -221,7 +221,7 @@ html::not(.sh-dark) .admin-navbar {
   bottom: 0 !important;
   left: 0 !important;
   top: 74px;
-  width: 17.7rem !important;
+  width: 18rem !important;
   z-index: 1001 !important;
   transition: transform 0.3s ease-in-out !important;
   transform: translateX(0) !important;
