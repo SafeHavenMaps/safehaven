@@ -8,7 +8,8 @@
     <AdminFamiliesEditForm
       :original-form-fields="fetchedFamily.comment_form.fields"
       :on-save-callback="onSave"
-      kind-name="comment"
+      kind-name="commentaire"
+      kind="comment"
     />
   </div>
 </template>
