@@ -14,6 +14,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::collections::HashMap;
 use std::fmt::Display;
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -44,7 +45,7 @@ pub struct ViewRequest {
     active_categories: Vec<Uuid>,
     active_required_tags: Vec<Uuid>,
     active_hidden_tags: Vec<Uuid>,
-    enums_constraints: Value,
+    enums_constraints: HashMap<String, Vec<Value>>,
 }
 
 impl Display for ViewRequest {
@@ -85,6 +86,23 @@ fn is_token_allowed_for_family(token: &MapUserTokenClaims, family_id: &Uuid) -> 
     family_is_allowed && !family_is_excluded
 }
 
+fn are_constraints_allowed(
+    family_id: &Uuid,
+    forbidden_indexed: &HashMap<Uuid, Vec<String>>,
+    constraints: &HashMap<String, Vec<Value>>,
+) -> Result<(), AppError> {
+    let default_array = vec![];
+    let forbidden_fields = forbidden_indexed.get(family_id).unwrap_or(&default_array);
+
+    match constraints
+        .iter()
+        .all(|(k, v)| !forbidden_fields.contains(&k.to_string()) || v.is_empty())
+    {
+        true => Ok(()),
+        false => Err(AppError::Forbidden),
+    }
+}
+
 #[utoipa::path(
     post,
     path = "/api/map/view",
@@ -115,6 +133,13 @@ pub async fn viewer_view_request(
         request.zoom_level as f64,
     );
 
+    // Check if some of the constraints are forbidden
+    are_constraints_allowed(
+        &request.family_id,
+        &token.fam_priv_idx,
+        &request.enums_constraints,
+    )?;
+
     // Doing the request
     let request = FindEntitiesRequest {
         xmin: request.xmin,
@@ -133,7 +158,8 @@ pub async fn viewer_view_request(
         active_categories: request.active_categories,
         active_required_tags: request.active_required_tags,
         active_hidden_tags: request.active_hidden_tags,
-        enums_constraints: request.enums_constraints,
+        enums_constraints: serde_json::to_value(request.enums_constraints)
+            .expect("Enums should be serializable"),
     };
 
     Ok(AppJson(
@@ -151,7 +177,7 @@ pub struct SearchRequest {
     active_required_tags: Vec<Uuid>,
     active_hidden_tags: Vec<Uuid>,
     require_locations: bool,
-    enums_constraints: Value,
+    enums_constraints: HashMap<String, Vec<Value>>,
 }
 
 impl Display for SearchRequest {
@@ -184,6 +210,13 @@ async fn viewer_search_request(
         return Err(AppError::Unauthorized);
     }
 
+    // Check if some of the constraints are forbidden
+    are_constraints_allowed(
+        &request.family_id,
+        &token.fam_priv_idx,
+        &request.enums_constraints,
+    )?;
+
     let request = SearchEntitiesRequest {
         search_query: request.search_query,
         geographic_restriction: token.perms.geographic_restrictions.clone(),
@@ -200,7 +233,8 @@ async fn viewer_search_request(
         active_required_tags: request.active_required_tags,
         active_hidden_tags: request.active_hidden_tags,
         require_locations: request.require_locations,
-        enums_constraints: request.enums_constraints,
+        enums_constraints: serde_json::to_value(request.enums_constraints)
+            .expect("Enums should be serializable"),
     };
 
     Ok(AppJson(

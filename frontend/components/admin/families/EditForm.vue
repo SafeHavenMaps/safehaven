@@ -734,6 +734,7 @@ function onFieldAdd(key: string, title: string, form_page: number) {
     form_weight: 0,
     user_facing: true,
     indexed: false,
+    privately_indexed: false,
     mandatory: false,
   }
   edited_form_fields.value.push(new_field)

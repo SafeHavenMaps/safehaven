@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use axum::response::{IntoResponse, Response};
 use axum::RequestExt;
 use axum::{
@@ -12,7 +14,9 @@ use axum_extra::{
 };
 use chrono::{TimeDelta, Utc};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
+use crate::models::family::Family;
 use crate::{
     api::{AppError, AppState, DbConn},
     models::access_token::{AccessToken, Permissions},
@@ -21,6 +25,7 @@ use crate::{
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MapUserTokenClaims {
     pub perms: Permissions,
+    pub fam_priv_idx: HashMap<Uuid, Vec<String>>,
     pub exp: usize,
     pub iat: usize,
 }
@@ -96,12 +101,33 @@ pub async fn viewer_authentication_middleware(
                     Err(app_error) => return app_error.into_response(),
                 };
 
+            let perms = access_token.permissions.0;
+
+            let families = match perms.families_policy.allow_all {
+                true => match Family::list(&mut conn).await {
+                    Ok(families) => families,
+                    Err(app_error) => return app_error.into_response(),
+                },
+                false => {
+                    match Family::list_restricted(&perms.families_policy.allow_list, &mut conn)
+                        .await
+                    {
+                        Ok(families) => families,
+                        Err(app_error) => return app_error.into_response(),
+                    }
+                }
+            };
+
+            let fam_priv_idx: HashMap<Uuid, Vec<String>> =
+                Family::get_privately_indexed_fields_for_families(&families);
+
             // Create a new token
             let new_claims = MapUserTokenClaims {
                 iat: Utc::now().timestamp() as usize,
                 exp: (Utc::now() + TimeDelta::try_hours(1).expect("valid duration")).timestamp()
                     as usize,
-                perms: access_token.permissions.0.clone(),
+                fam_priv_idx,
+                perms: perms.clone(),
             };
             let new_token = app_state.generate_token(new_claims.clone());
 

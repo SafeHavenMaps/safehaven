@@ -3521,6 +3521,7 @@
           "display_name",
           "field_type",
           "indexed",
+          "privately_indexed",
           "mandatory",
           "user_facing",
           "form_page",
@@ -3564,7 +3565,7 @@
           },
           "indexed": {
             "type": "boolean",
-            "description": "Sets if the field is indexed (used in full text search)"
+            "description": "Sets if the field is indexed (used in full text search, or constraints search)"
           },
           "key": {
             "type": "string",
@@ -3573,6 +3574,10 @@
           "mandatory": {
             "type": "boolean",
             "description": "Sets if the field is mandatory"
+          },
+          "privately_indexed": {
+            "type": "boolean",
+            "description": "Sets if the field is indexed, the field must be indexed for this setting to be used.\nPrivatly indexed means only administrators can constraint on this field.\nIt only works for EnumSingleOption and EnumMultiOption"
           },
           "user_facing": {
             "type": "boolean",
@@ -4329,7 +4334,13 @@
               "format": "uuid"
             }
           },
-          "enums_constraints": {},
+          "enums_constraints": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {}
+            }
+          },
           "family_id": {
             "type": "string",
             "format": "uuid"
@@ -4508,7 +4519,13 @@
               "format": "uuid"
             }
           },
-          "enums_constraints": {},
+          "enums_constraints": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {}
+            }
+          },
           "family_id": {
             "type": "string",
             "format": "uuid"

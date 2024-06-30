@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::api::auth::MapUserTokenClaims;
 use crate::api::{AppError, AppJson, AppState, DbConn};
 use crate::models::options::{
@@ -105,13 +107,6 @@ async fn bootstrap(
 
     tracing::trace!("Bootstrapping: found access token");
 
-    let signed_token = app_state.generate_token(MapUserTokenClaims {
-        iat: Utc::now().timestamp() as usize,
-        exp: (Utc::now() + TimeDelta::try_minutes(2).expect("valid duration")).timestamp() as usize,
-        perms: perms.clone(),
-    });
-    tracing::trace!("Generated access token");
-
     let families = match perms.families_policy.allow_all {
         true => Family::list(&mut conn).await?,
         false => Family::list_restricted(&perms.families_policy.allow_list, &mut conn).await?,
@@ -119,6 +114,17 @@ async fn bootstrap(
     tracing::trace!("Loaded {} families", families.len());
 
     let families_ids: Vec<_> = families.iter().map(|f| f.id).collect();
+
+    let fam_priv_idx: HashMap<Uuid, Vec<String>> =
+        Family::get_privately_indexed_fields_for_families(&families);
+
+    let signed_token = app_state.generate_token(MapUserTokenClaims {
+        iat: Utc::now().timestamp() as usize,
+        exp: (Utc::now() + TimeDelta::try_minutes(2).expect("valid duration")).timestamp() as usize,
+        fam_priv_idx,
+        perms: perms.clone(),
+    });
+    tracing::trace!("Generated access token");
 
     let categories = Category::list_with_families(families_ids, &mut conn).await?;
     tracing::trace!("Loaded {} categories", categories.len());
