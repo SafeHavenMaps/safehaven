@@ -173,7 +173,7 @@
                 />
 
                 <AdminInputSwitchField
-                  v-if="indexableTypes.includes(field.field_type)"
+                  v-if="kind=='entity' && indexableTypes.includes(field.field_type)"
                   :id="'indexed_' + index"
                   v-model="field.indexed"
                   :label="searchableTypes.includes(field.field_type) ? 'Recherchable' : 'Filtrable'"
@@ -184,7 +184,7 @@
                 />
 
                 <AdminInputSwitchField
-                  v-if="filterableTypes.includes(field.field_type)"
+                  v-if="kind=='entity' && filterableTypes.includes(field.field_type)"
                   :id="'privately_indexed_' + index"
                   v-model="field.privately_indexed"
                   :label="'Filtrage admin uniquement'"
@@ -524,6 +524,7 @@ import type { ConfirmationOptions } from 'primevue/confirmationoptions'
 import type { FormField, StringFieldTypeMetadata, OptionsFieldTypeMetadata, EventsFieldTypeMetadata } from '~/lib'
 
 const props = defineProps<{
+  kind: 'entity' | 'comment'
   kindName: string
   originalFormFields: FormField[]
   onSaveCallback: (editedFormFields: FormField[]) => Promise<{ error: Error | undefined }>
@@ -733,7 +734,7 @@ function onFieldTypeChange(field: FormField) {
   }
   else {
     if (display_indexes.value[field.key] == 'notDisplayed')
-      field.privately_indexed = true
+      field.privately_indexed = field.indexed
   }
 }
 

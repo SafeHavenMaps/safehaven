@@ -20,6 +20,7 @@
           :original-form-fields="fetchedFamily.entity_form.fields"
           :on-save-callback="onSave"
           kind-name="entité"
+          kind="entity"
         />
       </TabPanel>
       <TabPanel value="1">
