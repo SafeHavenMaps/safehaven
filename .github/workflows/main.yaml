@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Install Nix
         uses: cachix/install-nix-action@v27
@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Install Nix
         uses: cachix/install-nix-action@v27
@@ -62,7 +62,9 @@ jobs:
               docker-archive:/dev/stdin \
               docker://ghcr.io/safehavenmaps/safehaven:$TAG
 
-  build_aarch64:
+  build_arm64:
+    # aarch64 are terribly long. We only build on release events.
+    if: github.event_name == 'release'
     needs:
       - check
     name: Build arm64 Docker image
@@ -70,8 +72,8 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      
+        uses: actions/checkout@v4
+
       - name: Install QEMU
         run: sudo apt-get install -y qemu-user-static
 
