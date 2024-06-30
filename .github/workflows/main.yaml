@@ -7,8 +7,7 @@ on:
       - created
 
 jobs:
-  build:
-    name: Build
+  check:
     runs-on: ubuntu-latest
 
     services:
@@ -22,25 +21,72 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Set up Nix
-        uses: DeterminateSystems/nix-installer-action@main
-
-      - name: Set up Nix Caching using GitHub Actions Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v2
-
-      - name: Check health of Nix flake input
-        uses: DeterminateSystems/flake-checker-action@main
+        
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
 
       - name: Run project checks
         run: nix develop -c check_project
+  
+  build_x64:
+    needs:
+      - check
+    name: Build x86_64 Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
 
       - name: Set container release tag
         run: |
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
-            echo -n "${GITHUB_REF#refs/tags/}" > ./container_release
+            echo -n "${GITHUB_REF#refs/tags/}-x64" > ./container_release
           else
-            echo -n "main-$(git rev-parse --short HEAD)" > ./container_release
+            echo -n "main-$(git rev-parse --short HEAD)-x64" > ./container_release
+          fi
+          # Export value to Github variables
+          echo "TAG=$(cat ./container_release)" >> $GITHUB_ENV
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | skopeo login ghcr.io --username ${{ github.actor }} --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          nix build .#dockerImage
+          ./result | gzip --fast | \
+            skopeo copy \
+              docker-archive:/dev/stdin \
+              docker://ghcr.io/safehavenmaps/safehaven:$TAG
+
+  build_aarch64:
+    needs:
+      - check
+    name: Build arm64 Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Install QEMU
+        run: sudo apt-get install -y qemu-user-static
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            system = aarch64-linux
+
+      - name: Set container release tag
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            echo -n "${GITHUB_REF#refs/tags/}-arm64" > ./container_release
+          else
+            echo -n "main-$(git rev-parse --short HEAD)-arm64" > ./container_release
           fi
           # Export value to Github variables
           echo "TAG=$(cat ./container_release)" >> $GITHUB_ENV
