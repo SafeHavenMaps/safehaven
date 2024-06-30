@@ -173,12 +173,24 @@
                 />
 
                 <AdminInputSwitchField
+                  v-if="indexableTypes.includes(field.field_type)"
                   :id="'indexed_' + index"
                   v-model="field.indexed"
-                  label="Recherchable"
+                  :label="searchableTypes.includes(field.field_type) ? 'Recherchable' : 'Filtrable'"
                   :variant="hasFieldAttributeBeenEdited(index, 'indexed')"
                   :disabled="display_indexes[field.key]=='notDisplayed'
-                    || !indexableTypes.includes(field.field_type)"
+                    && searchableTypes.includes(field.field_type)"
+                  @update:model-value="onIndexableChange(field)"
+                />
+
+                <AdminInputSwitchField
+                  v-if="filterableTypes.includes(field.field_type)"
+                  :id="'privately_indexed_' + index"
+                  v-model="field.privately_indexed"
+                  :label="'Filtrage admin uniquement'"
+                  :variant="hasFieldAttributeBeenEdited(index, 'privately_indexed')"
+                  :disabled="display_indexes[field.key]=='notDisplayed'"
+                  @update:model-value="onIndexableChange(field)"
                 />
               </span>
             </div>
@@ -564,7 +576,9 @@ edited_form_fields.value.forEach((field) => {
   }
 })
 
-const indexableTypes = ['SingleLineText', 'MultiLineText', 'EnumSingleOption', 'EnumMultiOption']
+const searchableTypes = ['SingleLineText', 'MultiLineText']
+const filterableTypes = ['EnumSingleOption', 'EnumMultiOption']
+const indexableTypes = [...searchableTypes, ...filterableTypes]
 
 function hasFieldAttributeBeenEdited(index: number, attribute: keyof FormField) {
   return index < props.originalFormFields.length
@@ -662,7 +676,10 @@ function onDisplayIndexChange(field: FormField, new_display_index: 'notDisplayed
     })
   }
   if (new_display_index === 'notDisplayed' || new_display_index === null) {
-    field.indexed = false
+    if (filterableTypes.includes(field.field_type))
+      field.privately_indexed = true
+    else
+      field.indexed = false
     max_display_index.value -= 1
   }
   else {
@@ -707,7 +724,25 @@ function onFieldTypeChange(field: FormField) {
   }
   if (!indexableTypes.includes(field.field_type)) {
     field.indexed = false
+    field.privately_indexed = false
   }
+  else if (!filterableTypes.includes(field.field_type)) {
+    field.privately_indexed = false
+    if (display_indexes.value[field.key] == 'notDisplayed')
+      field.indexed = false
+  }
+  else {
+    if (display_indexes.value[field.key] == 'notDisplayed')
+      field.privately_indexed = true
+  }
+}
+
+function onIndexableChange(field: FormField) {
+  if (filterableTypes.includes(field.field_type))
+    if (display_indexes.value[field.key] == 'notDisplayed')
+      field.privately_indexed = field.indexed
+    else
+      field.privately_indexed = field.privately_indexed && field.indexed
 }
 
 function onFieldDelete(key: string) {
