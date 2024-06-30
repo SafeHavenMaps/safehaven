@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::api::AppError;
 use serde::{Deserialize, Serialize};
 use serde_json::{to_value, Value};
@@ -47,8 +49,13 @@ pub struct Field {
     /// if it's an email, a phone number, etc...
     pub field_type_metadata: Option<Value>,
 
-    /// Sets if the field is indexed (used in full text search)
+    /// Sets if the field is indexed (used in full text search, or constraints search)
     pub indexed: bool,
+
+    /// Sets if the field is indexed, the field must be indexed for this setting to be used.
+    /// Privatly indexed means only administrators can constraint on this field.
+    /// It only works for EnumSingleOption and EnumMultiOption
+    pub privately_indexed: bool,
 
     /// Sets if the field is mandatory
     pub mandatory: bool,
@@ -416,5 +423,25 @@ impl Family {
         .fetch_one(conn)
         .await
         .map_err(AppError::Database)
+    }
+
+    pub fn get_privately_indexed_fields_for_families(
+        families: &Vec<Family>,
+    ) -> HashMap<Uuid, Vec<String>> {
+        families
+            .iter()
+            .map(|f| {
+                (
+                    f.id,
+                    f.entity_form
+                        .0
+                        .fields
+                        .iter()
+                        .filter(|fi| fi.privately_indexed)
+                        .map(|fi| fi.key.clone())
+                        .collect(),
+                )
+            })
+            .collect()
     }
 }

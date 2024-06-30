@@ -131,7 +131,10 @@ export class AppState {
       })
 
     this.filteringEnums = family.entity_form.fields
-      .filter(f => f.indexed && (f.field_type === 'EnumMultiOption' || f.field_type === 'EnumSingleOption'))
+      .filter(
+        f => f.indexed
+        && !f.privately_indexed
+        && (f.field_type === 'EnumMultiOption' || f.field_type === 'EnumSingleOption'))
       .map((f) => {
         return {
           key: f.key,
@@ -253,6 +256,7 @@ export class AppState {
         allowed: data.allowed_tags.includes(tag.id),
       }
     })
+
     this.filteringTags = this.tagsData
       .filter(tag => tag.allowed)
       .filter(tag => tag.is_filter)

@@ -193,6 +193,7 @@ pub enum AppError {
     TokenValidation,
     BadUsernameOrPassword,
     Unauthorized,
+    Forbidden,
     Validation(String),
     Database(sqlx::Error),
     InvalidPagination,
@@ -253,6 +254,7 @@ impl IntoResponse for AppError {
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized", None),
             AppError::InvalidPagination => (StatusCode::BAD_REQUEST, "invalid_pagination", None),
             AppError::Internal(e) => (StatusCode::INTERNAL_SERVER_ERROR, "internal_error", e),
+            AppError::Forbidden => (StatusCode::FORBIDDEN, "forbidden", None),
         };
 
         let resp = (
