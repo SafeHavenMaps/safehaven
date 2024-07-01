@@ -353,6 +353,7 @@
   </Dialog>
 
   <ViewerEntityAddForm
+    v-if="state.permissions?.can_add_entity"
     ref="entityAddForm"
     :family="state.activeFamily"
     :categories="

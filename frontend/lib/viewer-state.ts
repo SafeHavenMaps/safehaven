@@ -12,6 +12,7 @@ import type {
   FetchedEntity,
   InitConfig,
   EnumFilter,
+  PublicPermissions,
 } from '~/lib'
 
 type ViewData = {
@@ -32,11 +33,11 @@ export class AppState {
   }
 
   public initConfig: InitConfig | null = null
+  public permissions: PublicPermissions | null = null
 
   private familiesData: Family[] | null = null
   private categoriesData: AllowedCategory[] | null = null
   private tagsData: AllowedTag[] | null = null
-  private canAccessCommentsData = false
 
   private familiesLookupTable: Record<string, Family> = {}
   private categoriesLookupTable: Record<string, Category> = {}
@@ -83,10 +84,6 @@ export class AppState {
           .filter(f => f.active.length > 0)
           .map(f => [f.key, f.active]),
       )
-  }
-
-  get canAccessComments() {
-    return this.canAccessCommentsData
   }
 
   get activeHiddenTags() {
@@ -279,7 +276,13 @@ export class AppState {
       this.tagsLookupTable[tag.id] = tag
     })
 
-    this.canAccessCommentsData = data.can_access_comments
+    this.permissions = {
+      can_list_entities: data.can_list_entities,
+      can_access_entity: data.can_access_entity,
+      can_add_entity: data.can_add_entity,
+      can_access_comments: data.can_access_comments,
+      can_add_comment: data.can_add_comment,
+    }
 
     if (this.familiesData.length === 0) {
       throw new Error('No families available')
