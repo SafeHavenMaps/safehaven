@@ -426,7 +426,7 @@ impl Family {
     }
 
     pub fn get_privately_indexed_fields_for_families(
-        families: &Vec<Family>,
+        families: &[Family],
     ) -> HashMap<Uuid, Vec<String>> {
         families
             .iter()
