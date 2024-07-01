@@ -120,8 +120,12 @@ pub async fn viewer_view_request(
 ) -> Result<AppJson<EntitiesAndClusters>, AppError> {
     tracing::trace!("Received view request {}", request);
 
+    if !token.perms.can_list_entities {
+        return Err(AppError::Forbidden);
+    }
+
     if !is_token_allowed_for_family(&token, &request.family_id) {
-        return Err(AppError::Unauthorized);
+        return Err(AppError::Forbidden);
     }
 
     let dyn_config = app_state.dyn_config.read().await;
@@ -206,8 +210,12 @@ async fn viewer_search_request(
 ) -> Result<AppJson<ViewerCachedEntitiesWithPagination>, AppError> {
     tracing::trace!("Received search request {}", request);
 
+    if !token.perms.can_list_entities {
+        return Err(AppError::Forbidden);
+    }
+
     if !is_token_allowed_for_family(&token, &request.family_id) {
-        return Err(AppError::Unauthorized);
+        return Err(AppError::Forbidden);
     }
 
     // Check if some of the constraints are forbidden
@@ -245,14 +253,14 @@ async fn viewer_search_request(
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct PublicNewEntityRequest {
     entity: PublicNewEntity,
-    comment: PublicNewComment,
+    comment: Option<PublicNewComment>,
     hcaptcha_token: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct PublicNewEntityResponse {
     entity: PublicEntity,
-    comment: PublicComment,
+    comment: Option<PublicComment>,
 }
 
 async fn check_captcha(state: AppState, response: Option<String>) -> Result<(), AppError> {
@@ -299,16 +307,26 @@ async fn check_captcha(state: AppState, response: Option<String>) -> Result<(), 
 async fn viewer_new_entity(
     DbConn(mut conn): DbConn,
     State(state): State<AppState>,
+    token: MapUserTokenClaims,
     Json(request): Json<PublicNewEntityRequest>,
 ) -> Result<AppJson<PublicNewEntityResponse>, AppError> {
+    if !token.perms.can_add_entity {
+        return Err(AppError::Forbidden);
+    }
+
+    if !token.perms.can_add_comment && request.comment.is_some() {
+        return Err(AppError::Forbidden);
+    }
+
     check_captcha(state, request.hcaptcha_token).await?;
 
     let db_entity = PublicEntity::new(request.entity, &mut conn).await?;
+    let mut db_comment = None;
 
-    let mut new_comment = request.comment;
-    new_comment.entity_id = db_entity.id;
-
-    let db_comment = PublicComment::new(new_comment, &mut conn).await?;
+    if let Some(mut comment) = request.comment {
+        comment.entity_id = db_entity.id;
+        db_comment = Some(PublicComment::new(comment, &mut conn).await?);
+    }
 
     Ok(AppJson(PublicNewEntityResponse {
         entity: db_entity,
@@ -334,8 +352,19 @@ pub struct NewCommentRequest {
 async fn viewer_new_comment(
     DbConn(mut conn): DbConn,
     State(state): State<AppState>,
+    token: MapUserTokenClaims,
     Json(request): Json<NewCommentRequest>,
 ) -> Result<AppJson<PublicComment>, AppError> {
+    if !token.perms.can_add_comment {
+        return Err(AppError::Forbidden);
+    }
+
+    let target_entity = PublicEntity::get(request.comment.entity_id, &mut conn).await?;
+
+    if !is_token_allowed_for_family(&token, &target_entity.family_id) {
+        return Err(AppError::Forbidden);
+    }
+
     check_captcha(state, request.hcaptcha_token).await?;
     let db_comment = PublicComment::new(request.comment, &mut conn).await?;
     Ok(AppJson(db_comment))
@@ -371,7 +400,15 @@ async fn viewer_fetch_entity(
     Path(id): Path<Uuid>,
     Json(request): Json<FetchEntityRequest>,
 ) -> Result<AppJson<FetchedEntity>, AppError> {
+    if !token.perms.can_access_entity {
+        return Err(AppError::Forbidden);
+    }
+
     let entity = PublicEntity::get(id, &mut conn).await?;
+
+    if !is_token_allowed_for_family(&token, &entity.family_id) {
+        return Err(AppError::Forbidden);
+    }
 
     let can_read_entity = (token.perms.families_policy.allow_all
         || token
@@ -463,7 +500,7 @@ async fn viewer_fetch_entity(
         .collect();
 
     if !can_read_entity && filtered_children.is_empty() {
-        return Err(AppError::Unauthorized);
+        return Err(AppError::Forbidden);
     }
 
     let comments = match token.perms.can_access_comments {
