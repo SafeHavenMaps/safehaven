@@ -167,7 +167,6 @@ const tooltip_excess_tags: Ref<undefined | string[]> = ref(undefined)
 
 const firstRow = ref(0)
 const isSmallScreen = useMediaQuery('(max-width: 768px)')
-console.log(isSmallScreen.value)
 const optionalColumns = ref(['Catégorie', 'Tags', 'Visibilité'])
 const table_key = `dt-state-entities-${familyId}`
 if (!(table_key in state.tablesSelectedColumns)) {

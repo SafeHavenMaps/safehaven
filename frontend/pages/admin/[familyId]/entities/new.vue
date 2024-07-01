@@ -90,7 +90,6 @@ const familyId = useRoute().params.familyId as string
 if (state.families == undefined)
   await state.fetchFamilies()
 const family = state.families.filter(family => family.id == familyId)[0]
-console.log(family, state.families)
 
 // Fetch categories and tags if not already fetched
 if (!state.categories) {
