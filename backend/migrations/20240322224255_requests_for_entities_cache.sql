@@ -337,7 +337,7 @@ CREATE OR REPLACE FUNCTION search_entities_admin(
 BEGIN
     RETURN QUERY
     WITH filtered_entities AS (
-        SELECT 
+        SELECT
             ec.*,
             CASE
                 WHEN ec.display_name ILIKE '%' || lower(search_query) || '%' THEN 1 ELSE 0
@@ -368,10 +368,16 @@ BEGIN
             )
     ),
     ranked_entities AS (
-        SELECT 
-            fe.*,
+        SELECT DISTINCT ON (fe.entity_id)
+            fe.id,
+            fe.entity_id,
+            fe.category_id,
+            fe.tags_ids,
+            fe.family_id,
+            fe.display_name,
+            fe.hidden,
             RANK() OVER (
-                ORDER BY exact_match_score DESC,
+                ORDER BY fe.entity_id, exact_match_score DESC,
                     ts_rank(full_text_search_ts, plainto_tsquery(search_query)) DESC
             ) AS rank
         FROM filtered_entities fe
@@ -381,7 +387,7 @@ BEGIN
     ),
     paginated_results AS (
         SELECT
-            re.entity_id AS id,
+            re.id,
             re.entity_id,
             re.category_id,
             re.tags_ids,
