@@ -24,10 +24,40 @@
       label="Actif"
     />
 
+    <Divider class="!my-2" />
+
     <AdminInputSwitchField
-      id="comments"
+      id="list_entities"
+      v-model="editedAccessToken.permissions.can_list_entities"
+      label="Permission de lister les entités"
+      helper-text="Comprend le nom, la catégorie, les tags et la date de création de chaque entité"
+    />
+
+    <AdminInputSwitchField
+      id="access_entities"
+      v-model="editedAccessToken.permissions.can_access_entity"
+      label="Permission de consulter les entités"
+      :disabled="!editedAccessToken.permissions.can_list_entities"
+    />
+
+    <AdminInputSwitchField
+      id="add_entity"
+      v-model="editedAccessToken.permissions.can_add_entity"
+      label="Permission d'ajouter une entité"
+    />
+
+    <AdminInputSwitchField
+      id="access_comments"
       v-model="editedAccessToken.permissions.can_access_comments"
-      label="Permission d'accès aux commentaires"
+      label="Permission de lister et consulter les commentaires"
+      :disabled="!editedAccessToken.permissions.can_access_entity"
+    />
+
+    <AdminInputSwitchField
+      id="add_comment"
+      v-model="editedAccessToken.permissions.can_add_comment"
+      label="Permission d'ajouter un commentaire"
+      :disabled="!editedAccessToken.permissions.can_list_entities"
     />
 
     <Divider class="!my-2" />
@@ -117,7 +147,11 @@ const editedAccessToken: Ref<NewOrUpdateAccessToken> = ref(
     ? {
         active: true,
         permissions: {
+          can_list_entities: false,
+          can_access_entity: false,
+          can_add_entity: false,
           can_access_comments: false,
+          can_add_comment: false,
           categories_policy: {
             allow_all: true,
             allow_list: [],
@@ -156,6 +190,25 @@ watch(geographicRestrictionsOn, (newValue) => {
 
 const processingRequest = ref(false)
 const toast = useToast()
+
+watch(
+  () => editedAccessToken.value.permissions.can_list_entities,
+  (newVal) => {
+    if (!newVal) {
+      editedAccessToken.value.permissions.can_access_entity = false
+      editedAccessToken.value.permissions.can_add_comment = false
+    }
+  },
+)
+
+watch(
+  () => editedAccessToken.value.permissions.can_access_entity,
+  (newVal) => {
+    if (!newVal) {
+      editedAccessToken.value.permissions.can_access_comments = false
+    }
+  },
+)
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
