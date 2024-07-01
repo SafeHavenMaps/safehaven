@@ -3194,7 +3194,11 @@
           "categories",
           "allowed_categories",
           "allowed_tags",
+          "can_list_entities",
+          "can_access_entity",
+          "can_add_entity",
           "can_access_comments",
+          "can_add_comment",
           "tags",
           "cartography_init_config"
         ],
@@ -3214,6 +3218,18 @@
             }
           },
           "can_access_comments": {
+            "type": "boolean"
+          },
+          "can_access_entity": {
+            "type": "boolean"
+          },
+          "can_add_comment": {
+            "type": "boolean"
+          },
+          "can_add_entity": {
+            "type": "boolean"
+          },
+          "can_list_entities": {
             "type": "boolean"
           },
           "cartography_init_config": {

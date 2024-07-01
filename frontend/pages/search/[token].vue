@@ -170,6 +170,12 @@
         </div>
       </template>
 
+      <ViewerCommentAddForm
+        v-if="state.permissions?.can_add_comment"
+        :family="state.activeEntity!.family"
+        :entity="state.activeEntity!.entity"
+      />
+
       <ViewerCommonEntityDisplayer
         v-if="state.activeEntity"
         :entity="state.activeEntity!"
@@ -210,6 +216,8 @@ const route = useRoute()
 const token = route.params.token as string
 try {
   await state.bootstrapWithToken(token)
+  if (!state.permissions?.can_access_entity)
+    throw 'Unauthorized'
 }
 catch {
   toast.add({
