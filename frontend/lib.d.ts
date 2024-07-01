@@ -18,7 +18,7 @@ export type Category = api.components['schemas']['Category']
 export type Tag = api.components['schemas']['Tag']
 
 export type PublicEntity = api.components['schemas']['PublicEntity']
-export type PublicListedEntity = api.components['schemas']['ListedEntity']
+export type PublicListedEntity = api.components['schemas']['PublicListedEntity']
 export type PublicNewEntity = api.components['schemas']['PublicNewEntity']
 export type PublicNewEntityRequest = api.components['schemas']['PublicNewEntityRequest']
 export type PublicNewEntityResponse = api.components['schemas']['PublicNewEntityResponse']
