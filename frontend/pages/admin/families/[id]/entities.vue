@@ -24,11 +24,12 @@
         />
       </TabPanel>
       <TabPanel value="1">
-        <p class="text-muted-color">
-          Édition directe du formulaire d'ajout en json, utile pour l'import/export.
-          Les changements ne sont pas synchonisés avec ceux de l'édition visuelle en absence de sauvegarde.
-        </p>
-      <!-- <AdminFamiliesEditFormJson /> -->
+        <AdminFamiliesEditFormJson
+          :original-form-fields="fetchedFamily.entity_form.fields"
+          :on-save-callback="onSave"
+          kind-name="entité"
+          kind="entity"
+        />
       </TabPanel>
     </TabPanels>
   </Tabs>
