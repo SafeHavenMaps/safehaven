@@ -1,9 +1,16 @@
 <template>
   <div>
     <form
-      class="flex flex-column gap-3 mx-4"
+      class="flex flex-col gap-3 mx-4"
       style="width:68rem;"
+      @submit.prevent
     >
+      <p class="text-muted-color">
+        Édition directe du formulaire d'ajout en json, utile pour l'import/export.
+        Ne réalisez d'autre changements par ce biais que si vous comprenez précisément la structure du formulaire.
+        Pour sauvegarder, utilisez le bouton de prévisualisation, qui vous permettra d'abord de vérifier vos changements dans l'outil d'édition visuelle.
+        Tout changement réalisé dans l'éditeur visuel auparavant et non sauvegardé sera écrasé.
+      </p>
       <!-- @submit.prevent="onSave" -->
       <VAceEditor
         ref="editor"
@@ -13,26 +20,29 @@
         style="height: 400px; width: 100%;"
         @init="onEditorInit"
       />
-      <button @click="logEditorContent">
-        Log Content
-      </button>
+      <span class="flex gap-1 justify-content-end">
+        <Button
+          label="Import"
+          severity="info"
+        />
+        <Button
+          label="Export"
+          severity="info"
+        />
+      </span>
 
-      <!-- <span class="flex gap-1 justify-content-end">
+      <span class="flex gap-1 justify-content-end">
         <NuxtLink to="/admin/families">
           <Button
             label="Annuler"
             severity="secondary"
-            :loading="processingRequest"
-            :disabled="processingRequest"
           />
         </NuxtLink>
         <Button
-          label="Sauvegarder"
+          label="Synchroniser et prévisualiser"
           type="submit"
-          :loading="processingRequest"
-          :disabled="processingRequest || anyFieldTitleOrKeyEmpty"
         />
-      </span> -->
+      </span>
     </form>
   </div>
 </template>
@@ -47,15 +57,23 @@ import { VAceEditor } from 'vue3-ace-editor'
 import * as ace from 'ace-builds'
 
 // Import the necessary modes and themes from ace-builds
-import 'ace-builds/src-noconflict/mode-javascript'
+import 'ace-builds/src-noconflict/mode-json'
 import 'ace-builds/src-noconflict/theme-monokai' // Theme CSS
+import type { FormField } from '~/lib'
 
 ace.config.set('basePath', '/node_modules/ace-builds/src-noconflict')
-const editorContent = ref<string>('console.log("Hello, world!")')
 
-function logEditorContent() {
-  console.log('Editor content:', 'editorContent.value')
-}
+const props = defineProps<{
+  kind: 'entity' | 'comment'
+  kindName: string
+  originalFormFields: FormField[]
+  onSaveCallback: (editedFormFields: FormField[]) => Promise<{ error: Error | undefined }>
+}>()
+
+const edited_form_fields: Ref<FormField[]> = ref(JSON.parse(JSON.stringify(props.originalFormFields))) // deep copy
+edited_form_fields.value.sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
+
+const editorContent = ref<string>(JSON.stringify(edited_form_fields, null, 2))
 
 interface CustomCompletion {
   caption: string
