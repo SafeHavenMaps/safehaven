@@ -10,7 +10,6 @@
     />
 
     <Card
-      v-if="state.permissions?.can_list_entities"
       class="m-2 p-2"
     >
       <template #header>
@@ -216,6 +215,8 @@ const route = useRoute()
 const token = route.params.token as string
 try {
   await state.bootstrapWithToken(token)
+  if (!state.permissions?.can_list_entities)
+    throw 'Unauthorized'
 }
 catch {
   toast.add({
