@@ -57,7 +57,7 @@
       id="add_comment"
       v-model="editedAccessToken.permissions.can_add_comment"
       label="Permission d'ajouter un commentaire"
-      :disabled="!editedAccessToken.permissions.can_list_entities"
+      :disabled="!editedAccessToken.permissions.can_list_entities && !editedAccessToken.permissions.can_add_entity"
     />
 
     <Divider class="!my-2" />
@@ -192,11 +192,20 @@ const processingRequest = ref(false)
 const toast = useToast()
 
 watch(
+  () => editedAccessToken.value.permissions.can_add_entity,
+  (newVal) => {
+    if (!newVal) {
+      editedAccessToken.value.permissions.can_add_comment &&= editedAccessToken.value.permissions.can_list_entities
+    }
+  },
+)
+
+watch(
   () => editedAccessToken.value.permissions.can_list_entities,
   (newVal) => {
     if (!newVal) {
       editedAccessToken.value.permissions.can_access_entity = false
-      editedAccessToken.value.permissions.can_add_comment = false
+      editedAccessToken.value.permissions.can_add_comment &&= editedAccessToken.value.permissions.can_add_entity
     }
   },
 )
