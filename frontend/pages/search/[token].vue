@@ -5,7 +5,7 @@
       :show-category-switcher="false"
       :show-search="false"
       :show-family-switcher="false"
-      :show-map-button="true"
+      :show-map-button="state.permissions?.can_access_entity"
       :show-search-button="false"
     />
 
@@ -13,9 +13,17 @@
       class="m-2 p-2"
     >
       <template #header>
-        <span class="text-2xl font-bold">
-          Recherche
-        </span>
+        <div class="flex flex-col gap-1">
+          <span class="text-2xl font-bold">
+            Recherche
+          </span>
+          <span
+            v-if="state.permissions?.can_add_comment && !state.permissions?.can_access_entity"
+            class="text-muted-color"
+          >
+            Pour ajouter un commentaire, veuillez d'abord rechercher l'entité à laquelle vous désirez l'ajouter
+          </span>
+        </div>
       </template>
 
       <template #content>
