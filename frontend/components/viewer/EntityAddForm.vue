@@ -12,7 +12,7 @@
       v-for="page in Array.from({ length: entityPageCount+1 }, (_, i) => i)"
       :key="`EntityPage${page}`"
       class="flex grow flex-col gap-4"
-      @submit.prevent="curr_page += 1"
+      @submit.prevent="include_comment || curr_page < lastNonCaptchaPage ? curr_page += 1 : onSave()"
     >
       <div
         v-if="curr_page == page"
@@ -34,6 +34,13 @@
           <FormAdresses
             v-model:locations="editedEntity!.locations"
           />
+
+          <AdminInputSwitchField
+            v-if="state.permissions?.can_add_comment"
+            id="include_comment"
+            label="Ajouter un commentaire"
+            v-model:="include_comment"
+          />
         </template>
         <template v-else>
           <FormDynamicField
@@ -53,9 +60,9 @@
             @click="curr_page -= 1"
           />
           <Button
-            :label="curr_page == entityPageCount ? 'Suivant' : 'Suivant'"
+            :label="include_comment || curr_page < entityPageCount ? 'Suivant' : 'Sauvegarder'"
             type="submit"
-            outlined
+            :outlined="include_comment || curr_page < entityPageCount"
             :disabled="!isEntityPageValid(page)"
           />
         </span>
@@ -64,10 +71,10 @@
 
     <!-- Comment Form Pages -->
     <form
-      v-for="page in Array.from({ length: commentPageCount+2 }, (_, i) => i)"
+      v-for="page in Array.from({ length: commentPageCount + 2 }, (_, i) => i)"
       :key="`CommentPage${page}`"
       class="flex grow flex-col gap-4 max-w-[30rem]"
-      @submit.prevent="curr_page < (entityPageCount + commentPageCount + 1) ? curr_page += 1 : onSave()"
+      @submit.prevent="curr_page < lastNonCaptchaPage ? curr_page += 1 : onSave()"
     >
       <div
         v-if="curr_page == entityPageCount + 1 + page"
@@ -110,9 +117,9 @@
             @click="curr_page -= 1"
           />
           <Button
-            :label="curr_page == (entityPageCount + commentPageCount + 1) ? 'Sauvegarder' : 'Suivant'"
+            :label="curr_page == lastNonCaptchaPage ? 'Sauvegarder' : 'Suivant'"
             type="submit"
-            :outlined="curr_page != (entityPageCount + commentPageCount + 1)"
+            :outlined="curr_page != lastNonCaptchaPage"
             :loading="processingRequest"
             :disabled="processingRequest || !isCommentPageValid(page)"
           />
@@ -185,6 +192,10 @@ const curr_page = ref(0)
 const entityPageCount = ref(0)
 const commentPageCount = ref(0)
 
+const include_comment = ref(!!state.permissions?.can_add_comment)
+const lastNonCaptchaPage = computed(() => include_comment.value ? entityPageCount.value + commentPageCount.value + 1 : entityPageCount.value)
+const captchaPage = computed(() => entityPageCount.value + commentPageCount.value + 2)
+
 const entityFieldValid = ref(
   props.family.entity_form.fields
     .reduce((acc, field) => {
@@ -236,7 +247,7 @@ watch(
 watch(
   () => formVisible.value,
   (__, _) => {
-    curr_page.value = Math.min(curr_page.value, entityPageCount.value + commentPageCount.value + 1)
+    curr_page.value = Math.min(curr_page.value, lastNonCaptchaPage.value)
   },
 )
 
@@ -293,7 +304,7 @@ function hCaptchaError() {
 
 async function onSave() {
   if (state.hasSafeModeEnabled) {
-    curr_page.value += 1
+    curr_page.value = captchaPage.value
   }
   else {
     await realOnSave(null)
@@ -305,15 +316,17 @@ async function realOnSave(token: string | null) {
   try {
     await state.client.createEntity({
       entity: editedEntity.value,
-      comment: editedComment.value,
+      comment: include_comment.value ? editedComment.value : null,
       hcaptcha_token: token,
     })
     formVisible.value = false
-    toast.add({ severity: 'success', summary: 'Succès', detail: 'Entité et commentaire ajoutés avec succès', life: 3000 })
+    toast.add({ severity: 'success', summary: 'Succès',
+      detail: include_comment.value ? 'Entité et commentaire ajoutés avec succès' : 'Entité ajoutée avec succès', life: 3000 })
     reset_refs()
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur lors de l\'ajout de l\'entité ou du commentaire', life: 3000 })
+    toast.add({ severity: 'error', summary: 'Erreur',
+      detail: include_comment.value ? 'Erreur lors de l\'ajout de l\'entité ou du commentaire' : 'Erreur lors de l\'ajout de l\'entité', life: 3000 })
   }
   processingRequest.value = false
 }
