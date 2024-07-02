@@ -9,7 +9,10 @@
       :show-search-button="false"
     />
 
-    <Card class="m-2 p-2">
+    <Card
+      v-if="state.permissions?.can_list_entities"
+      class="m-2 p-2"
+    >
       <template #header>
         <span class="text-2xl font-bold">
           Recherche
@@ -151,18 +154,16 @@
     </Card>
 
     <Dialog
+      v-if="state.hasActiveEntity"
       v-model:visible="state.hasActiveEntity"
       maximizable
       :style="{ width: '50rem' }"
       :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
       modal
+      dismissable-mask
     >
       <template #header>
-        <div
-          v-if="
-            state.activeEntity"
-          class="flex items-center gap-2"
-        >
+        <div class="flex items-center gap-2">
           <CategoryTag :category="state.activeEntity!.category" />
           <h3 class="grow font-bold text-lg m-0">
             {{ state.activeEntity!.entity.display_name }}
@@ -177,7 +178,6 @@
       />
 
       <ViewerCommonEntityDisplayer
-        v-if="state.activeEntity"
         :entity="state.activeEntity!"
         :categories="state.categories"
         @entity-selected="displayEntityId"
@@ -216,8 +216,6 @@ const route = useRoute()
 const token = route.params.token as string
 try {
   await state.bootstrapWithToken(token)
-  if (!state.permissions?.can_access_entity)
-    throw 'Unauthorized'
 }
 catch {
   toast.add({

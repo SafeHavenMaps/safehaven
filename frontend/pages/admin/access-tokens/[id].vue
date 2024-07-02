@@ -30,7 +30,7 @@
       id="list_entities"
       v-model="editedAccessToken.permissions.can_list_entities"
       label="Permission de lister les entités"
-      helper-text="Comprend le nom, la catégorie, les tags et la date de création de chaque entité"
+      helper-text="Comprend le nom, la catégorie, les tags, les parents, les adresses et la date de création de chaque entité"
     />
 
     <AdminInputSwitchField

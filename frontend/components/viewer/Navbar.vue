@@ -98,6 +98,7 @@
               </Button>
 
               <Button
+                v-if="state.permissions?.can_add_entity"
                 label="Ajouter"
                 severity="info"
                 @click="openAddModal()"
@@ -161,6 +162,7 @@
           </Button>
 
           <Button
+            v-if="state.permissions?.can_add_entity"
             label="Ajouter"
             severity="info"
             @click="openAddModal()"
