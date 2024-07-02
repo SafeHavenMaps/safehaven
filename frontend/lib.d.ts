@@ -18,7 +18,7 @@ export type Category = api.components['schemas']['Category']
 export type Tag = api.components['schemas']['Tag']
 
 export type PublicEntity = api.components['schemas']['PublicEntity']
-export type PublicListedEntity = api.components['schemas']['ListedEntity']
+export type PublicListedEntity = api.components['schemas']['PublicListedEntity']
 export type PublicNewEntity = api.components['schemas']['PublicNewEntity']
 export type PublicNewEntityRequest = api.components['schemas']['PublicNewEntityRequest']
 export type PublicNewEntityResponse = api.components['schemas']['PublicNewEntityResponse']
@@ -71,6 +71,13 @@ export type AccessToken = api.components['schemas']['AccessToken']
     permissions: Permissions & { geographic_restrictions: null | [number, number][][] }
   }
 export type AccessTokenStats = api.components['schemas']['AccessTokenStats']
+export type PublicPermissions = {
+  can_list_entities: boolean
+  can_access_entity: boolean
+  can_add_entity: boolean
+  can_access_comments: boolean
+  can_add_comment: boolean
+}
 
 export type User = api.components['schemas']['User']
 export type NewOrUpdatedUser = api.components['schemas']['NewOrUpdatedUser']

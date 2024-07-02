@@ -70,7 +70,11 @@ pub struct BootstrapResponse {
     categories: Vec<Category>,
     allowed_categories: Vec<Uuid>,
     allowed_tags: Vec<Uuid>,
+    can_list_entities: bool,
+    can_access_entity: bool,
+    can_add_entity: bool,
     can_access_comments: bool,
+    can_add_comment: bool,
     tags: Vec<Tag>,
     cartography_init_config: CartographyInitConfig,
 }
@@ -177,7 +181,11 @@ async fn bootstrap(
         categories,
         allowed_categories,
         allowed_tags,
+        can_list_entities: perms.can_list_entities,
+        can_access_entity: perms.can_access_entity,
+        can_add_entity: perms.can_add_entity,
         can_access_comments: perms.can_access_comments,
+        can_add_comment: perms.can_add_comment,
         tags,
         cartography_init_config: dyn_config.cartography_init.clone(),
     };

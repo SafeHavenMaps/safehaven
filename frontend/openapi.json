@@ -3194,7 +3194,11 @@
           "categories",
           "allowed_categories",
           "allowed_tags",
+          "can_list_entities",
+          "can_access_entity",
+          "can_add_entity",
           "can_access_comments",
+          "can_add_comment",
           "tags",
           "cartography_init_config"
         ],
@@ -3214,6 +3218,18 @@
             }
           },
           "can_access_comments": {
+            "type": "boolean"
+          },
+          "can_access_entity": {
+            "type": "boolean"
+          },
+          "can_add_comment": {
+            "type": "boolean"
+          },
+          "can_add_entity": {
+            "type": "boolean"
+          },
+          "can_list_entities": {
             "type": "boolean"
           },
           "cartography_init_config": {
@@ -4002,10 +4018,26 @@
           "families_policy",
           "categories_policy",
           "tags_policy",
-          "can_access_comments"
+          "can_list_entities",
+          "can_access_entity",
+          "can_access_comments",
+          "can_add_entity",
+          "can_add_comment"
         ],
         "properties": {
           "can_access_comments": {
+            "type": "boolean"
+          },
+          "can_access_entity": {
+            "type": "boolean"
+          },
+          "can_add_comment": {
+            "type": "boolean"
+          },
+          "can_add_entity": {
+            "type": "boolean"
+          },
+          "can_list_entities": {
             "type": "boolean"
           },
           "categories_policy": {
@@ -4201,12 +4233,16 @@
       "PublicNewEntityRequest": {
         "type": "object",
         "required": [
-          "entity",
-          "comment"
+          "entity"
         ],
         "properties": {
           "comment": {
-            "$ref": "#/components/schemas/PublicNewComment"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicNewComment"
+              }
+            ],
+            "nullable": true
           },
           "entity": {
             "$ref": "#/components/schemas/PublicNewEntity"
@@ -4220,12 +4256,16 @@
       "PublicNewEntityResponse": {
         "type": "object",
         "required": [
-          "entity",
-          "comment"
+          "entity"
         ],
         "properties": {
           "comment": {
-            "$ref": "#/components/schemas/PublicComment"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicComment"
+              }
+            ],
+            "nullable": true
           },
           "entity": {
             "$ref": "#/components/schemas/PublicEntity"

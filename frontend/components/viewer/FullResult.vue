@@ -54,6 +54,7 @@
           <div class="flex flex-col md:items-end gap-8">
             <div class="flex flex-row-reverse md:flex-row gap-2">
               <Button
+                v-if="state.permissions?.can_access_entity"
                 label="Voir en détail"
                 class="flex-auto md:flex-initial whitespace-nowrap"
                 @click="changeActiveEntity(props.entity)"
@@ -62,6 +63,11 @@
                   <AppIcon icon-name="eye" />
                 </template>
               </Button>
+              <ViewerCommentAddForm
+                v-if="state.permissions?.can_add_comment && !state.permissions.can_access_entity"
+                :family="state.activeFamily"
+                :entity="props.entity"
+              />
             </div>
           </div>
         </div>
@@ -71,18 +77,16 @@
 </template>
 
 <script setup lang="ts">
-import type { ViewerPaginatedCachedEntities } from '~/lib'
+import type { ViewerSearchedCachedEntity } from '~/lib'
 import state from '~/lib/viewer-state'
 
-type ReceivedEntity = ViewerPaginatedCachedEntities['entities'][0]
-
 const props = defineProps<{
-  entity: ReceivedEntity
+  entity: ViewerSearchedCachedEntity
 }>()
 
 const locations = computed(() => props.entity.locations.map(loc => [loc.x, loc.y]))
 
-function changeActiveEntity(entity: ReceivedEntity) {
+function changeActiveEntity(entity: ViewerSearchedCachedEntity) {
   state.selectEntity(entity.entity_id)
 }
 </script>

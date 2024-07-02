@@ -11,7 +11,12 @@ pub struct Permissions {
     pub categories_policy: PermissionPolicy,
     pub tags_policy: PermissionPolicy,
     pub geographic_restrictions: Option<MultiPolygon>,
+
+    pub can_list_entities: bool,
+    pub can_access_entity: bool,
     pub can_access_comments: bool,
+    pub can_add_entity: bool,
+    pub can_add_comment: bool,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
