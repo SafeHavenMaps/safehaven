@@ -79,6 +79,9 @@ import type { NewOrUpdatedUser } from '~/lib'
 import state from '~/lib/admin-state'
 import { isValidText } from '~/lib/validation'
 
+if (!state.is_admin)
+  navigateTo('/admin/home')
+
 const userId = useRoute().params.id as string
 
 const isNew = (userId === 'new')

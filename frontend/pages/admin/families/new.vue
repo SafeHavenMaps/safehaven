@@ -59,6 +59,9 @@ definePageMeta({
   layout: 'admin-ui',
 })
 
+if (!state.is_admin)
+  navigateTo('/admin/home')
+
 if (state.families == undefined)
   await state.fetchFamilies()
 

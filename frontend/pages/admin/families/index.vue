@@ -123,14 +123,16 @@ const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
   'Familles',
   'family',
-  [
-    {
-      icon: 'add',
-      label: 'Nouvelle famille',
-      severity: 'success',
-      url: `/admin/families/new`,
-    },
-  ],
+  state.is_admin
+    ? [
+        {
+          icon: 'add',
+          label: 'Nouvelle famille',
+          severity: 'success',
+          url: `/admin/families/new`,
+        },
+      ]
+    : [],
   [
     { label: 'Familles', url: '/admin/families' },
   ],
