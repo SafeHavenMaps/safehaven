@@ -24,7 +24,7 @@
     />
 
     <div
-      :hidden="!editPassword && !isNew"
+      :hidden="!editPassword"
       class="flex-col gap-4"
       :class="{ flex: isNew || editPassword }"
     >
@@ -34,11 +34,10 @@
       <Password
         v-model="newPassword"
         input-id="password"
-        :disabled="!isNew && !editPassword"
         toggle-mask
         class="-mt-2"
         input-class="w-full"
-        :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
+        :invalid="editPassword && !isValidText(newPassword)"
       />
       <label for="passwordConfirm">
         Confirmer le nouveau mot de passe :
@@ -46,11 +45,10 @@
       <Password
         v-model="newPasswordConfirm"
         input-id="passwordConfirm"
-        :disabled="!isNew && !editPassword"
         toggle-mask
         class="-mt-2"
         input-class="w-full"
-        :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
+        :invalid="editPassword && newPassword!=newPasswordConfirm"
       />
     </div>
 
@@ -90,7 +88,7 @@ const user = ref(isNew
   : await state.client.getUser(userId),
 )
 
-const editPassword = ref(false)
+const editPassword = ref(isNew)
 const newPassword = ref('')
 const newPasswordConfirm = ref('')
 
@@ -103,7 +101,7 @@ definePageMeta({
 
 function isDisabled() {
   return processingRequest.value
-    || (editPassword.value && (newPassword.value != newPasswordConfirm.value || !!isValidText(newPassword.value)))
+    || (editPassword.value && (newPassword.value != newPasswordConfirm.value || !isValidText(newPassword.value)))
     || !isValidText(user.value.name)
 }
 
