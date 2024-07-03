@@ -111,6 +111,9 @@ definePageMeta({
   layout: 'admin-ui',
 })
 
+if (!state.is_admin)
+  navigateTo('/admin/home')
+
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
   'Utilisateur⋅ices',

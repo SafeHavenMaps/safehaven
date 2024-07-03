@@ -43,6 +43,9 @@ definePageMeta({
   layout: 'admin-ui',
 })
 
+if (!state.is_admin)
+  navigateTo('/admin/home')
+
 const id = useRoute().params.id as string
 
 const fetchedFamily = await state.client.getFamily(id)
