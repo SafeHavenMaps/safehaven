@@ -31,7 +31,7 @@
         toggle-mask
         class=" -mt-2"
         input-class="w-full"
-        :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
+        :invalid="editPassword && !isValidText(newPassword)"
       />
       <label
         for="passwordConfirm"
@@ -46,7 +46,7 @@
         toggle-mask
         class="-mt-2"
         input-class="w-full"
-        :invalid="editPassword && (newPassword!=newPasswordConfirm || !newPassword)"
+        :invalid="editPassword && newPassword!=newPasswordConfirm"
       />
     </div>
 
@@ -66,7 +66,7 @@
         label="Sauvegarder"
         type="submit"
         :loading="processingRequest"
-        :disabled="processingRequest || (newPassword!=newPasswordConfirm || !newPassword)"
+        :disabled="processingRequest || (newPassword!=newPasswordConfirm || !isValidText(newPassword))"
       />
     </span>
   </form>
@@ -75,6 +75,7 @@
 <script setup lang="ts">
 import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import state from '~/lib/admin-state'
+import { isValidText } from '~/lib/validation'
 
 const editPassword = ref(false)
 const newPassword = ref('')
