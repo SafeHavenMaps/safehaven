@@ -147,8 +147,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue'
-import { useToast } from 'primevue/usetoast'
 import type { Category, EntityOrCommentData, Family, FormField, PublicNewComment, PublicNewEntity } from '~/lib'
 import state from '~/lib/viewer-state'
 import { isValidRichText, isValidText } from '~/lib/validation'

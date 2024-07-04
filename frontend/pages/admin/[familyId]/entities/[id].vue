@@ -198,7 +198,7 @@ const editedEntity: Ref<AdminNewOrUpdateEntity> = ref(JSON.parse(JSON.stringify(
 
 const processingRequest = ref(false)
 const toast = useToast()
-const entitiesUrl = useRoute().query.entitiesUrl
+const entitiesUrl = useRoute().query.entitiesUrl ?? 'entities'
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(

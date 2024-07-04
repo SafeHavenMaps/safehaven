@@ -137,7 +137,7 @@ async function refreshSearch() {
       active_categories_ids: categoryFilteringList!.value.filter(t => t.active).map(t => t.id),
       required_tags_ids: tagFilteringList!.value.filter(t => t.active).map(t => t.id),
       excluded_tags_ids: tagFilteringList!.value.filter(t => t.active === false).map(t => t.id),
-      enums_constraints: [], // We do not support enums filtering on Entity selection
+      enums_constraints: {}, // We do not support enums filtering on Entity selection
     },
   )
 }
