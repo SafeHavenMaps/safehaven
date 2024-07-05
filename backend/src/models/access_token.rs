@@ -7,15 +7,40 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
 pub struct Permissions {
+    /// Restriction to a specific set of families
     pub families_policy: PermissionPolicy,
+
+    /// Restriction to a specific set of categories
     pub categories_policy: PermissionPolicy,
+
+    /// Restriction to a specific set of tags
     pub tags_policy: PermissionPolicy,
+
+    /// Restriction to a specific area
     pub geographic_restrictions: Option<MultiPolygon>,
 
+    /// Permission to list entities
     pub can_list_entities: bool,
+
+    /// Permission to list entities with an empty or short query (can be used to list all entities)
+    pub can_list_without_query: bool,
+
+    /// Permission to list entities with filters
+    pub can_list_with_filters: bool,
+
+    /// Permission to list entities with enum constraints
+    pub can_list_with_enum_constraints: bool,
+
+    /// Permission to view an entity
     pub can_access_entity: bool,
+
+    /// Permission to view an entity's comments
     pub can_access_comments: bool,
+
+    /// Permission to add an entity
     pub can_add_entity: bool,
+
+    /// Permission to add a comment to an entity
     pub can_add_comment: bool,
 }
 

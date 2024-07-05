@@ -34,6 +34,13 @@ pub fn routes(state: &AppState) -> Router<AppState> {
         ))
 }
 
+fn require_permission(condition: bool) -> Result<(), AppError> {
+    if !condition {
+        return Err(AppError::Forbidden);
+    }
+    Ok(())
+}
+
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ViewRequest {
     family_id: Uuid,
@@ -118,15 +125,20 @@ pub async fn viewer_view_request(
     token: MapUserTokenClaims,
     Json(request): Json<ViewRequest>,
 ) -> Result<AppJson<EntitiesAndClusters>, AppError> {
+    // The token must allow to list entities
+    require_permission(token.perms.can_list_entities)?;
+
+    // The family must be allowed
+    require_permission(is_token_allowed_for_family(&token, &request.family_id))?;
+
+    // Check if some of the constraints are forbidden
+    are_constraints_allowed(
+        &request.family_id,
+        &token.fam_priv_idx,
+        &request.enums_constraints,
+    )?;
+
     tracing::trace!("Received view request {}", request);
-
-    if !token.perms.can_list_entities {
-        return Err(AppError::Forbidden);
-    }
-
-    if !is_token_allowed_for_family(&token, &request.family_id) {
-        return Err(AppError::Forbidden);
-    }
 
     let dyn_config = app_state.dyn_config.read().await;
 
@@ -136,13 +148,6 @@ pub async fn viewer_view_request(
         dyn_config.cartography_cluster.minimal_cluster_size,
         request.zoom_level as f64,
     );
-
-    // Check if some of the constraints are forbidden
-    are_constraints_allowed(
-        &request.family_id,
-        &token.fam_priv_idx,
-        &request.enums_constraints,
-    )?;
 
     // Doing the request
     let request = FindEntitiesRequest {
@@ -208,15 +213,27 @@ async fn viewer_search_request(
     token: MapUserTokenClaims,
     Json(request): Json<SearchRequest>,
 ) -> Result<AppJson<ViewerCachedEntitiesWithPagination>, AppError> {
+    // The token must allow to list entities
+    require_permission(token.perms.can_list_entities)?;
+
+    // The family must be allowed
+    require_permission(is_token_allowed_for_family(&token, &request.family_id))?;
+
+    // The token must allow to list entities with tag filters or the request must not have any tag filters
+    require_permission(
+        token.perms.can_list_with_filters
+            || (request.active_required_tags.is_empty() && request.active_hidden_tags.is_empty()),
+    )?;
+
+    // The token must allow to list entities without query or the query must be at least 4 characters long
+    require_permission(token.perms.can_list_without_query || request.search_query.len() >= 4)?;
+
+    // The token must allow to list entities with enum constraints or the request must not have any enum constraints
+    require_permission(
+        token.perms.can_list_with_enum_constraints || request.enums_constraints.is_empty(),
+    )?;
+
     tracing::trace!("Received search request {}", request);
-
-    if !token.perms.can_list_entities {
-        return Err(AppError::Forbidden);
-    }
-
-    if !is_token_allowed_for_family(&token, &request.family_id) {
-        return Err(AppError::Forbidden);
-    }
 
     // Check if some of the constraints are forbidden
     are_constraints_allowed(
@@ -310,13 +327,11 @@ async fn viewer_new_entity(
     token: MapUserTokenClaims,
     Json(request): Json<PublicNewEntityRequest>,
 ) -> Result<AppJson<PublicNewEntityResponse>, AppError> {
-    if !token.perms.can_add_entity {
-        return Err(AppError::Forbidden);
-    }
+    // The token must allow to add entities
+    require_permission(token.perms.can_add_entity)?;
 
-    if !token.perms.can_add_comment && request.comment.is_some() {
-        return Err(AppError::Forbidden);
-    }
+    // The token must allow to add comments or the request must not have any comment
+    require_permission(token.perms.can_add_comment || request.comment.is_none())?;
 
     check_captcha(state, request.hcaptcha_token).await?;
 
@@ -355,15 +370,16 @@ async fn viewer_new_comment(
     token: MapUserTokenClaims,
     Json(request): Json<NewCommentRequest>,
 ) -> Result<AppJson<PublicComment>, AppError> {
-    if !token.perms.can_add_comment {
-        return Err(AppError::Forbidden);
-    }
+    // The token must allow to add comments
+    require_permission(token.perms.can_add_comment)?;
 
     let target_entity = PublicEntity::get(request.comment.entity_id, &mut conn).await?;
 
-    if !is_token_allowed_for_family(&token, &target_entity.family_id) {
-        return Err(AppError::Forbidden);
-    }
+    // The token must allow to add comments to the entity's family
+    require_permission(is_token_allowed_for_family(
+        &token,
+        &target_entity.family_id,
+    ))?;
 
     check_captcha(state, request.hcaptcha_token).await?;
     let db_comment = PublicComment::new(request.comment, &mut conn).await?;
@@ -400,15 +416,13 @@ async fn viewer_fetch_entity(
     Path(id): Path<Uuid>,
     Json(request): Json<FetchEntityRequest>,
 ) -> Result<AppJson<FetchedEntity>, AppError> {
-    if !token.perms.can_access_entity {
-        return Err(AppError::Forbidden);
-    }
+    // The token must allow to access an entity
+    require_permission(token.perms.can_access_entity)?;
 
     let entity = PublicEntity::get(id, &mut conn).await?;
 
-    if !is_token_allowed_for_family(&token, &entity.family_id) {
-        return Err(AppError::Forbidden);
-    }
+    // The family must be allowed
+    require_permission(is_token_allowed_for_family(&token, &entity.family_id))?;
 
     let can_read_entity = (token.perms.families_policy.allow_all
         || token

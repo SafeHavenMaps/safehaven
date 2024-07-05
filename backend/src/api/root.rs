@@ -65,18 +65,47 @@ pub async fn status(State(app_state): State<AppState>) -> AppJson<StatusResponse
 
 #[derive(Serialize, ToSchema)]
 pub struct BootstrapResponse {
+    /// Signed token for subsequent requests
     signed_token: String,
+
+    /// List of known families
     families: Vec<Family>,
+
+    /// List of known categories
     categories: Vec<Category>,
+
+    /// List of allowed categories
     allowed_categories: Vec<Uuid>,
+
+    /// List of allowed tags
     allowed_tags: Vec<Uuid>,
+
+    /// Permission to list entities
     can_list_entities: bool,
+
+    /// Permission to list entities with an empty or short query (can be used to list all entities)
+    can_list_without_query: bool,
+
+    /// Permission to list entities with filters
+    can_list_with_filters: bool,
+
+    /// Permission to list entities with enum constraints
+    can_list_with_enum_constraints: bool,
+
+    /// Permission to view an entity
     can_access_entity: bool,
-    can_add_entity: bool,
+
+    /// Permission to view an entity's comments
     can_access_comments: bool,
+
+    /// Permission to add an entity
+    can_add_entity: bool,
+
+    /// Permission to add a comment to an entity
     can_add_comment: bool,
+
+    /// List of tags
     tags: Vec<Tag>,
-    cartography_init_config: CartographyInitConfig,
 }
 
 #[serde_as]
@@ -149,8 +178,6 @@ async fn bootstrap(
         }
     });
 
-    let dyn_config = app_state.dyn_config.read().await;
-
     let allowed_categories = match perms.categories_policy.allow_all {
         true => categories
             .iter()
@@ -182,12 +209,14 @@ async fn bootstrap(
         allowed_categories,
         allowed_tags,
         can_list_entities: perms.can_list_entities,
+        can_list_without_query: perms.can_list_without_query,
+        can_list_with_filters: perms.can_list_with_filters,
+        can_list_with_enum_constraints: perms.can_list_with_enum_constraints,
         can_access_entity: perms.can_access_entity,
         can_add_entity: perms.can_add_entity,
         can_access_comments: perms.can_access_comments,
         can_add_comment: perms.can_add_comment,
         tags,
-        cartography_init_config: dyn_config.cartography_init.clone(),
     };
 
     Ok(AppJson(resp))
