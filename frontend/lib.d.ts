@@ -28,13 +28,7 @@ type PaginatedVec<T> = Omit<api.components['schemas']['PaginatedVec'], 'entities
 export type ViewerCachedEntity = api.components['schemas']['ViewerCachedEntity']
 export type ViewerSearchedCachedEntity = api.components['schemas']['ViewerSearchedCachedEntity']
 export type ViewerPaginatedCachedEntities = PaginatedVec<ViewerSearchedCachedEntity>
-export type ViewerCachedEntityWithLocation = ViewerCachedEntity & {
-  web_mercator_x: number
-  web_mercator_y: number
-}
-export type ViewerPaginatedCachedEntitiesWithLocation = ViewerPaginatedCachedEntities & {
-  entities: (ViewerCachedEntityWithLocation)[]
-}
+
 export type FetchedEntity = api.components['schemas']['FetchedEntity']
 export type ResolvedFetchedEntity = FetchedEntity & {
   family: Family

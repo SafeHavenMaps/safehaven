@@ -147,12 +147,13 @@ async function goToEntity(entity: ViewerSearchedCachedEntity) {
       life: 3000,
     })
   }
+  if (entity.locations.length > 0) {
+    const location = entity.locations[0]
 
-  const location = entity.locations[0]
-
-  mapRef.value?.goToWebMercatorCoordinates([
-    location.x,
-    location.y,
-  ], 14)
+    mapRef.value?.goToWebMercatorCoordinates([
+      location.x,
+      location.y,
+    ], 14)
+  }
 }
 </script>
