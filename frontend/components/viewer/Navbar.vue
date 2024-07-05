@@ -266,25 +266,46 @@
               <Divider type="dotted" />
 
               <div style="max-height: 500px; overflow-y: auto;">
-                <div
-                  v-for="result in currentSearchEntities()"
-                  :key="result.id"
-                  class="result mb-2 p-2"
-                  @click="entityChosen(result)"
+                <DataView
+                  :value="currentEntitiesResults!.entities"
+                  :first="firstRow"
+                  :rows="pageSize"
+                  :total-records="currentEntitiesResults!.total_results"
+                  paginator
+                  :page-link-size="3"
+                  data-key="id"
+                  lazy
+                  layout="list"
+                  @page="onPage"
                 >
-                  <div>{{ result.display_name }}</div>
+                  <template #list>
+                    <div
+                      v-for="result in currentSearchEntities()"
+                      :key="result.id"
+                      class="result mb-2 p-2"
+                      @click="entityChosen(result)"
+                    >
+                      <div>{{ result.display_name }}</div>
+                      <div
+                        v-if="result.locations.length == 0"
+                        class="italic text-sm"
+                      >
+                        Aucune adresse connue
+                      </div>
+                      <span
+                        v-for="(parent, i) in result.parents"
+                        :key="parent.id"
+                        class="text-xs"
+                      >
+                        {{ parent.display_name }} {{ i < result.parents.length - 1 ? ', ' : '' }}
+                      </span>
 
-                  <div
-                    v-if="result.parent_display_name"
-                    class="text-xs"
-                  >
-                    {{ result.parent_display_name }}
-                  </div>
-
-                  <div class="mt-1">
-                    <CategoryTag :category="state.getCategory(result.category_id)" />
-                  </div>
-                </div>
+                      <div class="mt-1">
+                        <CategoryTag :category="state.getCategory(result.category_id)" />
+                      </div>
+                    </div>
+                  </template>
+                </DataView>
               </div>
             </div>
           </TabPanel>
@@ -368,11 +389,12 @@
 <script setup lang="ts">
 import type Popover from 'primevue/popover'
 import type { Coordinate } from 'ol/coordinate'
+import type { PageState } from 'primevue/paginator'
 import state from '~/lib/viewer-state'
 import defaultLogo from '~/assets/logo_square.svg'
 import type { Result as NominatimResult } from '~/lib/nominatim'
 import { freeFormSearch } from '~/lib/nominatim'
-import type { ViewerPaginatedCachedEntitiesWithLocation, ViewerSearchedCachedEntity } from '~/lib'
+import type { ViewerPaginatedCachedEntities, ViewerSearchedCachedEntity } from '~/lib'
 import type { ViewerEntityAddForm } from '#build/components'
 
 const toast = useToast()
@@ -411,7 +433,11 @@ const showInformation = ref(false)
 const oneSearchMade = ref(false)
 const filterPopupVisible = ref(false)
 const currentLocationsResults: Ref<NominatimResult[]> = ref([])
-const currentEntitiesResults: Ref<ViewerPaginatedCachedEntitiesWithLocation | null> = ref(null)
+const currentEntitiesResults: Ref<ViewerPaginatedCachedEntities | null> = ref(null)
+
+const currentPage = ref(1)
+const pageSize = ref(5)
+const firstRow = ref(0)
 
 function currentSearchEntities() {
   return currentEntitiesResults.value?.entities ?? []
@@ -445,8 +471,22 @@ async function searchLocation() {
 }
 
 async function searchEntity() {
+  currentPage.value = 1
+  pageSize.value = 5
+  firstRow.value = 0
+  await refreshResult()
+}
+
+function onPage(event: PageState) {
+  currentPage.value = event.page + 1
+  pageSize.value = event.rows
+  firstRow.value = (currentPage.value - 1) * pageSize.value
+  refreshResult()
+}
+
+async function refreshResult() {
   try {
-    currentEntitiesResults.value = await state.searchEntitiesWithLocations(entitySearch.value)
+    currentEntitiesResults.value = await state.searchEntities(entitySearch.value, currentPage.value, pageSize.value)
   }
   catch {
     toast.add({

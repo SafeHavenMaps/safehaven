@@ -351,18 +351,7 @@ export class AppState {
     )
   }
 
-  async searchEntitiesWithLocations(query: string) {
-    return await this.client.searchEntitiesWithLocations(
-      query,
-      this.activeFamilyId!,
-      this.activeFilteringCategories,
-      this.activeRequiredTags,
-      this.activeHiddenTags,
-      this.activeFilteringEnums,
-    )
-  }
-
-  async searchEntities(query: string, page: number, pageSize: number) {
+  async searchEntities(query: string, page: number, pageSize: number, require_locations?: boolean) {
     return await this.client.searchEntities(
       query,
       this.activeFamilyId!,
@@ -372,6 +361,7 @@ export class AppState {
       page,
       pageSize,
       this.activeFilteringEnums,
+      require_locations ?? false,
     )
   }
 

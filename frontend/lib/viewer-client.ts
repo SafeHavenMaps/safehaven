@@ -1,7 +1,7 @@
 import createClient from 'openapi-fetch'
 import type { paths } from './api'
 import createAuthMiddleware from './viewer-auth-middleware'
-import type { FetchedEntity, PublicNewCommentRequest, PublicNewEntityRequest, PublicComment, ViewerCachedEntityWithLocation, ViewerPaginatedCachedEntities, ViewerPaginatedCachedEntitiesWithLocation, PublicNewEntityResponse } from '~/lib'
+import type { FetchedEntity, PublicNewCommentRequest, PublicNewEntityRequest, PublicComment, ViewerPaginatedCachedEntities, PublicNewEntityResponse } from '~/lib'
 
 type Callback = () => Promise<void>
 
@@ -95,39 +95,6 @@ export default function useClient() {
       return data
     },
 
-    async searchEntitiesWithLocations(
-      query: string,
-      familyId: string,
-      activeCategories: string[],
-      activeRequiredTags: string[],
-      activeHiddenTags: string[],
-      enumsConstraints: Record<string, Array<unknown>>,
-    ): Promise<ViewerPaginatedCachedEntitiesWithLocation> {
-      const { data, error } = await rawClient.POST('/api/map/search', {
-        body: {
-          search_query: query,
-          family_id: familyId,
-          page: 1,
-          page_size: 5,
-          active_categories: activeCategories,
-          active_required_tags: activeRequiredTags,
-          active_hidden_tags: activeHiddenTags,
-          require_locations: true,
-          enums_constraints: enumsConstraints,
-        },
-      })
-      if (error) throw error
-
-      return {
-        ...data,
-        entities: data.entities.map((entity: ViewerCachedEntityWithLocation) => ({
-          ...entity,
-          web_mercator_x: entity.web_mercator_x!,
-          web_mercator_y: entity.web_mercator_y!,
-        })),
-      }
-    },
-
     async searchEntities(
       query: string,
       familyId: string,
@@ -137,6 +104,7 @@ export default function useClient() {
       page: number,
       pageSize: number,
       enumsConstraints: Record<string, Array<unknown>>,
+      require_locations?: boolean,
     ): Promise<ViewerPaginatedCachedEntities> {
       const { data, error } = await rawClient.POST('/api/map/search', {
         body: {
@@ -147,7 +115,7 @@ export default function useClient() {
           active_categories: activeCategories,
           active_required_tags: activeRequiredTags,
           active_hidden_tags: activeHiddenTags,
-          require_locations: false,
+          require_locations: require_locations ?? false,
           enums_constraints: enumsConstraints,
         },
       })
