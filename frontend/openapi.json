@@ -3195,12 +3195,14 @@
           "allowed_categories",
           "allowed_tags",
           "can_list_entities",
+          "can_list_without_query",
+          "can_list_with_filters",
+          "can_list_with_enum_constraints",
           "can_access_entity",
-          "can_add_entity",
           "can_access_comments",
+          "can_add_entity",
           "can_add_comment",
-          "tags",
-          "cartography_init_config"
+          "tags"
         ],
         "properties": {
           "allowed_categories": {
@@ -3208,53 +3210,73 @@
             "items": {
               "type": "string",
               "format": "uuid"
-            }
+            },
+            "description": "List of allowed categories"
           },
           "allowed_tags": {
             "type": "array",
             "items": {
               "type": "string",
               "format": "uuid"
-            }
+            },
+            "description": "List of allowed tags"
           },
           "can_access_comments": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to view an entity's comments"
           },
           "can_access_entity": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to view an entity"
           },
           "can_add_comment": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to add a comment to an entity"
           },
           "can_add_entity": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to add an entity"
           },
           "can_list_entities": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to list entities"
           },
-          "cartography_init_config": {
-            "$ref": "#/components/schemas/CartographyInitConfig"
+          "can_list_with_enum_constraints": {
+            "type": "boolean",
+            "description": "Permission to list entities with enum constraints"
+          },
+          "can_list_with_filters": {
+            "type": "boolean",
+            "description": "Permission to list entities with filters"
+          },
+          "can_list_without_query": {
+            "type": "boolean",
+            "description": "Permission to list entities with an empty or short query (can be used to list all entities)"
           },
           "categories": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Category"
-            }
+            },
+            "description": "List of known categories"
           },
           "families": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Family"
-            }
+            },
+            "description": "List of known families"
           },
           "signed_token": {
-            "type": "string"
+            "type": "string",
+            "description": "Signed token for subsequent requests"
           },
           "tags": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Tag"
-            }
+            },
+            "description": "List of tags"
           }
         }
       },
@@ -4019,6 +4041,9 @@
           "categories_policy",
           "tags_policy",
           "can_list_entities",
+          "can_list_without_query",
+          "can_list_with_filters",
+          "can_list_with_enum_constraints",
           "can_access_entity",
           "can_access_comments",
           "can_add_entity",
@@ -4026,19 +4051,36 @@
         ],
         "properties": {
           "can_access_comments": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to view an entity's comments"
           },
           "can_access_entity": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to view an entity"
           },
           "can_add_comment": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to add a comment to an entity"
           },
           "can_add_entity": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to add an entity"
           },
           "can_list_entities": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Permission to list entities"
+          },
+          "can_list_with_enum_constraints": {
+            "type": "boolean",
+            "description": "Permission to list entities with enum constraints"
+          },
+          "can_list_with_filters": {
+            "type": "boolean",
+            "description": "Permission to list entities with filters"
+          },
+          "can_list_without_query": {
+            "type": "boolean",
+            "description": "Permission to list entities with an empty or short query (can be used to list all entities)"
           },
           "categories_policy": {
             "$ref": "#/components/schemas/PermissionPolicy"
@@ -4599,7 +4641,6 @@
           "id",
           "entity_id",
           "category_id",
-          "tags_ids",
           "family_id",
           "display_name"
         ],
@@ -4636,13 +4677,6 @@
             "type": "string",
             "nullable": true
           },
-          "tags_ids": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
           "web_mercator_x": {
             "type": "number",
             "format": "double",
@@ -4661,7 +4695,6 @@
           "id",
           "entity_id",
           "category_id",
-          "tags_ids",
           "family_id",
           "display_name",
           "parents",
@@ -4697,13 +4730,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ParentRepresentation"
-            }
-          },
-          "tags_ids": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         }
