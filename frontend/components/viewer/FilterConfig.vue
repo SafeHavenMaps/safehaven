@@ -4,8 +4,10 @@
       <Tab value="0">
         Général
       </Tab>
-      <Tab value="1"
-        v-if="hasFilteringTags">
+      <Tab
+        v-if="hasFilteringTags"
+        value="1"
+      >
         Tags
       </Tab>
       <Tab
@@ -77,8 +79,8 @@
           </Button>
         </div>
         <div
-          class="filter-settings mt-2"
           v-if="hasFilteringPrimaryTags"
+          class="filter-settings mt-2"
         >
           <span class="font-medium block mb-2">Filtres</span>
           <div
@@ -111,8 +113,10 @@
         </div>
       </TabPanel>
 
-      <TabPanel value="1"
-        v-if="hasFilteringTags">
+      <TabPanel
+        v-if="hasFilteringTags"
+        value="1"
+      >
         <span class="font-medium block mb-2">Tags</span>
         <InputGroup
           class="mb-6 mt-2"
@@ -201,23 +205,22 @@
 </template>
 
 <script setup lang="ts">
-import type { Category, Tag, EnumFilter, PublicPermissions } from '~/lib'
+import type { Category, Tag, EnumFilter } from '~/lib'
 
 export interface Props {
   maximumHeight?: string
   filteringTags: (Tag & { active: boolean | null })[]
   filteringCategories: (Category & { active: boolean })[]
   filteringEnums: EnumFilter[]
-  permissions?: PublicPermissions
 }
 
 const props = withDefaults(defineProps<Props>(), {
   maximumHeight: '350px',
 })
 
-const hasFilteringTags = computed(() => (!props.permissions || props.permissions.can_list_with_filters) && props.filteringTags.filter(tag => !tag.is_primary_filter).length > 0)
-const hasFilteringPrimaryTags = computed(() => (!props.permissions || props.permissions.can_list_with_filters) && props.filteringTags.filter(tag => tag.is_primary_filter).length > 0)
-const hasFilteringEnums = computed(() => (!props.permissions || props.permissions.can_list_with_enum_constraints) && props.filteringEnums.length > 0)
+const hasFilteringTags = computed(() => props.filteringTags.filter(tag => !tag.is_primary_filter).length > 0)
+const hasFilteringPrimaryTags = computed(() => props.filteringTags.filter(tag => tag.is_primary_filter).length > 0)
+const hasFilteringEnums = computed(() => props.filteringEnums.length > 0)
 
 const emit = defineEmits<{
   (event: 'filtersChanged'): void
