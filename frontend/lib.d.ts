@@ -71,6 +71,9 @@ export type PublicPermissions = {
   can_add_entity: boolean
   can_access_comments: boolean
   can_add_comment: boolean
+  can_list_without_query: boolean
+  can_list_with_filters: boolean
+  can_list_with_enum_constraints: boolean
 }
 
 export type User = api.components['schemas']['User']

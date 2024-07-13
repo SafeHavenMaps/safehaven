@@ -213,6 +213,7 @@
 
   <Popover ref="filterOp">
     <ViewerFilterConfig
+      :permissions = "state.permissions!"
       v-model:filteringTags="state.filteringTags"
       v-model:filteringCategories="state.filteringCategories"
       v-model:filteringEnums="state.filteringEnums"
@@ -227,6 +228,7 @@
     modal
   >
     <ViewerFilterConfig
+      :permissions = "state.permissions!"
       v-model:filteringTags="state.filteringTags"
       v-model:filteringCategories="state.filteringCategories"
       v-model:filteringEnums="state.filteringEnums"
@@ -248,11 +250,12 @@
           <TabPanel value="0">
             <form @submit.prevent="searchEntity">
               <label for="placeSearch">
-                Recherche d'un point sur la carte
+                Recherche d'un point sur la carte <i v-if="!state.permissions?.can_list_without_query">(4 caractères minimum)</i>
               </label>
               <InputGroup>
                 <InputText
                   v-model="entitySearch"
+                  placeholder="Tapez votre recherche ici"
                 />
                 <Button type="submit">
                   <template #icon>
@@ -263,7 +266,10 @@
             </form>
 
             <div v-if="currentSearchEntities().length > 0">
-              <Divider type="dotted" />
+              <Divider
+                type="dotted"
+                class="!mb-2"
+              />
 
               <div style="max-height: 500px; overflow-y: auto;">
                 <DataView
