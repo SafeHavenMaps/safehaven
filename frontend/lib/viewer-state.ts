@@ -128,25 +128,26 @@ export class AppState {
         }
       })
 
-    this.filteringEnums = family.entity_form.fields
-      .filter(
-        f => f.indexed
-        && !f.privately_indexed
-        && (f.field_type === 'EnumMultiOption' || f.field_type === 'EnumSingleOption'))
-      .map((f) => {
-        return {
-          key: f.key,
-          title: f.display_name,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          values: (f.field_type_metadata as any).options.map((v: any) => {
-            return {
-              label: v.label,
-              value: v.value,
-            }
-          }),
-          active: [],
-        }
-      })
+    if (this.permissions?.can_list_with_enum_constraints)
+      this.filteringEnums = family.entity_form.fields
+        .filter(
+          f => f.indexed
+          && !f.privately_indexed
+          && (f.field_type === 'EnumMultiOption' || f.field_type === 'EnumSingleOption'))
+        .map((f) => {
+          return {
+            key: f.key,
+            title: f.display_name,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            values: (f.field_type_metadata as any).options.map((v: any) => {
+              return {
+                label: v.label,
+                value: v.value,
+              }
+            }),
+            active: [],
+          }
+        })
   }
 
   get online() {
@@ -266,15 +267,16 @@ export class AppState {
       }
     })
 
-    this.filteringTags = this.tagsData
-      .filter(tag => tag.allowed)
-      .filter(tag => tag.is_filter)
-      .map((tag) => {
-        return {
-          ...tag,
-          active: tag.default_filter_status ? null : false,
-        }
-      })
+    if (this.permissions.can_list_with_filters)
+      this.filteringTags = this.tagsData
+        .filter(tag => tag.allowed)
+        .filter(tag => tag.is_filter)
+        .map((tag) => {
+          return {
+            ...tag,
+            active: tag.default_filter_status ? null : false,
+          }
+        })
 
     this.familiesData.forEach((family) => {
       this.familiesLookupTable[family.id] = family
@@ -355,7 +357,7 @@ export class AppState {
     )
   }
 
-  async searchEntities(query: string, page: number, pageSize: number, require_locations?: boolean) : Promise<ViewerPaginatedCachedEntities>{
+  async searchEntities(query: string, page: number, pageSize: number, require_locations?: boolean): Promise<ViewerPaginatedCachedEntities> {
     if (this.permissions?.can_list_without_query || query.length >= 4)
       return await this.client.searchEntities(
         query,
@@ -369,7 +371,7 @@ export class AppState {
         require_locations ?? false,
       )
     else
-      return { entities: [], response_current_page: 0, total_pages: 0, total_results: 0, }
+      return { entities: [], response_current_page: 0, total_pages: 0, total_results: 0 }
   }
 
   getCategory(category_id: string) {

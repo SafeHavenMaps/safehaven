@@ -62,6 +62,27 @@
 
     <Divider class="!my-2" />
 
+    <AdminInputSwitchField
+      id="list_entities"
+      v-model="editedAccessToken.permissions.can_list_without_query"
+      label="Permission de lister textuellement les entités avec une recherche vide"
+      helper-text="Si désactivée mais que le listage est activé, 4 caractères minimum seront nécessaires pour réaliser une recherche"
+    />
+
+    <AdminInputSwitchField
+      id="list_entities"
+      v-model="editedAccessToken.permissions.can_list_with_filters"
+      label="Permission de filtrer les entités par tags"
+    />
+
+    <AdminInputSwitchField
+      id="list_entities"
+      v-model="editedAccessToken.permissions.can_list_with_enum_constraints"
+      label="Permission de filtrer les entités par contraintes sur les réponses au formulaire d'entité"
+    />
+
+    <Divider class="!my-2" />
+
     <AdminInputPolicyPermissionField
       v-model="editedAccessToken.permissions.families_policy"
       :policy-name="'families_policy'"
@@ -147,11 +168,14 @@ const editedAccessToken: Ref<NewOrUpdateAccessToken> = ref(
     ? {
         active: true,
         permissions: {
-          can_list_entities: false,
-          can_access_entity: false,
-          can_add_entity: false,
-          can_access_comments: false,
-          can_add_comment: false,
+          can_list_entities: true,
+          can_access_entity: true,
+          can_add_entity: true,
+          can_access_comments: true,
+          can_add_comment: true,
+          can_list_without_query: true,
+          can_list_with_enum_constraints: true,
+          can_list_with_filters: true,
           categories_policy: {
             allow_all: true,
             allow_list: [],
@@ -205,6 +229,9 @@ watch(
   (newVal) => {
     if (!newVal) {
       editedAccessToken.value.permissions.can_access_entity = false
+      editedAccessToken.value.permissions.can_list_with_filters = false
+      editedAccessToken.value.permissions.can_list_without_query = false
+      editedAccessToken.value.permissions.can_list_with_enum_constraints = false
       editedAccessToken.value.permissions.can_add_comment &&= editedAccessToken.value.permissions.can_add_entity
     }
   },

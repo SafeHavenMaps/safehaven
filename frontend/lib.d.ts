@@ -57,9 +57,9 @@ export type ErrorResponse = api.components['schemas']['ErrorResponse']
 
 export type NewOrUpdateCategory = api.components['schemas']['NewOrUpdateCategory']
 export type NewOrUpdateTag = api.components['schemas']['NewOrUpdateTag']
-export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAccessToken'] & { permissions: Permissions }
 export type PermissionPolicy = api.components['schemas']['PermissionPolicy']
 export type Permissions = api.components['schemas']['Permissions']
+export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAccessToken'] & { permissions: Permissions }
 export type AccessToken = api.components['schemas']['AccessToken']
   & {
     permissions: Permissions & { geographic_restrictions: null | [number, number][][] }

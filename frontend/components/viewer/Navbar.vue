@@ -213,7 +213,6 @@
 
   <Popover ref="filterOp">
     <ViewerFilterConfig
-      :permissions = "state.permissions!"
       v-model:filteringTags="state.filteringTags"
       v-model:filteringCategories="state.filteringCategories"
       v-model:filteringEnums="state.filteringEnums"
@@ -228,7 +227,6 @@
     modal
   >
     <ViewerFilterConfig
-      :permissions = "state.permissions!"
       v-model:filteringTags="state.filteringTags"
       v-model:filteringCategories="state.filteringCategories"
       v-model:filteringEnums="state.filteringEnums"
