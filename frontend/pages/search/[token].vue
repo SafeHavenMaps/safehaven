@@ -32,7 +32,7 @@
             <InputGroup>
               <InputText
                 v-model="query"
-                placeholder="Tapez votre recherche ici"
+                :placeholder="'Tapez votre recherche ici' + (state.permissions?.can_list_without_query ? '' : '(4 caractères minimum)')"
               />
 
               <Button
@@ -76,7 +76,7 @@
             <InputGroup>
               <InputText
                 v-model="query"
-                placeholder="Tapez votre recherche ici"
+                :placeholder="'Tapez votre recherche ici' + (state.permissions?.can_list_without_query ? '' : '(4 caractères minimum)')"
               />
               <Button type="submit">
                 <template #icon>
@@ -200,6 +200,7 @@
       modal
     >
       <ViewerFilterConfig
+      :permissions = "state.permissions!"
         v-model:filteringTags="state.filteringTags"
         v-model:filteringCategories="state.filteringCategories"
         v-model:filteringEnums="state.filteringEnums"

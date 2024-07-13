@@ -13,6 +13,7 @@ import type {
   InitConfig,
   EnumFilter,
   PublicPermissions,
+  ViewerPaginatedCachedEntities,
 } from '~/lib'
 
 type ViewData = {
@@ -235,6 +236,17 @@ export class AppState {
 
     const data = await this.client.bootstrap(token)
 
+    this.permissions = {
+      can_list_entities: data.can_list_entities,
+      can_access_entity: data.can_access_entity,
+      can_add_entity: data.can_add_entity,
+      can_access_comments: data.can_access_comments,
+      can_add_comment: data.can_add_comment,
+      can_list_without_query: data.can_list_without_query,
+      can_list_with_filters: data.can_list_with_filters,
+      can_list_with_enum_constraints: data.can_list_with_enum_constraints,
+    }
+
     this.familiesData = data.families
       .sort((a, b) => a.sort_order - b.sort_order)
 
@@ -275,14 +287,6 @@ export class AppState {
     this.tagsData.forEach((tag) => {
       this.tagsLookupTable[tag.id] = tag
     })
-
-    this.permissions = {
-      can_list_entities: data.can_list_entities,
-      can_access_entity: data.can_access_entity,
-      can_add_entity: data.can_add_entity,
-      can_access_comments: data.can_access_comments,
-      can_add_comment: data.can_add_comment,
-    }
 
     if (this.familiesData.length === 0) {
       throw new Error('No families available')
@@ -351,18 +355,21 @@ export class AppState {
     )
   }
 
-  async searchEntities(query: string, page: number, pageSize: number, require_locations?: boolean) {
-    return await this.client.searchEntities(
-      query,
-      this.activeFamilyId!,
-      this.activeFilteringCategories,
-      this.activeRequiredTags,
-      this.activeHiddenTags,
-      page,
-      pageSize,
-      this.activeFilteringEnums,
-      require_locations ?? false,
-    )
+  async searchEntities(query: string, page: number, pageSize: number, require_locations?: boolean) : Promise<ViewerPaginatedCachedEntities>{
+    if (this.permissions?.can_list_without_query || query.length >= 4)
+      return await this.client.searchEntities(
+        query,
+        this.activeFamilyId!,
+        this.activeFilteringCategories,
+        this.activeRequiredTags,
+        this.activeHiddenTags,
+        page,
+        pageSize,
+        this.activeFilteringEnums,
+        require_locations ?? false,
+      )
+    else
+      return { entities: [], response_current_page: 0, total_pages: 0, total_results: 0, }
   }
 
   getCategory(category_id: string) {
