@@ -78,10 +78,6 @@
 import { useRoute } from 'vue-router'
 import state from '~/lib/admin-state'
 
-if (await state.check_login()) {
-  await navigateTo('/admin/home')
-}
-
 const username: Ref<string> = ref('')
 const password: Ref<string> = ref('')
 const remember_me: Ref<boolean> = ref(false)
@@ -98,6 +94,10 @@ if (typeof redirect_query_param === 'string') {
   if (match) {
     redirectUrl = match[0]
   }
+}
+
+if (await state.check_login()) {
+  window.location.href = redirectUrl
 }
 
 async function login() {
