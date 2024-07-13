@@ -24,6 +24,8 @@
     <DataTable
       v-model:filters="state.tablesFilters[table_key]"
       paginator
+      paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+      current-page-report-template="&nbsp&nbsp&nbsp({totalPages} page·s, {totalRecords} commentaire·s)"
       state-storage="session"
       :state-key="table_key"
       data-key="id"

@@ -43,6 +43,8 @@
       :first="firstRow"
       lazy
       paginator
+      paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+      current-page-report-template="&nbsp&nbsp&nbsp({totalPages} page·s, {totalRecords} entité·s)"
       data-key="id"
       :value="currentEntitiesResults?.entities"
       :total-records="currentEntitiesResults?.total_results"

@@ -28,6 +28,8 @@
       :state-key="table_key"
       data-key="id"
       paginator
+      paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+      current-page-report-template="&nbsp&nbsp&nbsp({totalPages} page·s, {totalRecords} tag·s)"
       :value="tags"
       striped-rows
       :rows="10"
