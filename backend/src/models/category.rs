@@ -4,6 +4,8 @@ use sqlx::PgConnection;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
+use super::access_token::PermissionPolicy;
+
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct NewOrUpdateCategory {
     pub title: String,
@@ -154,34 +156,9 @@ impl Category {
         .map_err(AppError::Database)
     }
 
-    pub async fn list_with_families(
-        families: Vec<Uuid>,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<Category>, AppError> {
-        sqlx::query_as!(
-            Category,
-            r#"
-            SELECT
-                id,
-                title,
-                family_id,
-                default_status,
-                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
-                fill_color,
-                border_color,
-                version
-            FROM categories
-            WHERE family_id = ANY($1)
-            "#,
-            &families
-        )
-        .fetch_all(conn)
-        .await
-        .map_err(AppError::Database)
-    }
-
     pub async fn list_restricted(
-        ids: Vec<Uuid>,
+        policy: PermissionPolicy,
+        parent_policy: PermissionPolicy,
         families: Vec<Uuid>,
         conn: &mut PgConnection,
     ) -> Result<Vec<Category>, AppError> {
@@ -198,9 +175,21 @@ impl Category {
                 border_color,
                 version
             FROM categories
-            WHERE id = ANY($1) AND family_id = ANY($2)
+            WHERE 
+                (
+                    ($1 AND NOT (id = ANY($3)))
+                    OR id = ANY($2)
+                    OR ($4 AND NOT (id = ANY($6)))
+                    OR id = ANY($5)
+                )
+                AND family_id = ANY($7)
             "#,
-            &ids,
+            &policy.allow_all,
+            &policy.allow_list,
+            &policy.force_exclude,
+            &parent_policy.allow_all,
+            &parent_policy.allow_list,
+            &parent_policy.force_exclude,
             &families
         )
         .fetch_all(conn)

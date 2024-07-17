@@ -74,12 +74,6 @@ pub struct BootstrapResponse {
     /// List of known categories
     categories: Vec<Category>,
 
-    /// List of allowed categories
-    allowed_categories: Vec<Uuid>,
-
-    /// List of allowed tags
-    allowed_tags: Vec<Uuid>,
-
     /// Permission to list entities
     can_list_entities: bool,
 
@@ -162,10 +156,7 @@ async fn bootstrap(
     let categories = Category::list_with_families(families_ids, &mut conn).await?;
     tracing::trace!("Loaded {} categories", categories.len());
 
-    let tags = match perms.tags_policy.allow_all {
-        true => Tag::list(&mut conn).await?,
-        false => Tag::list_restricted(&perms.tags_policy.allow_list, &mut conn).await?,
-    };
+    let tags = Tag::list_restricted(&perms.tags_policy, &mut conn).await?;
     tracing::trace!("Loaded {} tags", tags.len());
 
     // Register visit in background to avoid blocking the response
@@ -206,8 +197,6 @@ async fn bootstrap(
         signed_token,
         families,
         categories,
-        allowed_categories,
-        allowed_tags,
         can_list_entities: perms.can_list_entities,
         can_list_without_query: perms.can_list_without_query,
         can_list_with_filters: perms.can_list_with_filters,

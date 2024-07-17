@@ -4,6 +4,8 @@ use sqlx::PgConnection;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
+use super::access_token::PermissionPolicy;
+
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct Tag {
     pub id: Uuid,
@@ -134,21 +136,36 @@ impl Tag {
     }
 
     pub async fn list_restricted(
-        ids: &Vec<Uuid>,
+        policy: PermissionPolicy,
+        parent_policy: PermissionPolicy,
+        families: Vec<Uuid>,
         conn: &mut PgConnection,
     ) -> Result<Vec<Tag>, AppError> {
-        sqlx::query_as!(
+        let tags = sqlx::query_as!(
             Tag,
             r#"
             SELECT id, title, is_filter, is_primary_filter, filter_description,
                 default_filter_status, version, fill_color, border_color
             FROM tags
-            WHERE id = ANY($1)
+            WHERE 
+                (
+                    ($1 AND NOT (id = ANY($3)))
+                    OR id = ANY($2)
+                    OR ($4 AND NOT (id = ANY($6)))
+                    OR id = ANY($5)
+                )
             "#,
-            &ids
+            policy.allow_all,
+            &policy.allow_list,
+            &policy.force_exclude,
+            parent_policy.allow_all,
+            &parent_policy.allow_list,
+            &parent_policy.force_exclude
         )
         .fetch_all(conn)
         .await
-        .map_err(AppError::Database)
+        .map_err(AppError::Database)?;
+
+        Ok(tags)
     }
 }

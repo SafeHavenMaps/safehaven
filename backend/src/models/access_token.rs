@@ -16,6 +16,12 @@ pub struct Permissions {
     /// Restriction to a specific set of tags
     pub tags_policy: PermissionPolicy,
 
+    /// Restriction to a specific set of categories for parent entities
+    pub parents_categories_policy: PermissionPolicy,
+
+    /// Restriction to a specific set of tags for parent entities
+    pub parents_tags_policy: PermissionPolicy,
+
     /// Restriction to a specific area
     pub geographic_restrictions: Option<MultiPolygon>,
 
