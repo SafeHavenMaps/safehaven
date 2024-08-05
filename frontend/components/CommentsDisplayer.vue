@@ -9,7 +9,7 @@
         <span class="flex items-center gap-2 w-full">
           {{ comment.author }} - {{ new Date(comment.created_at).toLocaleDateString() }}
           <Tag
-            v-if="!public && (comment as AdminComment).moderated"
+            v-if="!public && !(comment as AdminComment).moderated"
             value="À modérer"
           />
           <AdminEditDeleteButtons

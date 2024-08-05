@@ -74,7 +74,7 @@ impl PublicComment {
             r#"
             SELECT id, author, text, data, created_at, updated_at
             FROM comments 
-            WHERE entity_id = $1
+            WHERE entity_id = $1 AND moderated
             ORDER BY created_at
             "#,
             given_entity_id

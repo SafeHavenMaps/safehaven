@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, author, text, data, created_at, updated_at\n            FROM comments \n            WHERE entity_id = $1\n            ORDER BY created_at\n            ",
+  "query": "\n            SELECT id, author, text, data, created_at, updated_at\n            FROM comments \n            WHERE entity_id = $1 AND moderated\n            ORDER BY created_at\n            ",
   "describe": {
     "columns": [
       {
@@ -48,5 +48,5 @@
       false
     ]
   },
-  "hash": "24922014e76822fd941d84e2fb212f099d176c29e824370b8ec6333b2bf1b808"
+  "hash": "ffed961cdeb582dadde70c53b98dcc677c2a045ebac44669ef8a02e7a67a3a30"
 }
