@@ -4,7 +4,7 @@ An open-source project to create a map of safe spaces for people in need.
 
 ## Deploy
 
-We provide docker images that are ready to deploy SafeHaven. You can find the releases in the 
+We provide docker images that are ready to deploy SafeHaven. You can find the releases in the
 [packages view of the SafeHavenMaps organisation](https://github.com/SafeHavenMaps/safehaven/pkgs/container/safehaven).
 
 ### Pre-requisites
@@ -35,7 +35,7 @@ To learn more about the configuration, you can visit [our documentation website]
 ### Start the docker container:
 
 ```bash
-docker run -d \ 
+docker run -d \
   -e SH__DATABASE__URL="postgresql://user:password@host/safehaven" \  # Set the database path
   -e SH__DATABASE__POOL_SIZE="5" \                                    # Set the number of connections to the database
   -e SH__SECURE_COOKIE="true" \                                       # Activate if you have a reverse proxy with HTTPS.
@@ -45,7 +45,7 @@ docker run -d \
 
 ## Contributing
 
-We welcome contributions from everyone. 
+We welcome contributions from everyone.
 
 To spin up a development environment, follow these steps:
 
@@ -67,3 +67,7 @@ To spin up a development environment, follow these steps:
   - Run `regen_api` to regenerate the API
   - Run `start_dev_env` to start the stack using process-compose
     - You can add the argument `db` to `start_dev_env` to start a PostgreSQL server if you do not have one.
+
+## License
+
+Licensed under the GNU General Public License v3.0, see [LICENSE](LICENSE).
