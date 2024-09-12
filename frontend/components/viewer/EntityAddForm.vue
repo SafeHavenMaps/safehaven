@@ -5,7 +5,6 @@
     closable
     class="w-full  max-w-[30rem]"
     :header="props.family.entity_form.title"
-    :content-props="{ onClick: (event: Event) => { event.stopPropagation() } }"
   >
     <!-- Entity Form Pages -->
     <form
@@ -35,12 +34,20 @@
             v-model:locations="editedEntity!.locations"
           />
 
-          <AdminInputSwitchField
+          <div
             v-if="state.permissions?.can_add_comment"
-            id="include_comment"
-            label="Ajouter un commentaire"
-            v-model:="include_comment"
-          />
+            class="flex flex-col gap-2"
+          >
+            <span class="flex items-center gap-2">
+              <ToggleSwitch
+                class="shrink-0"
+                :model-value="include_comment"
+                input-id="include_comment"
+                @change="(event: Event) => onIncludeCommentToggle(event)"
+              />
+              <label for="include_comment">Inclure un commentaire</label>
+            </span>
+          </div>
         </template>
         <template v-else>
           <FormDynamicField
@@ -147,6 +154,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ConfirmationOptions } from 'primevue/confirmationoptions'
 import type { Category, EntityOrCommentData, Family, FormField, PublicNewComment, PublicNewEntity } from '~/lib'
 import state from '~/lib/viewer-state'
 import { isValidRichText, isValidText } from '~/lib/validation'
@@ -327,5 +335,33 @@ async function realOnSave(token: string | null) {
       detail: include_comment.value ? 'Erreur lors de l\'ajout de l\'entité ou du commentaire' : 'Erreur lors de l\'ajout de l\'entité', life: 3000 })
   }
   processingRequest.value = false
+}
+
+const confirm = useConfirm()
+function onIncludeCommentToggle(event: Event) {
+  console.log(event)
+  console.log(event.currentTarget as HTMLElement)
+  if (!include_comment.value) {
+    include_comment.value = true
+  }
+  else {
+    const options: ConfirmationOptions = {
+      target: event.currentTarget as HTMLElement,
+      group: 'delete',
+      message: `Ne pas inclure de commentaire empêchera les autres utilisateur·ices de bénéficier de vos retours, 
+      et ne vous laissera préciser que les informations générales. Si vous avez une expérience personelle avec cette entité, 
+      nous vous conseillons d'inclure un commentaire.`,
+      icon: 'warning',
+      rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+      acceptClass: 'p-button-sm',
+      rejectLabel: 'Annuler',
+      acceptLabel: 'Confirmer',
+      reject: () => {},
+      accept: () => {
+        include_comment.value = false
+      },
+    }
+    confirm.require(options)
+  }
 }
 </script>
