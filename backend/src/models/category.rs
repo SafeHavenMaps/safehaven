@@ -179,32 +179,4 @@ impl Category {
         .await
         .map_err(AppError::Database)
     }
-
-    pub async fn list_restricted(
-        ids: Vec<Uuid>,
-        families: Vec<Uuid>,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<Category>, AppError> {
-        sqlx::query_as!(
-            Category,
-            r#"
-            SELECT
-                id,
-                title,
-                family_id,
-                default_status,
-                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
-                fill_color,
-                border_color,
-                version
-            FROM categories
-            WHERE id = ANY($1) AND family_id = ANY($2)
-            "#,
-            &ids,
-            &families
-        )
-        .fetch_all(conn)
-        .await
-        .map_err(AppError::Database)
-    }
 }
