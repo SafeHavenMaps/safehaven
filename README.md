@@ -52,7 +52,8 @@ To spin up a development environment, follow these steps:
 **Pre-requisites:**
 
 - A working installation of Nix
-  - Supports of Nix Flakes is required
+  - Supports of Nix Flakes is required.
+  - A PostgreSQL server with PostGIS in version 16 or higher. You can start one with `start_docker_postgresql`.
 
 **Steps:**
 
@@ -65,8 +66,8 @@ To spin up a development environment, follow these steps:
   - Run `npm install` to install the dependencies
 - Inside the root folder:
   - Run `regen_api` to regenerate the API
+  - _Optional:_ Run `start_docker_postgresql` to start a PostgreSQL server with PostGIS
   - Run `start_dev_env` to start the stack using process-compose
-    - You can add the argument `db` to `start_dev_env` to start a PostgreSQL server if you do not have one.
 
 ## License
 
