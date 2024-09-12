@@ -232,7 +232,7 @@
 
           # When modifying npm dependencies, replace the hash with pkgs.lib.fakeSha256
           # then run `nix build .#frontend`. Use the hash in the error to replace the value.
-          npmDepsHash = "sha256-x6poyKwpmT/uKck0vRhwy02RbZutqL06w7t5JJ3xbaw=";
+          npmDepsHash = "sha256-t/moREQsCKqFpMKmb10aLn0fC4o0KzAc0l6LCRY6r4M=";
 
           installPhase = ''
             runHook preInstall
