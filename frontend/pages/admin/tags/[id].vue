@@ -92,6 +92,7 @@ const editedTag: Ref<NewOrUpdateTag> = ref(isNew
   ? {
       title: '',
       is_filter: true,
+      is_primary_filter: false,
       default_filter_status: true,
       filter_description: '',
       border_color: '#deb9c9',
@@ -106,7 +107,7 @@ const toast = useToast()
 function isDisabled() {
   return processingRequest.value
     || !isValidText(editedTag.value.title)
-    || (editedTag.value.is_filter && !isValidText(editedTag.value.filter_description))
+    || (editedTag.value.is_primary_filter && !isValidText(editedTag.value.filter_description))
     || !isValidHexColor(editedTag.value.border_color)
     || !isValidHexColor(editedTag.value.fill_color)
 }
