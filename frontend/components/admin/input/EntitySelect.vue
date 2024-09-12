@@ -80,9 +80,9 @@
 
     <Popover ref="filters_overlay">
       <ViewerFilterConfig
-        v-model:filteringTags="tagFilteringList"
-        v-model:filteringCategories="categoryFilteringList"
-        v-model:filteringEnums="enumsFilteringList"
+        v-model:filtering-tags="tagFilteringList"
+        v-model:filtering-categories="categoryFilteringList"
+        v-model:filtering-enums="enumsFilteringList"
         @filters-changed="refreshSearch"
       />
     </Popover>

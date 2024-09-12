@@ -1,6 +1,6 @@
 <template>
   <PanelMenu
-    v-model:expandedKeys="expandedKeys"
+    v-model:expanded-keys="expandedKeys"
     :model="menuItems"
     class="navigation-tree mt-6"
     style="width: 17rem;"

@@ -46,7 +46,7 @@
           <FormDynamicField
             v-for="field in entityFieldsSortedByPage(page)"
             :key="field.key"
-            v-model:fieldContent="(editedEntity.data as EntityOrCommentData)[field.key]"
+            v-model:field-content="(editedEntity.data as EntityOrCommentData)[field.key]"
             :form-field="(field as FormField)"
             @is-valid="isValid => entityFieldValid[field.key]= isValid"
           />
@@ -101,7 +101,7 @@
           <FormDynamicField
             v-for="field in commentFieldsSortedByPage(page)"
             :key="field.key"
-            v-model:fieldContent="(editedComment.data as EntityOrCommentData)[field.key]"
+            v-model:field-content="(editedComment.data as EntityOrCommentData)[field.key]"
             :form-field="(field as FormField)"
             @is-valid="isValid => commentFieldValid[field.key]= isValid"
           />

@@ -200,9 +200,9 @@
       modal
     >
       <ViewerFilterConfig
-        v-model:filteringTags="state.filteringTags"
-        v-model:filteringCategories="state.filteringCategories"
-        v-model:filteringEnums="state.filteringEnums"
+        v-model:filtering-tags="state.filteringTags"
+        v-model:filtering-categories="state.filteringCategories"
+        v-model:filtering-enums="state.filteringEnums"
       />
     </Dialog>
 

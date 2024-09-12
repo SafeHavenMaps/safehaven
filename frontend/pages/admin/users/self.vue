@@ -90,12 +90,12 @@ definePageMeta({
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-    `Profil`,
-    'user',
-    [],
-    [
-      { label: `Profil`, url: `/admin/users/self` },
-    ],
+  `Profil`,
+  'user',
+  [],
+  [
+    { label: `Profil`, url: `/admin/users/self` },
+  ],
 )
 
 async function onSave() {

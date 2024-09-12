@@ -34,12 +34,12 @@ const fetchedFamily = await state.fetchFamily(id)
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-        `Édition de l'icône de la catégorie ${fetchedFamily.title}`,
-        'family',
-        [],
-        [
-          { label: 'Familles', url: '/admin/families' },
-          { label: `Édition de l'icône de la famille ${fetchedFamily.title}`, url: `/admin/families/${id}/general` },
-        ],
+  `Édition de l'icône de la catégorie ${fetchedFamily.title}`,
+  'family',
+  [],
+  [
+    { label: 'Familles', url: '/admin/families' },
+    { label: `Édition de l'icône de la famille ${fetchedFamily.title}`, url: `/admin/families/${id}/general` },
+  ],
 )
 </script>

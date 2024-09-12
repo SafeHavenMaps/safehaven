@@ -154,7 +154,7 @@ function extractHostnameFromUrl(url) {
     const hostname = u.hostname
     return hostname.startsWith('www.') ? hostname.substring(4) : hostname
   }
-  catch (e) {
+  catch {
     return url
   }
 }

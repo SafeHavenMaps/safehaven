@@ -121,12 +121,12 @@ function getGradient(ctx: CanvasRenderingContext2D, chartArea: { top: number, bo
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-    `Détails du jeton ${token.title}`,
-    'accessToken',
-    [],
-    [
-      { label: 'Jetons d\'accès', url: '/admin/access-tokens' },
-      { label: `Détails du jeton ${token.title}`, url: `/admin/access-tokens/${accessTokenId}` },
-    ],
+  `Détails du jeton ${token.title}`,
+  'accessToken',
+  [],
+  [
+    { label: 'Jetons d\'accès', url: '/admin/access-tokens' },
+    { label: `Détails du jeton ${token.title}`, url: `/admin/access-tokens/${accessTokenId}` },
+  ],
 )
 </script>

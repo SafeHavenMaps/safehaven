@@ -131,9 +131,9 @@
 
     <Popover ref="filters_overlay">
       <ViewerFilterConfig
-        v-model:filteringTags="state.tablesQueryParams[table_key].tagFilteringList!"
-        v-model:filteringCategories="state.tablesQueryParams[table_key].categoryFilteringList!"
-        v-model:filteringEnums="state.tablesQueryParams[table_key].enumsFilteringList!"
+        v-model:filtering-tags="state.tablesQueryParams[table_key].tagFilteringList!"
+        v-model:filtering-categories="state.tablesQueryParams[table_key].categoryFilteringList!"
+        v-model:filtering-enums="state.tablesQueryParams[table_key].enumsFilteringList!"
         class="w-[25rem]"
         @filters-changed="refreshTable"
       />

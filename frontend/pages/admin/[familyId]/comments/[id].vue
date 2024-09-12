@@ -23,7 +23,7 @@
       <FormDynamicField
         v-for="field in family.comment_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
         :key="field.key"
-        v-model:fieldContent="(editedComment.data as EntityOrCommentData)[field.key]"
+        v-model:field-content="(editedComment.data as EntityOrCommentData)[field.key]"
         :form-field="(field as FormField)"
       />
     </div>
@@ -168,7 +168,12 @@ function hasBeenEdited(field: keyof AdminNewOrUpdateComment) {
 async function onSave() {
   processingRequest.value = true
   try {
-    isNew ? await state.client.createComment(editedComment.value) : await state.client.updateComment(commentId, editedComment.value)
+    if (isNew) {
+      await state.client.createComment(editedComment.value)
+    }
+    else {
+      await state.client.updateComment(commentId, editedComment.value)
+    }
     navigateTo(returnUrl)
     toast.add({ severity: 'success', summary: 'Succès', detail: 'Commentaire modifié avec succès', life: 3000 })
   }
