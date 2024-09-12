@@ -40,6 +40,6 @@
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
     "vue-tsc": "^2.1.6",
-    "vue3-openlayers": "6.5.0"
+    "vue3-openlayers": "11.2.0"
   }
 }

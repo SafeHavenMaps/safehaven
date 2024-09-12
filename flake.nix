@@ -217,7 +217,7 @@
             name = "safehaven-backend";
             src = ./backend;
 
-            # When modifying cargo dependencies, replace the hash with pkgs.lib.fakeSha256
+            # When modifying cargo dependencies, replace the hash with pkgs.lib.fakeHash
             # then run `nix build .#backend`. Use the hash in the error to replace the value.
             cargoHash = "sha256-7Bx/GNFx/OUfQPTS8a/DsPik8gju73qY1zNXCyHY8a0=";
           };
@@ -230,9 +230,9 @@
           src = ./frontend;
           nodejs = fixedNode;
 
-          # When modifying npm dependencies, replace the hash with pkgs.lib.fakeSha256
+          # When modifying npm dependencies, replace the hash with pkgs.lib.fakeHash
           # then run `nix build .#frontend`. Use the hash in the error to replace the value.
-          npmDepsHash = "sha256-t/moREQsCKqFpMKmb10aLn0fC4o0KzAc0l6LCRY6r4M=";
+          npmDepsHash = "sha256-JMnsRV/Fsn+xvEb0Rz8EKlSSdF0/qAoz4AMWdh8ouaY=";
 
           installPhase = ''
             runHook preInstall
