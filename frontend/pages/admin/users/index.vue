@@ -23,7 +23,7 @@
       />
     </span>
     <DataTable
-      v-model="state.tablesSelectedColumns[table_key]"
+      v-model:filters="state.tablesFilters[table_key]"
       paginator
       paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       current-page-report-template="&nbsp&nbsp&nbsp({totalPages} page·s, {totalRecords} utilisateur·ice·s)"
