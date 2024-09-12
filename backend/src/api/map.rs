@@ -80,7 +80,7 @@ fn clusterize(
     ))
 }
 
-fn is_token_allowed_for_family(token: &MapUserTokenClaims, family_id: &Uuid) -> bool {
+fn is_family_allowed_by_token(token: &MapUserTokenClaims, family_id: &Uuid) -> bool {
     let family_is_allowed = token.perms.families_policy.allow_all
         || token.perms.families_policy.allow_list.contains(family_id);
 
@@ -91,6 +91,47 @@ fn is_token_allowed_for_family(token: &MapUserTokenClaims, family_id: &Uuid) -> 
         .contains(family_id);
 
     family_is_allowed && !family_is_excluded
+}
+
+fn is_category_allowed_by_token(token: &MapUserTokenClaims, category_id: &Uuid) -> bool {
+    let category_is_allowed = token.perms.categories_policy.allow_all
+        || token
+            .perms
+            .categories_policy
+            .allow_list
+            .contains(category_id);
+
+    let category_is_excluded = token
+        .perms
+        .categories_policy
+        .force_exclude
+        .contains(category_id);
+
+    category_is_allowed && !category_is_excluded
+}
+
+fn is_category_explicitly_excluded_by_token(
+    token: &MapUserTokenClaims,
+    category_id: &Uuid,
+) -> bool {
+    !token
+        .perms
+        .categories_policy
+        .force_exclude
+        .contains(category_id)
+}
+
+fn is_tag_allowed_by_token(token: &MapUserTokenClaims, tag_id: &Uuid) -> bool {
+    let tag_is_allowed =
+        token.perms.tags_policy.allow_all || token.perms.tags_policy.allow_list.contains(tag_id);
+
+    let tag_is_excluded = token.perms.tags_policy.force_exclude.contains(tag_id);
+
+    tag_is_allowed && !tag_is_excluded
+}
+
+fn is_tag_explicitly_excluded_by_token(token: &MapUserTokenClaims, tag_id: &Uuid) -> bool {
+    token.perms.tags_policy.force_exclude.contains(tag_id)
 }
 
 fn are_constraints_allowed(
@@ -129,7 +170,7 @@ pub async fn viewer_view_request(
     require_permission(token.perms.can_list_entities)?;
 
     // The family must be allowed
-    require_permission(is_token_allowed_for_family(&token, &request.family_id))?;
+    require_permission(is_family_allowed_by_token(&token, &request.family_id))?;
 
     // Check if some of the constraints are forbidden
     are_constraints_allowed(
@@ -217,7 +258,7 @@ async fn viewer_search_request(
     require_permission(token.perms.can_list_entities)?;
 
     // The family must be allowed
-    require_permission(is_token_allowed_for_family(&token, &request.family_id))?;
+    require_permission(is_family_allowed_by_token(&token, &request.family_id))?;
 
     // The token must allow to list entities with tag filters or the request must not have any tag filters
     require_permission(
@@ -376,10 +417,7 @@ async fn viewer_new_comment(
     let target_entity = PublicEntity::get(request.comment.entity_id, &mut conn).await?;
 
     // The token must allow to add comments to the entity's family
-    require_permission(is_token_allowed_for_family(
-        &token,
-        &target_entity.family_id,
-    ))?;
+    require_permission(is_family_allowed_by_token(&token, &target_entity.family_id))?;
 
     check_captcha(state, request.hcaptcha_token).await?;
     let db_comment = PublicComment::new(request.comment, &mut conn).await?;
@@ -422,56 +460,61 @@ async fn viewer_fetch_entity(
     let entity = PublicEntity::get(id, &mut conn).await?;
 
     // The family must be allowed
-    require_permission(is_token_allowed_for_family(&token, &entity.family_id))?;
-
-    let can_read_entity = (token.perms.families_policy.allow_all
-        || token
-            .perms
-            .families_policy
-            .allow_list
-            .contains(&entity.family_id))
-        && (token.perms.categories_policy.allow_all
-            || token
-                .perms
-                .categories_policy
-                .allow_list
-                .contains(&entity.category_id))
-        && (token.perms.tags_policy.allow_all
-            || entity
-                .tags
-                .iter()
-                .all(|tag| token.perms.tags_policy.allow_list.contains(tag)));
+    require_permission(is_family_allowed_by_token(&token, &entity.family_id))?;
+    // The category must not be explicitly excluded
+    require_permission(!is_category_explicitly_excluded_by_token(
+        &token,
+        &entity.category_id,
+    ))?;
+    // The tags must each not be explicitly excluded
+    entity
+        .tags
+        .iter()
+        .find_map(|tag_id| {
+            require_permission(!is_tag_explicitly_excluded_by_token(&token, tag_id)).err()
+        })
+        .map_or(Ok(()), |err| Err(err))?;
 
     let parents = PublicEntity::get_parents(id, &mut conn).await?;
     let children = PublicEntity::get_children(id, &mut conn).await?;
 
-    let filtered_children: Vec<PublicListedEntity> = children
+    let authorized_children: Vec<PublicListedEntity> = children
         .into_iter()
         // filter against permissions
         .filter(|child| {
-            (token.perms.categories_policy.allow_all
-                || token
-                    .perms
-                    .categories_policy
-                    .allow_list
-                    .contains(&child.category_id))
-                && (token.perms.tags_policy.allow_all
-                    || child
-                        .tags
-                        .iter()
-                        .all(|tag| token.perms.tags_policy.allow_list.contains(tag)))
+            is_category_allowed_by_token(&token, &child.category_id)
+                && child
+                    .tags
+                    .iter()
+                    .all(|tag_id| is_tag_allowed_by_token(&token, tag_id))
         })
+        .collect();
+
+    // If the entity does not have any included children, we must check if it is included itself,
+    // rather than simply not excluded as we did at the top of the function
+    if authorized_children.is_empty() {
+        // The category must be allowed
+        require_permission(!is_category_allowed_by_token(&token, &entity.category_id))?;
+        // The tags must each be allowed
+        entity
+            .tags
+            .iter()
+            .find_map(|tag_id| require_permission(!is_tag_allowed_by_token(&token, tag_id)).err())
+            .map_or(Ok(()), |err| Err(err))?;
+    }
+
+    let filtered_children: Vec<PublicListedEntity> = authorized_children
+        .into_iter()
         // filter against request
         .filter(|child| {
             request
                 .active_categories
                 .iter()
                 .any(|cat| *cat == child.category_id)
-                && (request.active_required_tags.is_empty()
-                    || request
-                        .active_required_tags
-                        .iter()
-                        .any(|tag| child.tags.contains(tag)))
+                && request
+                    .active_required_tags
+                    .iter()
+                    .all(|tag| child.tags.contains(tag))
                 && !request
                     .active_hidden_tags
                     .iter()
@@ -479,43 +522,25 @@ async fn viewer_fetch_entity(
         })
         .collect();
 
+    // Parents must simply not be excluded to be shown, unlike children which must be allowed in their own right
     let filtered_parents: Vec<PublicListedEntity> = parents
         .into_iter()
         // filter against permissions
         .filter(|parent| {
-            (token.perms.categories_policy.allow_all
-                || token
-                    .perms
-                    .categories_policy
-                    .allow_list
-                    .contains(&parent.category_id))
-                && (token.perms.tags_policy.allow_all
-                    || parent
-                        .tags
-                        .iter()
-                        .all(|tag| token.perms.tags_policy.allow_list.contains(tag)))
+            !is_category_explicitly_excluded_by_token(&token, &parent.category_id)
+                && !parent
+                    .tags
+                    .iter()
+                    .any(|tag_id| is_tag_explicitly_excluded_by_token(&token, tag_id))
         })
         // filter against request
         .filter(|parent| {
-            request
-                .active_categories
+            !request
+                .active_hidden_tags
                 .iter()
-                .any(|cat| *cat == parent.category_id)
-                && (request.active_required_tags.is_empty()
-                    || request
-                        .active_required_tags
-                        .iter()
-                        .any(|tag| parent.tags.contains(tag)))
-                && !request
-                    .active_hidden_tags
-                    .iter()
-                    .any(|tag| parent.tags.contains(tag))
+                .any(|tag| parent.tags.contains(tag))
         })
         .collect();
-
-    if !can_read_entity && filtered_children.is_empty() {
-        return Err(AppError::Forbidden);
-    }
 
     let comments = match token.perms.can_access_comments {
         true => PublicComment::list_for_public_entity(id, &entity.comment_form, &mut conn).await?,

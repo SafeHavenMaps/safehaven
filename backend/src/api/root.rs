@@ -140,10 +140,7 @@ async fn bootstrap(
 
     tracing::trace!("Bootstrapping: found access token");
 
-    let families = match perms.families_policy.allow_all {
-        true => Family::list(&mut conn).await?,
-        false => Family::list_restricted(&perms.families_policy.allow_list, &mut conn).await?,
-    };
+    let families = Family::list_restricted(&perms.families_policy, &mut conn).await?;
     tracing::trace!("Loaded {} families", families.len());
 
     let families_ids: Vec<_> = families.iter().map(|f| f.id).collect();
@@ -159,13 +156,15 @@ async fn bootstrap(
     });
     tracing::trace!("Generated access token");
 
-    let categories = Category::list_with_families(families_ids, &mut conn).await?;
+    let categories = Category::list_except_with_families(
+        &perms.categories_policy.force_exclude,
+        families_ids,
+        &mut conn,
+    )
+    .await?;
     tracing::trace!("Loaded {} categories", categories.len());
 
-    let tags = match perms.tags_policy.allow_all {
-        true => Tag::list(&mut conn).await?,
-        false => Tag::list_restricted(&perms.tags_policy.allow_list, &mut conn).await?,
-    };
+    let tags = Tag::list_except(&perms.tags_policy.force_exclude, &mut conn).await?;
     tracing::trace!("Loaded {} tags", tags.len());
 
     // Register visit in background to avoid blocking the response
@@ -179,26 +178,12 @@ async fn bootstrap(
     });
 
     let allowed_categories = match perms.categories_policy.allow_all {
-        true => categories
-            .iter()
-            .map(|c| c.id)
-            .filter(|id| {
-                perms
-                    .categories_policy
-                    .force_exclude
-                    .iter()
-                    .all(|f| f != id)
-            })
-            .collect(),
+        true => categories.iter().map(|c| c.id).collect(),
         false => perms.categories_policy.allow_list.clone(),
     };
 
     let allowed_tags = match perms.tags_policy.allow_all {
-        true => tags
-            .iter()
-            .map(|t| t.id)
-            .filter(|id| perms.tags_policy.force_exclude.iter().all(|f| f != id))
-            .collect(),
+        true => tags.iter().map(|t| t.id).collect(),
         false => perms.tags_policy.allow_list.clone(),
     };
 

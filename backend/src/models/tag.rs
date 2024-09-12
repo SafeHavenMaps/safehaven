@@ -133,8 +133,8 @@ impl Tag {
         .map_err(AppError::Database)
     }
 
-    pub async fn list_restricted(
-        ids: &Vec<Uuid>,
+    pub async fn list_except(
+        excluded_tags: &Vec<Uuid>,
         conn: &mut PgConnection,
     ) -> Result<Vec<Tag>, AppError> {
         sqlx::query_as!(
@@ -143,9 +143,9 @@ impl Tag {
             SELECT id, title, is_filter, is_primary_filter, filter_description,
                 default_filter_status, version, fill_color, border_color
             FROM tags
-            WHERE id = ANY($1)
+            WHERE NOT (id = ANY($1))
             "#,
-            &ids
+            &excluded_tags
         )
         .fetch_all(conn)
         .await

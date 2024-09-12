@@ -7,6 +7,7 @@ use sqlx::{types::Json, PgConnection};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
+use crate::models::access_token::PermissionPolicy;
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct Form {
     pub title: String,
@@ -357,7 +358,7 @@ impl Family {
     }
 
     pub async fn list_restricted(
-        ids: &Vec<Uuid>,
+        family_policy: &PermissionPolicy,
         conn: &mut PgConnection,
     ) -> Result<Vec<Family>, AppError> {
         sqlx::query_as!(
@@ -369,9 +370,11 @@ impl Family {
                 sort_order,
                 version
             FROM families
-            WHERE id = ANY($1)
+            WHERE ($1 OR id = ANY($2)) AND NOT (id = ANY($3))
             "#,
-            &ids
+            family_policy.allow_all,
+            &family_policy.allow_list,
+            &family_policy.force_exclude
         )
         .fetch_all(conn)
         .await

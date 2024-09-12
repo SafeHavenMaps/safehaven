@@ -103,19 +103,9 @@ pub async fn viewer_authentication_middleware(
 
             let perms = access_token.permissions.0;
 
-            let families = match perms.families_policy.allow_all {
-                true => match Family::list(&mut conn).await {
-                    Ok(families) => families,
-                    Err(app_error) => return app_error.into_response(),
-                },
-                false => {
-                    match Family::list_restricted(&perms.families_policy.allow_list, &mut conn)
-                        .await
-                    {
-                        Ok(families) => families,
-                        Err(app_error) => return app_error.into_response(),
-                    }
-                }
+            let families = match Family::list_restricted(&perms.families_policy, &mut conn).await {
+                Ok(families) => families,
+                Err(app_error) => return app_error.into_response(),
             };
 
             let fam_priv_idx: HashMap<Uuid, Vec<String>> =

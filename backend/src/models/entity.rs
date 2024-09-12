@@ -124,7 +124,7 @@ impl PublicEntity {
             FROM entities e
             INNER JOIN categories c ON e.category_id = c.id
             INNER JOIN families f ON c.family_id = f.id
-            WHERE e.id = $1 AND e.moderated
+            WHERE e.id = $1 AND e.moderated AND NOT e.hidden
             "#,
             given_id
         )
@@ -153,7 +153,7 @@ impl PublicEntity {
                 ) as "tags!"
             FROM entities e
             INNER JOIN entities_entities ee ON e.id = ee.child_id
-            WHERE ee.parent_id = $1 AND e.moderated
+            WHERE ee.parent_id = $1 AND e.moderated AND NOT e.hidden
             "#,
             given_id
         )
@@ -179,7 +179,7 @@ impl PublicEntity {
                 ) as "tags!"
             FROM entities e
             INNER JOIN entities_entities ee ON e.id = ee.parent_id
-            WHERE ee.child_id = $1 AND e.moderated
+            WHERE ee.child_id = $1 AND e.moderated AND NOT e.hidden
             "#,
             given_id
         )

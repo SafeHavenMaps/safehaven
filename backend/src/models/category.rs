@@ -154,7 +154,8 @@ impl Category {
         .map_err(AppError::Database)
     }
 
-    pub async fn list_with_families(
+    pub async fn list_except_with_families(
+        excluded_categories: &Vec<Uuid>,
         families: Vec<Uuid>,
         conn: &mut PgConnection,
     ) -> Result<Vec<Category>, AppError> {
@@ -171,8 +172,9 @@ impl Category {
                 border_color,
                 version
             FROM categories
-            WHERE family_id = ANY($1)
+            WHERE NOT (id = ANY($1)) AND family_id = ANY($2)
             "#,
+            &excluded_categories,
             &families
         )
         .fetch_all(conn)

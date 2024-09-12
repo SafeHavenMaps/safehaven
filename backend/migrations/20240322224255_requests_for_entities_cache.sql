@@ -6,21 +6,20 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
     geographic_restriction TEXT,
     input_family_id UUID,
 
-    allow_all_categories BOOL,
-    allow_all_tags BOOL,
-    categories_list UUID[],
-    tags_list UUID[],
-    exclude_categories_list UUID[],
-    exclude_tags_list UUID[],
+    at_allow_all_categories BOOL,
+    at_allow_all_tags BOOL,
+    at_allowed_categories_ids  UUID[],
+    at_allowed_tags_ids UUID[],
+    at_excluded_categories_ids UUID[],
+    at_excluded_tags_ids UUID[],
 
     cluster_eps DOUBLE PRECISION,
     cluster_min_points INT,
 
-    active_categories_ids UUID[],
-    required_tags_ids UUID[],
-    excluded_tags_ids UUID[],
-
-    enum_constraints JSONB
+    user_active_categories_ids UUID[],
+    user_required_tags_ids UUID[],
+    user_excluded_tags_ids UUID[],
+    user_enum_constraints JSONB
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -39,7 +38,7 @@ CREATE OR REPLACE FUNCTION fetch_entities_within_view(
 ) AS $$
 BEGIN
     RETURN QUERY
-    WITH filtered_entities AS (
+    WITH included_entities AS (
         SELECT ec.id,
             ec.entity_id,
             ec.category_id,
@@ -49,10 +48,14 @@ BEGIN
             ec.parent_id,
             ec.parent_display_name,
             ec.web_mercator_location,
-            ec.plain_text_location
+            ec.plain_text_location,
+            ec.enums
         FROM entities_caches ec
         WHERE
-            ST_Intersects(
+            -- Family filter
+            ec.family_id = input_family_id
+            -- Geographic filter
+            AND ST_Intersects(
                 ec.web_mercator_location,
                 ST_MakeEnvelope(input_xmin, input_ymin, input_xmax, input_ymax, 3857)
             )
@@ -60,45 +63,53 @@ BEGIN
                 geographic_restriction IS NULL OR
                 ST_Intersects(ec.web_mercator_location, st_geomfromtext(geographic_restriction))
             )
+            -- Hidden filter
             AND NOT ec.hidden
-            AND ec.family_id = input_family_id
+            -- Access tokens blacklists
+            AND NOT (ec.category_id = ANY(at_excluded_categories_ids))
+            AND NOT (ec.tags_ids && at_excluded_tags_ids)
+            -- User filters blacklists
+            AND NOT (ec.tags_ids && user_excluded_tags_ids)
+    ),
+    filtered_entities AS (
+        SELECT *
+        FROM included_entities ie
+        WHERE
             -- Categories filter
-            AND (allow_all_categories OR ec.category_id = ANY(categories_list))
-            AND NOT (ec.category_id = ANY(exclude_categories_list))
+            (at_allow_all_categories OR ie.category_id = ANY(at_allowed_categories_ids))
             -- Tags filter
-            AND (allow_all_tags OR ec.tags_ids && tags_list)
-            AND NOT (ec.tags_ids && exclude_tags_list)
+            AND (at_allow_all_tags OR ie.tags_ids && at_allowed_tags_ids)
             -- User filters
-            AND (ec.category_id = ANY(active_categories_ids))
-            AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
-            AND NOT (ec.tags_ids && excluded_tags_ids)
+            AND (ie.category_id = ANY(user_active_categories_ids))
+            AND (array_length(user_required_tags_ids, 1) = 0 OR user_required_tags_ids <@ ie.tags_ids)
             -- Enum constraints
             AND (
-                enum_constraints IS NULL OR
-                enum_constraints = '{}'::jsonb OR
+                user_enum_constraints IS NULL OR
+                user_enum_constraints = '{}'::jsonb OR
                 (
                     SELECT bool_and(
-                        ec.enums->key ?| array(SELECT jsonb_array_elements_text(value))
+                        ie.enums->key ?| array(SELECT jsonb_array_elements_text(value))
                     )
-                    FROM jsonb_each(enum_constraints) AS constraints(key, value)
-                    WHERE key IS NOT NULL AND ec.enums ? key
+                    FROM jsonb_each(user_enum_constraints) AS constraints(key, value)
+                    WHERE key IS NOT NULL AND ie.enums ? key
                 )
             )
     ),
     parent_entities AS (
         SELECT
-            DISTINCT e.id,
-            e.entity_id,
-            e.category_id,
-            e.tags_ids,
-            e.family_id,
-            e.display_name,
-            e.parent_id,
-            e.parent_display_name,
-            e.web_mercator_location,
-            e.plain_text_location
-        FROM entities_caches e
-        WHERE e.entity_id IN (SELECT DISTINCT fe.parent_id FROM filtered_entities fe)
+            DISTINCT ie.id,
+            ie.entity_id,
+            ie.category_id,
+            ie.tags_ids,
+            ie.family_id,
+            ie.display_name,
+            ie.parent_id,
+            ie.parent_display_name,
+            ie.web_mercator_location,
+            ie.plain_text_location,
+            ie.enums
+        FROM included_entities ie
+        WHERE ie.entity_id IN (SELECT DISTINCT fe.parent_id FROM filtered_entities fe)
     ),
     combined_entities AS (
         SELECT * FROM filtered_entities fe WHERE fe.parent_id IS NULL
@@ -147,25 +158,23 @@ CREATE OR REPLACE FUNCTION search_entities(
     geographic_restriction TEXT,
     input_family_id UUID,
 
-    allow_all_categories BOOL,
-    allow_all_tags BOOL,
-
-    categories_list UUID[],
-    tags_list UUID[],
-
-    exclude_categories_list UUID[],
-    exclude_tags_list UUID[],
+    at_allow_all_categories BOOL,
+    at_allow_all_tags BOOL,
+    at_allowed_categories_ids  UUID[],
+    at_allowed_tags_ids UUID[],
+    at_excluded_categories_ids UUID[],
+    at_excluded_tags_ids UUID[],
 
     current_page BIGINT,
     page_size BIGINT,
 
-    active_categories_ids UUID[],
-    required_tags_ids UUID[],
-    excluded_tags_ids UUID[],
+    user_active_categories_ids UUID[],
+    user_required_tags_ids UUID[],
+    user_excluded_tags_ids UUID[],
 
     require_locations BOOL,
 
-    enum_constraints JSONB
+    user_enum_constraints JSONB
 ) RETURNS TABLE (
     id UUID,
     entity_id UUID,
@@ -180,49 +189,60 @@ CREATE OR REPLACE FUNCTION search_entities(
     response_current_page BIGINT
 ) AS $$
 BEGIN
-    RETURN QUERY WITH
+    RETURN QUERY
+    WITH included_entities AS (
+        SELECT ec.*
+        FROM entities_caches ec
+        WHERE
+            -- Family filter
+            ec.family_id = input_family_id
+            -- Hidden filter
+            AND NOT ec.hidden
+            -- Access tokens blacklists
+            AND NOT (ec.category_id = ANY(at_excluded_categories_ids))
+            AND NOT (ec.tags_ids && at_excluded_tags_ids)
+            -- User filters blacklists
+            AND NOT (ec.tags_ids && user_excluded_tags_ids)
+    ),
     filtered_entities AS (
         SELECT
-            ec.*,
+            ie.*,
             CASE
                 WHEN search_query IS NOT NULL AND search_query = '' AND
-                    (ec.display_name ILIKE '%' || lower(search_query) || '%')
+                    (ie.display_name ILIKE '%' || lower(search_query) || '%')
                 THEN 1 ELSE 0
             END AS exact_match_score
-        FROM entities_caches ec
+        FROM included_entities ie
         WHERE
             (
                 search_query IS NULL OR search_query = '' OR (
-                    ec.display_name ILIKE '%' || lower(search_query) || '%'
+                    ie.display_name ILIKE '%' || lower(search_query) || '%'
                         OR (full_text_search_ts @@ plainto_tsquery(search_query))
                     )
             )
             AND (
                 geographic_restriction IS NULL OR
-                ST_Intersects(ec.web_mercator_location, st_geomfromtext(geographic_restriction))
+                ST_Intersects(ie.web_mercator_location, st_geomfromtext(geographic_restriction))
             )
-            AND ec.family_id = input_family_id
-            AND NOT ec.hidden
+            AND ie.family_id = input_family_id
+            AND NOT ie.hidden
             -- Categories
-            AND (allow_all_categories OR ec.category_id = ANY(categories_list))
-            AND NOT (ec.category_id = ANY(exclude_categories_list))
+            AND (at_allow_all_categories OR ie.category_id = ANY(at_allowed_categories_ids))
             -- Tags
-            AND (allow_all_tags OR (ec.tags_ids && tags_list))
-            AND NOT (ec.tags_ids && exclude_tags_list)
+            AND (at_allow_all_tags OR (ie.tags_ids && at_allowed_tags_ids))
             -- User filters
-            AND (ec.category_id = ANY(active_categories_ids))
-            AND (array_length(required_tags_ids, 1) = 0 OR required_tags_ids <@ ec.tags_ids)
-            AND NOT (ec.tags_ids && excluded_tags_ids)
+            AND (ie.category_id = ANY(user_active_categories_ids))
+            AND (array_length(user_required_tags_ids, 1) = 0 OR user_required_tags_ids <@ ie.tags_ids)
             -- Enum constraints
             AND (
-                enum_constraints IS NULL OR
-                enum_constraints = '{}'::jsonb OR
+                user_enum_constraints IS NULL OR
+                user_enum_constraints = '{}'::jsonb OR
                 (
                     SELECT bool_and(
-                        ec.enums->key ?| array(SELECT jsonb_array_elements_text(value))
+                        ie.enums->key ?| array(SELECT jsonb_array_elements_text(value))
                     )
-                    FROM jsonb_each(enum_constraints) AS constraints(key, value)
-                    WHERE key IS NOT NULL AND ec.enums ? key
+                    FROM jsonb_each(user_enum_constraints) AS constraints(key, value)
+                    WHERE key IS NOT NULL AND ie.enums ? key
                 )
             )
     ),
