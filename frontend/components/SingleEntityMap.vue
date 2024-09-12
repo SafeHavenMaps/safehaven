@@ -83,7 +83,7 @@ const props = defineProps<{
 }>()
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 #map_container,
 #map {
   width: 100%;

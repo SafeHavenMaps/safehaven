@@ -145,62 +145,61 @@
           }
         '';
 
-        processConfigFile = includeDatabase: (
-          let
-            processes =
-              {
-                backend = {
-                  command = "cargo run -- serve";
-                  working_dir = "./backend";
-                };
-                frontend = {
-                  command = "npm run dev";
-                  working_dir = "./frontend";
-                };
-                reverse = {
-                  command = "${pkgs.nginx}/bin/nginx -c ${nginxConfigFile}";
-                };
-              }
-              // (
-                if includeDatabase
-                then {
-                  database = {
-                    command = "postgres -D ./.pgdata";
-                  };
-                }
-                else {}
-              );
-          in
-            pkgs.writeText "process.yaml" (builtins.toJSON {
-              version = "0.5";
-              processes = processes;
-            })
-        );
+        processConfigFile = let
+          processes = {
+            backend = {
+              command = "cargo run -- serve";
+              working_dir = "./backend";
+            };
+            frontend = {
+              command = "npm run dev";
+              working_dir = "./frontend";
+            };
+            reverse = {
+              command = "${pkgs.nginx}/bin/nginx -c ${nginxConfigFile}";
+            };
+          };
+        in
+          pkgs.writeText "process.yaml" (builtins.toJSON {
+            version = "0.5";
+            processes = processes;
+          });
+
+        pgHba = pkgs.writeText "pg_hba.conf" ''
+          local all all trust
+          host all all 0.0.0.0/0 trust
+          host all all ::/0 trust
+        '';
+
+        pgInitScript = pkgs.writeTextFile {
+          name = "pg_init_script";
+          text = ''
+            #!/bin/sh
+            set -e
+            # Copy the pg_hba.conf file
+            cp /wanted_pg_hba.conf /var/lib/postgresql/data/pg_hba.conf
+            # Create the database
+            psql -U postgres -c "CREATE DATABASE safehaven;"
+            psql -U postgres -d safehaven -c "CREATE EXTENSION postgis;"
+          '';
+          executable = true;
+        };
+
+        startDockerPostgresql = pkgs.writeShellScriptBin "start_docker_postgresql" ''
+          set -e
+          docker run --rm -d \
+            --name safehaven-postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -v $PWD/.pgdata:/var/lib/postgresql/data \
+            -v ${pgHba}:/wanted_pg_hba.conf \
+            -v ${pgInitScript}:/docker-entrypoint-initdb.d/init.sh \
+            -p 5432:5432 \
+            postgis/postgis:16-3.4-alpine
+        '';
 
         startDevEnv = pkgs.writeShellScriptBin "start_dev_env" ''
           set -e
-
-          if [ "$1" = "db" ]; then
-            if [ ! -d "./.pgdata" ]; then
-              echo "Preparing the database"
-
-              initdb -D ./.pgdata -U postgres
-
-              echo 'local all all trust'              >  ./.pgdata/pg_hba.conf
-              echo 'host all all 127.0.0.1/32 trust'  >> ./.pgdata/pg_hba.conf
-              echo 'host all all ::1/128 trust'       >> ./.pgdata/pg_hba.conf
-
-              echo "unix_socket_directories = '$PWD/.pgdata'" >> ./.pgdata/postgresql.conf
-
-              pg_ctl -D ./.pgdata -l ./.pgdata/logfile start
-              createdb -h localhost -U postgres safehaven
-              pg_ctl -D ./.pgdata stop
-            fi
-
-            ${pkgs.process-compose}/bin/process-compose -f ${processConfigFile true}
-          else
-            ${pkgs.process-compose}/bin/process-compose -f ${processConfigFile false}
-          fi
+          ${pkgs.process-compose}/bin/process-compose -f ${processConfigFile}
         '';
 
         # Version when compiling the packages
@@ -220,7 +219,7 @@
 
             # When modifying cargo dependencies, replace the hash with pkgs.lib.fakeSha256
             # then run `nix build .#backend`. Use the hash in the error to replace the value.
-            cargoSha256 = "sha256-0Rkyor7BXLI8+VZUVFqp1wMvHhBhy7sQSeOvZC8yIgE=";
+            cargoHash = "sha256-7Bx/GNFx/OUfQPTS8a/DsPik8gju73qY1zNXCyHY8a0=";
           };
 
         # Frontend derivation
@@ -233,7 +232,7 @@
 
           # When modifying npm dependencies, replace the hash with pkgs.lib.fakeSha256
           # then run `nix build .#frontend`. Use the hash in the error to replace the value.
-          npmDepsHash = "sha256-btoUwnmxoCO+vetf2uDxdN/nw3YF6H/ERLtIEtksW3A=";
+          npmDepsHash = "sha256-x6poyKwpmT/uKck0vRhwy02RbZutqL06w7t5JJ3xbaw=";
 
           installPhase = ''
             runHook preInstall
@@ -269,6 +268,7 @@
               checkProject
               regenApi
               startDevEnv
+              startDockerPostgresql
               # Backend
               sqlx-cli
               # Front
