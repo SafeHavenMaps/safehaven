@@ -21,6 +21,13 @@
       </div>
     </template>
   </ConfirmPopup>
+
+  <ConfirmDialog group="confirm_dialog">
+    <template #message="slotProps">
+      <AppIcon :icon-name="slotProps.message.icon!" />
+      <span class="max-w-96">{{ slotProps.message.message }}</span>
+    </template>
+  </ConfirmDialog>
 </template>
 
 <script setup lang="ts">

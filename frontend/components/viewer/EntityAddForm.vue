@@ -347,19 +347,20 @@ function onIncludeCommentToggle(event: Event) {
   else {
     const options: ConfirmationOptions = {
       target: event.currentTarget as HTMLElement,
-      group: 'delete',
-      message: `Ne pas inclure de commentaire empêchera les autres utilisateur·ices de bénéficier de vos retours, 
-      et ne vous laissera préciser que les informations générales. Si vous avez une expérience personelle avec cette entité, 
-      nous vous conseillons d'inclure un commentaire.`,
+      group: 'confirm_dialog',
+      message: `Ne pas inclure de commentaire ne vous laissera préciser que des informations générales. 
+      Si vous avez des retours ou une expérience personelle à partager, 
+      il est recommandé d'inclure un commentaire.`,
+      header: 'Confirmation',
       icon: 'warning',
       rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
       acceptClass: 'p-button-sm',
-      rejectLabel: 'Annuler',
-      acceptLabel: 'Confirmer',
-      reject: () => {},
-      accept: () => {
+      rejectLabel: 'Ne pas inclure de commentaire',
+      acceptLabel: 'Annuler',
+      reject: () => {
         include_comment.value = false
       },
+      accept: () => {},
     }
     confirm.require(options)
   }
