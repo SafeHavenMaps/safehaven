@@ -18,7 +18,7 @@ WITH families_indexed_fields AS (
             WHERE
                 (field->>'indexed')::boolean IS TRUE
                 AND
-                (field->>'field_type')::text IN ('SingleLineText', 'MultiLineText')
+                (field->>'field_type')::text IN ('SingleLineText', 'MultiLineText', 'RichText')
         ) AS indexed_strings
     FROM families f
 ),

@@ -577,7 +577,7 @@ edited_form_fields.value.forEach((field) => {
   }
 })
 
-const searchableTypes = ['SingleLineText', 'MultiLineText']
+const searchableTypes = ['SingleLineText', 'MultiLineText', 'RichText']
 const filterableTypes = ['EnumSingleOption', 'EnumMultiOption']
 const indexableTypes = [...searchableTypes, ...filterableTypes]
 
