@@ -73,7 +73,8 @@ try {
   await state.fetchFamilies()
   await state.getEntitiesCommentsCounts()
 }
-catch {
+catch (e) {
+  console.log(e)
   // Do nothing
 }
 

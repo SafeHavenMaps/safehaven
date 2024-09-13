@@ -3,6 +3,7 @@
 import theme from './theme.mjs'
 
 export default defineNuxtConfig({
+  compatibilityDate: '2024-09-13',
   modules: [
     '@primevue/nuxt-module',
     '@nuxt/eslint',

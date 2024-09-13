@@ -123,6 +123,7 @@ export class AppState {
   // Families
   async fetchFamilies(): Promise<void> {
     this.familiesData = await this.client.listFamilies()
+    console.log(this.familiesData)
     this.familyRecord = this.familiesData.reduce((families, family) => {
       families[family.id] = family
       return families

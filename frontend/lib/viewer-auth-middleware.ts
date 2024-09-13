@@ -9,13 +9,15 @@ export default function createAuthMiddleware(
 
   return {
 
-    async onRequest(request, _options) {
+    async onRequest(params) {
+      const { request } = params
       request.headers.set('X-SH-Plain-AccessToken', plainToken)
       request.headers.set('Authorization', `Bearer ${usedAuthToken}`)
       return request
     },
 
-    async onResponse(response, _options) {
+    async onResponse(params) {
+      const { response } = params
       if (response.status === 401) {
         await onAuthError()
       }
