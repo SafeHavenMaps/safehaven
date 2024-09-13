@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT e.id,\n            e.display_name,\n            e.category_id,\n            e.created_at,\n                COALESCE(\n                    (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), \n                    array[]::uuid[]\n                ) as \"tags!\"\n            FROM entities e\n            INNER JOIN entities_entities ee ON e.id = ee.child_id\n            WHERE ee.parent_id = $1 AND e.moderated\n            ",
+  "query": "\n            SELECT e.id,\n            e.display_name,\n            e.category_id,\n            e.created_at,\n                COALESCE(\n                    (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), \n                    array[]::uuid[]\n                ) as \"tags!\"\n            FROM entities e\n            INNER JOIN entities_entities ee ON e.id = ee.child_id\n            WHERE ee.parent_id = $1 AND e.moderated AND NOT e.hidden\n            ",
   "describe": {
     "columns": [
       {
@@ -42,5 +42,5 @@
       null
     ]
   },
-  "hash": "fa5956ca2b974431e823d1b37d2537a718335f9eba08e237a744598b5ef2e81c"
+  "hash": "f10f7ebc6ab934115a10d9185360bbdc2a7355c47945a9f0a1f3ef725d9b9416"
 }
