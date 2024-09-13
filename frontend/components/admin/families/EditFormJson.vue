@@ -50,7 +50,7 @@
 <script setup lang="ts">
 // import type { ConfirmationOptions } from 'primevue/confirmationoptions'
 // import type { FormField, StringFieldTypeMetadata, OptionsFieldTypeMetadata } from '~/lib'
-
+import { toRaw } from 'vue'
 import 'ace-builds/src-noconflict/ace' // Core Ace styles
 
 import { VAceEditor } from 'vue3-ace-editor'
@@ -70,10 +70,12 @@ const props = defineProps<{
   onSaveCallback: (editedFormFields: FormField[]) => Promise<{ error: Error | undefined }>
 }>()
 
-const edited_form_fields: Ref<FormField[]> = ref(JSON.parse(JSON.stringify(props.originalFormFields))) // deep copy
-edited_form_fields.value.sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
+const rawEditedFormFields = toRaw(props.originalFormFields)
+const edited_form_fields: FormField[] = JSON.parse(JSON.stringify(rawEditedFormFields)) // deep copy
+edited_form_fields.sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
 
-const editorContent = ref<string>(JSON.stringify(edited_form_fields, null, 2))
+const rawPassedContent = JSON.stringify(toRaw(edited_form_fields), null, 2)
+const editorContent = ref<string>(rawPassedContent)
 
 interface CustomCompletion {
   caption: string
