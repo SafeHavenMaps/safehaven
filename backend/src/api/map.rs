@@ -242,7 +242,7 @@ impl Display for SearchRequest {
     path = "/api/map/search",
     request_body = SearchRequest,
     responses(
-        (status = 200, description = "List of entities", body = CachedEntitiesWithPagination),
+        (status = 200, description = "List of entities", body = PaginatedVec<ViewerSearchedCachedEntity>),
         (status = 401, description = "Invalid token", body = ErrorResponse),
     )
 )]

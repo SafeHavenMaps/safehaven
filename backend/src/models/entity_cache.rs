@@ -148,7 +148,9 @@ impl From<Vec<AdminPaginatedCachedEntity>> for AdminCachedEntitiesWithPagination
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct PaginatedVec<T> {
+    #[schema(value_type = Object)]
     pub entities: Vec<T>,
+
     pub total_results: i64,
     pub total_pages: i64,
     pub response_current_page: i64,

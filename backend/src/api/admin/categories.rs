@@ -86,8 +86,7 @@ pub async fn admin_category_update(
 
 #[utoipa::path(
     put,
-    path = "/api/admin/categories/:id/icon",
-    request_body = Icon,
+    path = "/api/admin/categories/{id}/icon",
     params(
         ("id" = Uuid, Path, description = "Category identifier")
     ),
@@ -145,7 +144,7 @@ pub async fn admin_category_delete(
 
 #[utoipa::path(
     delete,
-    path = "/api/admin/categories/:id/icon",
+    path = "/api/admin/categories/{id}/icon",
     params(
         ("id" = Uuid, Path, description = "Category identifier")
     ),

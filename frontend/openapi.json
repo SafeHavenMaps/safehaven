@@ -358,104 +358,6 @@
         }
       }
     },
-    "/api/admin/categories/:id/icon": {
-      "put": {
-        "tags": [
-          "admin::categories"
-        ],
-        "operationId": "admin_category_update_icon",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Category identifier",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Icon"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Category icon updated"
-          },
-          "401": {
-            "description": "Invalid permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "admin::categories"
-        ],
-        "operationId": "admin_category_delete_icon",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Category identifier",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Category icon deletion successful"
-          },
-          "401": {
-            "description": "Invalid permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/admin/categories/{id}": {
       "get": {
         "tags": [
@@ -587,6 +489,94 @@
         "responses": {
           "200": {
             "description": "Category deletion successful"
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/categories/{id}/icon": {
+      "put": {
+        "tags": [
+          "admin::categories"
+        ],
+        "operationId": "admin_category_update_icon",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Category identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category icon updated"
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin::categories"
+        ],
+        "operationId": "admin_category_delete_icon",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Category identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category icon deletion successful"
           },
           "401": {
             "description": "Invalid permissions",
@@ -956,7 +946,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminCachedEntitiesWithPagination"
+                  "$ref": "#/components/schemas/PaginatedVec"
                 }
               }
             }
@@ -1343,104 +1333,6 @@
         }
       }
     },
-    "/api/admin/families/:id/icon": {
-      "put": {
-        "tags": [
-          "admin::families"
-        ],
-        "operationId": "admin_family_update_icon",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Family identifier",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Icon"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Family icon updated"
-          },
-          "401": {
-            "description": "Invalid permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "admin::families"
-        ],
-        "operationId": "admin_family_delete_icon",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Family identifier",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Family icon deletion successful"
-          },
-          "401": {
-            "description": "Invalid permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/admin/families/{id}": {
       "get": {
         "tags": [
@@ -1572,6 +1464,94 @@
         "responses": {
           "200": {
             "description": "Family deleted successfully"
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/families/{id}/icon": {
+      "put": {
+        "tags": [
+          "admin::families"
+        ],
+        "operationId": "admin_family_update_icon",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Family identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Family icon updated"
+          },
+          "401": {
+            "description": "Invalid permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin::families"
+        ],
+        "operationId": "admin_family_delete_icon",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Family identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Family icon deletion successful"
           },
           "401": {
             "description": "Invalid permissions",
@@ -1790,15 +1770,7 @@
         "operationId": "admin_logout",
         "responses": {
           "200": {
-            "description": "Logout",
-            "headers": {
-              "Set-Cookie": {
-                "schema": {
-                  "$ref": "#/components/schemas/CookieJar"
-                },
-                "description": "Cookie jar cleaned"
-              }
-            }
+            "description": "Logout"
           },
           "404": {
             "description": "User or password not found",
@@ -1851,14 +1823,7 @@
         "operationId": "admin_count_comments_entities",
         "responses": {
           "200": {
-            "description": "Dicts of entities and comments counts by family and category id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Json"
-                }
-              }
-            }
+            "description": "Dicts of entities and comments counts by family and category id"
           },
           "401": {
             "description": "Invalid permissions",
@@ -2140,7 +2105,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewUser"
+                "$ref": "#/components/schemas/NewOrUpdatedUser"
               }
             }
           },
@@ -2580,7 +2545,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CachedEntitiesWithPagination"
+                  "$ref": "#/components/schemas/PaginatedVec"
                 }
               }
             }
@@ -2684,7 +2649,7 @@
             "format": "int64"
           },
           "permissions": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "title": {
             "type": "string"
@@ -2702,10 +2667,10 @@
         ],
         "properties": {
           "origins": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "visits_30_days": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           }
         }
       },
@@ -2848,7 +2813,7 @@
             "format": "uuid"
           },
           "locations": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "moderated": {
             "type": "boolean"
@@ -2923,7 +2888,7 @@
             "format": "uuid"
           },
           "locations": {
-            "$ref": "#/components/schemas/sqlx.types.Json"
+            "type": "object"
           },
           "moderated": {
             "type": "boolean"
@@ -3101,7 +3066,7 @@
             "type": "boolean"
           },
           "locations": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "moderated": {
             "type": "boolean"
@@ -3494,10 +3459,10 @@
         ],
         "properties": {
           "comment_form": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "entity_form": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "icon_hash": {
             "type": "string",
@@ -3517,6 +3482,37 @@
           "version": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "FetchEntityRequest": {
+        "type": "object",
+        "required": [
+          "active_categories",
+          "active_required_tags",
+          "active_hidden_tags"
+        ],
+        "properties": {
+          "active_categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "active_hidden_tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "active_required_tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },
@@ -3558,6 +3554,7 @@
           "key",
           "display_name",
           "field_type",
+          "field_type_metadata",
           "indexed",
           "privately_indexed",
           "mandatory",
@@ -3581,8 +3578,8 @@
             "$ref": "#/components/schemas/FieldType"
           },
           "field_type_metadata": {
-            "description": "Used to store detail about the field that relevent\nonly for the frontend. For instance, if the field is an enum\nuse it to store possible values. If it is a SingleLineText, specify\nif it's an email, a phone number, etc...",
-            "nullable": true
+            "type": "object",
+            "description": "Used to store detail about the field that relevent\nonly for the frontend. For instance, if the field is an enum\nuse it to store possible values. If it is a SingleLineText, specify\nif it's an email, a phone number, etc..."
           },
           "form_page": {
             "type": "integer",
@@ -3727,7 +3724,7 @@
             "format": "int64"
           },
           "visits_30_days": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           }
         }
       },
@@ -3800,7 +3797,22 @@
       "MultiPolygon": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/Polygon"
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "number",
+                  "format": "double"
+                },
+                {
+                  "type": "number",
+                  "format": "double"
+                }
+              ]
+            }
+          }
         }
       },
       "NewCommentRequest": {
@@ -3831,7 +3843,7 @@
             "type": "boolean"
           },
           "permissions": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "title": {
             "type": "string"
@@ -3972,10 +3984,7 @@
         ],
         "properties": {
           "entities": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/T"
-            }
+            "type": "object"
           },
           "response_current_page": {
             "type": "integer",
@@ -4154,7 +4163,7 @@
             "format": "uuid"
           },
           "comment_form": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "created_at": {
             "type": "string",
@@ -4165,7 +4174,7 @@
             "type": "string"
           },
           "entity_form": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "family_id": {
             "type": "string",
@@ -4176,7 +4185,7 @@
             "format": "uuid"
           },
           "locations": {
-            "$ref": "#/components/schemas/Json"
+            "type": "object"
           },
           "tags": {
             "type": "array",
