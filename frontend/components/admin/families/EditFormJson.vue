@@ -25,7 +25,14 @@
           label="Import"
           severity="info"
           @click="triggerImport"
-        />
+        >
+          <template #icon>
+            <AppIcon
+              icon-name="upload"
+              class="-mx-1"
+            />
+          </template>
+        </Button>
         <input
           ref="fileInput"
           type="file"
@@ -41,7 +48,14 @@
             label="Export"
             severity="info"
             @click="onExport"
-          />
+          >
+            <template #icon>
+              <AppIcon
+                icon-name="download"
+                class="-mx-1"
+              />
+            </template>
+          </Button>
         </a>
       </span>
 
@@ -114,7 +128,7 @@ function onImport(event: Event) {
         }
       }
       reader.readAsText(file)
-      toast.add({ severity: 'success', summary: 'Succès', detail: `Le fichier a été importé avec succès`, life: 3000 })
+      toast.add({ severity: 'success', summary: 'Succès', detail: `Le fichier a été importé avec succès. Les changements ne sont pas encore sauvegardés.`, life: 3000 })
     }
   }
   catch {
