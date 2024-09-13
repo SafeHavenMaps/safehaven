@@ -1,11 +1,8 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-pub type Coordinates = (f64, f64);
-pub type Polygon = Vec<Coordinates>;
-
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
-pub struct MultiPolygon(Vec<Polygon>);
+pub struct MultiPolygon(Vec<Vec<(f64, f64)>>);
 
 impl MultiPolygon {
     pub fn to_polygon_string(&self, srid: Option<u32>) -> String {

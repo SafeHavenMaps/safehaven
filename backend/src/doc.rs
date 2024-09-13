@@ -6,7 +6,7 @@ use crate::{
             AdminUserIdentity, LoginRequest, LoginResponse,
         },
         map::{
-            self, FetchedEntity, NewCommentRequest, PublicNewEntityRequest,
+            self, FetchEntityRequest, FetchedEntity, NewCommentRequest, PublicNewEntityRequest,
             PublicNewEntityResponse, SearchRequest as MapSearchRequest, ViewRequest,
         },
         root::{self, BootstrapResponse, SafeHavenVersionResponse, SafeMode, StatusResponse},
@@ -28,8 +28,8 @@ use crate::{
         },
         entity_cache::{
             AdminCachedEntitiesWithPagination, AdminCachedEntity, Cluster, EntitiesAndClusters,
-            LocationRepresentation, ParentRepresentation, ViewerCachedEntitiesWithPagination,
-            ViewerCachedEntity, ViewerSearchedCachedEntity,
+            LocationRepresentation, PaginatedVec, ParentRepresentation,
+            ViewerCachedEntitiesWithPagination, ViewerCachedEntity, ViewerSearchedCachedEntity,
         },
         family::{Family, Field, FieldType, Form, NewOrUpdateFamily},
         options::{
@@ -161,6 +161,8 @@ use utoipa::OpenApi;
         PublicEntity,
         PublicListedEntity,
         PublicNewEntity,
+        PaginatedVec<ViewerSearchedCachedEntity>,
+        PaginatedVec<AdminCachedEntity>,
         ViewerCachedEntity,
         ViewerSearchedCachedEntity,
         LocationRepresentation,
@@ -195,6 +197,7 @@ use utoipa::OpenApi;
         MapSearchRequest,
         NewCommentRequest,
         PublicNewEntityRequest,
+        FetchEntityRequest,
         FetchedEntity,
         // helper postgis polygons
         MultiPolygon,

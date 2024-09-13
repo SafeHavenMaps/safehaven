@@ -96,8 +96,7 @@ pub async fn admin_family_update(
 
 #[utoipa::path(
     put,
-    path = "/api/admin/families/:id/icon",
-    request_body = Icon,
+    path = "/api/admin/families/{id}/icon",
     params(
         ("id" = Uuid, Path, description = "Family identifier")
     ),
@@ -165,7 +164,7 @@ pub async fn admin_family_delete(
 
 #[utoipa::path(
     delete,
-    path = "/api/admin/families/:id/icon",
+    path = "/api/admin/families/{id}/icon",
     params(
         ("id" = Uuid, Path, description = "Family identifier")
     ),

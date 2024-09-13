@@ -21,7 +21,7 @@ pub async fn admin_home_stats(
     get,
     path = "/api/admin/stats/count-comments-entities",
     responses(
-        (status = 200, description = "Dicts of entities and comments counts by family and category id", body = Json<CountResult>),
+        (status = 200, description = "Dicts of entities and comments counts by family and category id"),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]

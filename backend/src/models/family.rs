@@ -48,6 +48,7 @@ pub struct Field {
     /// only for the frontend. For instance, if the field is an enum
     /// use it to store possible values. If it is a SingleLineText, specify
     /// if it's an email, a phone number, etc...
+    #[schema(value_type = Object)]
     pub field_type_metadata: Option<Value>,
 
     /// Sets if the field is indexed (used in full text search, or constraints search)
@@ -79,7 +80,9 @@ pub struct Family {
     pub id: Uuid,
     pub title: String,
     pub icon_hash: Option<String>,
+    #[schema(value_type = Object)]
     pub entity_form: Json<Form>,
+    #[schema(value_type = Object)]
     pub comment_form: Json<Form>,
     pub sort_order: i32,
     pub version: i32,

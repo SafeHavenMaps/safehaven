@@ -30,7 +30,7 @@ pub async fn admin_users_list(
 #[utoipa::path(
     post,
     path = "/api/admin/users",
-    request_body = NewUser,
+    request_body = NewOrUpdatedUser,
     responses(
         (status = 200, description = "User", body = User),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),

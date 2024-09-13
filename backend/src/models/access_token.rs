@@ -55,6 +55,7 @@ pub struct PermissionPolicy {
 pub struct NewOrUpdateAccessToken {
     pub title: String,
     pub token: String,
+    #[schema(value_type = Object)]
     pub permissions: Json<Permissions>,
     pub active: bool,
 }
@@ -64,6 +65,7 @@ pub struct AccessToken {
     pub id: Uuid,
     pub title: String,
     pub token: String,
+    #[schema(value_type = Object)]
     pub permissions: Json<Permissions>,
     pub last_week_visits: i64,
     pub active: bool,
@@ -71,7 +73,10 @@ pub struct AccessToken {
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct AccessTokenStats {
+    #[schema(value_type = Object)]
     pub origins: Json<Value>,
+
+    #[schema(value_type = Object)]
     pub visits_30_days: Json<Value>,
 }
 

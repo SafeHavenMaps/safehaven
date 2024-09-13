@@ -93,6 +93,7 @@ pub struct HomePageStats {
     pub total_visits_30_days: i64,
     pub total_visits_7_days: i64,
 
+    #[schema(value_type = Object)]
     pub visits_30_days: Json<Value>,
 }
 

@@ -206,7 +206,7 @@ async fn admin_login(
     delete,
     path = "/api/admin/session",
     responses(
-        (status = 200, description = "Logout", headers(("Set-Cookie" = CookieJar, description = "Cookie jar cleaned"))),
+        (status = 200, description = "Logout"),
         (status = 404, description = "User or password not found", body = ErrorResponse),
     )
 )]
