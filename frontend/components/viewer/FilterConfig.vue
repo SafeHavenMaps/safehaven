@@ -272,7 +272,7 @@ function enumsFiltersChanged() {
 }
 
 function resetFilters() {
-  props.filteringTags.filter(t => !t.is_filter).forEach(t => t.active = null)
+  props.filteringTags.filter(t => !t.is_primary_filter).forEach(t => t.active = null)
   tagFiltersChanged()
 }
 </script>
