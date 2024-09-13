@@ -10,6 +10,7 @@ export type AppError = {
 }
 
 export type InitConfig = api.components['schemas']['StatusResponse']
+export type SafeHavenVersion = api.components['schemas']['SafeHavenVersionResponse']
 
 export type SafeHavenOptions = api.components['schemas']['SafeHavenOptions']
 export type ConfigurationOption = api.components['schemas']['ConfigurationOption']

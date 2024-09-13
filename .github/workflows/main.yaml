@@ -45,11 +45,15 @@ jobs:
         run: |
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
             echo -n "${GITHUB_REF#refs/tags/}-x64" > ./container_release
+            # Replace the version in backend/build.rs
+            sed -i "s/main/$TAG/" backend/build.rs
           else
             echo -n "main-$(git rev-parse --short HEAD)-x64" > ./container_release
           fi
           # Export value to Github variables
           echo "TAG=$(cat ./container_release)" >> $GITHUB_ENV
+          # Set the commit short hash (from the GitHub action variables) in the backend/build.rs
+          sed -i "s/current/$GITHUB_SHA/" backend/build.rs
 
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | skopeo login ghcr.io --username ${{ github.actor }} --password-stdin
@@ -87,11 +91,15 @@ jobs:
         run: |
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
             echo -n "${GITHUB_REF#refs/tags/}-arm64" > ./container_release
+            # Replace the version in backend/build.rs
+            sed -i "s/main/$TAG/" backend/build.rs
           else
             echo -n "main-$(git rev-parse --short HEAD)-arm64" > ./container_release
           fi
           # Export value to Github variables
           echo "TAG=$(cat ./container_release)" >> $GITHUB_ENV
+          # Set the commit short hash (from the GitHub action variables) in the backend/build.rs
+          sed -i "s/current/$GITHUB_SHA/" backend/build.rs
 
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | skopeo login ghcr.io --username ${{ github.actor }} --password-stdin

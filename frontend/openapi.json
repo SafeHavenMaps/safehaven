@@ -2657,6 +2657,15 @@
           }
         }
       }
+    },
+    "/api/version": {
+      "get": {
+        "tags": [
+          "root"
+        ],
+        "operationId": "version",
+        "responses": {}
+      }
     }
   },
   "components": {
@@ -4342,6 +4351,25 @@
           },
           "safe_mode": {
             "$ref": "#/components/schemas/SafeModeConfig"
+          }
+        }
+      },
+      "SafeHavenVersionResponse": {
+        "type": "object",
+        "required": [
+          "version",
+          "git_hash"
+        ],
+        "properties": {
+          "git_hash": {
+            "type": "string"
+          },
+          "github_latest_version": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "string"
           }
         }
       },

@@ -57,6 +57,38 @@
         </template>
       </Button>
 
+      <template v-if="isUpdateAvailable">
+        <OverlayBadge
+          value="1"
+          severity="danger"
+        >
+          <Button
+            severity="secondary"
+            outlined
+            class="ml-2"
+            style="color: white; border-color: white;"
+            @click="toggleVersionPopup()"
+          >
+            <template #icon>
+              <AppIcon icon-name="information" />
+            </template>
+          </Button>
+        </OverlayBadge>
+      </template>
+      <template v-else>
+        <Button
+          severity="secondary"
+          outlined
+          class="ml-2"
+          style="color: white; border-color: white;"
+          @click="toggleVersionPopup()"
+        >
+          <template #icon>
+            <AppIcon icon-name="information" />
+          </template>
+        </Button>
+      </template>
+
       <Button
         rounded
         severity="secondary"
@@ -81,6 +113,31 @@
       />
     </template>
   </Toolbar>
+
+  <Dialog
+    v-model:visible="versionModalVisible"
+    header="Information de version"
+    modal
+    dismissable-mask
+  >
+    <Message
+      v-if="isUpdateAvailable"
+      severity="warn"
+      class="m-1"
+    >
+      Une mise à jour est disponible.<br>
+      <a href="https://github.com/SafeHavenMaps/safehaven/releases">Rendez-vous sur GitHub</a> pour voir et mettre à jour vers la dernière version.
+    </Message>
+    <p>
+      Version actuelle: <pre>{{ state.versionInformation?.version ?? 'Inconnu' }}</pre>
+    </p>
+    <p>
+      Git hash: <pre>{{ state.versionInformation?.git_hash ?? 'Inconnu' }}</pre>
+    </p>
+    <p v-if="state.versionInformation?.github_latest_version">
+      Dernière version: <pre>{{ state.versionInformation?.github_latest_version }}</pre>
+    </p>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -92,15 +149,22 @@ const emit = defineEmits(['toggleSidebar'])
 const darkMode = useDarkMode()
 
 const accountMenu = ref<typeof Menu | null>(null)
+const versionModalVisible = ref(false)
 const navbarRef: Ref<HTMLElement | null> = ref(null)
 
 try {
-  await state.fetchConfig()
   await state.check_login()
+  await state.fetchConfig()
+  await state.fetchVersionInformaton()
 }
 catch {
   // Do nothing
 }
+
+const isUpdateAvailable = computed(() => {
+  return state.versionInformation?.version !== 'main'
+    && state.versionInformation?.github_latest_version !== state.versionInformation?.version
+})
 
 const items = [
   {
@@ -128,6 +192,10 @@ function toggleAccountMenu(event: Event) {
 
 function toggleDarkMode() {
   darkMode.toggle()
+}
+
+function toggleVersionPopup() {
+  versionModalVisible.value = !versionModalVisible.value
 }
 </script>
 

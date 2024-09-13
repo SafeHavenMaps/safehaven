@@ -57,6 +57,12 @@ struct ConfigArgs {}
 
 #[tokio::main]
 async fn main() {
+    println!(
+        "SafeHaven version: {}, build: {}. Initializing...",
+        env!("SH_VERSION"),
+        env!("SH_GITHASH")
+    );
+
     let args = Cli::parse();
     match &args.command {
         Commands::Openapi(a) => openapi(a),

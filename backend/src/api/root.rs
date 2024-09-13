@@ -21,6 +21,7 @@ use uuid::Uuid;
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/status", get(status))
+        .route("/version", get(version))
         .route("/bootstrap/:token", get(bootstrap))
 }
 
@@ -113,6 +114,36 @@ pub struct BootstrapResponse {
 pub struct BootstrapQueryParams {
     #[serde_as(as = "NoneAsEmptyString")]
     pub referrer: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+pub struct SafeHavenVersionResponse {
+    version: &'static str,
+    git_hash: &'static str,
+    github_latest_version: Option<String>,
+}
+
+async fn get_github_last_version() -> Option<String> {
+    let client = reqwest::Client::new();
+    let response = client
+        .get("https://api.github.com/repos/SafeHavenMaps/safehaven/releases/latest")
+        .header("User-Agent", "SafeHaven")
+        .send()
+        .await
+        .ok()?;
+    let json: serde_json::Value = response.json().await.ok()?;
+    let version = json.get("tag_name")?.as_str()?;
+    Some(version.to_string())
+}
+
+#[utoipa::path(get, path = "/api/version")]
+pub async fn version() -> AppJson<SafeHavenVersionResponse> {
+    let github_latest_version = get_github_last_version().await;
+    AppJson(SafeHavenVersionResponse {
+        version: env!("SH_VERSION"),
+        git_hash: env!("SH_GITHASH"),
+        github_latest_version,
+    })
 }
 
 #[utoipa::path(

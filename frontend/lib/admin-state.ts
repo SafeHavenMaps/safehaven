@@ -15,6 +15,7 @@ import type {
   FamilyRecord,
   TagRecord,
   EnumFilter,
+  SafeHavenVersion,
 } from '~/lib'
 
 interface Identifiable {
@@ -24,6 +25,7 @@ export class AppState {
   public client = useClient()
   // For categories, users, tags, access tokens, entities and comments the admin client shall be used directly
 
+  public versionInformation: SafeHavenVersion | null = null
   private optionsData: SafeHavenOptions | null = null
   private familiesData: Family[] | null = null
   public familyRecord: FamilyRecord = {}
@@ -81,6 +83,10 @@ export class AppState {
   // Config
   async fetchConfig(): Promise<void> {
     this.optionsData = await this.client.getConfig()
+  }
+
+  async fetchVersionInformaton(): Promise<void> {
+    this.versionInformation = await this.client.getVersionInformation()
   }
 
   get options(): SafeHavenOptions {
