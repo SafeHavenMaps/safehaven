@@ -58,9 +58,9 @@
       </Column>
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Créé le')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Créée le')"
         field="created_at"
-        header="Créé le"
+        header="Créée le"
         sortable
       >
         <template #body="slotProps">
@@ -68,9 +68,9 @@
         </template>
       </Column>
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Mis à jour le')"
+        v-if="state.tablesSelectedColumns[table_key].includes('Mise à jour le')"
         field="updated_at"
-        header="Mis à jour le"
+        header="Mise à jour le"
         sortable
       >
         <template #body="slotProps">
@@ -129,10 +129,10 @@ async function refreshTable() {
 refreshTable()
 
 const isSmallScreen = useMediaQuery('(max-width: 768px)')
-const optionalColumns = ref(['Catégorie', 'Créé le', 'Mis à jour le', 'Visibilité'])
+const optionalColumns = ref(['Catégorie', 'Créée le', 'Mise à jour le', 'Visibilité'])
 const table_key = `dt-state-entities-${familyId}`
 if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Catégorie', 'Créé le']
+  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Catégorie', 'Créée le']
 }
 if (!(table_key in state.tablesFilters)) {
   state.tablesFilters[table_key] = {
