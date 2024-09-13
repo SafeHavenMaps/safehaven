@@ -480,7 +480,7 @@ async fn viewer_fetch_entity(
         .find_map(|tag_id| {
             require_permission(!is_tag_explicitly_excluded_by_token(&token, tag_id)).err()
         })
-        .map_or(Ok(()), |err| Err(err))?;
+        .map_or(Ok(()), Err)?;
     debug!("[PERMDBG] No tag is explicitly excluded, continuing");
 
     let parents = PublicEntity::get_parents(id, &mut conn).await?;
@@ -519,7 +519,7 @@ async fn viewer_fetch_entity(
             .tags
             .iter()
             .find_map(|tag_id| require_permission(is_tag_allowed_by_token(&token, tag_id)).err())
-            .map_or(Ok(()), |err| Err(err))?;
+            .map_or(Ok(()), Err)?;
         debug!("[PERMDBG] No tag are explicitly excluded, continuing");
     }
 
