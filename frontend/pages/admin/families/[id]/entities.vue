@@ -1,5 +1,5 @@
 <template>
-  <Tabs value="0">
+  <Tabs v-model:value="tabValue">
     <TabList>
       <Tab value="0">
         Éditeur visuel
@@ -26,7 +26,7 @@
       <TabPanel value="1">
         <AdminFamiliesEditFormJson
           :original-form-fields="fetchedFamily.entity_form.fields"
-          :on-save-callback="onSave"
+          :on-sync-callback="onSynchronise"
           kind-name="entité"
           kind="entity"
         />
@@ -48,9 +48,9 @@ if (!state.is_admin)
   navigateTo('/admin/home')
 
 const id = useRoute().params.id as string
+const tabValue = ref('0')
 
 const fetchedFamily = await state.client.getFamily(id)
-const editedFamily = JSON.parse(JSON.stringify(fetchedFamily))
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
@@ -65,9 +65,20 @@ initAdminLayout(
 
 async function onSave(newFormFields: FormField[]): Promise<{ error: Error | undefined }> {
   try {
-    editedFamily.entity_form.fields = newFormFields
-    await state.client.updateFamily(id, editedFamily)
+    fetchedFamily.entity_form.fields = newFormFields
+    await state.client.updateFamily(id, fetchedFamily)
     navigateTo('/admin/families')
+    return { error: undefined }
+  }
+  catch (error) {
+    return { error: error as Error }
+  }
+}
+
+async function onSynchronise(newFormFields: FormField[]): Promise<{ error: Error | undefined }> {
+  try {
+    fetchedFamily.entity_form.fields = newFormFields
+    tabValue.value = '0'
     return { error: undefined }
   }
   catch (error) {

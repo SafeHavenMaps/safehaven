@@ -3,11 +3,11 @@
     <form
       class="flex flex-col gap-3 mx-4"
       style="width:68rem;"
-      @submit.prevent
+      @submit.prevent="onSync"
     >
       <p class="text-muted-color">
-        Édition directe du formulaire d'ajout en json, utile pour l'import/export.
-        Ne réalisez d'autre changements par ce biais que si vous comprenez précisément la structure du formulaire.
+        Édition directe du formulaire d'ajout en .json, utile pour l'import/export.
+        Ne réalisez d'autres changements par ce biais que si vous comprenez précisément la structure du formulaire.
         Pour sauvegarder, utilisez le bouton de prévisualisation, qui vous permettra d'abord de vérifier vos changements dans l'outil d'édition visuelle.
         Tout changement réalisé dans l'éditeur visuel auparavant et non sauvegardé sera écrasé.
       </p>
@@ -24,11 +24,25 @@
         <Button
           label="Import"
           severity="info"
+          @click="triggerImport"
         />
-        <Button
-          label="Export"
-          severity="info"
-        />
+        <input
+          ref="fileInput"
+          type="file"
+          accept=".json"
+          style="display: none;"
+          @change="onImport"
+        >
+        <a
+          ref="exportLink"
+          download="formFields.json"
+        >
+          <Button
+            label="Export"
+            severity="info"
+            @click="onExport"
+          />
+        </a>
       </span>
 
       <span class="flex gap-1 justify-content-end">
@@ -67,15 +81,69 @@ const props = defineProps<{
   kind: 'entity' | 'comment'
   kindName: string
   originalFormFields: FormField[]
-  onSaveCallback: (editedFormFields: FormField[]) => Promise<{ error: Error | undefined }>
+  onSyncCallback: (editedFormFields: FormField[]) => Promise<{ error: Error | undefined }>
 }>()
 
-const rawEditedFormFields = toRaw(props.originalFormFields)
-const edited_form_fields: FormField[] = JSON.parse(JSON.stringify(rawEditedFormFields)) // deep copy
-edited_form_fields.sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
+const toast = useToast()
 
-const rawPassedContent = JSON.stringify(toRaw(edited_form_fields), null, 2)
-const editorContent = ref<string>(rawPassedContent)
+const editedFormFields: FormField[] = JSON.parse(JSON.stringify(toRaw(props.originalFormFields))) // deep copy
+editedFormFields.sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
+
+const editorContent = ref<string>(JSON.stringify(toRaw(editedFormFields), null, 2))
+
+// Function to trigger import
+function triggerImport() {
+  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+  fileInput.click()
+}
+
+// Function to handle file import
+function onImport(event: Event) {
+  try {
+    const fileInput = event.target as HTMLInputElement
+    const file = fileInput.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        try {
+          editorContent.value = JSON.stringify(JSON.parse(result), null, 2)
+        }
+        catch {
+          toast.add({ severity: 'error', summary: 'Erreur', detail: `Le fichier importé ne possède pas une structure .json correcte`, life: 3000 })
+        }
+      }
+      reader.readAsText(file)
+      toast.add({ severity: 'success', summary: 'Succès', detail: `Le fichier a été importé avec succès`, life: 3000 })
+    }
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: `Le fichier n'a pas pu être importé`, life: 3000 })
+  }
+}
+
+const exportLink = ref<HTMLAnchorElement | null>(null)
+// Function to handle export
+function onExport() {
+  const json = editorContent.value
+  const blob = new Blob([json], { type: 'application/json' })
+  if (exportLink.value) {
+    exportLink.value.href = URL.createObjectURL(blob)
+    exportLink.value.download = 'formFields.json'
+  }
+}
+
+// Synchronisation function invoking the callback
+async function onSync() {
+  try {
+    const newFormFields = JSON.parse(editorContent.value)
+    await props.onSyncCallback(newFormFields as FormField[])
+    toast.add({ severity: 'success', summary: 'Succès', detail: `Synchronisation réussie, veuillez vérifier vos changements puis sauvegarder`, life: 3000 })
+  }
+  catch {
+    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de synchronisation. Votre .json est-il syntaxiquement correct?`, life: 3000 })
+  }
+}
 
 interface CustomCompletion {
   caption: string

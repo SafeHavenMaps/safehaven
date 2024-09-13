@@ -530,8 +530,37 @@ const props = defineProps<{
   onSaveCallback: (editedFormFields: FormField[]) => Promise<{ error: Error | undefined }>
 }>()
 
-const edited_form_fields: Ref<FormField[]> = ref(JSON.parse(JSON.stringify(props.originalFormFields))) // deep copy
-edited_form_fields.value.sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
+const edited_form_fields: Ref<FormField[]> = ref([])
+
+const page_count = ref(0)
+const display_indexes: Ref<Record<string, 'notDisplayed' | number>> = ref({})
+const max_display_index = ref(0)
+
+function initOrResetComponent() {
+  edited_form_fields.value = (JSON.parse(JSON.stringify(props.originalFormFields))) // deep copy
+  edited_form_fields.value.sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
+
+  page_count.value = (1 + Math.max(0, ...edited_form_fields.value.map(field => field.form_page)))
+  display_indexes.value = {}
+  max_display_index.value = 0
+
+  // Initialize display_indexes and max_display_index
+  edited_form_fields.value.forEach((field) => {
+    if (field.user_facing) {
+      display_indexes.value[field.key] = field.display_weight
+      max_display_index.value = Math.max(max_display_index.value, field.display_weight)
+    }
+    else {
+      display_indexes.value[field.key] = 'notDisplayed'
+    }
+  })
+}
+
+initOrResetComponent()
+
+watch(() => props.originalFormFields, () => {
+  initOrResetComponent()
+})
 
 const processingRequest = ref(false)
 const toast = useToast()
@@ -561,21 +590,6 @@ const editOptionsOptions = ref<OptionsFieldTypeMetadata['options']>([])
 const editEventsVisible = ref(false)
 const editEventsField: Ref<FormField | null> = ref(null)
 const editEventsEvents = ref<EventsFieldTypeMetadata['event_types']>([])
-
-const page_count = ref(1 + Math.max(0, ...edited_form_fields.value.map(field => field.form_page)))
-const display_indexes: Ref<Record<string, 'notDisplayed' | number>> = ref({})
-const max_display_index = ref(0)
-
-// Initialize display_indexes and max_display_index
-edited_form_fields.value.forEach((field) => {
-  if (field.user_facing) {
-    display_indexes.value[field.key] = field.display_weight
-    max_display_index.value = Math.max(max_display_index.value, field.display_weight)
-  }
-  else {
-    display_indexes.value[field.key] = 'notDisplayed'
-  }
-})
 
 const searchableTypes = ['SingleLineText', 'MultiLineText', 'RichText']
 const filterableTypes = ['EnumSingleOption', 'EnumMultiOption']
