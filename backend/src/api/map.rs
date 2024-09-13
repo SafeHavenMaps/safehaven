@@ -16,6 +16,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fmt::Display;
+use tracing::debug;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -101,11 +102,7 @@ fn is_category_allowed_by_token(token: &MapUserTokenClaims, category_id: &Uuid) 
             .allow_list
             .contains(category_id);
 
-    let category_is_excluded = token
-        .perms
-        .categories_policy
-        .force_exclude
-        .contains(category_id);
+    let category_is_excluded = is_category_explicitly_excluded_by_token(token, category_id);
 
     category_is_allowed && !category_is_excluded
 }
@@ -114,7 +111,7 @@ fn is_category_explicitly_excluded_by_token(
     token: &MapUserTokenClaims,
     category_id: &Uuid,
 ) -> bool {
-    !token
+    token
         .perms
         .categories_policy
         .force_exclude
@@ -125,7 +122,7 @@ fn is_tag_allowed_by_token(token: &MapUserTokenClaims, tag_id: &Uuid) -> bool {
     let tag_is_allowed =
         token.perms.tags_policy.allow_all || token.perms.tags_policy.allow_list.contains(tag_id);
 
-    let tag_is_excluded = token.perms.tags_policy.force_exclude.contains(tag_id);
+    let tag_is_excluded = is_tag_explicitly_excluded_by_token(token, tag_id);
 
     tag_is_allowed && !tag_is_excluded
 }
@@ -461,11 +458,21 @@ async fn viewer_fetch_entity(
 
     // The family must be allowed
     require_permission(is_family_allowed_by_token(&token, &entity.family_id))?;
+    debug!(
+        "[PERMDBG] Permission for family {} granted",
+        entity.family_id
+    );
+
     // The category must not be explicitly excluded
     require_permission(!is_category_explicitly_excluded_by_token(
         &token,
         &entity.category_id,
     ))?;
+    debug!(
+        "[PERMDBG] Category {} is not explicitly excluded, continuing",
+        entity.family_id
+    );
+
     // The tags must each not be explicitly excluded
     entity
         .tags
@@ -474,6 +481,7 @@ async fn viewer_fetch_entity(
             require_permission(!is_tag_explicitly_excluded_by_token(&token, tag_id)).err()
         })
         .map_or(Ok(()), |err| Err(err))?;
+    debug!("[PERMDBG] No tag is explicitly excluded, continuing");
 
     let parents = PublicEntity::get_parents(id, &mut conn).await?;
     let children = PublicEntity::get_children(id, &mut conn).await?;
@@ -489,18 +497,30 @@ async fn viewer_fetch_entity(
                     .all(|tag_id| is_tag_allowed_by_token(&token, tag_id))
         })
         .collect();
+    debug!(
+        "[PERMDBG] Found {} authorized children",
+        authorized_children.len()
+    );
 
     // If the entity does not have any included children, we must check if it is included itself,
     // rather than simply not excluded as we did at the top of the function
     if authorized_children.is_empty() {
+        debug!("[PERMDBG] No authorized children, checking entity itself");
+
         // The category must be allowed
-        require_permission(!is_category_allowed_by_token(&token, &entity.category_id))?;
+        require_permission(is_category_allowed_by_token(&token, &entity.category_id))?;
+        debug!(
+            "[PERMDBG] Permission for category {} granted",
+            entity.family_id
+        );
+
         // The tags must each be allowed
         entity
             .tags
             .iter()
-            .find_map(|tag_id| require_permission(!is_tag_allowed_by_token(&token, tag_id)).err())
+            .find_map(|tag_id| require_permission(is_tag_allowed_by_token(&token, tag_id)).err())
             .map_or(Ok(()), |err| Err(err))?;
+        debug!("[PERMDBG] No tag are explicitly excluded, continuing");
     }
 
     let filtered_children: Vec<PublicListedEntity> = authorized_children
@@ -521,6 +541,10 @@ async fn viewer_fetch_entity(
                     .any(|tag| child.tags.contains(tag))
         })
         .collect();
+    debug!(
+        "[PERMDBG] Found {} remaining children when applying user filters",
+        filtered_children.len()
+    );
 
     // Parents must simply not be excluded to be shown, unlike children which must be allowed in their own right
     let filtered_parents: Vec<PublicListedEntity> = parents
@@ -541,6 +565,10 @@ async fn viewer_fetch_entity(
                 .any(|tag| parent.tags.contains(tag))
         })
         .collect();
+    debug!(
+        "[PERMDBG] Found {} remaining parents when applying user filters",
+        filtered_parents.len()
+    );
 
     let comments = match token.perms.can_access_comments {
         true => PublicComment::list_for_public_entity(id, &entity.comment_form, &mut conn).await?,
