@@ -125,7 +125,7 @@
     <PolygonDrawer
       v-if="geographicRestrictionsOn"
       ref="polygonDrawer"
-      v-model:polygon-list="editedAccessToken.permissions.geographic_restrictions"
+      v-model:polygon-list="editedAccessToken.permissions.geographic_restrictions as [number, number][][]"
       :max-polygons="3"
     />
 

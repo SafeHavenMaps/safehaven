@@ -2,9 +2,8 @@
 
 use crate::api::AppError;
 use serde::Serialize;
-use serde_json::Value;
-use sqlx::{types::Json, PgConnection};
-use std::collections::HashMap;
+use sqlx::PgConnection;
+use std::collections::{BTreeMap, HashMap};
 use utoipa::ToSchema;
 
 pub type CountResult = (
@@ -93,13 +92,11 @@ pub struct HomePageStats {
     pub total_visits_30_days: i64,
     pub total_visits_7_days: i64,
 
-    #[schema(value_type = Object)]
-    pub visits_30_days: Json<Value>,
+    pub visits_30_days: BTreeMap<String, i64>,
 }
 
 pub async fn home_page_stats(conn: &mut PgConnection) -> Result<HomePageStats, AppError> {
-    let stats = sqlx::query_as!(
-        HomePageStats,
+    let result = sqlx::query!(
         r#"
         SELECT
             (SELECT COUNT(*) FROM entities WHERE moderated) as "total_entities!",
@@ -146,5 +143,19 @@ pub async fn home_page_stats(conn: &mut PgConnection) -> Result<HomePageStats, A
     .await
     .map_err(AppError::Database)?;
 
-    Ok(stats)
+    // Deserialize the visits_30_days field into a HashMap<String, i64>
+    let visits_30_days: BTreeMap<String, i64> = serde_json::from_value(result.visits_30_days)
+        .map_err(|err| {
+            AppError::Internal(format!("Failed to deserialize visits_30_days: {}", err).into())
+        })?;
+
+    Ok(HomePageStats {
+        total_entities: result.total_entities,
+        total_comments: result.total_comments,
+        pending_entities: result.pending_entities,
+        pending_comments: result.pending_comments,
+        total_visits_30_days: result.total_visits_30_days,
+        total_visits_7_days: result.total_visits_7_days,
+        visits_30_days,
+    })
 }

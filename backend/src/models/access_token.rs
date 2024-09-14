@@ -1,7 +1,12 @@
+use std::collections::{BTreeMap, HashMap};
+
 use crate::{api::AppError, helpers::postgis_polygons::MultiPolygon};
 use serde::{Deserialize, Serialize};
-use serde_json::{to_value, Value};
-use sqlx::{types::Json, PgConnection};
+use serde_json::{json, to_value};
+use sqlx::{
+    types::{Json, JsonValue},
+    PgConnection,
+};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -55,7 +60,7 @@ pub struct PermissionPolicy {
 pub struct NewOrUpdateAccessToken {
     pub title: String,
     pub token: String,
-    #[schema(value_type = Object)]
+    #[schema(value_type = Permissions)]
     pub permissions: Json<Permissions>,
     pub active: bool,
 }
@@ -65,7 +70,7 @@ pub struct AccessToken {
     pub id: Uuid,
     pub title: String,
     pub token: String,
-    #[schema(value_type = Object)]
+    #[schema(value_type = Permissions)]
     pub permissions: Json<Permissions>,
     pub last_week_visits: i64,
     pub active: bool,
@@ -73,11 +78,8 @@ pub struct AccessToken {
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct AccessTokenStats {
-    #[schema(value_type = Object)]
-    pub origins: Json<Value>,
-
-    #[schema(value_type = Object)]
-    pub visits_30_days: Json<Value>,
+    pub origins: HashMap<String, u32>,
+    pub visits_30_days: BTreeMap<String, u32>,
 }
 
 impl AccessToken {
@@ -249,54 +251,72 @@ impl AccessToken {
         access_token_id: Uuid,
         conn: &mut PgConnection,
     ) -> Result<AccessTokenStats, AppError> {
-        sqlx::query_as!(
-            AccessTokenStats,
-            r#"
-            SELECT
-            COALESCE((
-                WITH origins AS (
-                    SELECT DISTINCT(COALESCE(referrer, 'unknown')) AS referrer, COUNT(*) AS total
-                    FROM access_tokens_visits
-                    WHERE token_id = $1
-                    GROUP BY referrer
-                )
-                SELECT json_object_agg(referrer, total) FROM origins
-            ), '{}') as "origins!",
-            (
-                WITH date_series AS (
-                    SELECT generate_series(
-                        NOW()::date - INTERVAL '30 days',
-                        NOW()::date,
-                        INTERVAL '1 day'
-                    )::date AS visit_date
-                ),
-                aggregated_visits AS (
-                    SELECT
-                        ds.visit_date,
-                        COALESCE(COUNT(atv.visited_at), 0) AS visit_count
-                    FROM
-                        date_series ds
-                    LEFT JOIN
-                        access_tokens_visits atv
-                    ON
-                        ds.visit_date = DATE(atv.visited_at) 
-                        AND atv.token_id = $1
-                    GROUP BY
-                        ds.visit_date
-                    ORDER BY
-                        ds.visit_date
-                )
-                SELECT COALESCE(json_object_agg(
-                    TO_CHAR(visit_date, 'YYYY-MM-DD'),
-                    visit_count
-                ), '{}') AS visits
-                FROM aggregated_visits
-            ) as "visits_30_days!";
-            "#,
-            access_token_id
-        )
-        .fetch_one(conn)
-        .await
-        .map_err(AppError::Database)
+        let result = sqlx::query!(
+                r#"
+                SELECT
+                COALESCE((
+                    WITH origins AS (
+                        SELECT DISTINCT(COALESCE(referrer, 'unknown')) AS referrer, COUNT(*) AS total
+                        FROM access_tokens_visits
+                        WHERE token_id = $1
+                        GROUP BY referrer
+                    )
+                    SELECT json_object_agg(referrer, total) FROM origins
+                ), '{}') as "origins: JsonValue",
+                (
+                    WITH date_series AS (
+                        SELECT generate_series(
+                            NOW()::date - INTERVAL '30 days',
+                            NOW()::date,
+                            INTERVAL '1 day'
+                        )::date AS visit_date
+                    ),
+                    aggregated_visits AS (
+                        SELECT
+                            ds.visit_date,
+                            COALESCE(COUNT(atv.visited_at), 0) AS visit_count
+                        FROM
+                            date_series ds
+                        LEFT JOIN
+                            access_tokens_visits atv
+                        ON
+                            ds.visit_date = DATE(atv.visited_at) 
+                            AND atv.token_id = $1
+                        GROUP BY
+                            ds.visit_date
+                        ORDER BY
+                            ds.visit_date
+                    )
+                    SELECT COALESCE(json_object_agg(
+                        TO_CHAR(visit_date, 'YYYY-MM-DD'),
+                        visit_count
+                    ), '{}') AS visits
+                    FROM aggregated_visits
+                ) as "visits_30_days: JsonValue"
+                "#,
+                access_token_id
+            )
+            .fetch_one(conn)
+            .await
+            .map_err(AppError::Database)?;
+
+        // Provide a default empty object if origins is None
+        let origins_json: JsonValue = result.origins.unwrap_or_else(|| json!({}));
+        let visits_30_days_json: JsonValue = result.visits_30_days.unwrap_or_else(|| json!({}));
+
+        // Convert the JsonValue to HashMap<String, u32>
+        let origins: HashMap<String, u32> =
+            serde_json::from_value(origins_json).map_err(|err| {
+                AppError::Internal(format!("Failed to deserialize origins: {}", err).into())
+            })?;
+        let visits_30_days: BTreeMap<String, u32> = serde_json::from_value(visits_30_days_json)
+            .map_err(|err| {
+                AppError::Internal(format!("Failed to deserialize visits_30_days: {}", err).into())
+            })?;
+
+        Ok(AccessTokenStats {
+            origins,
+            visits_30_days,
+        })
     }
 }

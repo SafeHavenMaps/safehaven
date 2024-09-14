@@ -21,7 +21,7 @@
     <InputText
       v-if="props.formField.field_type=='SingleLineText'"
       :id="props.formField.key"
-      v-tooltip="formatTooltip[props.formField.field_type_metadata!.format]"
+      v-tooltip="formatTooltip[(props.formField as Extract<FieldTypeMetadataEnum, { field_type: 'SingleLineText' }>).field_type_metadata!.format]"
       :model-value="props.fieldContent as (string | undefined)"
       :variant="props.hasBeenEdited ? 'filled': 'outlined'"
       :invalid="!isValid && hasLostFocus"
@@ -86,7 +86,7 @@
       v-if="props.formField.field_type=='EnumSingleOption'"
       :id="props.formField.key"
       :model-value="(props.fieldContent as (string | undefined))"
-      :options="props.formField.field_type_metadata?.options"
+      :options="(props.formField as Extract<FieldTypeMetadataEnum, { field_type: 'EnumSingleOption' }>).field_type_metadata?.options"
       :invalid="!isValid && hasLostFocus"
       option-value="value"
       option-label="label"
@@ -97,7 +97,7 @@
       v-if="props.formField.field_type=='EnumMultiOption'"
       :id="props.formField.key"
       :model-value="(props.fieldContent as (string[] | undefined))"
-      :options="props.formField.field_type_metadata?.options"
+      :options="(props.formField as Extract<FieldTypeMetadataEnum, { field_type: 'EnumSingleOption' }>).field_type_metadata.options"
       :invalid="!isValid && hasLostFocus"
       option-value="value"
       option-label="label"
@@ -121,7 +121,7 @@
             v-model="event.type"
             placeholder="type d'évènement"
             class="grow"
-            :options="props.formField.field_type_metadata?.event_types"
+            :options="(props.formField as Extract<FieldTypeMetadataEnum, { field_type: 'EventList' }>).field_type_metadata?.event_types"
             option-value="value"
             option-label="label"
           />
@@ -188,7 +188,7 @@
 <script setup lang="ts">
 import DatePicker from 'primevue/datepicker'
 import validator from 'validator'
-import type { EntityOrCommentEvent, FieldContentMap, FormField } from '~/lib'
+import type { EntityOrCommentEvent, FieldContentMap, FieldTypeMetadataEnum, FormField } from '~/lib'
 import { isValidNumber, isValidRichText, isValidText } from '~/lib/validation'
 
 type FormProps<T extends FormField> = {
@@ -222,10 +222,10 @@ const isValid = computed(() => {
     return !props.formField.mandatory
 
   // otherwise if it has a required format we need to check it against this format
-  if (!props.formField.field_type_metadata || !('format' in props.formField.field_type_metadata))
+  if (!props.formField.field_type_metadata || !('format' in (props.formField.field_type_metadata as { format: string | undefined })))
     return true
 
-  switch (props.formField.field_type_metadata.format) {
+  switch ((props.formField.field_type_metadata as { format: string | undefined }).format) {
     case 'url':
       return validator.isURL(props.fieldContent as string)
     case 'email':

@@ -146,18 +146,18 @@ impl From<Vec<AdminPaginatedCachedEntity>> for AdminCachedEntitiesWithPagination
     }
 }
 
-#[derive(Deserialize, Serialize, ToSchema, Debug)]
+#[derive(Serialize, ToSchema, Debug)]
+#[aliases(
+    ViewerCachedEntitiesWithPagination = PaginatedVec<ViewerSearchedCachedEntity>,
+    AdminCachedEntitiesWithPagination = PaginatedVec<AdminCachedEntity>
+)]
 pub struct PaginatedVec<T> {
-    #[schema(value_type = Object)]
     pub entities: Vec<T>,
 
     pub total_results: i64,
     pub total_pages: i64,
     pub response_current_page: i64,
 }
-
-pub type ViewerCachedEntitiesWithPagination = PaginatedVec<ViewerSearchedCachedEntity>;
-pub type AdminCachedEntitiesWithPagination = PaginatedVec<AdminCachedEntity>;
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
 pub struct CachedClusteredEntity {

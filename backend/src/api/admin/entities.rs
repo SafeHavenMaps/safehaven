@@ -41,8 +41,10 @@ pub struct AdminEntityWithRelations {
     pub display_name: String,
     pub category_id: Uuid,
     pub family_id: Uuid,
-    #[schema(value_type = Object)]
+
+    #[schema(value_type = Vec<UnprocessedLocation>)]
     pub locations: sqlx::types::Json<Vec<UnprocessedLocation>>,
+
     pub data: Value,
     pub tags: Vec<Uuid>,
     pub hidden: bool,
@@ -64,7 +66,7 @@ pub struct AdminEntityWithRelations {
         ("page_size" = i64, Query, description = "Number of items per page (default: 20)")
     ),
     responses(
-        (status = 200, description = "Search results for entities", body = PaginatedVec<AdminCachedEntity>),
+        (status = 200, description = "Search results for entities", body = AdminCachedEntitiesWithPagination),
         (status = 401, description = "Invalid permissions", body = ErrorResponse),
     )
 )]
