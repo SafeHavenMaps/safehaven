@@ -24,7 +24,6 @@ export type PublicNewEntity = api.components['schemas']['PublicNewEntity']
 export type PublicNewEntityRequest = api.components['schemas']['PublicNewEntityRequest']
 export type PublicNewEntityResponse = api.components['schemas']['PublicNewEntityResponse']
 export type Cluster = api.components['schemas']['Cluster']
-type PaginatedVec<T> = Omit<api.components['schemas']['PaginatedVec'], 'entities'> & { entities: T[] }
 
 export type ViewerCachedEntity = api.components['schemas']['ViewerCachedEntity']
 export type ViewerSearchedCachedEntity = api.components['schemas']['ViewerSearchedCachedEntity']
@@ -40,9 +39,7 @@ export type ResolvedFetchedEntity = FetchedEntity & {
 export type AdminEntity = api.components['schemas']['AdminEntity']
 export type AdminListedEntity = api.components['schemas']['AdminListedEntity']
 export type AdminEntityWithRelations = api.components['schemas']['AdminEntityWithRelations']
-export type AdminNewOrUpdateEntity = api.components['schemas']['AdminNewOrUpdateEntity'] & {
-  locations: UnprocessedLocation[]
-}
+export type AdminNewOrUpdateEntity = api.components['schemas']['AdminNewOrUpdateEntity']
 export type AdminSearchRequestBody = api.components['schemas']['AdminSearchRequest']
 export type AdminCachedEntity = api.components['schemas']['AdminCachedEntity']
 export type AdminPaginatedCachedEntities = PaginatedVec<AdminCachedEntity>
@@ -60,22 +57,12 @@ export type NewOrUpdateCategory = api.components['schemas']['NewOrUpdateCategory
 export type NewOrUpdateTag = api.components['schemas']['NewOrUpdateTag']
 export type PermissionPolicy = api.components['schemas']['PermissionPolicy']
 export type Permissions = api.components['schemas']['Permissions']
-export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAccessToken'] & { permissions: Permissions }
+export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAccessToken']
 export type AccessToken = api.components['schemas']['AccessToken']
-  & {
-    permissions: Permissions & { geographic_restrictions: null | [number, number][][] }
-  }
 export type AccessTokenStats = api.components['schemas']['AccessTokenStats']
-export type PublicPermissions = {
-  can_list_entities: boolean
-  can_access_entity: boolean
-  can_add_entity: boolean
-  can_access_comments: boolean
-  can_add_comment: boolean
-  can_list_without_query: boolean
-  can_list_with_filters: boolean
-  can_list_with_enum_constraints: boolean
-}
+export type PublicPermissions = api.components['schemas']['Permissions']
+
+export type LimitedPublicPermissions = Omit<api.components['schemas']['Permissions'], 'categories_policy', 'families_policy', 'geographic_restrictions', 'tags_policy'>
 
 export type User = api.components['schemas']['User']
 export type NewOrUpdatedUser = api.components['schemas']['NewOrUpdatedUser']
@@ -131,35 +118,33 @@ export type FieldTypeMetadataEnum = {
   field_type: 'SingleLineText'
   field_type_metadata: StringFieldTypeMetadata
 } | {
-  field_type: 'EnumSingleOption' | 'EnumMultiOption'
+  field_type: 'EnumSingleOption'
+  field_type_metadata: OptionsFieldTypeMetadata
+} | {
+  field_type: 'EnumMultiOption'
   field_type_metadata: OptionsFieldTypeMetadata
 } | {
   field_type: 'EventList'
   field_type_metadata: EventsFieldTypeMetadata
 } | {
   field_type_metadata?: null
+} | {
+  field_type: 'MultiLineText' | 'RichText'
+} | {
+  field_type: 'Number'
+} | {
+  field_type: 'Boolean'
+} | {
+  field_type: 'DiscreteScore'
+} | {
+  field_type: 'Date'
 }
 
-export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily'] & {
-  comment_form: {
-    fields: FieldTypeMetadataEnum[]
-  }
-} & {
-  entity_form: {
-    fields: FieldTypeMetadataEnum[]
-  }
-}
+export type NewOrUpdateFamily = api.components['schemas']['NewOrUpdateFamily']
 
 export type FormField = NewOrUpdateFamily['entity_form']['fields'][number]
 
-export type Family = Omit<api.components['schemas']['Family'], 'entity_form' | 'comment_form'> & {
-  entity_form: api.components['schemas']['Form'] & {
-    fields: FormField[]
-  }
-  comment_form: api.components['schemas']['Form'] & {
-    fields: FormField[]
-  }
-}
+export type Family = api.components['schemas']['Family']
 
 export type EntityOrCommentEvent = {
   date: Date | undefined

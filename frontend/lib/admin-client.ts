@@ -2,7 +2,6 @@ import createClient from 'openapi-fetch'
 import type { paths } from './api'
 import createAuthMiddleware from './admin-auth-middleware'
 import type {
-  Family,
   NewOrUpdateFamily,
   Category,
   NewOrUpdateCategory,
@@ -14,13 +13,11 @@ import type {
   AdminComment,
   AdminListedComment,
   AdminNewOrUpdateComment,
-  AccessToken,
   NewOrUpdateAccessToken,
   User,
   NewOrUpdatedUser,
   SafeHavenOptions,
   ConfigurationOption,
-  AdminPaginatedCachedEntities,
   AdminSearchRequestBody,
   AccessTokenStats,
   AdminEntityWithRelations,
@@ -163,13 +160,13 @@ export default function useClient() {
       return data
     },
 
-    async listFamilies(): Promise<Family[]> {
+    async listFamilies() {
       const { data, error } = await this.rawClient.GET('/api/admin/families')
       if (error) throw error
       return data
     },
 
-    async getFamily(id: string): Promise<Family> {
+    async getFamily(id: string) {
       const { data, error } = await this.rawClient.GET('/api/admin/families/{id}', {
         params: { path: { id } },
       })
@@ -177,13 +174,13 @@ export default function useClient() {
       return data
     },
 
-    async createFamily(family: NewOrUpdateFamily): Promise<Family> {
+    async createFamily(family: NewOrUpdateFamily) {
       const { data, error } = await this.rawClient.POST('/api/admin/families', { body: family })
       if (error) throw error
       return data
     },
 
-    async updateFamily(id: string, family: NewOrUpdateFamily): Promise<Family> {
+    async updateFamily(id: string, family: NewOrUpdateFamily) {
       const { data, error } = await this.rawClient.PUT('/api/admin/families/{id}', {
         body: family,
         params: { path: { id } },
@@ -211,7 +208,7 @@ export default function useClient() {
     async searchEntities(
       pagination: { page: number, page_size: number },
       search_request: AdminSearchRequestBody,
-    ): Promise<AdminPaginatedCachedEntities> {
+    ) {
       const { data, error } = await this.rawClient.POST('/api/admin/entities/search', {
         params: { query: pagination },
         body: search_request,
@@ -384,19 +381,19 @@ export default function useClient() {
       return data
     },
 
-    async listAccessTokens(): Promise<AccessToken[]> {
+    async listAccessTokens() {
       const { data, error } = await this.rawClient.GET('/api/admin/access_tokens')
       if (error) throw error
       return data
     },
 
-    async createAccessToken(token: NewOrUpdateAccessToken): Promise<AccessToken> {
+    async createAccessToken(token: NewOrUpdateAccessToken) {
       const { data, error } = await this.rawClient.POST('/api/admin/access_tokens', { body: token })
       if (error) throw error
       return data
     },
 
-    async getAccessToken(id: string): Promise<AccessToken> {
+    async getAccessToken(id: string) {
       const { data, error } = await this.rawClient.GET('/api/admin/access_tokens/{id}', {
         params: { path: { id } },
       })
@@ -412,7 +409,7 @@ export default function useClient() {
       return data
     },
 
-    async updateAccessToken(id: string, token: NewOrUpdateAccessToken): Promise<AccessToken> {
+    async updateAccessToken(id: string, token: NewOrUpdateAccessToken) {
       const { data, error } = await this.rawClient.PUT('/api/admin/access_tokens/{id}', {
         body: token,
         params: { path: { id } },

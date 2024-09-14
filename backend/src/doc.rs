@@ -28,8 +28,8 @@ use crate::{
         },
         entity_cache::{
             AdminCachedEntitiesWithPagination, AdminCachedEntity, Cluster, EntitiesAndClusters,
-            LocationRepresentation, PaginatedVec, ParentRepresentation,
-            ViewerCachedEntitiesWithPagination, ViewerCachedEntity, ViewerSearchedCachedEntity,
+            LocationRepresentation, ParentRepresentation, ViewerCachedEntitiesWithPagination,
+            ViewerCachedEntity, ViewerSearchedCachedEntity,
         },
         family::{Family, Field, FieldType, Form, NewOrUpdateFamily},
         options::{
@@ -161,8 +161,6 @@ use utoipa::OpenApi;
         PublicEntity,
         PublicListedEntity,
         PublicNewEntity,
-        PaginatedVec<ViewerSearchedCachedEntity>,
-        PaginatedVec<AdminCachedEntity>,
         ViewerCachedEntity,
         ViewerSearchedCachedEntity,
         LocationRepresentation,

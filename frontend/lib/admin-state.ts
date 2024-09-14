@@ -94,12 +94,35 @@ export class AppState {
       general: {
         subtitle: 'Carte associative',
         title: 'SafeHaven',
+        information: null,
+        logo_url: null,
+        redirect_url: null,
       },
-      cartography_source: {},
-      init_popup: {},
-      safe_mode: {},
-      cartography_init: {},
-      cartography_cluster: {},
+      cartography_source: {
+        dark_map_attributions: '',
+        dark_map_url: '',
+        light_map_attributions: '',
+        light_map_url: '',
+      },
+      init_popup: {
+        popup: null,
+        popup_check_text: null,
+      },
+      safe_mode: {
+        enabled: false,
+        hcaptcha_secret: '',
+        hcaptcha_sitekey: '',
+      },
+      cartography_init: {
+        center_lat: 0,
+        center_lng: 0,
+        zoom: 0,
+      },
+      cartography_cluster: {
+        characteristic_distance: 0,
+        declustering_speed: 0,
+        minimal_cluster_size: 0,
+      },
     }
 
     if (raw_options.general.information != undefined)

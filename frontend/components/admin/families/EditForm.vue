@@ -521,7 +521,7 @@
 
 <script setup lang="ts">
 import type { ConfirmationOptions } from 'primevue/confirmationoptions'
-import type { FormField, StringFieldTypeMetadata, OptionsFieldTypeMetadata, EventsFieldTypeMetadata } from '~/lib'
+import type { FormField, StringFieldTypeMetadata, OptionsFieldTypeMetadata, EventsFieldTypeMetadata, FieldTypeMetadataEnum } from '~/lib'
 
 const props = defineProps<{
   kind: 'entity' | 'comment'
@@ -715,7 +715,7 @@ function onDisplayIndexChange(field: FormField, new_display_index: 'notDisplayed
 function onFieldTypeChange(field: FormField) {
   switch (field.field_type) {
     case 'SingleLineText':
-      if (!field.field_type_metadata || !('format' in field.field_type_metadata)) {
+      if (!field.field_type_metadata || !('format' in (field as Extract<FieldTypeMetadataEnum, { field_type: 'SingleLineText' }>))) {
         field.field_type_metadata = { format: 'none' }
       }
       break
@@ -724,12 +724,12 @@ function onFieldTypeChange(field: FormField) {
       break
     case 'EnumSingleOption':
     case 'EnumMultiOption':
-      if (!field.field_type_metadata || !('options' in field.field_type_metadata)) {
+      if (!field.field_type_metadata || !('options' in ((field as Extract<FieldTypeMetadataEnum, { field_type: 'EnumSingleOption' | 'EnumMultiOption' }>)).field_type_metadata)) {
         field.field_type_metadata = { options: [] }
       }
       break
     case 'EventList':
-      if (!field.field_type_metadata || !('event_types' in field.field_type_metadata)) {
+      if (!field.field_type_metadata || !('event_types' in ((field as Extract<FieldTypeMetadataEnum, { field_type: 'EventList' }>)).field_type_metadata)) {
         field.field_type_metadata = { event_types: [] }
       }
       break

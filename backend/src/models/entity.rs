@@ -40,13 +40,13 @@ pub struct PublicEntity {
     pub display_name: String,
     pub category_id: Uuid,
     pub family_id: Uuid,
-    #[schema(value_type = Object)]
+    #[schema(value_type = Vec<UnprocessedLocation>)]
     pub locations: Json<Vec<UnprocessedLocation>>,
     pub data: Value,
     pub tags: Vec<Uuid>,
-    #[schema(value_type = Object)]
+    #[schema(value_type = Form)]
     pub entity_form: Json<Form>,
-    #[schema(value_type = Object)]
+    #[schema(value_type = Form)]
     pub comment_form: Json<Form>,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
@@ -196,7 +196,7 @@ impl PublicEntity {
 pub struct AdminNewOrUpdateEntity {
     pub display_name: String,
     pub category_id: Uuid,
-    #[schema(value_type = Object)]
+    #[schema(value_type = Vec<UnprocessedLocation>)]
     pub locations: Json<Vec<UnprocessedLocation>>,
     pub data: Value,
     pub tags: Vec<Uuid>,
@@ -224,7 +224,7 @@ pub struct AdminEntity {
     pub display_name: String,
     pub category_id: Uuid,
     pub family_id: Uuid,
-    #[schema(value_type = Object)]
+    #[schema(value_type = Vec<UnprocessedLocation>)]
     pub locations: Json<Vec<UnprocessedLocation>>,
     pub data: Value,
     pub tags: Vec<Uuid>,

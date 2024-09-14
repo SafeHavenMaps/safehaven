@@ -128,15 +128,18 @@
       Une mise à jour est disponible.<br>
       <a href="https://github.com/SafeHavenMaps/safehaven/releases">Rendez-vous sur GitHub</a> pour voir et mettre à jour vers la dernière version.
     </Message>
-    <p>
+    <div class="m-1">
       Version actuelle: <pre>{{ state.versionInformation?.version ?? 'Inconnu' }}</pre>
-    </p>
-    <p>
+    </div>
+    <div class="m-1">
       Git hash: <pre>{{ state.versionInformation?.git_hash ?? 'Inconnu' }}</pre>
-    </p>
-    <p v-if="state.versionInformation?.github_latest_version">
+    </div>
+    <div
+      v-if="state.versionInformation?.github_latest_version"
+      class="m-1"
+    >
       Dernière version: <pre>{{ state.versionInformation?.github_latest_version }}</pre>
-    </p>
+    </div>
   </Dialog>
 </template>
 

@@ -12,8 +12,8 @@ import type {
   FetchedEntity,
   InitConfig,
   EnumFilter,
-  PublicPermissions,
   ViewerPaginatedCachedEntities,
+  LimitedPublicPermissions,
 } from '~/lib'
 
 type ViewData = {
@@ -34,7 +34,7 @@ export class AppState {
   }
 
   public initConfig: InitConfig | null = null
-  public permissions: PublicPermissions | null = null
+  public permissions: LimitedPublicPermissions | null = null
 
   private familiesData: Family[] | null = null
   private categoriesData: AllowedCategory[] | null = null
@@ -278,7 +278,7 @@ export class AppState {
           }
         })
 
-    this.familiesData.forEach((family) => {
+    this.familiesData?.forEach((family) => {
       this.familiesLookupTable[family.id] = family
     })
 
@@ -290,11 +290,11 @@ export class AppState {
       this.tagsLookupTable[tag.id] = tag
     })
 
-    if (this.familiesData.length === 0) {
+    if (this.familiesData?.length === 0) {
       throw new Error('No families available')
     }
 
-    this.activeFamily = this.familiesData[0]
+    this.activeFamily = this.familiesData![0]
 
     this.initialized = true
   }
