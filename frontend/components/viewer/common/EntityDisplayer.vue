@@ -217,9 +217,11 @@ const tabValue = ref(hasChildren.value ? '0' : '1')
 
 watch(
   () => props.entity,
-  (__, _) => {
+  (newEntity, oldValue) => {
     refreshDiscreteScoreAverages()
-    tabValue.value = hasChildren.value ? '0' : '1'
+    if (newEntity.entity.id !== oldValue.entity.id) {
+      tabValue.value = hasChildren.value ? '0' : '1'
+    }
   },
 )
 </script>
