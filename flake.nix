@@ -219,7 +219,7 @@
 
             # When modifying cargo dependencies, replace the hash with pkgs.lib.fakeHash
             # then run `nix build .#backend`. Use the hash in the error to replace the value.
-            cargoHash = "sha256-7Bx/GNFx/OUfQPTS8a/DsPik8gju73qY1zNXCyHY8a0=";
+            cargoHash = "sha256-ffaFgV5i4T0miX3k2uTiAU5P+zT7EHvXax9foZXTibQ=";
           };
 
         # Frontend derivation
