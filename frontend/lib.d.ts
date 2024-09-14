@@ -60,9 +60,7 @@ export type Permissions = api.components['schemas']['Permissions']
 export type NewOrUpdateAccessToken = api.components['schemas']['NewOrUpdateAccessToken']
 export type AccessToken = api.components['schemas']['AccessToken']
 export type AccessTokenStats = api.components['schemas']['AccessTokenStats']
-export type PublicPermissions = api.components['schemas']['Permissions']
-
-export type LimitedPublicPermissions = Omit<api.components['schemas']['Permissions'], 'categories_policy', 'families_policy', 'geographic_restrictions', 'tags_policy'>
+export type BootstrapPermissions = api.components['schemas']['BootstrapPermissions']
 
 export type User = api.components['schemas']['User']
 export type NewOrUpdatedUser = api.components['schemas']['NewOrUpdatedUser']

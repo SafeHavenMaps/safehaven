@@ -22,6 +22,9 @@ import type {
   AccessTokenStats,
   AdminEntityWithRelations,
   SafeHavenVersion,
+  Family,
+  AdminPaginatedCachedEntities,
+  AccessToken,
 } from '~/lib'
 
 // client as a closure
@@ -160,13 +163,13 @@ export default function useClient() {
       return data
     },
 
-    async listFamilies() {
+    async listFamilies(): Promise<Family[]> {
       const { data, error } = await this.rawClient.GET('/api/admin/families')
       if (error) throw error
       return data
     },
 
-    async getFamily(id: string) {
+    async getFamily(id: string): Promise<Family> {
       const { data, error } = await this.rawClient.GET('/api/admin/families/{id}', {
         params: { path: { id } },
       })
@@ -174,13 +177,13 @@ export default function useClient() {
       return data
     },
 
-    async createFamily(family: NewOrUpdateFamily) {
+    async createFamily(family: NewOrUpdateFamily): Promise<Family> {
       const { data, error } = await this.rawClient.POST('/api/admin/families', { body: family })
       if (error) throw error
       return data
     },
 
-    async updateFamily(id: string, family: NewOrUpdateFamily) {
+    async updateFamily(id: string, family: NewOrUpdateFamily): Promise<Family> {
       const { data, error } = await this.rawClient.PUT('/api/admin/families/{id}', {
         body: family,
         params: { path: { id } },
@@ -208,7 +211,7 @@ export default function useClient() {
     async searchEntities(
       pagination: { page: number, page_size: number },
       search_request: AdminSearchRequestBody,
-    ) {
+    ): Promise<AdminPaginatedCachedEntities> {
       const { data, error } = await this.rawClient.POST('/api/admin/entities/search', {
         params: { query: pagination },
         body: search_request,
@@ -381,19 +384,19 @@ export default function useClient() {
       return data
     },
 
-    async listAccessTokens() {
+    async listAccessTokens(): Promise<AccessToken[]> {
       const { data, error } = await this.rawClient.GET('/api/admin/access_tokens')
       if (error) throw error
       return data
     },
 
-    async createAccessToken(token: NewOrUpdateAccessToken) {
+    async createAccessToken(token: NewOrUpdateAccessToken): Promise<AccessToken> {
       const { data, error } = await this.rawClient.POST('/api/admin/access_tokens', { body: token })
       if (error) throw error
       return data
     },
 
-    async getAccessToken(id: string) {
+    async getAccessToken(id: string): Promise<AccessToken> {
       const { data, error } = await this.rawClient.GET('/api/admin/access_tokens/{id}', {
         params: { path: { id } },
       })
@@ -409,7 +412,7 @@ export default function useClient() {
       return data
     },
 
-    async updateAccessToken(id: string, token: NewOrUpdateAccessToken) {
+    async updateAccessToken(id: string, token: NewOrUpdateAccessToken): Promise<AccessToken> {
       const { data, error } = await this.rawClient.PUT('/api/admin/access_tokens/{id}', {
         body: token,
         params: { path: { id } },

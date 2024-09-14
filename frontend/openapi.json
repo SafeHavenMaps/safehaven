@@ -3279,14 +3279,9 @@
           }
         }
       },
-      "BootstrapResponse": {
+      "BootstrapPermissions": {
         "type": "object",
         "required": [
-          "signed_token",
-          "families",
-          "categories",
-          "allowed_categories",
-          "allowed_tags",
           "can_list_entities",
           "can_list_without_query",
           "can_list_with_filters",
@@ -3294,26 +3289,9 @@
           "can_access_entity",
           "can_access_comments",
           "can_add_entity",
-          "can_add_comment",
-          "tags"
+          "can_add_comment"
         ],
         "properties": {
-          "allowed_categories": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "description": "List of allowed categories"
-          },
-          "allowed_tags": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "description": "List of allowed tags"
-          },
           "can_access_comments": {
             "type": "boolean",
             "description": "Permission to view an entity's comments"
@@ -3345,6 +3323,36 @@
           "can_list_without_query": {
             "type": "boolean",
             "description": "Permission to list entities with an empty or short query (can be used to list all entities)"
+          }
+        }
+      },
+      "BootstrapResponse": {
+        "type": "object",
+        "required": [
+          "signed_token",
+          "families",
+          "categories",
+          "allowed_categories",
+          "allowed_tags",
+          "permissions",
+          "tags"
+        ],
+        "properties": {
+          "allowed_categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "List of allowed categories"
+          },
+          "allowed_tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "List of allowed tags"
           },
           "categories": {
             "type": "array",
@@ -3359,6 +3367,9 @@
               "$ref": "#/components/schemas/Family"
             },
             "description": "List of known families"
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/BootstrapPermissions"
           },
           "signed_token": {
             "type": "string",

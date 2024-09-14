@@ -65,22 +65,7 @@ pub async fn status(State(app_state): State<AppState>) -> AppJson<StatusResponse
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct BootstrapResponse {
-    /// Signed token for subsequent requests
-    signed_token: String,
-
-    /// List of known families
-    families: Vec<Family>,
-
-    /// List of known categories
-    categories: Vec<Category>,
-
-    /// List of allowed categories
-    allowed_categories: Vec<Uuid>,
-
-    /// List of allowed tags
-    allowed_tags: Vec<Uuid>,
-
+pub struct BootstrapPermissions {
     /// Permission to list entities
     can_list_entities: bool,
 
@@ -104,6 +89,27 @@ pub struct BootstrapResponse {
 
     /// Permission to add a comment to an entity
     can_add_comment: bool,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct BootstrapResponse {
+    /// Signed token for subsequent requests
+    signed_token: String,
+
+    /// List of known families
+    families: Vec<Family>,
+
+    /// List of known categories
+    categories: Vec<Category>,
+
+    /// List of allowed categories
+    allowed_categories: Vec<Uuid>,
+
+    /// List of allowed tags
+    allowed_tags: Vec<Uuid>,
+
+    /// Permissions
+    permissions: BootstrapPermissions,
 
     /// List of tags
     tags: Vec<Tag>,
@@ -224,14 +230,16 @@ async fn bootstrap(
         categories,
         allowed_categories,
         allowed_tags,
-        can_list_entities: perms.can_list_entities,
-        can_list_without_query: perms.can_list_without_query,
-        can_list_with_filters: perms.can_list_with_filters,
-        can_list_with_enum_constraints: perms.can_list_with_enum_constraints,
-        can_access_entity: perms.can_access_entity,
-        can_add_entity: perms.can_add_entity,
-        can_access_comments: perms.can_access_comments,
-        can_add_comment: perms.can_add_comment,
+        permissions: BootstrapPermissions {
+            can_list_entities: perms.can_list_entities,
+            can_list_without_query: perms.can_list_without_query,
+            can_list_with_filters: perms.can_list_with_filters,
+            can_list_with_enum_constraints: perms.can_list_with_enum_constraints,
+            can_access_entity: perms.can_access_entity,
+            can_access_comments: perms.can_access_comments,
+            can_add_entity: perms.can_add_entity,
+            can_add_comment: perms.can_add_comment,
+        },
         tags,
     };
 

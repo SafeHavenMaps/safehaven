@@ -13,7 +13,7 @@ import type {
   InitConfig,
   EnumFilter,
   ViewerPaginatedCachedEntities,
-  LimitedPublicPermissions,
+  BootstrapPermissions,
 } from '~/lib'
 
 type ViewData = {
@@ -34,7 +34,7 @@ export class AppState {
   }
 
   public initConfig: InitConfig | null = null
-  public permissions: LimitedPublicPermissions | null = null
+  public permissions: BootstrapPermissions | null = null
 
   private familiesData: Family[] | null = null
   private categoriesData: AllowedCategory[] | null = null
@@ -237,16 +237,7 @@ export class AppState {
 
     const data = await this.client.bootstrap(token)
 
-    this.permissions = {
-      can_list_entities: data.can_list_entities,
-      can_access_entity: data.can_access_entity,
-      can_add_entity: data.can_add_entity,
-      can_access_comments: data.can_access_comments,
-      can_add_comment: data.can_add_comment,
-      can_list_without_query: data.can_list_without_query,
-      can_list_with_filters: data.can_list_with_filters,
-      can_list_with_enum_constraints: data.can_list_with_enum_constraints,
-    }
+    this.permissions = data.permissions
 
     this.familiesData = data.families
       .sort((a, b) => a.sort_order - b.sort_order)
