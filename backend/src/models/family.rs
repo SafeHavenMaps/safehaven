@@ -262,9 +262,9 @@ impl Family {
             RETURNING 
                 id,
                 title,
-                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
-                entity_form as "entity_form: Json<Form>",
-                comment_form as "comment_form: Json<Form>",
+                (SELECT hash FROM icons WHERE id = icon_id) AS icon_hash,
+                entity_form AS "entity_form: Json<Form>",
+                comment_form AS "comment_form: Json<Form>",
                 sort_order,
                 version
             "#,
@@ -359,9 +359,9 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT id, title, (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
-                entity_form as "entity_form: Json<Form>", 
-                comment_form as "comment_form: Json<Form>",
+            SELECT id, title, (SELECT hash FROM icons WHERE id = icon_id) AS icon_hash,
+                entity_form AS "entity_form: Json<Form>", 
+                comment_form AS "comment_form: Json<Form>",
                 sort_order,
                 version
             FROM families
@@ -403,9 +403,9 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT families.id, families.title, (SELECT hash FROM icons WHERE id = families.icon_id) as icon_hash,
-                families.entity_form as "entity_form: Json<Form>", 
-                families.comment_form as "comment_form: Json<Form>",
+            SELECT families.id, families.title, (SELECT hash FROM icons WHERE id = families.icon_id) AS icon_hash,
+                families.entity_form AS "entity_form: Json<Form>", 
+                families.comment_form AS "comment_form: Json<Form>",
                 families.sort_order,
                 families.version
             FROM families
@@ -426,9 +426,9 @@ impl Family {
         sqlx::query_as!(
             Family,
             r#"
-            SELECT families.id, families.title, (SELECT hash FROM icons WHERE id = families.icon_id) as icon_hash,
-                families.entity_form as "entity_form: Json<Form>", 
-                families.comment_form as "comment_form: Json<Form>",
+            SELECT families.id, families.title, (SELECT hash FROM icons WHERE id = families.icon_id) AS icon_hash,
+                families.entity_form AS "entity_form: Json<Form>", 
+                families.comment_form AS "comment_form: Json<Form>",
                 families.sort_order,
                 families.version
             FROM families

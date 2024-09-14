@@ -99,12 +99,12 @@ pub async fn home_page_stats(conn: &mut PgConnection) -> Result<HomePageStats, A
     let result = sqlx::query!(
         r#"
         SELECT
-            (SELECT COUNT(*) FROM entities WHERE moderated) as "total_entities!",
-            (SELECT COUNT(*) FROM comments WHERE moderated) as "total_comments!",
-            (SELECT COUNT(*) FROM entities WHERE NOT moderated) as "pending_entities!",
-            (SELECT COUNT(*) FROM comments WHERE NOT moderated) as "pending_comments!",
-            (SELECT COUNT(*) FROM access_tokens_visits WHERE visited_at >= NOW()::date - INTERVAL '30 days') as "total_visits_30_days!",
-            (SELECT COUNT(*) FROM access_tokens_visits WHERE visited_at >= NOW()::date - INTERVAL '7 days') as "total_visits_7_days!",
+            (SELECT COUNT(*) FROM entities WHERE moderated) AS "total_entities!",
+            (SELECT COUNT(*) FROM comments WHERE moderated) AS "total_comments!",
+            (SELECT COUNT(*) FROM entities WHERE NOT moderated) AS "pending_entities!",
+            (SELECT COUNT(*) FROM comments WHERE NOT moderated) AS "pending_comments!",
+            (SELECT COUNT(*) FROM access_tokens_visits WHERE visited_at >= NOW()::date - INTERVAL '30 days') AS "total_visits_30_days!",
+            (SELECT COUNT(*) FROM access_tokens_visits WHERE visited_at >= NOW()::date - INTERVAL '7 days') AS "total_visits_7_days!",
             (
                 WITH date_series AS (
                     SELECT generate_series(
@@ -136,7 +136,7 @@ pub async fn home_page_stats(conn: &mut PgConnection) -> Result<HomePageStats, A
                 ) AS visits
                 FROM aggregated_visits
             )
-            as "visits_30_days!"
+            AS "visits_30_days!"
         "#
     )
     .fetch_one(conn)

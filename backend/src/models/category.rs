@@ -41,7 +41,7 @@ impl Category {
                 title,
                 family_id,
                 default_status,
-                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                (SELECT hash FROM icons WHERE id = icon_id) AS icon_hash,
                 fill_color,
                 border_color,
                 version
@@ -66,7 +66,7 @@ impl Category {
                 title,
                 family_id,
                 default_status,
-                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                (SELECT hash FROM icons WHERE id = icon_id) AS icon_hash,
                 fill_color,
                 border_color,
                 version
@@ -100,7 +100,7 @@ impl Category {
                 title,
                 family_id,
                 default_status,
-                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                (SELECT hash FROM icons WHERE id = icon_id) AS icon_hash,
                 fill_color,
                 border_color,
                 version
@@ -142,7 +142,7 @@ impl Category {
                 title,
                 family_id,
                 default_status,
-                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                (SELECT hash FROM icons WHERE id = icon_id) AS icon_hash,
                 fill_color,
                 border_color,
                 version
@@ -167,7 +167,7 @@ impl Category {
                 title,
                 family_id,
                 default_status,
-                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,
+                (SELECT hash FROM icons WHERE id = icon_id) AS icon_hash,
                 fill_color,
                 border_color,
                 version

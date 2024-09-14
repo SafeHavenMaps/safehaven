@@ -119,13 +119,13 @@ impl PublicEntity {
             PublicEntity,
             r#"
             SELECT e.id, c.family_id, e.category_id, e.display_name, e.data, e.created_at, e.updated_at,
-                e.locations as "locations: Json<Vec<UnprocessedLocation>>",
+                e.locations AS "locations: Json<Vec<UnprocessedLocation>>",
                 COALESCE(
                     (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                     array[]::uuid[]
-                ) as "tags!",
-                f.entity_form as "entity_form: Json<Form>",
-                f.comment_form as "comment_form: Json<Form>"
+                ) AS "tags!",
+                f.entity_form AS "entity_form: Json<Form>",
+                f.comment_form AS "comment_form: Json<Form>"
             FROM entities e
             INNER JOIN categories c ON e.category_id = c.id
             INNER JOIN families f ON c.family_id = f.id
@@ -155,7 +155,7 @@ impl PublicEntity {
                 COALESCE(
                     (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                     array[]::uuid[]
-                ) as "tags!"
+                ) AS "tags!"
             FROM entities e
             INNER JOIN entities_entities ee ON e.id = ee.child_id
             WHERE ee.parent_id = $1 AND e.moderated AND NOT e.hidden
@@ -181,7 +181,7 @@ impl PublicEntity {
                 COALESCE(
                     (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                     array[]::uuid[]
-                ) as "tags!"
+                ) AS "tags!"
             FROM entities e
             INNER JOIN entities_entities ee ON e.id = ee.parent_id
             WHERE ee.child_id = $1 AND e.moderated AND NOT e.hidden
@@ -476,7 +476,7 @@ impl AdminEntity {
                     COALESCE(
                         (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                         array[]::uuid[]
-                    ) as "tags!"
+                    ) AS "tags!"
                 FROM entities e
                 INNER JOIN entities_entities ee ON e.id = ee.parent_id
                 WHERE ee.child_id = $1
@@ -500,7 +500,7 @@ impl AdminEntity {
                     COALESCE(
                         (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                         array[]::uuid[]
-                    ) as "tags!"
+                    ) AS "tags!"
                 FROM entities e
                 INNER JOIN entities_entities ee ON e.id = ee.child_id
                 WHERE ee.parent_id = $1
@@ -517,13 +517,13 @@ impl AdminEntity {
             AdminEntity,
             r#"
             SELECT e.id, c.family_id, e.display_name, e.category_id, 
-                e.locations as "locations: Json<Vec<UnprocessedLocation>>", 
+                e.locations AS "locations: Json<Vec<UnprocessedLocation>>", 
                 e.data, e.hidden, e.moderation_notes, e.moderated, 
                 e.created_at, e.updated_at, e.version,
                 COALESCE(
                     (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                     array[]::uuid[]
-                ) as "tags!"
+                ) AS "tags!"
             FROM entities e
             INNER JOIN categories c ON e.category_id = c.id
             WHERE e.id = $1
@@ -544,7 +544,7 @@ impl AdminEntity {
                     COALESCE(
                         (SELECT array_agg(t.tag_id) FROM entity_tags t WHERE t.entity_id = e.id), 
                         array[]::uuid[]
-                    ) as "tags!"
+                    ) AS "tags!"
             FROM entities e
             WHERE NOT e.moderated
             ORDER BY created_at

@@ -99,9 +99,9 @@ impl AccessToken {
                 id,
                 title,
                 token, 
-                permissions as "permissions: Json<Permissions>",
+                permissions AS "permissions: Json<Permissions>",
                 active,
-                0 as "last_week_visits!"
+                0 AS "last_week_visits!"
             "#,
             access_token.title,
             access_token.token,
@@ -131,9 +131,9 @@ impl AccessToken {
                 id,
                 title,
                 token,
-                permissions as "permissions: Json<Permissions>",
+                permissions AS "permissions: Json<Permissions>",
                 active,
-                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') as "last_week_visits!"
+                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') AS "last_week_visits!"
             "#,
             given_id,
             update.title,
@@ -172,9 +172,9 @@ impl AccessToken {
                 id,
                 title,
                 token,
-                permissions as "permissions: Json<Permissions>",
+                permissions AS "permissions: Json<Permissions>",
                 active,
-                0 as "last_week_visits!"
+                0 AS "last_week_visits!"
             FROM access_tokens
             WHERE token = $1
             "#,
@@ -196,9 +196,9 @@ impl AccessToken {
                 id,
                 title,
                 token,
-                permissions as "permissions: Json<Permissions>",
+                permissions AS "permissions: Json<Permissions>",
                 active,
-                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') as "last_week_visits!"
+                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') AS "last_week_visits!"
             FROM access_tokens
             WHERE id = $1
             "#,
@@ -217,9 +217,9 @@ impl AccessToken {
                 id,
                 title,
                 token,
-                permissions as "permissions: Json<Permissions>",
+                permissions AS "permissions: Json<Permissions>",
                 active,
-                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') as "last_week_visits!"
+                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') AS "last_week_visits!"
             FROM access_tokens
             "#
         )
@@ -262,7 +262,7 @@ impl AccessToken {
                         GROUP BY referrer
                     )
                     SELECT json_object_agg(referrer, total) FROM origins
-                ), '{}') as "origins: JsonValue",
+                ), '{}') AS "origins: JsonValue",
                 (
                     WITH date_series AS (
                         SELECT generate_series(
@@ -292,7 +292,7 @@ impl AccessToken {
                         visit_count
                     ), '{}') AS visits
                     FROM aggregated_visits
-                ) as "visits_30_days: JsonValue"
+                ) AS "visits_30_days: JsonValue"
                 "#,
                 access_token_id
             )
