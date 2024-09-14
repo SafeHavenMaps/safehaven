@@ -16,20 +16,20 @@
         </p>
 
         <AdminFamiliesEditForm
-          class="-ml-4"
           :original-form-fields="fetchedFamily.entity_form.fields"
-          :on-save-callback="onSave"
           :categories="categories"
-          kind-name="entité"
+          :on-save-callback="onSave"
+          class="-ml-4"
           kind="entity"
+          kind-name="entité"
         />
       </TabPanel>
       <TabPanel value="1">
         <AdminFamiliesEditFormJson
           :original-form-fields="fetchedFamily.entity_form.fields"
           :on-sync-callback="onSynchronise"
-          kind-name="entité"
           kind="entity"
+          kind-name="entité"
         />
       </TabPanel>
     </TabPanels>
@@ -51,7 +51,7 @@ if (!state.is_admin)
 const id = useRoute().params.id as string
 const tabValue = ref('0')
 
-const fetchedFamily = await state.client.getFamily(id)
+const fetchedFamily = await state.fetchFamily(id)
 await state.fetchCategories()
 const categories = state.categories.filter(category => category.family_id == fetchedFamily.id)
 
@@ -81,7 +81,7 @@ async function onSave(newFormFields: FormField[]): Promise<{ error: Error | unde
 async function onSynchronise(newFormFields: FormField[]): Promise<{ error: Error | undefined }> {
   try {
     fetchedFamily.entity_form.fields = newFormFields
-    tabValue.value = '0'
+    tabValue.value = '0' // Switch back to the visual editor tab after synchronization
     return { error: undefined }
   }
   catch (error) {
