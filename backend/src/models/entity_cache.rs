@@ -262,16 +262,16 @@ impl ViewerCachedEntity {
             CachedClusteredEntity,
             r#"
             SELECT
-                id as "id!",
-                entity_id as "entity_id!",
-                category_id as "category_id!",
-                family_id as "family_id!",
-                display_name as "display_name!",
+                id AS "id!",
+                entity_id AS "entity_id!",
+                category_id AS "category_id!",
+                family_id AS "family_id!",
+                display_name AS "display_name!",
                 parent_id,
                 parent_display_name,
-                web_mercator_x as "web_mercator_x!",
-                web_mercator_y as "web_mercator_y!",
-                plain_text_location as "plain_text_location!",
+                web_mercator_x AS "web_mercator_x!",
+                web_mercator_y AS "web_mercator_y!",
+                plain_text_location AS "plain_text_location!",
                 cluster_id,
                 cluster_center_x,
                 cluster_center_y
@@ -383,16 +383,16 @@ impl ViewerCachedEntity {
             PaginatedCachedEntity,
             r#"
             SELECT 
-                id as "id!",
-                entity_id as "entity_id!",
-                category_id as "category_id!",
-                family_id as "family_id!",
-                display_name as "display_name!",
-                parents as "parents!: Json<Vec<ParentRepresentation>>",
-                locations as "locations!: Json<Vec<LocationRepresentation>>",
-                total_results as "total_results!",
-                total_pages as "total_pages!",
-                response_current_page as "response_current_page!"
+                id AS "id!",
+                entity_id AS "entity_id!",
+                category_id AS "category_id!",
+                family_id AS "family_id!",
+                display_name AS "display_name!",
+                parents AS "parents!: Json<Vec<ParentRepresentation>>",
+                locations AS "locations!: Json<Vec<LocationRepresentation>>",
+                total_results AS "total_results!",
+                total_pages AS "total_pages!",
+                response_current_page AS "response_current_page!"
             FROM search_entities(
                 $1,
                 $2,
@@ -459,16 +459,16 @@ impl AdminCachedEntity {
             AdminPaginatedCachedEntity,
             r#"
             SELECT 
-                id as "id!",
-                entity_id as "entity_id!",
-                category_id as "category_id!",
-                tags_ids as "tags_ids!",
-                family_id as "family_id!",
-                display_name as "display_name!",
-                total_results as "total_results!",
-                total_pages as "total_pages!",
-                response_current_page as "response_current_page!",
-                hidden as "hidden!"
+                id AS "id!",
+                entity_id AS "entity_id!",
+                category_id AS "category_id!",
+                tags_ids AS "tags_ids!",
+                family_id AS "family_id!",
+                display_name AS "display_name!",
+                total_results AS "total_results!",
+                total_pages AS "total_pages!",
+                response_current_page AS "response_current_page!",
+                hidden AS "hidden!"
             FROM search_entities_admin(
                 $1,
                 $2,

@@ -153,7 +153,7 @@ impl AdminComment {
                 RETURNING *
             )
             SELECT i.id, i.entity_id, i.author, i.text, i.data, i.created_at, i.updated_at, i.moderated, i.version, 
-                display_name as entity_display_name, category_id as entity_category_id
+                display_name AS entity_display_name, category_id AS entity_category_id
             FROM inserted i
             JOIN entities e 
             ON e.id = entity_id
@@ -195,7 +195,7 @@ impl AdminComment {
                 RETURNING *
             )
             SELECT i.id, i.entity_id, i.author, i.text, i.data, i.created_at, i.updated_at, i.moderated, i.version, 
-                e.display_name as entity_display_name, e.category_id as entity_category_id
+                e.display_name AS entity_display_name, e.category_id AS entity_category_id
             FROM inserted i
             JOIN entities e 
             ON e.id = entity_id
@@ -218,7 +218,7 @@ impl AdminComment {
             AdminComment,
             r#"
             SELECT c.id, c.entity_id, c.author, c.text, c.data, c.created_at, c.updated_at, c.moderated, c.version,
-                e.display_name as entity_display_name, e.category_id as entity_category_id
+                e.display_name AS entity_display_name, e.category_id AS entity_category_id
             FROM comments c
             JOIN entities e ON e.id = c.entity_id
             WHERE c.id = $1
@@ -253,7 +253,7 @@ impl AdminComment {
             AdminComment,
             r#"
             SELECT c.id, c.entity_id, c.author, c.text, c.data, c.created_at, c.updated_at, c.moderated, c.version,
-                e.display_name as entity_display_name, e.category_id as entity_category_id
+                e.display_name AS entity_display_name, e.category_id AS entity_category_id
             FROM comments c
             JOIN entities e ON e.id = c.entity_id
             WHERE entity_id = $1
@@ -270,7 +270,7 @@ impl AdminComment {
         sqlx::query_as!(
             AdminListedComment,
             r#"
-            SELECT c.id, c.entity_id, e.display_name as entity_display_name, e.category_id as entity_category_id, c.created_at,
+            SELECT c.id, c.entity_id, e.display_name AS entity_display_name, e.category_id AS entity_category_id, c.created_at,
                 c.author, c.moderated, c.updated_at
             FROM comments c
             INNER JOIN entities e ON c.entity_id = e.id
