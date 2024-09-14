@@ -149,6 +149,17 @@
                   value="!"
                 />
               </span>
+              <span class="flex items-center gap-2">
+                <label :for="'help_' + index">Texte d'aide :</label>
+                <Textarea
+                  :id="'help_' + index"
+                  v-model="field.help"
+                  auto-resize
+                  rows="1"
+                  :variant="hasFieldAttributeBeenEdited(index, 'help') ? 'filled': 'outlined'"
+                  class="flex grow"
+                />
+              </span>
             </div>
 
             <div class="flex flex-col gap-4">
@@ -189,22 +200,35 @@
                   v-model="field.privately_indexed"
                   :label="'Filtrage admin uniquement'"
                   :variant="hasFieldAttributeBeenEdited(index, 'privately_indexed')"
-                  :disabled="display_indexes[field.key]=='notDisplayed'"
+                  :disabled="display_indexes[field.key]=='notDisplayed' || !field.indexed"
                   @update:model-value="onIndexableChange(field)"
+                />
+              </span>
+              <span class="flex items-center gap-6">
+                <AdminInputSwitchField
+                  :id="'is_categories_restricted_' + index"
+                  :model-value="!(field.categories == null)"
+                  :label="'Restriction par catégories'"
+                  :variant="hasFieldAttributeBeenEdited(index, 'categories')"
+                  @update:model-value="(is_categories_restricted: boolean) => {
+                    if (is_categories_restricted) { field.categories = [] }
+                    else { field.categories = null }
+                  }"
+                />
+                <MultiSelect
+                  v-if="!(field.categories == null)"
+                  :id="'field_type_' + index"
+                  v-model="field.categories"
+                  :max-selected-labels="1"
+                  selected-items-label="{0} catégories selectionnées"
+                  class="w-full"
+                  :options="props.categories"
+                  option-label="title"
+                  option-value="id"
                 />
               </span>
             </div>
 
-          </span>
-
-          <span class="flex items-center gap-2 mr-4">
-            <label :for="'help_' + index">Texte d'aide :</label>
-            <InputText
-              :id="'help_' + index"
-              v-model="field.help"
-              class="flex grow"
-              :variant="hasFieldAttributeBeenEdited(index, 'help') ? 'filled': 'outlined'"
-            />
           </span>
         </Fieldset>
         <div class="flex justify-center">
@@ -521,11 +545,12 @@
 
 <script setup lang="ts">
 import type { ConfirmationOptions } from 'primevue/confirmationoptions'
-import type { FormField, StringFieldTypeMetadata, OptionsFieldTypeMetadata, EventsFieldTypeMetadata, FieldTypeMetadataEnum } from '~/lib'
+import type { FormField, StringFieldTypeMetadata, OptionsFieldTypeMetadata, EventsFieldTypeMetadata, FieldTypeMetadataEnum, Category } from '~/lib'
 
 const props = defineProps<{
   kind: 'entity' | 'comment'
   kindName: string
+  categories: Category[]
   originalFormFields: FormField[]
   onSaveCallback: (editedFormFields: FormField[]) => Promise<{ error: Error | undefined }>
 }>()

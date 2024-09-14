@@ -66,7 +66,8 @@
       >
         <template v-if="page < page_count + 1">
           <FormDynamicField
-            v-for="field in commentFieldsSortedByPage(page)"
+            v-for="field in commentFieldsSortedByPage(page)
+              .filter(field => field.categories == null || field.categories.includes(props.entity.category_id))"
             :key="field.key"
             v-model:field-content="(editedComment!.data as EntityOrCommentData)[field.key]"
             :form-field="(field as FormField)"
@@ -146,6 +147,7 @@ function reset_refs(new_entity_id: string) {
     data: {},
     entity_id: new_entity_id,
     text: '',
+    entity_category_id: props.entity.category_id,
   }
   curr_page.value = 0
   page_count.value = Math.max(0, ...props.family.comment_form.fields.map(field => field.form_page))

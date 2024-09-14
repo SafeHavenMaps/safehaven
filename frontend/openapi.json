@@ -2849,21 +2849,21 @@
           "moderated",
           "version",
           "entity_display_name",
-          "category_id"
+          "entity_category_id"
         ],
         "properties": {
           "author": {
             "type": "string"
-          },
-          "category_id": {
-            "type": "string",
-            "format": "uuid"
           },
           "created_at": {
             "type": "string",
             "format": "date-time"
           },
           "data": {},
+          "entity_category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "entity_display_name": {
             "type": "string"
           },
@@ -3144,13 +3144,18 @@
           "text",
           "data",
           "moderated",
-          "version"
+          "version",
+          "entity_category_id"
         ],
         "properties": {
           "author": {
             "type": "string"
           },
           "data": {},
+          "entity_category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "entity_id": {
             "type": "string",
             "format": "uuid"
@@ -3703,6 +3708,15 @@
           "display_weight"
         ],
         "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The categories this field is restricted to, if any",
+            "nullable": true
+          },
           "display_name": {
             "type": "string",
             "description": "The display name is used to show the field in the UI"
@@ -3717,7 +3731,7 @@
             "$ref": "#/components/schemas/FieldType"
           },
           "field_type_metadata": {
-            "description": "Used to store detail about the field that relevent\nonly for the frontend. For instance, if the field is an enum\nuse it to store possible values. If it is a SingleLineText, specify\nif it's an email, a phone number, etc..."
+            "description": "Used to store detail about the field that relevant\nonly for the frontend. For instance, if the field is an enum\nuse it to store possible values. If it is a SingleLineText, specify\nif it's an email, a phone number, etc..."
           },
           "form_page": {
             "type": "integer",
@@ -3750,7 +3764,7 @@
           },
           "privately_indexed": {
             "type": "boolean",
-            "description": "Sets if the field is indexed, the field must be indexed for this setting to be used.\nPrivatly indexed means only administrators can constraint on this field.\nIt only works for EnumSingleOption and EnumMultiOption"
+            "description": "Sets if the field is indexed, the field must be indexed for this setting to be used.\nPrivately indexed means only administrators can constraint on this field.\nIt only works for EnumSingleOption and EnumMultiOption"
           },
           "user_facing": {
             "type": "boolean",
@@ -4359,13 +4373,18 @@
           "entity_id",
           "author",
           "text",
-          "data"
+          "data",
+          "entity_category_id"
         ],
         "properties": {
           "author": {
             "type": "string"
           },
           "data": {},
+          "entity_category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "entity_id": {
             "type": "string",
             "format": "uuid"

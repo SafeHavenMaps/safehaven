@@ -16,7 +16,9 @@
         />
 
         <FormDynamicField
-          v-for="field in family.entity_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
+          v-for="field in family.entity_form.fields
+            .filter(field => field.categories == null || field.categories.includes(editedEntity.category_id))
+            .toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
           :key="field.key"
           v-model:field-content="(editedEntity.data as EntityOrCommentData)[field.key]"
           :form-field="(field as FormField)"

@@ -108,7 +108,8 @@
           </Fieldset>
 
           <ViewerCommonFormFields
-            :fields="props.entity?.family.entity_form.fields"
+            :fields="props.entity.family.entity_form.fields
+              .filter(field => field.categories == null || field.categories.includes(props.entity.category.id))"
             :data="props.entity?.entity.data"
           />
         </TabPanel>
@@ -155,6 +156,7 @@
             public
             :comments="props.entity.comments"
             :comment-form-fields="props.entity!.family.comment_form.fields"
+            :entity-category-id="props.entity.category.id"
           />
         </TabPanel>
       </TabPanels>

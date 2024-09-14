@@ -34,7 +34,8 @@
         />
 
         <ViewerCommonFormFields
-          :fields="props.commentFormFields"
+          :fields="props.commentFormFields
+            .filter(field => field.categories == null || field.categories.includes(props.entityCategoryId))"
           :data="comment.data"
         />
       </AccordionContent>
@@ -50,10 +51,12 @@ const props = defineProps<{
   commentFormFields: FormField[]
   comments: PublicComment[]
   public: true
+  entityCategoryId: string
 } | {
   commentFormFields: FormField[]
   comments: AdminComment[]
   public: false
+  entityCategoryId: string
 }>()
 
 const emit = defineEmits<{

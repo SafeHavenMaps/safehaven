@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE access_tokens\n            SET title = $2, token = $3, permissions = $4, active = $5\n            WHERE id = $1\n            RETURNING \n                id,\n                title,\n                token,\n                permissions as \"permissions: Json<Permissions>\",\n                active,\n                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') as \"last_week_visits!\"\n            ",
+  "query": "\n            UPDATE access_tokens\n            SET title = $2, token = $3, permissions = $4, active = $5\n            WHERE id = $1\n            RETURNING \n                id,\n                title,\n                token,\n                permissions AS \"permissions: Json<Permissions>\",\n                active,\n                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') AS \"last_week_visits!\"\n            ",
   "describe": {
     "columns": [
       {
@@ -52,5 +52,5 @@
       null
     ]
   },
-  "hash": "6f58e99a3aba105a086785eba7fe844eb995f5cb3eef9ce8a5183ab486873ad8"
+  "hash": "774a79f460f88cbacfe0a7cd963ab3a073f83afc9eb0198fe440405e54687dc8"
 }

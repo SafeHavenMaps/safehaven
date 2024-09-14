@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE categories\n            SET title = $2, family_id = $3, default_status = $4, fill_color = $5, border_color = $6, version = $7\n            WHERE id = $1\n            RETURNING\n                id,\n                title,\n                family_id,\n                default_status,\n                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,\n                fill_color,\n                border_color,\n                version\n            ",
+  "query": "\n            SELECT\n                id,\n                title,\n                family_id,\n                default_status,\n                (SELECT hash FROM icons WHERE id = icon_id) AS icon_hash,\n                fill_color,\n                border_color,\n                version\n            FROM categories\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -46,13 +46,7 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Varchar",
-        "Uuid",
-        "Bool",
-        "Varchar",
-        "Varchar",
-        "Int4"
+        "Uuid"
       ]
     },
     "nullable": [
@@ -66,5 +60,5 @@
       false
     ]
   },
-  "hash": "b84048f1a935c83bc70655032ef406371762e5b989ffd2220ac0df6f2c2aeef5"
+  "hash": "e92063f48832afff02878e598c3b59729ba8ff51fd774558cd26bf34e2957f1a"
 }

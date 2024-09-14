@@ -74,7 +74,9 @@ impl PublicEntity {
         conn: &mut PgConnection,
     ) -> Result<PublicEntity, AppError> {
         let family = Family::get_from_category(entity.category_id, conn).await?;
-        family.entity_form.validate_data(&entity.data)?;
+        family
+            .entity_form
+            .validate_data(&entity.data, entity.category_id)?;
 
         let locations = to_value(entity.locations).unwrap();
 
@@ -246,7 +248,9 @@ impl AdminEntity {
 
         // Validate the new data against the form from the corresponding family
         let family = Family::get_from_category(new_entity.category_id, &mut tx).await?;
-        family.entity_form.validate_data(&new_entity.data)?;
+        family
+            .entity_form
+            .validate_data(&new_entity.data, new_entity.category_id)?;
 
         // Serialize locations to JSON
         let locations = to_value(new_entity.locations).unwrap();
@@ -327,7 +331,9 @@ impl AdminEntity {
 
         // Validate the new data against the form from the corresponding family
         let family = Family::get_from_category(update.category_id, &mut tx).await?;
-        family.entity_form.validate_data(&update.data)?;
+        family
+            .entity_form
+            .validate_data(&update.data, update.category_id)?;
 
         // Serialize locations to JSON
         let locations = to_value(update.locations).unwrap();

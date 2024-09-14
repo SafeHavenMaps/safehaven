@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT c.id, c.entity_id, c.author, c.text, c.data, c.created_at, c.updated_at, c.moderated, c.version,\n                e.display_name as entity_display_name, e.category_id\n            FROM comments c\n            JOIN entities e ON e.id = c.entity_id\n            WHERE entity_id = $1\n            ORDER BY created_at\n            ",
+  "query": "\n            SELECT c.id, c.entity_id, c.author, c.text, c.data, c.created_at, c.updated_at, c.moderated, c.version,\n                e.display_name AS entity_display_name, e.category_id AS entity_category_id\n            FROM comments c\n            JOIN entities e ON e.id = c.entity_id\n            WHERE entity_id = $1\n            ORDER BY created_at\n            ",
   "describe": {
     "columns": [
       {
@@ -55,7 +55,7 @@
       },
       {
         "ordinal": 10,
-        "name": "category_id",
+        "name": "entity_category_id",
         "type_info": "Uuid"
       }
     ],
@@ -78,5 +78,5 @@
       false
     ]
   },
-  "hash": "60ab13c4272c0a0303351fe03c98704a09a91c421dca369b8c4c0535a083ddf5"
+  "hash": "4de1c6da26f19d7f56049709bc786db9a4bc74d864a3f1184ea2ab0a4988e869"
 }

@@ -28,6 +28,7 @@
           <FormCategorySelect
             v-model="editedEntity.category_id"
             :categories="props.categories"
+            @update:model-value="(new_category_id: string) => editedComment.entity_category_id = new_category_id"
           />
 
           <FormAdresses
@@ -51,7 +52,8 @@
         </template>
         <template v-else>
           <FormDynamicField
-            v-for="field in entityFieldsSortedByPage(page)"
+            v-for="field in entityFieldsSortedByPage(page)
+              .filter(field => field.categories == null || field.categories.includes(editedEntity.category_id))"
             :key="field.key"
             v-model:field-content="(editedEntity.data as EntityOrCommentData)[field.key]"
             :form-field="(field as FormField)"
@@ -106,7 +108,8 @@
         </template>
         <template v-else-if="page < (commentPageCount + 1)">
           <FormDynamicField
-            v-for="field in commentFieldsSortedByPage(page)"
+            v-for="field in commentFieldsSortedByPage(page)
+              .filter(field => field.categories == null || field.categories.includes(editedEntity.category_id))"
             :key="field.key"
             v-model:field-content="(editedComment.data as EntityOrCommentData)[field.key]"
             :form-field="(field as FormField)"
@@ -155,6 +158,7 @@
 
 <script setup lang="ts">
 import type { ConfirmationOptions } from 'primevue/confirmationoptions'
+import type { __String } from 'typescript'
 import type { Category, EntityOrCommentData, Family, FormField, PublicNewComment, PublicNewEntity } from '~/lib'
 import state from '~/lib/viewer-state'
 import { isValidRichText, isValidText } from '~/lib/validation'
@@ -192,6 +196,7 @@ const editedComment = ref<PublicNewComment>({
   data: {},
   entity_id: '00000000-0000-4000-8000-000000000000',
   text: '',
+  entity_category_id: '',
 })
 
 const curr_page = ref(0)
@@ -230,6 +235,7 @@ function reset_refs() {
     data: {},
     entity_id: '00000000-0000-4000-8000-000000000000',
     text: '',
+    entity_category_id: '',
   }
   curr_page.value = 0
   entityPageCount.value = Math.max(
