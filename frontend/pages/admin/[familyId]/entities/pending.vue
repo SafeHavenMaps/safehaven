@@ -130,7 +130,7 @@ refreshTable()
 
 const isSmallScreen = useMediaQuery('(max-width: 768px)')
 const optionalColumns = ref(['Catégorie', 'Créée le', 'Mise à jour le', 'Visibilité'])
-const table_key = `dt-state-entities-${familyId}`
+const table_key = `dt-state-pending-entities-${familyId}`
 if (!(table_key in state.tablesSelectedColumns)) {
   state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Catégorie', 'Créée le']
 }
