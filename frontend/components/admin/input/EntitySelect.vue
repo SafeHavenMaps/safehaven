@@ -116,7 +116,7 @@ const filters_overlay = ref<typeof Popover>()
 const search_query = ref('')
 const categoryFilteringList = ref<(Category & { active: boolean })[]>([])
 const tagFilteringList = ref<(Tag & { active: boolean | null })[]>([])
-const enumsFilteringList: EnumFilter[] = []
+const enumsFilteringList = ref<EnumFilter[]>([])
 
 const currentEntitiesResults: Ref<AdminPaginatedCachedEntities | null> = ref(null)
 const chosenEntity = ref<AdminCachedEntity | { id: string | undefined }>({ id: props.previousEntityId })
