@@ -44,7 +44,7 @@ pub struct Field {
     /// The type of the field
     pub field_type: FieldType,
 
-    /// Used to store detail about the field that relevent
+    /// Used to store detail about the field that relevant
     /// only for the frontend. For instance, if the field is an enum
     /// use it to store possible values. If it is a SingleLineText, specify
     /// if it's an email, a phone number, etc...
@@ -55,7 +55,7 @@ pub struct Field {
     pub indexed: bool,
 
     /// Sets if the field is indexed, the field must be indexed for this setting to be used.
-    /// Privatly indexed means only administrators can constraint on this field.
+    /// Privately indexed means only administrators can constraint on this field.
     /// It only works for EnumSingleOption and EnumMultiOption
     pub privately_indexed: bool,
 
@@ -73,6 +73,9 @@ pub struct Field {
 
     /// The weight of the field in the display (when displayed, ordered by weight)
     pub display_weight: u8,
+
+    /// The categories this field is restricted to, if any
+    pub categories: Option<Vec<Uuid>>,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Debug)]
@@ -118,9 +121,9 @@ impl Form {
         Ok(())
     }
 
-    pub fn validate_data(&self, data: &Value) -> Result<(), AppError> {
+    pub fn validate_data(&self, data: &Value, entity_category: Uuid) -> Result<(), AppError> {
         for field in &self.fields {
-            field.validate_data(data.get(&field.key))?;
+            field.validate_data(data.get(&field.key), entity_category)?;
         }
         Ok(())
     }
@@ -141,9 +144,18 @@ impl Field {
         Ok(())
     }
 
-    fn validate_data(&self, value: Option<&Value>) -> Result<(), AppError> {
-        let value = match value {
-            None if self.mandatory => {
+    fn validate_data(
+        &self,
+        field_value: Option<&Value>,
+        entity_category: Uuid,
+    ) -> Result<(), AppError> {
+        let field_required = self.mandatory
+            && self.categories.as_ref().map_or(true, |categories| {
+                categories.iter().any(|&c| c == entity_category)
+            });
+
+        let field_value = match field_value {
+            None if field_required => {
                 return Err(AppError::Validation(format!(
                     "Mandatory field {} is missing",
                     self.key
@@ -153,8 +165,8 @@ impl Field {
             Some(value) => value,
         };
 
-        if value.is_null() {
-            if self.mandatory {
+        if field_value.is_null() {
+            if field_required {
                 return Err(AppError::Validation(format!(
                     "Mandatory field {} is missing",
                     self.key
@@ -166,11 +178,11 @@ impl Field {
 
         match &self.field_type {
             FieldType::SingleLineText | FieldType::MultiLineText | FieldType::RichText => {
-                let str_value = value.as_str().ok_or_else(|| {
+                let str_value = field_value.as_str().ok_or_else(|| {
                     AppError::Validation(format!("Field {} is not a string", self.key))
                 })?;
 
-                if self.mandatory && str_value.is_empty() {
+                if field_required && str_value.is_empty() {
                     return Err(AppError::Validation(format!(
                         "Mandatory field {} is empty",
                         self.key
@@ -179,11 +191,11 @@ impl Field {
             }
 
             FieldType::Number | FieldType::DiscreteScore => {
-                let num_value = value.as_f64().ok_or_else(|| {
+                let num_value = field_value.as_f64().ok_or_else(|| {
                     AppError::Validation(format!("Field {} is not a number", self.key))
                 })?;
 
-                if self.mandatory && num_value.is_nan() {
+                if field_required && num_value.is_nan() {
                     return Err(AppError::Validation(format!(
                         "Mandatory field {} is not a valid number",
                         self.key
@@ -192,17 +204,17 @@ impl Field {
             }
 
             FieldType::Boolean => {
-                value.as_bool().ok_or_else(|| {
+                field_value.as_bool().ok_or_else(|| {
                     AppError::Validation(format!("Field {} is not a boolean", self.key))
                 })?;
             }
 
             FieldType::Date => {
-                let str_value = value.as_str().ok_or_else(|| {
+                let str_value = field_value.as_str().ok_or_else(|| {
                     AppError::Validation(format!("Field {} is not a string", self.key))
                 })?;
 
-                if self.mandatory && str_value.is_empty() {
+                if field_required && str_value.is_empty() {
                     return Err(AppError::Validation(format!(
                         "Mandatory field {} is empty",
                         self.key
@@ -213,11 +225,11 @@ impl Field {
             }
 
             FieldType::EnumMultiOption | FieldType::EventList => {
-                let arr_value = value.as_array().ok_or_else(|| {
+                let arr_value = field_value.as_array().ok_or_else(|| {
                     AppError::Validation(format!("Field {} is not an array", self.key))
                 })?;
 
-                if self.mandatory && arr_value.is_empty() {
+                if field_required && arr_value.is_empty() {
                     return Err(AppError::Validation(format!(
                         "Mandatory field {} is empty",
                         self.key

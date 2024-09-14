@@ -19,6 +19,7 @@
           class="-ml-4"
           :original-form-fields="fetchedFamily.entity_form.fields"
           :on-save-callback="onSave"
+          :categories="categories"
           kind-name="entité"
           kind="entity"
         />
@@ -51,6 +52,8 @@ const id = useRoute().params.id as string
 const tabValue = ref('0')
 
 const fetchedFamily = await state.client.getFamily(id)
+await state.fetchCategories()
+const categories = state.categories.filter(category => category.family_id == fetchedFamily.id)
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id,\n                title,\n                family_id,\n                default_status,\n                (SELECT hash FROM icons WHERE id = icon_id) as icon_hash,\n                fill_color,\n                border_color,\n                version\n            FROM categories\n            WHERE NOT (id = ANY($1)) AND family_id = ANY($2)\n            ",
+  "query": "\n            INSERT INTO categories (title, family_id, default_status, fill_color, border_color)\n            VALUES ($1, $2, $3, $4, $5)\n            RETURNING\n                id,\n                title,\n                family_id,\n                default_status,\n                (SELECT hash FROM icons WHERE id = icon_id) AS icon_hash,\n                fill_color,\n                border_color,\n                version\n            ",
   "describe": {
     "columns": [
       {
@@ -46,8 +46,11 @@
     ],
     "parameters": {
       "Left": [
-        "UuidArray",
-        "UuidArray"
+        "Varchar",
+        "Uuid",
+        "Bool",
+        "Varchar",
+        "Varchar"
       ]
     },
     "nullable": [
@@ -61,5 +64,5 @@
       false
     ]
   },
-  "hash": "2bf3946bc918212efca87de647ca671f1702e174ace2ea56d71094e6653588ce"
+  "hash": "ae38d2ce78819912784f250c1d2418bcea27807509963d6a1d3dc69a8d67df41"
 }

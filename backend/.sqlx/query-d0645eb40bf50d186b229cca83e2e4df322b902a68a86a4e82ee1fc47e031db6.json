@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT \n                id,\n                title,\n                token,\n                permissions as \"permissions: Json<Permissions>\",\n                active,\n                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') as \"last_week_visits!\"\n            FROM access_tokens\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT\n                id,\n                title,\n                token,\n                permissions AS \"permissions: Json<Permissions>\",\n                active,\n                (SELECT COUNT(*) FROM access_tokens_visits WHERE token_id = id AND visited_at > NOW() - INTERVAL '1 week') AS \"last_week_visits!\"\n            FROM access_tokens\n            ",
   "describe": {
     "columns": [
       {
@@ -35,9 +35,7 @@
       }
     ],
     "parameters": {
-      "Left": [
-        "Uuid"
-      ]
+      "Left": []
     },
     "nullable": [
       false,
@@ -48,5 +46,5 @@
       null
     ]
   },
-  "hash": "57eda34b265da49a19800c3bc9f20f1935599e10139a5d0814fbdbe95b81dbb3"
+  "hash": "d0645eb40bf50d186b229cca83e2e4df322b902a68a86a4e82ee1fc47e031db6"
 }

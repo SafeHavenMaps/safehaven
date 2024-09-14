@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO access_tokens (title, token, permissions, active)\n            VALUES ($1, $2, $3, $4)\n            RETURNING \n                id,\n                title,\n                token, \n                permissions as \"permissions: Json<Permissions>\",\n                active,\n                0 as \"last_week_visits!\"\n            ",
+  "query": "\n            INSERT INTO access_tokens (title, token, permissions, active)\n            VALUES ($1, $2, $3, $4)\n            RETURNING \n                id,\n                title,\n                token, \n                permissions AS \"permissions: Json<Permissions>\",\n                active,\n                0 AS \"last_week_visits!\"\n            ",
   "describe": {
     "columns": [
       {
@@ -51,5 +51,5 @@
       null
     ]
   },
-  "hash": "a2e3e58c85c52afd3b85a6b181e9be083c3811e58e85a5d7217c5275a023f3a4"
+  "hash": "a4ad29d1517628e943a7ae118deda6fdb8dbecf42873fd2ce76c825e60fcb7ec"
 }

@@ -21,7 +21,9 @@
       </div>
 
       <FormDynamicField
-        v-for="field in family.comment_form.fields.toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
+        v-for="field in family.comment_form.fields
+          .filter(field => field.categories == null || field.categories.includes(parentEntityToDisplay!.category_id))
+          .toSorted((field_a, field_b) => field_a.form_weight - field_b.form_weight)"
         :key="field.key"
         v-model:field-content="(editedComment.data as EntityOrCommentData)[field.key]"
         :form-field="(field as FormField)"
@@ -117,7 +119,7 @@ const returnUrl = urlEntityId == null ? `/admin/${familyId}/comments/pending` : 
 const fetchedComment: AdminComment | null = isNew ? null : await state.client.getComment(commentId)
 const parentEntityToDisplay = ref<{ category_id: string, display_name: string }>()
 if (fetchedComment) {
-  parentEntityToDisplay.value = { category_id: fetchedComment.category_id, display_name: fetchedComment.entity_display_name }
+  parentEntityToDisplay.value = { category_id: fetchedComment.entity_category_id, display_name: fetchedComment.entity_display_name }
 }
 else if (urlEntityId) {
   const fetchedParent = await state.client.getEntity(urlEntityId as string)
@@ -132,6 +134,7 @@ const editedComment: Ref<AdminNewOrUpdateComment> = isNew
     author: '',
     data: {},
     entity_id: urlEntityId ?? '',
+    entity_category_id: parentEntityToDisplay.value.category_id,
     moderated: false,
     text: '',
     version: 1,

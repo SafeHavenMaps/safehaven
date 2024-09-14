@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id as \"id!\",\n                entity_id as \"entity_id!\",\n                category_id as \"category_id!\",\n                family_id as \"family_id!\",\n                display_name as \"display_name!\",\n                parent_id,\n                parent_display_name,\n                web_mercator_x as \"web_mercator_x!\",\n                web_mercator_y as \"web_mercator_y!\",\n                plain_text_location as \"plain_text_location!\",\n                cluster_id,\n                cluster_center_x,\n                cluster_center_y\n            FROM fetch_entities_within_view(\n                $1,\n                $2,\n                $3,\n                $4,\n                $5,\n                $6,\n                $7,\n                $8,\n                $9,\n                $10,\n                $11,\n                $12,\n                $13,\n                $14,\n                $15,\n                $16,\n                $17,\n                $18\n            )\n            ",
+  "query": "\n            SELECT\n                id AS \"id!\",\n                entity_id AS \"entity_id!\",\n                category_id AS \"category_id!\",\n                family_id AS \"family_id!\",\n                display_name AS \"display_name!\",\n                parent_id,\n                parent_display_name,\n                web_mercator_x AS \"web_mercator_x!\",\n                web_mercator_y AS \"web_mercator_y!\",\n                plain_text_location AS \"plain_text_location!\",\n                cluster_id,\n                cluster_center_x,\n                cluster_center_y\n            FROM fetch_entities_within_view(\n                $1,\n                $2,\n                $3,\n                $4,\n                $5,\n                $6,\n                $7,\n                $8,\n                $9,\n                $10,\n                $11,\n                $12,\n                $13,\n                $14,\n                $15,\n                $16,\n                $17,\n                $18\n            )\n            ",
   "describe": {
     "columns": [
       {
@@ -107,5 +107,5 @@
       null
     ]
   },
-  "hash": "a6736caa3d3bfc6bb9ae445b1a308fe2bbb2585ccf4b4e03215b3c453863693c"
+  "hash": "c23fb52d04418585be96aca83b155e5c882d692f86a72281b2a0b2c7d9c5cefa"
 }

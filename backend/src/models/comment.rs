@@ -12,6 +12,7 @@ pub struct PublicNewComment {
     pub author: String,
     pub text: String,
     pub data: Value,
+    pub entity_category_id: Uuid,
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -45,7 +46,9 @@ impl PublicComment {
         conn: &mut PgConnection,
     ) -> Result<PublicComment, AppError> {
         let family = Family::get_from_entity(comment.entity_id, conn).await?;
-        family.comment_form.validate_data(&comment.data)?;
+        family
+            .comment_form
+            .validate_data(&comment.data, comment.entity_category_id)?;
 
         sqlx::query_as!(
             PublicComment,
@@ -105,7 +108,7 @@ pub struct AdminComment {
     pub moderated: bool,
     pub version: i32,
     pub entity_display_name: String,
-    pub category_id: Uuid,
+    pub entity_category_id: Uuid,
 }
 
 #[derive(FromRow, Deserialize, Serialize, ToSchema, Debug)]
@@ -128,6 +131,7 @@ pub struct AdminNewOrUpdateComment {
     pub data: Value,
     pub moderated: bool,
     pub version: i32,
+    pub entity_category_id: Uuid,
 }
 
 impl AdminComment {
@@ -136,7 +140,9 @@ impl AdminComment {
         conn: &mut PgConnection,
     ) -> Result<AdminComment, AppError> {
         let family = Family::get_from_entity(new_comment.entity_id, conn).await?;
-        family.comment_form.validate_data(&new_comment.data)?;
+        family
+            .comment_form
+            .validate_data(&new_comment.data, new_comment.entity_category_id)?;
 
         sqlx::query_as!(
             AdminComment,
@@ -147,7 +153,7 @@ impl AdminComment {
                 RETURNING *
             )
             SELECT i.id, i.entity_id, i.author, i.text, i.data, i.created_at, i.updated_at, i.moderated, i.version, 
-                display_name as entity_display_name, category_id 
+                display_name as entity_display_name, category_id as entity_category_id
             FROM inserted i
             JOIN entities e 
             ON e.id = entity_id
@@ -169,7 +175,9 @@ impl AdminComment {
         conn: &mut PgConnection,
     ) -> Result<AdminComment, AppError> {
         let family = Family::get_from_entity(update.entity_id, conn).await?;
-        family.comment_form.validate_data(&update.data)?;
+        family
+            .comment_form
+            .validate_data(&update.data, update.entity_category_id)?;
 
         sqlx::query_as!(
             AdminComment,
@@ -187,7 +195,7 @@ impl AdminComment {
                 RETURNING *
             )
             SELECT i.id, i.entity_id, i.author, i.text, i.data, i.created_at, i.updated_at, i.moderated, i.version, 
-                e.display_name as entity_display_name, e.category_id 
+                e.display_name as entity_display_name, e.category_id as entity_category_id
             FROM inserted i
             JOIN entities e 
             ON e.id = entity_id
@@ -210,7 +218,7 @@ impl AdminComment {
             AdminComment,
             r#"
             SELECT c.id, c.entity_id, c.author, c.text, c.data, c.created_at, c.updated_at, c.moderated, c.version,
-                e.display_name as entity_display_name, e.category_id
+                e.display_name as entity_display_name, e.category_id as entity_category_id
             FROM comments c
             JOIN entities e ON e.id = c.entity_id
             WHERE c.id = $1
@@ -245,7 +253,7 @@ impl AdminComment {
             AdminComment,
             r#"
             SELECT c.id, c.entity_id, c.author, c.text, c.data, c.created_at, c.updated_at, c.moderated, c.version,
-                e.display_name as entity_display_name, e.category_id
+                e.display_name as entity_display_name, e.category_id as entity_category_id
             FROM comments c
             JOIN entities e ON e.id = c.entity_id
             WHERE entity_id = $1

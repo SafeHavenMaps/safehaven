@@ -10,6 +10,7 @@
       :on-save-callback="onSave"
       kind-name="commentaire"
       kind="comment"
+      :categories="categories"
     />
   </div>
 </template>
@@ -28,8 +29,10 @@ if (!state.is_admin)
 
 const id = useRoute().params.id as string
 
-const fetchedFamily = await state.client.getFamily(id)
+const fetchedFamily = await state.fetchFamily(id)
 const editedFamily = JSON.parse(JSON.stringify(fetchedFamily))
+await state.fetchCategories()
+const categories = state.categories.filter(category => category.family_id == fetchedFamily.id)
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
