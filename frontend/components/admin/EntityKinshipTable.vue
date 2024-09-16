@@ -3,20 +3,20 @@
     <span class="flex gap-2">
       <Button
         v-if="!hasChildren"
-        label="Ajouter un parent"
+        :label="$t('cmp.admin.entityKinshipTable.addParent')"
         outlined
         @click="parentSelectVisible=true"
       />
       <Button
         v-if="!hasParents"
-        label="Ajouter un enfant"
+        :label="$t('cmp.admin.entityKinshipTable.addChild')"
         outlined
         @click="childSelectVisible=true"
       />
     </span>
-    <b v-if="hasChildren">Liste des enfants </b>
-    <b v-else-if="hasParents">Liste des parents </b>
-    <span v-else> Aucun parent ni enfant pour le moment </span>
+    <b v-if="hasChildren">{{ $t('cmp.admin.entityKinshipTable.childrenList') }}</b>
+    <b v-else-if="hasParents">{{ $t('cmp.admin.entityKinshipTable.parentsList') }}</b>
+    <span v-else>{{ $t('cmp.admin.entityKinshipTable.noKinship') }}</span>
     <AdminInputEntitySelect
       v-model:visible="parentSelectVisible"
       :categories="categories"
@@ -47,14 +47,14 @@
     >
       <Column
         field="display_name"
-        header="Nom de l'entité"
+        :header="$t('cmp.admin.entityKinshipTable.entityName')"
         class="max-w-[25rem]"
         sortable
       />
 
       <Column
         field="category_id"
-        header="Catégorie"
+        :header="$t('cmp.admin.entityKinshipTable.category')"
         sortable
       >
         <template #body="slotProps">
@@ -66,7 +66,7 @@
         <template #body="slotProps">
           <AdminEditDeleteButtons
             :id="slotProps.data.id"
-            :model-name="hasParents ? 'de la relation avec le parent' : `de la relation avec l'enfant`"
+            :model-name="hasParents ? $t('cmp.admin.entityKinshipTable.parentRelationship') : $t('cmp.admin.entityKinshipTable.childRelationship')"
             :name="slotProps.data.display_name"
             @edit="navigateTo(`/admin/${familyId}/entities/${slotProps.data.id}`)"
             @delete="onDelete"
@@ -101,26 +101,27 @@ const hasChildren = computed(() => !!props.mainEntity.children.length)
 const table_key = `dt-state-entities-kinship-${props.mainEntity.id}`
 
 const toast = useToast()
+const { t } = useI18n()
 
 async function onChildAdd(child_entity: { entity_id: string, display_name: string }) {
   try {
     await state.client.registerEntityParent(props.mainEntity.id, child_entity.entity_id)
-    toast.add({ severity: 'success', summary: 'Succès', detail: `Relation avec l'enfant ${child_entity.display_name} ajoutée avec succès`, life: 3000 })
+    toast.add({ severity: 'success', summary: t('cmp.admin.entityKinshipTable.success'), detail: t('cmp.admin.entityKinshipTable.childAddedSuccess', { name: child_entity.display_name }), life: 3000 })
     emit('updateKinship')
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur d'ajout de la relation avec l'enfant ${child_entity.display_name}`, life: 3000 })
+    toast.add({ severity: 'error', summary: t('cmp.admin.entityKinshipTable.error'), detail: t('cmp.admin.entityKinshipTable.childAddError', { name: child_entity.display_name }), life: 3000 })
   }
 }
 
 async function onParentAdd(parent_entity: { entity_id: string, display_name: string }) {
   try {
     await state.client.registerEntityParent(parent_entity.entity_id, props.mainEntity.id)
-    toast.add({ severity: 'success', summary: 'Succès', detail: `Relation avec le parent ${parent_entity.display_name} ajoutée avec succès`, life: 3000 })
+    toast.add({ severity: 'success', summary: t('cmp.admin.entityKinshipTable.success'), detail: t('cmp.admin.entityKinshipTable.parentAddedSuccess', { name: parent_entity.display_name }), life: 3000 })
     emit('updateKinship')
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur d'ajout de la relation avec le parent ${parent_entity.display_name}`, life: 3000 })
+    toast.add({ severity: 'error', summary: t('cmp.admin.entityKinshipTable.error'), detail: t('cmp.admin.entityKinshipTable.parentAddError', { name: parent_entity.display_name }), life: 3000 })
   }
 }
 
@@ -128,21 +129,21 @@ async function onDelete(kin_id: string, kin_name: string, onDeleteDone: () => vo
   if (hasParents.value) {
     try {
       await state.client.removeEntityParent(kin_id, props.mainEntity.id)
-      toast.add({ severity: 'success', summary: 'Succès', detail: `Relation avec le parent ${kin_name} supprimée avec succès`, life: 3000 })
+      toast.add({ severity: 'success', summary: t('cmp.admin.entityKinshipTable.success'), detail: t('cmp.admin.entityKinshipTable.parentRemovedSuccess', { name: kin_name }), life: 3000 })
       emit('updateKinship')
     }
     catch {
-      toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression de la relation avec le parent ${kin_name}`, life: 3000 })
+      toast.add({ severity: 'error', summary: t('cmp.admin.entityKinshipTable.error'), detail: t('cmp.admin.entityKinshipTable.parentRemoveError', { name: kin_name }), life: 3000 })
     }
   }
   else {
     try {
       await state.client.removeEntityParent(props.mainEntity.id, kin_id)
-      toast.add({ severity: 'success', summary: 'Succès', detail: `Relation avec l'enfant ${kin_name} supprimée avec succès`, life: 3000 })
+      toast.add({ severity: 'success', summary: t('cmp.admin.entityKinshipTable.success'), detail: t('cmp.admin.entityKinshipTable.childRemovedSuccess', { name: kin_name }), life: 3000 })
       emit('updateKinship')
     }
     catch {
-      toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de suppression de la relation avec l'enfant ${kin_name}`, life: 3000 })
+      toast.add({ severity: 'error', summary: t('cmp.admin.entityKinshipTable.error'), detail: t('cmp.admin.entityKinshipTable.childRemoveError', { name: kin_name }), life: 3000 })
     }
   }
   onDeleteDone()

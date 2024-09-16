@@ -6,7 +6,7 @@
       @submit.prevent="onSync"
     >
       <p class="text-muted-color">
-        {{ $t('admin.families.editformjson.description') }}
+        {{ $t('cmp.admin.families.editformjson.description') }}
       </p>
       <!-- @submit.prevent="onSave" -->
       <VAceEditor
@@ -19,7 +19,7 @@
       />
       <span class="flex gap-1 justify-content-end">
         <Button
-          :label="$t('admin.families.editformjson.import')"
+          :label="$t('cmp.admin.families.editformjson.import')"
           severity="info"
           @click="triggerImport"
         >
@@ -42,7 +42,7 @@
           download="formFields.json"
         >
           <Button
-            :label="$t('admin.families.editformjson.export')"
+            :label="$t('cmp.admin.families.editformjson.export')"
             severity="info"
             @click="onExport"
           >
@@ -59,12 +59,12 @@
       <span class="flex gap-1 justify-content-end">
         <NuxtLink to="/admin/families">
           <Button
-            :label="$t('admin.families.editform.cancel')"
+            :label="$t('cmp.admin.families.editform.cancel')"
             severity="secondary"
           />
         </NuxtLink>
         <Button
-          :label="$t('admin.families.editformjson.syncAndPreview')"
+          :label="$t('cmp.admin.families.editformjson.syncAndPreview')"
           type="submit"
         />
       </span>
@@ -122,15 +122,15 @@ function onImport(event: Event) {
           editorContent.value = JSON.stringify(JSON.parse(result), null, 2)
         }
         catch {
-          toast.add({ severity: 'error', summary: t('admin.families.editform.error'), detail: t('admin.families.editformjson.invalidJson'), life: 3000 })
+          toast.add({ severity: 'error', summary: t('cmp.admin.families.editform.error'), detail: t('cmp.admin.families.editformjson.invalidJson'), life: 3000 })
         }
       }
       reader.readAsText(file)
-      toast.add({ severity: 'success', summary: t('admin.families.editform.success'), detail: t('admin.families.editformjson.importSuccess'), life: 3000 })
+      toast.add({ severity: 'success', summary: t('cmp.admin.families.editform.success'), detail: t('cmp.admin.families.editformjson.importSuccess'), life: 3000 })
     }
   }
   catch {
-    toast.add({ severity: 'error', summary: t('admin.families.editform.error'), detail: t('admin.families.editformjson.importError'), life: 3000 })
+    toast.add({ severity: 'error', summary: t('cmp.admin.families.editform.error'), detail: t('cmp.admin.families.editformjson.importError'), life: 3000 })
   }
 }
 
@@ -150,10 +150,10 @@ async function onSync() {
   try {
     const newFormFields = JSON.parse(editorContent.value)
     await props.onSyncCallback(newFormFields as FormField[])
-    toast.add({ severity: 'success', summary: t('admin.families.editform.success'), detail: t('admin.families.editformjson.syncSuccess'), life: 3000 })
+    toast.add({ severity: 'success', summary: t('cmp.admin.families.editform.success'), detail: t('cmp.admin.families.editformjson.syncSuccess'), life: 3000 })
   }
   catch {
-    toast.add({ severity: 'error', summary: t('admin.families.editform.error'), detail: t('admin.families.editformjson.syncError'), life: 3000 })
+    toast.add({ severity: 'error', summary: t('cmp.admin.families.editform.error'), detail: t('cmp.admin.families.editformjson.syncError'), life: 3000 })
   }
 }
 

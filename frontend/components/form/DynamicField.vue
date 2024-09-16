@@ -22,7 +22,7 @@
       v-if="props.formField.field_type=='SingleLineText'"
       :id="props.formField.key"
       v-tooltip="formatTooltip[(props.formField as Extract<FieldTypeMetadataEnum, { field_type: 'SingleLineText' }>).field_type_metadata!.format]"
-      :model-value="props.fieldContent as (string | undefined)"
+      :model-value="(props.fieldContent as (string | undefined))"
       :variant="props.hasBeenEdited ? 'filled': 'outlined'"
       :invalid="!isValid && hasLostFocus"
       @update:model-value="updateField"
@@ -31,7 +31,7 @@
     <Textarea
       v-if="props.formField.field_type=='MultiLineText'"
       :id="props.formField.key"
-      :model-value="props.fieldContent as (string | undefined)"
+      :model-value="(props.fieldContent as (string | undefined))"
       :variant="props.hasBeenEdited ? 'filled': 'outlined'"
       :invalid="!isValid && hasLostFocus"
 
@@ -60,10 +60,12 @@
       v-if="props.formField.field_type=='DiscreteScore'"
       :id="props.formField.key"
       :model-value="(props.fieldContent as (number | undefined))"
-      :options="[{ label: 'Mauvais', value: 0 },
-                 { label: 'Plutôt mauvais', value: 3 },
-                 { label: 'Plutôt bon', value: 7 },
-                 { label: 'Bon', value: 10 }]"
+      :options="[
+        { label: $t('cmp.form.dynamicField.discreteScore.bad'), value: 0 },
+        { label: $t('cmp.form.dynamicField.discreteScore.ratherBad'), value: 3 },
+        { label: $t('cmp.form.dynamicField.discreteScore.ratherGood'), value: 7 },
+        { label: $t('cmp.form.dynamicField.discreteScore.good'), value: 10 },
+      ]"
       option-value="value"
       option-label="label"
       @update:model-value="updateField"
@@ -72,10 +74,11 @@
     <DatePicker
       v-if="props.formField.field_type=='Date'"
       :id="props.formField.key"
-      :model-value="props.fieldContent as (Date | undefined)"
+      :model-value="(props.fieldContent as (Date | undefined))"
       :variant="props.hasBeenEdited ? 'filled': 'outlined'"
       :invalid="!isValid && hasLostFocus"
-      date-format="dd/mm/yy"
+      :date-format="$t('cmp.form.dynamicField.dateFormat')"
+      :placeholder="$t('cmp.form.dynamicField.datePlaceholder')"
       show-icon
       icon-display="input"
       show-button-bar
@@ -119,7 +122,7 @@
         <span class="flex flex-wrap items-center gap-4">
           <Select
             v-model="event.type"
-            placeholder="type d'évènement"
+            :placeholder="$t('cmp.form.dynamicField.eventTypePlaceholder')"
             class="grow"
             :options="(props.formField as Extract<FieldTypeMetadataEnum, { field_type: 'EventList' }>).field_type_metadata?.event_types"
             option-value="value"
@@ -129,8 +132,8 @@
           <DatePicker
             v-model="event.date"
             class="w-40"
-            placeholder="jj/mm/aaaa"
-            date-format="dd/mm/yy"
+            :placeholder="$t('cmp.form.dynamicField.datePlaceholder')"
+            :date-format="$t('cmp.form.dynamicField.dateFormat')"
             show-icon
             icon-display="input"
             show-button-bar
@@ -153,7 +156,7 @@
         </span>
 
         <span class="flex items-center gap-2">
-          <label for="">Détails (optionels): </label>
+          <label for="">{{ $t('cmp.form.dynamicField.optionalDetails') }}: </label>
           <Textarea
             v-model="event.details"
           />
@@ -175,7 +178,7 @@
             <AppIcon
               icon-name="add"
             />
-            Nouvel évènement
+            {{ $t('cmp.form.dynamicField.newEvent') }}
           </template>
         </Button>
       </span>
@@ -200,6 +203,8 @@ type FormProps<T extends FormField> = {
 const props = defineProps<FormProps<FormField>>()
 
 const emit = defineEmits(['update:fieldContent', 'isValid'])
+const { t } = useI18n()
+
 const hasLostFocus = ref(false)
 const isValid = computed(() => {
   // if the field is missing or empty, it's only valid if optional
@@ -262,5 +267,5 @@ function onLostFocus() {
   hasLostFocus.value = true
 }
 
-const formatTooltip: Record<string, string | null> = { url: 'url valide attendu', email: 'email valide attendu', phone: 'Numéro de téléphone attendu', none: null }
+const formatTooltip: Record<string, string | null> = { url: t('cmp.form.dynamicField.urlTooltip'), email: t('cmp.form.dynamicField.emailTooltip'), phone: t('cmp.form.dynamicField.phoneTooltip'), none: null }
 </script>

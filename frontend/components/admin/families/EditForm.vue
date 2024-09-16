@@ -8,7 +8,7 @@
       <Fieldset
         v-for="page in Array.from({ length: page_count }, (_, i) => i + 1)"
         :key="`Page ${page}`"
-        :legend="page == page_count ? $t('admin.families.editform.newPage') : $t('admin.families.editform.page', { page })"
+        :legend="page == page_count ? $t('cmp.admin.families.editform.newPage') : $t('cmp.admin.families.editform.page', { page })"
         :toggleable="true"
         class="page-fieldset"
         style=""
@@ -45,7 +45,7 @@
           <template #legend>
             {{ field.display_name }}
             <Button
-              v-tooltip.top="$t('admin.families.editform.fieldDeleteTooltip', { kindName: props.kindName })"
+              v-tooltip.top="$t('cmp.admin.families.editform.fieldDeleteTooltip', { kindName: props.kindName })"
               text
               class="m-0 p-0 ml-2"
               severity="primary"
@@ -54,13 +54,13 @@
                 confirm.require({
                   target: event.currentTarget as HTMLElement,
                   group: 'delete',
-                  message: $t('admin.families.editform.confirmDeleteField'),
+                  message: $t('cmp.admin.families.editform.confirmDeleteField'),
                   objectId: `${field.display_name}`,
                   icon: 'warning',
                   rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
                   acceptClass: 'p-button-sm',
-                  rejectLabel: $t('admin.families.editform.rejectDelete'),
-                  acceptLabel: $t('admin.families.editform.acceptDelete'),
+                  rejectLabel: $t('cmp.admin.families.editform.rejectDelete'),
+                  acceptLabel: $t('cmp.admin.families.editform.acceptDelete'),
                   reject: () => {},
                   accept: () => onFieldDelete(field.key),
                 } as ExtendedConfirmationOptions)"
@@ -77,17 +77,17 @@
               style="min-width: 50%;"
             >
               <span class="flex items-center gap-2 grow">
-                <label :for="'display_name_' + index">{{ $t('admin.families.editform.fieldTitle') }}:</label>
+                <label :for="'display_name_' + index">{{ $t('cmp.admin.families.editform.fieldTitle') }}:</label>
                 <InputText
                   :id="'display_name_' + index"
                   v-model="field.display_name"
                   :variant="hasFieldAttributeBeenEdited(index, 'display_name') ? 'filled' : 'outlined'"
                   :invalid="!field.display_name"
                   class="mr-6 grow"
-                  :placeholder="$t('admin.families.editform.fieldTitlePlaceholder')"
+                  :placeholder="$t('cmp.admin.families.editform.fieldTitlePlaceholder')"
                 />
                 <Button
-                  :label="$t('admin.families.editform.editKey')"
+                  :label="$t('cmp.admin.families.editform.editKey')"
                   outlined
                   @click="() => {
                     editKeyField = field
@@ -98,7 +98,7 @@
               </span>
 
               <span class="flex items-center gap-2">
-                <label :for="'field_type_' + index">{{ $t('admin.families.editform.fieldType') }}: </label>
+                <label :for="'field_type_' + index">{{ $t('cmp.admin.families.editform.fieldType') }}: </label>
                 <Select
                   :id="'field_type_' + index"
                   v-model="field.field_type"
@@ -120,7 +120,7 @@
                   v-if="['EnumSingleOption', 'EnumMultiOption'].includes(field.field_type)"
                   :id="'field_type_metadata_' + index"
                   v-model="field.field_type_metadata"
-                  :label="$t('admin.families.editform.options')"
+                  :label="$t('cmp.admin.families.editform.options')"
                   class="border border-black/10"
                   severity="secondary"
                   @click="() => {
@@ -133,7 +133,7 @@
                   v-if="['EventList'].includes(field.field_type)"
                   :id="'field_type_metadata_' + index"
                   v-model="field.field_type_metadata"
-                  :label="$t('admin.families.editform.events')"
+                  :label="$t('cmp.admin.families.editform.events')"
                   class="border border-black/10"
                   severity="secondary"
                   @click="() => {
@@ -143,12 +143,12 @@
                   }"
                 />
                 <Badge
-                  v-tooltip.bottom="$t('admin.families.editform.fieldChangeWarning')"
+                  v-tooltip.bottom="$t('cmp.admin.families.editform.fieldChangeWarning')"
                   value="!"
                 />
               </span>
               <span class="flex items-center gap-2">
-                <label :for="'help_' + index">{{ $t('admin.families.editform.helpText') }}:</label>
+                <label :for="'help_' + index">{{ $t('cmp.admin.families.editform.helpText') }}:</label>
                 <Textarea
                   :id="'help_' + index"
                   v-model="field.help"
@@ -162,7 +162,7 @@
 
             <div class="flex flex-col gap-4">
               <span class="flex items-center gap-2">
-                <label :for="'display_weight_' + index">{{ $t('admin.families.editform.displayOrder') }}: </label>
+                <label :for="'display_weight_' + index">{{ $t('cmp.admin.families.editform.displayOrder') }}: </label>
                 <Select
                   :id="'display_weight_' + index"
                   :model-value="display_indexes[field.key]"
@@ -176,7 +176,7 @@
                 <AdminInputSwitchField
                   :id="'mandatory_' + index"
                   v-model="field.mandatory"
-                  :label="$t('admin.families.editform.required')"
+                  :label="$t('cmp.admin.families.editform.required')"
                   :variant="hasFieldAttributeBeenEdited(index, 'mandatory')"
                   :disabled="field.field_type == 'Boolean'"
                 />
@@ -185,7 +185,7 @@
                   v-if="kind == 'entity' && indexableTypes.includes(field.field_type)"
                   :id="'indexed_' + index"
                   v-model="field.indexed"
-                  :label="searchableTypes.includes(field.field_type) ? $t('admin.families.editform.searchable') : $t('admin.families.editform.filterable')"
+                  :label="searchableTypes.includes(field.field_type) ? $t('cmp.admin.families.editform.searchable') : $t('cmp.admin.families.editform.filterable')"
                   :variant="hasFieldAttributeBeenEdited(index, 'indexed')"
                   :disabled="display_indexes[field.key]=='notDisplayed'
                     && searchableTypes.includes(field.field_type)"
@@ -196,7 +196,7 @@
                   v-if="kind == 'entity' && filterableTypes.includes(field.field_type)"
                   :id="'privately_indexed_' + index"
                   v-model="field.privately_indexed"
-                  :label="$t('admin.families.editform.adminFilterOnly')"
+                  :label="$t('cmp.admin.families.editform.adminFilterOnly')"
                   :variant="hasFieldAttributeBeenEdited(index, 'privately_indexed')"
                   :disabled="display_indexes[field.key] == 'notDisplayed' || !field.indexed"
                   @update:model-value="onIndexableChange(field)"
@@ -206,7 +206,7 @@
                 <AdminInputSwitchField
                   :id="'is_categories_restricted_' + index"
                   :model-value="!(field.categories == null)"
-                  :label="$t('admin.families.editform.restrictedByCategories')"
+                  :label="$t('cmp.admin.families.editform.restrictedByCategories')"
                   :variant="hasFieldAttributeBeenEdited(index, 'categories')"
                   @update:model-value="(is_categories_restricted: boolean) => {
                     if (is_categories_restricted) { field.categories = [] }
@@ -218,7 +218,7 @@
                   :id="'field_type_' + index"
                   v-model="field.categories"
                   :max-selected-labels="1"
-                  :selected-items-label="$t('admin.families.editform.selectedCategories')"
+                  :selected-items-label="$t('cmp.admin.families.editform.selectedCategories')"
                   class="w-full"
                   :options="props.categories"
                   option-label="title"
@@ -235,7 +235,7 @@
             outlined
             rounded
             severity="primary"
-            :label="$t('admin.families.editform.newField')"
+            :label="$t('cmp.admin.families.editform.newField')"
             @click="() => {
               addFieldFormPage = page
               addFieldVisible = true
@@ -256,14 +256,14 @@
       <span class="flex gap-1 justify-end">
         <NuxtLink to="/admin/families">
           <Button
-            :label="$t('admin.families.editform.cancel')"
+            :label="$t('cmp.admin.families.editform.cancel')"
             severity="secondary"
             :loading="processingRequest"
             :disabled="processingRequest"
           />
         </NuxtLink>
         <Button
-          :label="$t('admin.families.editform.save')"
+          :label="$t('cmp.admin.families.editform.save')"
           type="submit"
           :loading="processingRequest"
           :disabled="processingRequest || anyFieldTitleOrKeyEmpty"
@@ -278,7 +278,7 @@
       modal
       dismissable-mask
       :closable="false"
-      :header="$t('admin.families.editform.editFieldOptions', { display_name: editOptionsField!.display_name })"
+      :header="$t('cmp.admin.families.editform.editFieldOptions', { display_name: editOptionsField!.display_name })"
     >
       <div class="flex flex-col gap-4">
         <div
@@ -286,32 +286,32 @@
           :key="index"
           class="flex items-center gap-2"
         >
-          <label :for="'option_label_' + index">{{ $t('admin.families.editform.optionLabel') }}:</label>
+          <label :for="'option_label_' + index">{{ $t('cmp.admin.families.editform.optionLabel') }}:</label>
           <InputText
             :id="'option_label_' + index"
             v-model="option.label"
-            :placeholder="$t('admin.families.editform.optionLabelPlaceholder')"
+            :placeholder="$t('cmp.admin.families.editform.optionLabelPlaceholder')"
           />
           <label
-            v-tooltip.bottom="$t('admin.families.editform.optionHiddenTooltip')"
+            v-tooltip.bottom="$t('cmp.admin.families.editform.optionHiddenTooltip')"
             :for="'option_hidden_' + index"
-          >{{ $t('admin.families.editform.hidden') }}:</label>
+          >{{ $t('cmp.admin.families.editform.hidden') }}:</label>
           <ToggleSwitch
             :id="'option_hidden_' + index"
             v-model="option.hidden"
           />
-          <label :for="'option_value_' + index">{{ $t('admin.families.editform.optionKey') }}:</label>
+          <label :for="'option_value_' + index">{{ $t('cmp.admin.families.editform.optionKey') }}:</label>
           <InputText
             :id="'option_value_' + index"
             v-model="option.value"
-            :placeholder="$t('admin.families.editform.optionKeyPlaceholder')"
+            :placeholder="$t('cmp.admin.families.editform.optionKeyPlaceholder')"
           />
           <Badge
-            v-tooltip.bottom="$t('admin.families.editform.optionKeyWarning', { kindName: props.kindName })"
+            v-tooltip.bottom="$t('cmp.admin.families.editform.optionKeyWarning', { kindName: props.kindName })"
             value="!"
           />
           <Button
-            v-tooltip.top="$t('admin.families.editform.optionDeleteTooltip', { kindName: props.kindName })"
+            v-tooltip.top="$t('cmp.admin.families.editform.optionDeleteTooltip', { kindName: props.kindName })"
             rounded
             outlined
             class="m-0 p-1 ml-2"
@@ -329,7 +329,7 @@
         <span class="flex justify-center">
           <Button
             type="button"
-            :label="$t('admin.families.editform.addOption')"
+            :label="$t('cmp.admin.families.editform.addOption')"
             @click="editOptionsOptions.push({ label: '', value: '', hidden: false })"
           />
         </span>
@@ -337,13 +337,13 @@
         <div class="flex justify-end gap-2">
           <Button
             type="button"
-            :label="$t('admin.families.editform.cancel')"
+            :label="$t('cmp.admin.families.editform.cancel')"
             severity="secondary"
             @click="editOptionsVisible = false"
           />
           <Button
             type="button"
-            :label="$t('admin.families.editform.confirm')"
+            :label="$t('cmp.admin.families.editform.confirm')"
             @click="() => {
               editOptionsField!.field_type_metadata = { options: editOptionsOptions }
               editOptionsVisible = false
@@ -359,7 +359,7 @@
       modal
       dismissable-mask
       :closable="false"
-      :header="$t('admin.families.editform.editFieldEvents', { display_name: editEventsField!.display_name })"
+      :header="$t('cmp.admin.families.editform.editFieldEvents', { display_name: editEventsField!.display_name })"
     >
       <div class="flex flex-col gap-4">
         <div
@@ -367,13 +367,13 @@
           :key="index"
           class="flex items-center gap-2"
         >
-          <label :for="'event_label_' + index">{{ $t('admin.families.editform.eventLabel') }}:</label>
+          <label :for="'event_label_' + index">{{ $t('cmp.admin.families.editform.eventLabel') }}:</label>
           <InputText
             :id="'event_label_' + index"
             v-model="event.label"
-            :placeholder="$t('admin.families.editform.eventLabelPlaceholder')"
+            :placeholder="$t('cmp.admin.families.editform.eventLabelPlaceholder')"
           />
-          <label :for="'event_color_' + index">{{ $t('admin.families.editform.eventColor') }}:</label>
+          <label :for="'event_color_' + index">{{ $t('cmp.admin.families.editform.eventColor') }}:</label>
           <InputText
             :id="'event_color_' + index"
             v-model="event.color"
@@ -383,18 +383,18 @@
             v-model="event.color"
             format="hex"
           />
-          <label :for="'event_value_' + index">{{ $t('admin.families.editform.eventKey') }}:</label>
+          <label :for="'event_value_' + index">{{ $t('cmp.admin.families.editform.eventKey') }}:</label>
           <InputText
             :id="'event_value_' + index"
             v-model="event.value"
-            :placeholder="$t('admin.families.editform.eventKeyPlaceholder')"
+            :placeholder="$t('cmp.admin.families.editform.eventKeyPlaceholder')"
           />
           <Badge
-            v-tooltip.bottom="$t('admin.families.editform.eventKeyWarning', { kindName: props.kindName })"
+            v-tooltip.bottom="$t('cmp.admin.families.editform.eventKeyWarning', { kindName: props.kindName })"
             value="!"
           />
           <Button
-            v-tooltip.top="$t('admin.families.editform.eventDeleteTooltip', { kindName: props.kindName })"
+            v-tooltip.top="$t('cmp.admin.families.editform.eventDeleteTooltip', { kindName: props.kindName })"
             rounded
             outlined
             class="m-0 p-1 ml-2"
@@ -412,7 +412,7 @@
         <span class="flex justify-center">
           <Button
             type="button"
-            :label="$t('admin.families.editform.addEvent')"
+            :label="$t('cmp.admin.families.editform.addEvent')"
             @click="editEventsEvents.push({ label: '', value: '', color: '#FFFFFF' })"
           />
         </span>
@@ -420,13 +420,13 @@
         <div class="flex justify-end gap-2">
           <Button
             type="button"
-            :label="$t('admin.families.editform.cancel')"
+            :label="$t('cmp.admin.families.editform.cancel')"
             severity="secondary"
             @click="editEventsVisible = false"
           />
           <Button
             type="button"
-            :label="$t('admin.families.editform.confirm')"
+            :label="$t('cmp.admin.families.editform.confirm')"
             @click="() => {
               editEventsField!.field_type_metadata = { event_types: editEventsEvents }
               editEventsVisible = false
@@ -442,42 +442,42 @@
       modal
       dismissable-mask
       :closable="false"
-      :header="$t('admin.families.editform.editFieldKey', { display_name: editKeyField!.display_name })"
+      :header="$t('cmp.admin.families.editform.editFieldKey', { display_name: editKeyField!.display_name })"
     >
       <div class="flex flex-col gap-4">
         <span class="flex items-center gap-2">
-          <label for="display_name_add">{{ $t('admin.families.editform.fieldTitle') }}:</label>
+          <label for="display_name_add">{{ $t('cmp.admin.families.editform.fieldTitle') }}:</label>
           <InputText
             id="display_name_add"
             v-model="editKeyField!.display_name"
             :invalid="!editKeyField!.display_name"
-            :placeholder="$t('admin.families.editform.fieldTitlePlaceholder')"
+            :placeholder="$t('cmp.admin.families.editform.fieldTitlePlaceholder')"
           />
         </span>
         <span class="flex items-center gap-2 ml-2">
-          <label for="key_add">{{ $t('admin.families.editform.fieldKey') }}:</label>
+          <label for="key_add">{{ $t('cmp.admin.families.editform.fieldKey') }}:</label>
           <InputText
             id="key_add"
             v-model="editKeyKey"
             :invalid="!editKeyKey"
-            :placeholder="$t('admin.families.editform.fieldKeyPlaceholder')"
+            :placeholder="$t('cmp.admin.families.editform.fieldKeyPlaceholder')"
           />
           <Badge
-            v-tooltip.bottom="$t('admin.families.editform.keyWarning', { kindName: props.kindName })"
+            v-tooltip.bottom="$t('cmp.admin.families.editform.keyWarning', { kindName: props.kindName })"
             value="!"
           />
         </span>
         <div class="flex justify-end gap-2">
           <Button
             type="button"
-            :label="$t('admin.families.editform.cancel')"
+            :label="$t('cmp.admin.families.editform.cancel')"
             severity="secondary"
             @click="editKeyVisible = false"
           />
           <Button
             :disabled="!editKeyKey || !editKeyField?.display_name"
             type="button"
-            :label="$t('admin.families.editform.confirm')"
+            :label="$t('cmp.admin.families.editform.confirm')"
             @click="() => onKeyChange(editKeyField!, editKeyKey)"
           />
         </div>
@@ -489,42 +489,42 @@
       modal
       dismissable-mask
       :closable="false"
-      :header="$t('admin.families.editform.addNewField')"
+      :header="$t('cmp.admin.families.editform.addNewField')"
     >
       <div class="flex flex-col gap-4">
         <span class="flex items-center gap-2">
-          <label for="display_name_add">{{ $t('admin.families.editform.fieldTitle') }}:</label>
+          <label for="display_name_add">{{ $t('cmp.admin.families.editform.fieldTitle') }}:</label>
           <InputText
             id="display_name_add"
             v-model="addFieldTitle"
             :invalid="!addFieldTitle"
-            :placeholder="$t('admin.families.editform.fieldTitlePlaceholder')"
+            :placeholder="$t('cmp.admin.families.editform.fieldTitlePlaceholder')"
           />
         </span>
         <span class="flex items-center gap-2 ml-2">
-          <label for="key_add">{{ $t('admin.families.editform.fieldKey') }}:</label>
+          <label for="key_add">{{ $t('cmp.admin.families.editform.fieldKey') }}:</label>
           <InputText
             id="key_add"
             v-model="addFieldKey"
             :invalid="!addFieldKey"
-            :placeholder="$t('admin.families.editform.fieldKeyPlaceholder')"
+            :placeholder="$t('cmp.admin.families.editform.fieldKeyPlaceholder')"
           />
           <Badge
-            v-tooltip.bottom="$t('admin.families.editform.keyWarning', { kindName: props.kindName })"
+            v-tooltip.bottom="$t('cmp.admin.families.editform.keyWarning', { kindName: props.kindName })"
             value="!"
           />
         </span>
         <div class="flex justify-end gap-2">
           <Button
             type="button"
-            :label="$t('admin.families.editform.cancel')"
+            :label="$t('cmp.admin.families.editform.cancel')"
             severity="secondary"
             @click="addFieldVisible = false"
           />
           <Button
             :disabled="!addFieldKey || !addFieldTitle"
             type="button"
-            :label="$t('admin.families.editform.confirm')"
+            :label="$t('cmp.admin.families.editform.confirm')"
             @click="() => onFieldAdd(addFieldKey, addFieldTitle, addFieldFormPage)"
           />
         </div>
@@ -679,7 +679,7 @@ function onKeyChange(field_to_modify: FormField, new_key: string) {
   }
   for (const field of edited_form_fields.value) {
     if (field.key == new_key) {
-      toast.add({ severity: 'error', summary: t('admin.families.editform.error'), detail: t('admin.families.editform.keyAlreadyInUse'), life: 3000 })
+      toast.add({ severity: 'error', summary: t('cmp.admin.families.editform.error'), detail: t('cmp.admin.families.editform.keyAlreadyInUse'), life: 3000 })
       return
     }
   }
@@ -786,7 +786,7 @@ function onFieldDelete(key: string) {
 function onFieldAdd(key: string, title: string, form_page: number) {
   edited_form_fields.value.forEach((field) => {
     if (field.key == key) {
-      toast.add({ severity: 'error', summary: t('admin.families.editform.error'), detail: t('admin.families.editform.keyAlreadyInUse'), life: 3000 })
+      toast.add({ severity: 'error', summary: t('cmp.admin.families.editform.error'), detail: t('cmp.admin.families.editform.keyAlreadyInUse'), life: 3000 })
       return
     }
   })
@@ -836,32 +836,32 @@ async function onSave() {
       throw error
     }
     navigateTo('/admin/families')
-    toast.add({ severity: 'success', summary: t('admin.families.editform.success'), detail: t('admin.families.editform.familyUpdatedSuccess'), life: 3000 })
+    toast.add({ severity: 'success', summary: t('cmp.admin.families.editform.success'), detail: t('cmp.admin.families.editform.familyUpdatedSuccess'), life: 3000 })
   }
   catch {
-    toast.add({ severity: 'error', summary: t('admin.families.editform.error'), detail: t('admin.families.editform.familyUpdateError'), life: 3000 })
+    toast.add({ severity: 'error', summary: t('cmp.admin.families.editform.error'), detail: t('cmp.admin.families.editform.familyUpdateError'), life: 3000 })
   }
   processingRequest.value = false
 }
 
 const fieldTypeOptions = [
-  { label: t('admin.families.editform.fieldTypeSingleLineText'), value: 'SingleLineText' },
-  { label: t('admin.families.editform.fieldTypeMultiLineText'), value: 'MultiLineText' },
-  { label: t('admin.families.editform.fieldTypeRichText'), value: 'RichText' },
-  { label: t('admin.families.editform.fieldTypeBoolean'), value: 'Boolean' },
-  { label: t('admin.families.editform.fieldTypeNumber'), value: 'Number' },
-  { label: t('admin.families.editform.fieldTypeDiscreteScore'), value: 'DiscreteScore' },
-  { label: t('admin.families.editform.fieldTypeDate'), value: 'Date' },
-  { label: t('admin.families.editform.fieldTypeSingleOption'), value: 'EnumSingleOption' },
-  { label: t('admin.families.editform.fieldTypeMultiOption'), value: 'EnumMultiOption' },
-  { label: t('admin.families.editform.fieldTypeEventList'), value: 'EventList' },
+  { label: t('cmp.admin.families.editform.fieldTypeSingleLineText'), value: 'SingleLineText' },
+  { label: t('cmp.admin.families.editform.fieldTypeMultiLineText'), value: 'MultiLineText' },
+  { label: t('cmp.admin.families.editform.fieldTypeRichText'), value: 'RichText' },
+  { label: t('cmp.admin.families.editform.fieldTypeBoolean'), value: 'Boolean' },
+  { label: t('cmp.admin.families.editform.fieldTypeNumber'), value: 'Number' },
+  { label: t('cmp.admin.families.editform.fieldTypeDiscreteScore'), value: 'DiscreteScore' },
+  { label: t('cmp.admin.families.editform.fieldTypeDate'), value: 'Date' },
+  { label: t('cmp.admin.families.editform.fieldTypeSingleOption'), value: 'EnumSingleOption' },
+  { label: t('cmp.admin.families.editform.fieldTypeMultiOption'), value: 'EnumMultiOption' },
+  { label: t('cmp.admin.families.editform.fieldTypeEventList'), value: 'EventList' },
 ]
 
 const fieldStringTypeOptions = [
-  { label: t('admin.families.editform.stringTypeNone'), value: 'none' },
-  { label: t('admin.families.editform.stringTypeUrl'), value: 'url' },
-  { label: t('admin.families.editform.stringTypePhone'), value: 'phone-number' },
-  { label: t('admin.families.editform.stringTypeEmail'), value: 'e-mail' },
+  { label: t('cmp.admin.families.editform.stringTypeNone'), value: 'none' },
+  { label: t('cmp.admin.families.editform.stringTypeUrl'), value: 'url' },
+  { label: t('cmp.admin.families.editform.stringTypePhone'), value: 'phone-number' },
+  { label: t('cmp.admin.families.editform.stringTypeEmail'), value: 'e-mail' },
 ]
 </script>
 

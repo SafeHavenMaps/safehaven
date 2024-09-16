@@ -345,8 +345,6 @@ async function realOnSave(token: string | null) {
 
 const confirm = useConfirm()
 function onIncludeCommentToggle(event: Event) {
-  console.log(event)
-  console.log(event.currentTarget as HTMLElement)
   if (!include_comment.value) {
     include_comment.value = true
   }

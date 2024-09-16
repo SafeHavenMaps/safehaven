@@ -1,12 +1,12 @@
 <template>
   <div class="flex flex-col gap-2">
-    <label for="category_id">Catégorie <RequiredIndicator /></label>
+    <label for="category_id">{{ $t('cmp.form.categorySelect.category') }} <RequiredIndicator /></label>
     <Select
       id="category_id"
       :model-value="props.modelValue"
       :options="categories"
-      label="Catégorie"
-      placeholder="Sélectionner une catégorie"
+      :label="$t('cmp.form.categorySelect.category')"
+      :placeholder="$t('cmp.form.categorySelect.selectCategory')"
       option-value="id"
       @update:model-value="updateValue"
     >

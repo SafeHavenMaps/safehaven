@@ -72,6 +72,7 @@ import state from '~/lib/viewer-state'
 import ViewerMap from '~/components/viewer/Map.vue'
 
 const toast = useToast()
+const { t } = useI18n()
 
 // Init state with url token
 const route = useRoute()
@@ -84,8 +85,8 @@ try {
 catch {
   toast.add({
     severity: 'error',
-    summary: $t('viewer.error.error'),
-    detail: $t('viewer.error.couldNotLoadMap'),
+    summary: t('cmp.viewer.error.error'),
+    detail: t('cmp.viewer.error.couldNotLoadMap'),
     life: 3000,
   })
   if (state.redirectUrl) {

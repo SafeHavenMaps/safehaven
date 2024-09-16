@@ -99,7 +99,7 @@
 
               <Button
                 v-if="state.permissions?.can_add_entity"
-                :label="$t('viewer.navbar.add')"
+                :label="$t('cmp.viewer.navbar.add')"
                 severity="info"
                 @click="openAddModal()"
               >
@@ -112,7 +112,7 @@
 
               <Button
                 v-if="props.showCategorySwitcher"
-                :label="$t('viewer.navbar.filters')"
+                :label="$t('cmp.viewer.navbar.filters')"
                 severity="primary"
                 @click="openFilterPopup()"
               >
@@ -163,7 +163,7 @@
 
           <Button
             v-if="state.permissions?.can_add_entity"
-            :label="$t('viewer.navbar.add')"
+            :label="$t('cmp.viewer.navbar.add')"
             severity="info"
             @click="openAddModal()"
           >
@@ -176,7 +176,7 @@
 
           <Button
             v-if="props.showCategorySwitcher"
-            :label="$t('viewer.navbar.filters')"
+            :label="$t('cmp.viewer.navbar.filters')"
             severity="primary"
             @click="openFilterPanel"
           >

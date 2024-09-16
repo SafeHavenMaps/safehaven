@@ -3,7 +3,7 @@
     <Button
       outlined
       severity="success"
-      label="Ajouter une adresse"
+      :label="$t('cmp.form.adresses.addAddress')"
       @click="addNewAddress"
     />
   </div>
@@ -14,7 +14,7 @@
   >
     <Column
       field="plain_text"
-      header="Adresses"
+      :header="$t('cmp.form.adresses.addresses')"
       sortable
     />
     <Column>
@@ -49,7 +49,7 @@
 
   <Dialog
     v-model:visible="displayNominatimPicker"
-    header="Sélectionner une adresse"
+    :header="$t('cmp.form.adresses.selectAddress')"
     :modal="true"
     :closable="false"
     dismissable-mask
@@ -61,12 +61,12 @@
     />
     <template #footer>
       <Button
-        label="Annuler"
+        :label="$t('cmp.form.adresses.cancel')"
         severity="secondary"
         @click="displayNominatimPicker = false"
       />
       <Button
-        label="Sélectionner"
+        :label="$t('cmp.form.adresses.select')"
         :disabled="!addressSelected"
         @click="applyAddressChanges"
       />
@@ -84,6 +84,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:locations'])
 
 const toast = useToast()
+const { t } = useI18n()
 
 const currentlyEditedLocation = ref<{ index: number, loc: UnprocessedLocation } | null>(null)
 const displayNominatimPicker = ref(false)
@@ -110,7 +111,7 @@ function editAddress(index: number) {
 function applyAddressChanges() {
   if (addressSelected.value) {
     if (props.locations.some(loc => loc.plain_text == currentlyEditedLocation.value!.loc.plain_text))
-      toast.add({ severity: 'error', summary: 'Erreur', detail: `Addresse déjà présente`, life: 3000 })
+      toast.add({ severity: 'error', summary: t('cmp.form.adresses.error'), detail: t('cmp.form.adresses.addressAlreadyExists'), life: 3000 })
     else {
       const updatedLocations = [...props.locations]
       updatedLocations[currentlyEditedLocation.value!.index] = { ...currentlyEditedLocation.value!.loc }
