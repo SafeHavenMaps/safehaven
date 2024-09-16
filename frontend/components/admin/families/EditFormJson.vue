@@ -6,10 +6,7 @@
       @submit.prevent="onSync"
     >
       <p class="text-muted-color">
-        Édition directe du formulaire d'ajout en .json, utile pour l'import/export.
-        Ne réalisez d'autres changements par ce biais que si vous comprenez précisément la structure du formulaire.
-        Pour sauvegarder, utilisez le bouton de prévisualisation, qui vous permettra d'abord de vérifier vos changements dans l'outil d'édition visuelle.
-        Tout changement réalisé dans l'éditeur visuel auparavant et non sauvegardé sera écrasé.
+        {{ $t('admin.families.editformjson.description') }}
       </p>
       <!-- @submit.prevent="onSave" -->
       <VAceEditor
@@ -22,7 +19,7 @@
       />
       <span class="flex gap-1 justify-content-end">
         <Button
-          label="Import"
+          :label="$t('admin.families.editformjson.import')"
           severity="info"
           @click="triggerImport"
         >
@@ -45,7 +42,7 @@
           download="formFields.json"
         >
           <Button
-            label="Export"
+            :label="$t('admin.families.editformjson.export')"
             severity="info"
             @click="onExport"
           >
@@ -62,12 +59,12 @@
       <span class="flex gap-1 justify-content-end">
         <NuxtLink to="/admin/families">
           <Button
-            label="Annuler"
+            :label="$t('admin.families.editform.cancel')"
             severity="secondary"
           />
         </NuxtLink>
         <Button
-          label="Synchroniser et prévisualiser"
+          :label="$t('admin.families.editformjson.syncAndPreview')"
           type="submit"
         />
       </span>
@@ -99,6 +96,7 @@ const props = defineProps<{
 }>()
 
 const toast = useToast()
+const { t } = useI18n()
 
 const editedFormFields: FormField[] = JSON.parse(JSON.stringify(toRaw(props.originalFormFields))) // deep copy
 editedFormFields.sort((field_a, field_b) => field_a.form_weight - field_b.form_weight)
@@ -124,15 +122,15 @@ function onImport(event: Event) {
           editorContent.value = JSON.stringify(JSON.parse(result), null, 2)
         }
         catch {
-          toast.add({ severity: 'error', summary: 'Erreur', detail: `Le fichier importé ne possède pas une structure .json correcte`, life: 3000 })
+          toast.add({ severity: 'error', summary: t('admin.families.editform.error'), detail: t('admin.families.editformjson.invalidJson'), life: 3000 })
         }
       }
       reader.readAsText(file)
-      toast.add({ severity: 'success', summary: 'Succès', detail: `Le fichier a été importé avec succès. Les changements ne sont pas encore sauvegardés.`, life: 3000 })
+      toast.add({ severity: 'success', summary: t('admin.families.editform.success'), detail: t('admin.families.editformjson.importSuccess'), life: 3000 })
     }
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: `Le fichier n'a pas pu être importé`, life: 3000 })
+    toast.add({ severity: 'error', summary: t('admin.families.editform.error'), detail: t('admin.families.editformjson.importError'), life: 3000 })
   }
 }
 
@@ -152,10 +150,10 @@ async function onSync() {
   try {
     const newFormFields = JSON.parse(editorContent.value)
     await props.onSyncCallback(newFormFields as FormField[])
-    toast.add({ severity: 'success', summary: 'Succès', detail: `Synchronisation réussie, veuillez vérifier vos changements puis sauvegarder`, life: 3000 })
+    toast.add({ severity: 'success', summary: t('admin.families.editform.success'), detail: t('admin.families.editformjson.syncSuccess'), life: 3000 })
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: `Erreur de synchronisation. Votre .json est-il syntaxiquement correct?`, life: 3000 })
+    toast.add({ severity: 'error', summary: t('admin.families.editform.error'), detail: t('admin.families.editformjson.syncError'), life: 3000 })
   }
 }
 
