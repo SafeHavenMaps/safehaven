@@ -1,0 +1,12 @@
+{
+    "viewer": {
+        "navbar": {
+            "add": "Add",
+            "filters": "Filters"
+        },
+        "errors": {
+            "Error": "Error",
+            "CouldNotLoadMap": "Could not load the map"
+        }
+    }
+}

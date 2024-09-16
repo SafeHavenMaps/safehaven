@@ -99,7 +99,7 @@
 
               <Button
                 v-if="state.permissions?.can_add_entity"
-                label="Ajouter"
+                :label="$t('viewer.navbar.add')"
                 severity="info"
                 @click="openAddModal()"
               >
@@ -112,7 +112,7 @@
 
               <Button
                 v-if="props.showCategorySwitcher"
-                label="Filtres"
+                :label="$t('viewer.navbar.filters')"
                 severity="primary"
                 @click="openFilterPopup()"
               >
@@ -163,7 +163,7 @@
 
           <Button
             v-if="state.permissions?.can_add_entity"
-            label="Ajouter"
+            :label="$t('viewer.navbar.add')"
             severity="info"
             @click="openAddModal()"
           >
@@ -176,7 +176,7 @@
 
           <Button
             v-if="props.showCategorySwitcher"
-            label="Filtres"
+            :label="$t('viewer.navbar.filters')"
             severity="primary"
             @click="openFilterPanel"
           >
@@ -204,6 +204,16 @@
           >
             <template #icon>
               <AppIcon icon-name="lightDark" />
+            </template>
+          </Button>
+
+          <Button
+            severity="secondary"
+            outlined
+          >
+            <!-- TODO: Open a popover with a LocaleMenu inside to change the active locale of the app  -->
+            <template #icon>
+              <AppIcon icon-name="i18n" />
             </template>
           </Button>
         </div>

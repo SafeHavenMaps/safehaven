@@ -1,0 +1,12 @@
+{
+    "viewer": {
+        "navbar": {
+            "add": "Ajouter",
+            "filters": "Filtres"
+        },
+        "errors": {
+            "error": "Erreur",
+            "couldNotLoadMap": "Impossible de charger la carte"
+        }
+    }
+}

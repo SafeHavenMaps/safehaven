@@ -84,8 +84,8 @@ try {
 catch {
   toast.add({
     severity: 'error',
-    summary: 'Erreur',
-    detail: 'Impossible de charger la carte',
+    summary: $t('viewer.error.error'),
+    detail: $t('viewer.error.couldNotLoadMap'),
     life: 3000,
   })
   if (state.redirectUrl) {
