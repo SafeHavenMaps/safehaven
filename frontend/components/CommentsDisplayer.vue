@@ -10,12 +10,12 @@
           {{ comment.author }} - {{ new Date(comment.created_at).toLocaleDateString() }}
           <Tag
             v-if="!public && !(comment as AdminComment).moderated"
-            value="À modérer"
+            :value="$t('cmp.commentDisplayer.toModerate')"
           />
           <AdminEditDeleteButtons
             v-if="!public"
             :id="comment.id"
-            model-name="du commentaire"
+            :model-name="$t('cmp.commentDisplayer.commentModelName')"
             :loading="false"
             :name="`de ${comment.author}`"
             class="ml-auto mr-2"

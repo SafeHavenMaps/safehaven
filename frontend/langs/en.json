@@ -1,13 +1,118 @@
 {
   "cmp": {
     "viewer": {
+      "common": {
+        "entityDisplayer": {
+          "attached": "Attached",
+          "information": "Information",
+          "attachments": "Attachments",
+          "comments": "Comments",
+          "view": "View",
+          "addresses": "Addresses",
+          "address": "Address",
+          "notes": "Notes"
+        },
+        "formFields": {
+          "yes": "✅ Yes",
+          "no": "❌ No",
+          "date": "Date",
+          "comment": "Comment"
+        }
+      },
+      "commentAddForm": {
+        "newComment": "New comment",
+        "addComment": "Add a comment",
+        "author": "Author",
+        "commentText": "Comment text",
+        "previous": "Previous",
+        "next": "Next",
+        "save": "Save",
+        "captchaCheck": "Hold on a second, we need to verify you're not a robot...",
+        "captchaExpired": "The captcha has expired",
+        "captchaValidationError": "Captcha validation error",
+        "success": "Success",
+        "commentSuccess": "Comment successfully updated",
+        "error": "Error",
+        "commentError": "Error updating the comment",
+        "page": "Page"
+      },
+      "entityAddForm": {
+        "displayName": "Display Name",
+        "includeComment": "Include a comment",
+        "author": "Author",
+        "commentText": "Comment Text",
+        "captchaCheck": "Hold on a second, we need to verify you're not a robot...",
+        "captchaExpired": "The captcha has expired",
+        "captchaValidationError": "Captcha validation error",
+        "success": "Success",
+        "entitySuccess": "Entity successfully added",
+        "entityAndCommentSuccess": "Entity and comment successfully added",
+        "error": "Error",
+        "entityError": "Error adding the entity",
+        "entityAndCommentError": "Error adding the entity or comment",
+        "previous": "Previous",
+        "next": "Next",
+        "save": "Save"
+      },
+      "filterConfig": {
+        "general": "General",
+        "tags": "Tags",
+        "constraints": "Constraints",
+        "categories": "Categories",
+        "invert": "Invert",
+        "selectAll": "Select All",
+        "reset": "Reset",
+        "filters": "Filters",
+        "hidden": "Hidden",
+        "displayed": "Displayed",
+        "required": "Required",
+        "searchTag": "Search Tag",
+        "clearSearch": "Clear Search",
+        "clearFilters": "Clear All Filters"
+      },
+      "fullResult": {
+        "noGeo": "No geographic location",
+        "viewDetails": "View details"
+      },
+      "information": {
+        "safeHaven": "SafeHaven",
+        "safeHavenDescription": "SafeHaven is an open-source solution for creating collaborative maps.<br>You can easily create your own map!",
+        "discoverOnGitHub": "Discover on GitHub"
+      },
+      "map": {
+        "error": "Error",
+        "refreshError": "Unable to refresh the map",
+        "entityLoadError": "Unable to load the selected entity"
+      },
       "navbar": {
         "add": "Add",
-        "filters": "Filters"
+        "filters": "Filters",
+        "mapMode": "Switch to map mode",
+        "listMode": "Switch to list mode",
+        "info": "Info",
+        "search": "Search",
+        "darkMode": "Dark/Light Mode",
+        "searchPoint": "Search for a point",
+        "searchPlace": "Search for a place",
+        "searchPlaceholder": "Type your search here",
+        "searchPointOnMap": "Search for a point on the map",
+        "minChars": "4 characters minimum",
+        "placeSearchPlaceholder": "Tours, France",
+        "searchPlaceOrAddress": "Search for a city, place, or address",
+        "noResults": "No results found",
+        "information": "Information",
+        "error": "Error",
+        "resultsLoadError": "Unable to load results",
+        "noKnownAddress": "No known address",
+        "searchWithNominatim": "Search with Nominatim © OpenStreetMap Contributor"
       },
-      "errors": {
-        "Error": "Error",
-        "CouldNotLoadMap": "Could not load the map"
+      "richTextEditor": {
+        "bold": "Bold",
+        "italic": "Italic",
+        "underline": "Underline",
+        "strike": "Strike",
+        "subscript": "Subscript",
+        "superscript": "Superscript"
       }
     },
     "admin": {
@@ -205,6 +310,38 @@
         "emptyFilterMessage": "No results found",
         "placeholder": "Select tags"
       }
+    },
+    "commentDisplayer": {
+      "toModerate": "Awaiting moderation",
+      "commentModelName": "of the comment"
+    },
+    "nominatimPicker": {
+      "searchAddress": "Search for an address",
+      "startSearch": "Start search",
+      "noResults": "No results found",
+      "address": "Address"
+    },
+    "polygonDrawer": {
+      "header": "Define a geographical area",
+      "polygon": "polygon",
+      "polygons": "polygons",
+      "max": "at most",
+      "clear": "Clear",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "requiredIndicator": {
+      "requiredField": "Required field"
+    },
+    "startPopup": {
+      "information": "Information",
+      "validate": "Validate"
+    }
+  },
+  "pages": {
+    "errors": {
+      "Error": "Error",
+      "CouldNotLoadMap": "Could not load the map"
     }
   }
 }

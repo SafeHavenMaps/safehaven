@@ -1,13 +1,118 @@
 {
   "cmp": {
     "viewer": {
+      "common": {
+        "entityDisplayer": {
+          "attached": "Rattachés",
+          "information": "Informations",
+          "attachments": "Rattachements",
+          "comments": "Commentaires",
+          "view": "Voir",
+          "addresses": "Adresses",
+          "address": "Adresse",
+          "notes": "Notes"
+        },
+        "formFields": {
+          "yes": "✅ Oui",
+          "no": "❌ Non",
+          "date": "Date",
+          "comment": "Commentaire"
+        }
+      },
+      "commentAddForm": {
+        "newComment": "Nouveau commentaire",
+        "addComment": "Ajouter un commentaire",
+        "author": "Auteur",
+        "commentText": "Texte du commentaire",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "save": "Sauvegarder",
+        "captchaCheck": "Une petite seconde, on doit vérifier que vous n'êtes pas un robot...",
+        "captchaExpired": "Le captcha a expiré",
+        "captchaValidationError": "Erreur de validation du captcha",
+        "success": "Succès",
+        "commentSuccess": "Commentaire modifié avec succès",
+        "error": "Erreur",
+        "commentError": "Erreur de modification du commentaire",
+        "page": "Page"
+      },
+      "entityAddForm": {
+        "displayName": "Nom d'affichage",
+        "includeComment": "Inclure un commentaire",
+        "author": "Auteur",
+        "commentText": "Texte du commentaire",
+        "captchaCheck": "Une petite seconde, on doit vérifier que vous n'êtes pas un robot...",
+        "captchaExpired": "Le captcha a expiré",
+        "captchaValidationError": "Erreur de validation du captcha",
+        "success": "Succès",
+        "entitySuccess": "Entité ajoutée avec succès",
+        "entityAndCommentSuccess": "Entité et commentaire ajoutés avec succès",
+        "error": "Erreur",
+        "entityError": "Erreur lors de l'ajout de l'entité",
+        "entityAndCommentError": "Erreur lors de l'ajout de l'entité ou du commentaire",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "save": "Sauvegarder"
+      },
+      "filterConfig": {
+        "general": "Général",
+        "tags": "Tags",
+        "constraints": "Contraintes",
+        "categories": "Catégories",
+        "invert": "Inverser",
+        "selectAll": "Tout sélectionner",
+        "reset": "Réinitialiser",
+        "filters": "Filtres",
+        "hidden": "Caché",
+        "displayed": "Affiché",
+        "required": "Requis",
+        "searchTag": "Rechercher un tag",
+        "clearSearch": "Retirer la recherche",
+        "clearFilters": "Retirer tous les filtres"
+      },
+      "fullResult": {
+        "noGeo": "Aucune position géographique",
+        "viewDetails": "Voir en détail"
+      },
+      "information": {
+        "safeHaven": "SafeHaven",
+        "safeHavenDescription": "SafeHaven est une solution opensource de création de carte collaborative.<br>Vous pouvez facilement créer votre carte !",
+        "discoverOnGitHub": "Découvrir sur GitHub"
+      },
+      "map": {
+        "error": "Erreur",
+        "refreshError": "Impossible de rafraîchir la carte",
+        "entityLoadError": "Impossible de charger l'entité sélectionnée"
+      },
       "navbar": {
         "add": "Ajouter",
-        "filters": "Filtres"
+        "filters": "Filtres",
+        "mapMode": "Passage en mode carte",
+        "listMode": "Passage en mode liste",
+        "info": "Info",
+        "search": "Recherche",
+        "darkMode": "Mode sombre/clair",
+        "searchPoint": "Chercher un point",
+        "searchPlace": "Chercher un lieu",
+        "searchPlaceholder": "Tapez votre recherche ici",
+        "searchPointOnMap": "Recherche d'un point sur la carte",
+        "minChars": "4 caractères minimum",
+        "placeSearchPlaceholder": "Tours, France",
+        "searchPlaceOrAddress": "Recherche d'une ville, d'un lieu, d'une adresse",
+        "noResults": "Aucun résultat trouvé",
+        "information": "Informations",
+        "error": "Erreur",
+        "resultsLoadError": "Impossible de charger les résultats",
+        "noKnownAddress": "Aucune adresse connue",
+        "searchWithNominatim": "Recherche avec Nominatim © OpenStreetMap Contributor"
       },
-      "errors": {
-        "Error": "Erreur",
-        "CouldNotLoadMap": "Impossible de charger la carte"
+      "richTextEditor": {
+        "bold": "Gras",
+        "italic": "Italique",
+        "underline": "Souligner",
+        "strike": "Barrer",
+        "subscript": "Indice",
+        "superscript": "Exposant"
       }
     },
     "admin": {
@@ -205,6 +310,38 @@
         "emptyFilterMessage": "Aucun résultat trouvé",
         "placeholder": "Sélectionner des tags"
       }
+    },
+    "commentDisplayer": {
+      "toModerate": "À modérer",
+      "commentModelName": "du commentaire"
+    },
+    "nominatimPicker": {
+      "searchAddress": "Rechercher une adresse",
+      "startSearch": "Lancer la recherche",
+      "noResults": "Aucun résultat trouvé",
+      "address": "Adresse"
+    },
+    "polygonDrawer": {
+      "header": "Délimitez une zone géographique",
+      "polygon": "polygone",
+      "polygons": "polygones",
+      "max": "au plus",
+      "clear": "Effacer",
+      "cancel": "Annuler",
+      "save": "Sauvegarder"
+    },
+    "requiredIndicator": {
+      "requiredField": "Champ requis"
+    },
+    "startPopup": {
+      "information": "Informations",
+      "validate": "Valider"
+    }
+  },
+  "pages": {
+    "errors": {
+      "Error": "Erreur",
+      "CouldNotLoadMap": "Impossible de charger la carte"
     }
   }
 }

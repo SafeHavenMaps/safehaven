@@ -4,10 +4,10 @@
       <InputGroup class="mb-6 mt-2">
         <InputText
           v-model="locationInput"
-          placeholder="Rechercher une adresse"
+          :placeholder="$t('cmp.nominatimPicker.searchAddress')"
         />
         <Button
-          v-tooltip.bottom="'Lancer la recherche'"
+          v-tooltip.bottom="$t('cmp.nominatimPicker.startSearch')"
           severity="primary"
           type="submit"
         >
@@ -20,7 +20,7 @@
 
     <div v-if="!results.length && resultsSearched">
       <Message severity="error">
-        Aucun résultat trouvé
+        {{ $t('cmp.nominatimPicker.noResults') }}
       </Message>
     </div>
     <div
@@ -33,7 +33,9 @@
         category-id="default"
         :zoom="10"
       />
-      <small class="text-secondary flex ">Addresse : {{ results[0].display_name }}</small>
+      <small class="text-secondary flex ">
+        {{ $t('cmp.nominatimPicker.address') }} : {{ results[0].display_name }}
+      </small>
     </div>
   </div>
 </template>

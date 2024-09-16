@@ -1,6 +1,6 @@
 <template>
   <span
-    v-tooltip.bottom="'Champ requis'"
+    v-tooltip.bottom="$t('cmp.requiredIndicator.requiredField')"
     style="color: darkred;"
   >*</span>
 </template>

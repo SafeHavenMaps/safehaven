@@ -4,7 +4,7 @@
     modal
     maximizable
     dismissable-mask
-    header="Délimitez une zone géographique"
+    :header="$t('cmp.polygonDrawer.header')"
     content-class="h-96"
   >
     <div class="flex flex-col gap-1 w-full h-full">
@@ -51,23 +51,24 @@
         <small
           v-if="maxPolygons"
           class="text-muted-color"
-        >{{ maxPolygons }} polygone{{ maxPolygons>1 ? 's' : '' }} au plus</small>
-      </span>
+        >
+          {{ maxPolygons }} {{ maxPolygons>1 ? $t('cmp.polygonDrawer.polygons') : $t('cmp.polygonDrawer.polygon') }} {{ $t('cmp.polygonDrawer.max') }}
+        </small></span>
 
       <span class="flex justify-end items-center gap-2">
         <Button
-          label="Effacer"
+          :label="$t('cmp.polygonDrawer.clear')"
           severity="warn"
           outlined
           @click="clearPolygons"
         />
         <Button
-          label="Annuler"
+          :label="$t('cmp.polygonDrawer.cancel')"
           severity="secondary"
           @click="drawVisible=false"
         />
         <Button
-          label="Sauvegarder"
+          :label="$t('cmp.polygonDrawer.save')"
           @click="save()"
         />
       </span>

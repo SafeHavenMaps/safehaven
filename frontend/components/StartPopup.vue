@@ -4,7 +4,7 @@
     v-if="popupData?.sanitizedContent"
     v-model:visible="visible"
     modal
-    :header="popupData.siteTitle + ` : Informations`"
+    :header="popupData.siteTitle + ` : ` + $t('cmp.startPopup.information')"
     :closable="false"
     :draggable="false"
     :style="{ width: '50rem' }"
@@ -31,7 +31,7 @@
 
     <template #footer>
       <Button
-        label="Valider"
+        :label="$t('cmp.startPopup.validate')"
         text
         severity="primary"
         autofocus

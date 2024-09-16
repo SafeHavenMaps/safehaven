@@ -8,19 +8,19 @@
     <template #toolbar>
       <span class="ql-formats">
         <button
-          v-tooltip.bottom="'Gras'"
+          v-tooltip.bottom="$t('cmp.viewer.richTextEditor.bold')"
           class="ql-bold"
         />
         <button
-          v-tooltip.bottom="'Italique'"
+          v-tooltip.bottom="$t('cmp.viewer.richTextEditor.italic')"
           class="ql-italic"
         />
         <button
-          v-tooltip.bottom="'Souligner'"
+          v-tooltip.bottom="$t('cmp.viewer.richTextEditor.underline')"
           class="ql-underline"
         />
         <button
-          v-tooltip.bottom="'Barrer'"
+          v-tooltip.bottom="$t('cmp.viewer.richTextEditor.strike')"
           class="ql-strike"
         />
 
@@ -33,12 +33,12 @@
           <option value="large" />
         </select> -->
         <button
-          v-tooltip.bottom="'Indice'"
+          v-tooltip.bottom="$t('cmp.viewer.richTextEditor.subscript')"
           class="ql-script"
           value="sub"
         />
         <button
-          v-tooltip.bottom="'Exposant'"
+          v-tooltip.bottom="$t('cmp.viewer.richTextEditor.superscript')"
           class="ql-script"
           value="super"
         />
