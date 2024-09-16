@@ -10,7 +10,7 @@
     >
     <Card class="p-3 m-2">
       <template #title>
-        Espace d'administration
+        {{ $t('page.admin.login.adminSpace') }}
       </template>
       <template #content>
         <div class="flex flex-col gap-4 max-w-[17rem]">
@@ -20,11 +20,10 @@
             :closable="false"
             class="-my-1"
           >
-            Nom d'utilisateur⋅ice ou
-            mot de passe incorrect
+            {{ $t('page.admin.login.invalidCredentials') }}
           </Message>
           <label for="username">
-            Nom d'utilisateur⋅ice
+            {{ $t('page.admin.login.username') }}
           </label>
           <InputText
             id="username"
@@ -33,7 +32,7 @@
             class="w-full -mt-2"
           />
           <label for="password">
-            Mot de passe
+            {{ $t('page.admin.login.password') }}
           </label>
           <Password
             v-model="password"
@@ -53,11 +52,11 @@
             <label
               for="remember_me"
               class="ml-1 text-sm"
-            > Se souvenir de moi </label>
+            > {{ $t('page.admin.login.rememberMe') }} </label>
           </span>
 
           <Button
-            label="Login"
+            :label="$t('page.admin.login.login')"
             type="submit"
             class="w-full justify-center"
             :disabled="awaiting_auth_response"

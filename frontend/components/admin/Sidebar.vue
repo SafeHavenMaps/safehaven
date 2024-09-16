@@ -27,9 +27,9 @@
             :value="item.pending_count"
             severity="danger"
           />
-          <span
-            class="grow text-link"
-          >{{ item.label }}</span>
+          <span class="grow text-link">
+            {{ item.label }}
+          </span>
         </a>
       </NuxtLink>
 
@@ -49,9 +49,7 @@
           :value="item.pending_count"
           severity="danger"
         />
-        <span
-          class="grow text-link"
-        >
+        <span class="grow text-link">
           {{ item.label }}
         </span>
 
@@ -73,11 +71,11 @@ try {
   await state.fetchFamilies()
   await state.getEntitiesCommentsCounts()
 }
-catch (e) {
-  console.log(e)
+catch {
   // Do nothing
 }
 
+const { t } = useI18n()
 const currentRoute = useRoute()
 const expandedKeys = ref({})
 
@@ -103,7 +101,7 @@ function classForLink(active: boolean) {
 }
 
 const familyNodes = computed(() => [{
-  label: 'Gestion',
+  label: t('cmp.admin.sidebar.management'),
   icon: 'listEdit',
   route: 'families',
   key: 'families-mgmt',
@@ -121,23 +119,23 @@ const familyNodes = computed(() => [{
       active: false,
       items: [
         {
-          label: 'Catégories',
+          label: t('cmp.admin.sidebar.categories'),
           icon: 'category',
           route: item.id + '/categories',
         },
         {
-          label: 'Entités',
+          label: t('cmp.admin.sidebar.entities'),
           icon: 'entity',
           route: item.id + '/entities',
         },
         {
-          label: 'Entités en attente',
+          label: t('cmp.admin.sidebar.pendingEntities'),
           icon: 'pendingEntity',
           pending_count: counts[1],
           route: item.id + '/entities/pending',
         },
         {
-          label: 'Commentaires en attente',
+          label: t('cmp.admin.sidebar.pendingComments'),
           icon: 'pendingComment',
           pending_count: counts[3],
           route: item.id + '/comments/pending',
@@ -149,21 +147,21 @@ const familyNodes = computed(() => [{
 
 const nodes = computed(() => [
   {
-    label: 'Accueil',
+    label: t('cmp.admin.sidebar.home'),
     icon: 'home',
     route: 'home',
     active: false,
     key: 'home',
   },
   {
-    label: 'Configuration',
+    label: t('cmp.admin.sidebar.config'),
     icon: 'config',
     route: 'config',
     active: false,
     key: 'config',
   },
   {
-    label: 'Utilisateur⋅ices',
+    label: t('cmp.admin.sidebar.users'),
     icon: 'user',
     route: 'users',
     admin_only: true,
@@ -171,14 +169,14 @@ const nodes = computed(() => [
     key: 'users',
   },
   {
-    label: 'Jetons d\'accès',
+    label: t('cmp.admin.sidebar.accessTokens'),
     icon: 'accessToken',
     route: 'access-tokens',
     active: false,
     key: 'access-tokens',
   },
   {
-    label: 'Familles',
+    label: t('cmp.admin.sidebar.families'),
     icon: 'family',
     pending_count: Object.values(state.countsByFamily).reduce((summed_count, counts) => summed_count + counts[1] + counts[3], 0),
     items: familyNodes.value,
@@ -186,7 +184,7 @@ const nodes = computed(() => [
     key: 'families',
   },
   {
-    label: 'Tags',
+    label: t('cmp.admin.sidebar.tags'),
     icon: 'tag',
     route: 'tags',
     active: false,

@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-2">
-    <label for="tag_id">Tags</label>
+    <label for="tag_id">{{ $t('cmp.form.tagSelect.tags') }}</label>
     <div class="flex flex-wrap gap-1">
       <DisplayedTag
         v-for="tag_id in props.modelValue"
@@ -12,10 +12,10 @@
     <MultiSelect
       id="tag_id"
       filter
-      empty-filter-message="Aucun résultat trouvé"
+      :empty-filter-message="$t('cmp.form.tagSelect.emptyFilterMessage')"
       :model-value="props.modelValue"
       :options="tags"
-      placeholder="Sélectionner des tags"
+      :placeholder="$t('cmp.form.tagSelect.placeholder')"
       option-value="id"
       option-label="title"
       @update:model-value="updateValue"

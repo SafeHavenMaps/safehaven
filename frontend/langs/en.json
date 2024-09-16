@@ -1,0 +1,443 @@
+{
+  "cmp": {
+    "viewer": {
+      "common": {
+        "entityDisplayer": {
+          "attached": "Attached",
+          "information": "Information",
+          "attachments": "Attachments",
+          "comments": "Comments",
+          "view": "View",
+          "addresses": "Addresses",
+          "address": "Address",
+          "notes": "Notes"
+        },
+        "formFields": {
+          "yes": "✅ Yes",
+          "no": "❌ No",
+          "date": "Date",
+          "comment": "Comment"
+        }
+      },
+      "commentAddForm": {
+        "newComment": "New comment",
+        "addComment": "Add a comment",
+        "author": "Author",
+        "commentText": "Comment text",
+        "previous": "Previous",
+        "next": "Next",
+        "save": "Save",
+        "captchaCheck": "Hold on a second, we need to verify you're not a robot...",
+        "captchaExpired": "The captcha has expired",
+        "captchaValidationError": "Captcha validation error",
+        "success": "Success",
+        "commentSuccess": "Comment successfully updated",
+        "error": "Error",
+        "commentError": "Error updating the comment",
+        "page": "Page"
+      },
+      "entityAddForm": {
+        "displayName": "Display name",
+        "includeComment": "Include a comment",
+        "author": "Author",
+        "commentText": "Comment text",
+        "captchaCheck": "Hold on a second, we need to verify you're not a robot...",
+        "captchaExpired": "The captcha has expired",
+        "captchaValidationError": "Captcha validation error",
+        "success": "Success",
+        "entitySuccess": "Entity successfully added",
+        "entityAndCommentSuccess": "Entity and comment successfully added",
+        "error": "Error",
+        "entityError": "Error adding the entity",
+        "entityAndCommentError": "Error adding the entity or comment",
+        "previous": "Previous",
+        "next": "Next",
+        "save": "Save"
+      },
+      "filterConfig": {
+        "general": "General",
+        "tags": "Tags",
+        "constraints": "Constraints",
+        "categories": "Categories",
+        "invert": "Invert",
+        "selectAll": "Select All",
+        "reset": "Reset",
+        "filters": "Filters",
+        "hidden": "Hidden",
+        "displayed": "Displayed",
+        "required": "Required",
+        "searchTag": "Search Tag",
+        "clearSearch": "Clear Search",
+        "clearFilters": "Clear All Filters"
+      },
+      "fullResult": {
+        "noGeo": "No geographic location",
+        "viewDetails": "View details"
+      },
+      "information": {
+        "safeHaven": "SafeHaven",
+        "safeHavenDescription": "SafeHaven is an open-source solution for creating collaborative maps.<br>You can easily create your own map!",
+        "discoverOnGitHub": "Discover on GitHub"
+      },
+      "map": {
+        "error": "Error",
+        "refreshError": "Unable to refresh the map",
+        "entityLoadError": "Unable to load the selected entity"
+      },
+      "navbar": {
+        "add": "Add",
+        "filters": "Filters",
+        "mapMode": "Switch to map mode",
+        "listMode": "Switch to list mode",
+        "info": "Info",
+        "search": "Search",
+        "darkMode": "Dark/Light Mode",
+        "searchPoint": "Search for a point",
+        "searchPlace": "Search for a place",
+        "searchPlaceholder": "Type your search here",
+        "searchPointOnMap": "Search for a point on the map",
+        "minChars": "4 characters minimum",
+        "placeSearchPlaceholder": "Tours, France",
+        "searchPlaceOrAddress": "Search for a city, place, or address",
+        "noResults": "No results found",
+        "information": "Information",
+        "error": "Error",
+        "resultsLoadError": "Unable to load results",
+        "noKnownAddress": "No known address",
+        "searchWithNominatim": "Search with Nominatim © OpenStreetMap Contributor"
+      },
+      "richTextEditor": {
+        "bold": "Bold",
+        "italic": "Italic",
+        "underline": "Underline",
+        "strike": "Strike",
+        "subscript": "Subscript",
+        "superscript": "Superscript"
+      }
+    },
+    "admin": {
+      "families": {
+        "editform": {
+          "newPage": "New Page",
+          "page": "Page {page}",
+          "fieldTitle": "Title",
+          "fieldTitlePlaceholder": "Field title",
+          "editKey": "Edit Key",
+          "fieldType": "Type",
+          "options": "Options",
+          "events": "Events",
+          "fieldChangeWarning": "Changing the type, subtype, or format may cause inconsistencies.",
+          "helpText": "Help Text",
+          "helpTextPlaceholder": "Help text",
+          "displayOrder": "Display Order",
+          "notDisplayed": "Not displayed",
+          "required": "Required",
+          "searchable": "Searchable",
+          "filterable": "Filterable",
+          "adminFilterOnly": "Admin Filter Only",
+          "restrictedByCategories": "Restricted by Categories",
+          "selectedCategories": "{0} categories selected",
+          "newField": "New Field",
+          "cancel": "Cancel",
+          "save": "Save",
+          "confirmDeleteField": "Confirm field deletion",
+          "acceptDelete": "Confirm",
+          "rejectDelete": "Cancel",
+          "fieldDeleteTooltip": "This field will no longer be visible on the {kindName}s that already contain it unless the key is reused. However, the information will remain in the database.",
+          "editFieldOptions": "Edit options for field {display_name}",
+          "editFieldEvents": "Edit events for field {display_name}",
+          "editFieldKey": "Edit key for field {display_name}",
+          "optionLabel": "Label",
+          "optionLabelPlaceholder": "Option name",
+          "optionKey": "Key",
+          "optionKeyPlaceholder": "Unique key",
+          "optionKeyWarning": "Modifying the key or deleting the option may cause inconsistencies in {kindName}s using this option.",
+          "optionHiddenTooltip": "If enabled, this field will not be displayed in the results when this option is selected",
+          "optionDeleteTooltip": "This option will no longer be visible on the {kindName}s that already contain it unless the key is reused. However, the information will remain in the database.",
+          "addOption": "Add an option",
+          "eventLabel": "Label",
+          "eventLabelPlaceholder": "Event name",
+          "eventColor": "Color",
+          "eventKey": "Key",
+          "eventKeyPlaceholder": "Unique key",
+          "eventKeyWarning": "Modifying the key or deleting the event may cause inconsistencies in {kindName}s using this event.",
+          "eventDeleteTooltip": "This event will no longer be visible on the {kindName}s that already contain it unless the key is reused. However, the information will remain in the database.",
+          "addEvent": "Add an event",
+          "addNewField": "Add a new field",
+          "fieldKey": "Key",
+          "fieldKeyPlaceholder": "Unique key",
+          "keyWarning": "If modified, {kindName}s in the database containing the old key will no longer be able to display this field unless a compatible field in the form takes over the old key.",
+          "error": "Error",
+          "keyAlreadyInUse": "Key already in use by another field",
+          "success": "Success",
+          "familyUpdatedSuccess": "Family successfully updated",
+          "familyUpdateError": "Error updating family",
+          "fieldTypeSingleLineText": "Short Text",
+          "fieldTypeMultiLineText": "Long Text",
+          "fieldTypeRichText": "Rich Text",
+          "fieldTypeBoolean": "Boolean",
+          "fieldTypeNumber": "Number",
+          "fieldTypeDiscreteScore": "Discrete Score",
+          "fieldTypeDate": "Date",
+          "fieldTypeSingleOption": "Single Choice",
+          "fieldTypeMultiOption": "Multiple Choices",
+          "fieldTypeEventList": "Event List",
+          "stringTypeNone": "None",
+          "stringTypeUrl": "URL",
+          "stringTypePhone": "Phone Number",
+          "stringTypeEmail": "Email"
+        },
+        "editformjson": {
+          "description": "Direct editing of the form in .json, useful for import/export. Make other changes this way only if you precisely understand the form structure. To save, use the preview button, which will allow you to first check your changes in the visual editor. Any unsaved changes made in the visual editor will be overwritten.",
+          "import": "Import",
+          "export": "Export",
+          "syncAndPreview": "Synchronize and preview",
+          "importSuccess": "File imported successfully. Changes are not yet saved.",
+          "importError": "File could not be imported.",
+          "syncSuccess": "Synchronization successful. Please verify your changes and save.",
+          "syncError": "Synchronization error. Is your JSON syntactically correct?",
+          "invalidJson": "The imported file does not have a valid JSON structure."
+        }
+      },
+      "input": {
+        "iconUpload": {
+          "downloadFailed": "Failed to download image.",
+          "error": "Error",
+          "success": "Success",
+          "uploadSuccess": "Image uploaded successfully!",
+          "uploadFailedWithStatus": "Failed to upload image, status {status}.",
+          "uploadFailedWithMessage": "Failed to upload image: {message}",
+          "changeIcon": "Change Icon",
+          "upload": "Upload",
+          "localFile": "Upload from local files",
+          "or": "OR",
+          "urlPlaceholder": "http://url.com/icon.svg",
+          "save": "Save",
+          "downloadFromUrl": "Download from URL"
+        },
+        "policyPermissionField": {
+          "accessAll": "Access to all {label} by default",
+          "selectExclude": "Select {label} to exclude (if any)",
+          "selectInclude": "Select {label} to include"
+        }
+      },
+      "editDeleteButtons": {
+        "deleteHeader": "Delete {modelName} {name}",
+        "deleteWarning": "Deleting {modelName} {name} will permanently remove {count} entities.",
+        "confirmPrompt": "This action cannot be undone. To confirm, please enter the name {modelName} below:",
+        "confirmDelete": "Confirm the deletion of {modelName}",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      },
+      "entityKinshipTable": {
+        "addParent": "Add Parent",
+        "addChild": "Add Child",
+        "childrenList": "Children List",
+        "parentsList": "Parents List",
+        "noKinship": "No parent or child at the moment",
+        "entityName": "Entity Name",
+        "category": "Category",
+        "parentRelationship": "of the relationship with the parent",
+        "childRelationship": "of the relationship with the child",
+        "success": "Success",
+        "error": "Error",
+        "childAddedSuccess": "Relationship with the child {name} added successfully",
+        "childAddError": "Error adding relationship with the child {name}",
+        "parentAddedSuccess": "Relationship with the parent {name} added successfully",
+        "parentAddError": "Error adding relationship with the parent {name}",
+        "parentRemovedSuccess": "Relationship with the parent {name} removed successfully",
+        "parentRemoveError": "Error removing relationship with the parent {name}",
+        "childRemovedSuccess": "Relationship with the child {name} removed successfully",
+        "childRemoveError": "Error removing relationship with the child {name}"
+      },
+      "navbar": {
+        "versionInfo": "Version Information",
+        "updateAvailable": "An update is available.",
+        "githubLink": "Visit GitHub to see and update to the latest version.",
+        "currentVersion": "Current Version",
+        "gitHash": "Git hash",
+        "latestVersion": "Latest Version",
+        "unknown": "Unknown",
+        "myAccount": "My Account",
+        "logout": "Log Out"
+      },
+      "sidebar": {
+        "management": "Management",
+        "categories": "Categories",
+        "entities": "Entities",
+        "pendingEntities": "Pending Entities",
+        "pendingComments": "Pending Comments",
+        "home": "Home",
+        "config": "Configuration",
+        "users": "Users",
+        "accessTokens": "Access Tokens",
+        "families": "Families",
+        "tags": "Tags"
+      }
+    },
+    "form": {
+      "adresses": {
+        "addAddress": "Add Address",
+        "addresses": "Addresses",
+        "selectAddress": "Select Address",
+        "cancel": "Cancel",
+        "select": "Select",
+        "error": "Error",
+        "addressAlreadyExists": "Address already exists"
+      },
+      "categorySelect": {
+        "category": "Category",
+        "selectCategory": "Select a category"
+      },
+      "dynamicField": {
+        "discreteScore": {
+          "bad": "Bad",
+          "ratherBad": "Rather bad",
+          "ratherGood": "Rather good",
+          "good": "Good"
+        },
+        "dateFormat": "dd/mm/yy",
+        "datePlaceholder": "dd/mm/yyyy",
+        "optionalDetails": "Details (optional)",
+        "newEvent": "New event",
+        "eventTypePlaceholder": "Event type",
+        "urlTooltip": "Valid URL expected",
+        "emailTooltip": "Valid email expected",
+        "phoneTooltip": "Phone number expected"
+      },
+      "tagSelect": {
+        "tags": "Tags",
+        "emptyFilterMessage": "No results found",
+        "placeholder": "Select tags"
+      }
+    },
+    "commentDisplayer": {
+      "toModerate": "Awaiting moderation",
+      "commentModelName": "of the comment"
+    },
+    "nominatimPicker": {
+      "searchAddress": "Search for an address",
+      "startSearch": "Start search",
+      "noResults": "No results found",
+      "address": "Address"
+    },
+    "polygonDrawer": {
+      "header": "Define a geographical area",
+      "polygon": "polygon",
+      "polygons": "polygons",
+      "max": "at most",
+      "clear": "Clear",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "requiredIndicator": {
+      "requiredField": "Required field"
+    },
+    "startPopup": {
+      "information": "Information",
+      "validate": "Validate"
+    }
+  },
+  "page": {
+    "search": {
+      "token": {
+        "resultsSingular": "result",
+        "resultsPlural": "results",
+        "search": "Search",
+        "addCommentHint": "To add a comment, please first search for the entity you wish to comment on",
+        "searchPlaceholder": "Type your search here",
+        "minChars": "(4 characters minimum)",
+        "filters": "Filters",
+        "error": "Error",
+        "loadDataError": "Unable to load data",
+        "loadResultsError": "Unable to load results"
+      }
+    },
+    "map": {
+      "token": {
+        "error": "Error",
+        "couldNotLoadEntity": "Unable to load the selected entity",
+        "couldNotLoadMap": "Unable to load the map"
+      }
+    },
+    "add": {
+      "token": {
+        "add": "Add",
+        "error": "Error",
+        "couldNotLoadMap": "Unable to load the map"
+      }
+    },
+    "admin": {
+      "login": {
+        "adminSpace": "Administration Space",
+        "invalidCredentials": "Invalid username or password",
+        "username": "Username",
+        "password": "Password",
+        "rememberMe": "Remember me",
+        "login": "Login"
+      },
+      "home": {
+        "pageTitle": "Dashboard",
+        "activities30Days": "Activities in the last 30 days",
+        "entities": "Entities",
+        "comments": "Comments",
+        "visits30Days": "Visits (30d)",
+        "visits7Days": "Visits (7d)",
+        "visits": "Visits"
+      },
+      "config": {
+        "add": "Add",
+        "general": "General",
+        "popup": "Popup",
+        "mapInitialization": "Map - Initialization",
+        "mapSource": "Map - Source",
+        "mapCluster": "Map - Cluster",
+        "safeMode": "Safe Mode",
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "information": "Information",
+        "logoUrl": "Logo URL",
+        "redirectUrlEnabled": "Redirect invalid tokens to a custom URL",
+        "redirectUrl": "Redirect URL",
+        "cancel": "Cancel",
+        "reset": "Reset",
+        "save": "Save",
+        "showPopup": "Show a popup on application launch",
+        "popupText": "Welcome popup",
+        "popupCheckbox": "Add a checkbox in the welcome popup",
+        "popupCheckboxText": "Text accompanying the checkbox in the welcome popup",
+        "centerLat": "Center Latitude",
+        "centerLng": "Center Longitude",
+        "zoom": "Zoom Level",
+        "lightMapUrl": "Tile URL, light theme",
+        "lightMapAttributions": "Tile attributions, light theme",
+        "darkMapUrl": "Tile URL, dark theme",
+        "darkMapAttributions": "Tile attributions, dark theme",
+        "characteristicDistance": "Characteristic Distance",
+        "declusteringSpeed": "Declustering Speed",
+        "minimalClusterSize": "Minimal Cluster Size",
+        "enableSafeMode": "Enable Safe Mode",
+        "hcaptchaSitekey": "hCaptcha Site Key",
+        "hcaptchaSecret": "hCaptcha Secret Key",
+        "error": "Error",
+        "resetError": "Error resetting the option group",
+        "resetSuccess": "Option group successfully reset",
+        "saveError": "Error saving the option group",
+        "saveSuccess": "Option group successfully saved",
+        "success": "Success"
+      }
+    }
+  },
+  "layout": {
+    "admin": {
+      "navigation": "Navigation"
+    }
+  },
+  "app": {
+    "apiUnavailable": "API is not available",
+    "tryAgainLater": "Please try again later"
+  },
+  "error": {
+    "somethingWentWrong": "Oops! Something went wrong."
+  }
+}

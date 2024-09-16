@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
+    '@nuxtjs/i18n',
   ],
   ssr: false,
   devtools: { enabled: true },
@@ -25,6 +26,26 @@ export default defineNuxtConfig({
           darkModeSelector: '.sh-dark',
         },
       },
+    },
+  },
+  i18n: {
+    locales: [{
+      code: 'en',
+      file: 'en.json',
+    }, {
+      code: 'fr',
+      file: 'fr.json',
+    }],
+    langDir: 'langs/',
+    lazy: true,
+    strategy: 'no_prefix',
+    defaultLocale: 'en',
+
+    detectBrowserLanguage: {
+      useCookie: true, // Use a cookie to remember the user's chosen language
+      cookieKey: 'i18n_redirected',
+      alwaysRedirect: true, // Always redirect to browser locale if it's different
+      fallbackLocale: 'en', // Fallback if no match is found or browser locale unsupported
     },
   },
   css: [

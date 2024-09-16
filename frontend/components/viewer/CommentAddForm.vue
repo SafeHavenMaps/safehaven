@@ -1,6 +1,6 @@
 <template>
   <Button
-    label="Nouveau commentaire"
+    :label="$t('cmp.viewer.commentAddForm.newComment')"
     rounded
     outlined
     @click="formVisible=true"
@@ -11,7 +11,7 @@
           class="-ml-1 mr-1"
           icon-name="commentAdd"
         />
-        Ajouter un commentaire
+        {{ $t('cmp.viewer.commentAddForm.addComment') }}
       </div>
     </template>
   </Button>
@@ -33,11 +33,11 @@
       <AdminInputTextField
         id="author"
         v-model="editedComment!.author"
-        label="Auteur"
+        :label="$t('cmp.viewer.commentAddForm.author')"
       />
 
       <div class="flex flex-col gap-2">
-        <label for="comment_text">Texte du commentaire<RequiredIndicator /></label>
+        <label for="comment_text">{{ $t('cmp.viewer.commentAddForm.commentText') }}<RequiredIndicator /></label>
         <ViewerRichTextEditor
           id="comment_text"
           v-model="editedComment!.text"
@@ -47,7 +47,7 @@
 
       <span class="flex gap-1 justify-end">
         <Button
-          label="Suivant"
+          :label="$t('cmp.viewer.commentAddForm.next')"
           type="submit"
           outlined
           :disabled="!isCommentPageValid(0)"
@@ -56,7 +56,7 @@
     </form>
     <form
       v-for="page in Array.from({ length: page_count+1 }, (_, i) => i+1)"
-      :key="`Page ${page}`"
+      :key="`Page ${$t('cmp.viewer.commentAddForm.page')} ${page}`"
       class="flex grow flex-col gap-4 max-w-[30rem]"
       @submit.prevent="() => page == page_count ? onSave() : curr_page+=1"
     >
@@ -78,12 +78,12 @@
             class="flex gap-1 justify-end"
           >
             <Button
-              label="Précédent"
+              :label="$t('cmp.viewer.commentAddForm.previous')"
               outlined
               @click="curr_page -= 1"
             />
             <Button
-              :label="page == page_count ? 'Sauvegarder' : 'Suivant'"
+              :label="page == page_count ? $t('cmp.viewer.commentAddForm.save') : $t('cmp.viewer.commentAddForm.next')"
               type="submit"
               :outlined="page != page_count"
               :loading="processingRequest"
@@ -96,7 +96,7 @@
           class="flex flex-col justify-center items-center "
         >
           <div class="text-center font-bold">
-            Une petite seconde, on doit vérifier que vous n'êtes pas un robot...
+            {{ $t('cmp.viewer.commentAddForm.captchaCheck') }}
           </div>
 
           <div class="m-3">
@@ -127,6 +127,7 @@ const props = defineProps<{
 
 const processingRequest = ref(false)
 const toast = useToast()
+const { t } = useI18n()
 
 const editedComment = ref<PublicNewComment>()
 
@@ -188,8 +189,8 @@ function hCaptchaVerify(token: string) {
 function hCaptchaExpired() {
   toast.add({
     severity: 'error',
-    summary: 'Erreur',
-    detail: 'Le captcha a expiré',
+    summary: t('cmp.viewer.commentAddForm.error'),
+    detail: t('cmp.viewer.commentAddForm.captchaExpired'),
     life: 3000,
   })
 }
@@ -197,8 +198,8 @@ function hCaptchaExpired() {
 function hCaptchaError() {
   toast.add({
     severity: 'error',
-    summary: 'Erreur',
-    detail: 'Erreur de validation du captcha',
+    summary: t('cmp.viewer.commentAddForm.error'),
+    detail: t('cmp.viewer.commentAddForm.captchaValidationError'),
     life: 3000,
   })
 }
@@ -222,8 +223,8 @@ async function realOnSave(token: string | null) {
     formVisible.value = false
     toast.add({
       severity: 'success',
-      summary: 'Succès',
-      detail: 'Commentaire modifié avec succès',
+      summary: t('cmp.viewer.commentAddForm.success'),
+      detail: t('cmp.viewer.commentAddForm.commentSuccess'),
       life: 3000,
     })
     reset_refs(props.entity.id)
@@ -231,8 +232,8 @@ async function realOnSave(token: string | null) {
   catch {
     toast.add({
       severity: 'error',
-      summary: 'Erreur',
-      detail: 'Erreur de modification du commentaire',
+      summary: t('cmp.viewer.commentAddForm.error'),
+      detail: t('cmp.viewer.commentAddForm.commentError'),
       life: 3000,
     })
   }

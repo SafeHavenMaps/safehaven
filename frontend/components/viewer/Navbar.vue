@@ -19,7 +19,7 @@
 
         <Button
           v-if="props.showMapButton"
-          v-tooltip.bottom="'Passage en mode carte'"
+          v-tooltip.bottom="$t('cmp.viewer.navbar.mapMode')"
           outlined
           severity="primary"
           small
@@ -36,7 +36,7 @@
 
         <Button
           v-if="props.showSearchButton"
-          v-tooltip.bottom="'Passage en mode liste'"
+          v-tooltip.bottom="$t('cmp.viewer.navbar.listMode')"
           outlined
           severity="primary"
           small
@@ -87,7 +87,7 @@
 
             <div class="flex flex-col gap-2">
               <Button
-                label="Info"
+                :label="$t('cmp.viewer.navbar.info')"
                 outlined
                 severity="primary"
                 @click="showInformation = true"
@@ -99,7 +99,7 @@
 
               <Button
                 v-if="state.permissions?.can_add_entity"
-                label="Ajouter"
+                :label="$t('cmp.viewer.navbar.add')"
                 severity="info"
                 @click="openAddModal()"
               >
@@ -112,7 +112,7 @@
 
               <Button
                 v-if="props.showCategorySwitcher"
-                label="Filtres"
+                :label="$t('cmp.viewer.navbar.filters')"
                 severity="primary"
                 @click="openFilterPopup()"
               >
@@ -125,7 +125,7 @@
 
               <Button
                 v-if="props.showSearch"
-                label="Recherche"
+                :label="$t('cmp.viewer.navbar.search')"
                 severity="primary"
                 @click="openSearchPanel"
               >
@@ -137,7 +137,7 @@
               <Button
                 severity="secondary"
                 outlined
-                label="Mode sombre/clair"
+                :label="$t('cmp.viewer.navbar.darkMode')"
                 @click="toggleDarkMode()"
               >
                 <template #icon>
@@ -163,7 +163,7 @@
 
           <Button
             v-if="state.permissions?.can_add_entity"
-            label="Ajouter"
+            :label="$t('cmp.viewer.navbar.add')"
             severity="info"
             @click="openAddModal()"
           >
@@ -176,7 +176,7 @@
 
           <Button
             v-if="props.showCategorySwitcher"
-            label="Filtres"
+            :label="$t('cmp.viewer.navbar.filters')"
             severity="primary"
             @click="openFilterPanel"
           >
@@ -206,6 +206,16 @@
               <AppIcon icon-name="lightDark" />
             </template>
           </Button>
+
+          <Button
+            severity="secondary"
+            outlined
+          >
+            <!-- TODO: Open a popover with a LocaleMenu inside to change the active locale of the app  -->
+            <template #icon>
+              <AppIcon icon-name="i18n" />
+            </template>
+          </Button>
         </div>
       </div>
     </template>
@@ -223,7 +233,7 @@
 
   <Dialog
     v-model:visible="filterPopupVisible"
-    header="Filtres"
+    :header="$t('cmp.viewer.navbar.filters')"
     modal
   >
     <ViewerFilterConfig
@@ -238,22 +248,22 @@
       <Tabs value="0">
         <TabList>
           <Tab value="0">
-            Chercher un point
+            {{ $t('cmp.viewer.navbar.searchPoint') }}
           </Tab>
           <Tab value="1">
-            Chercher un lieu
+            {{ $t('cmp.viewer.navbar.searchPlace') }}
           </Tab>
         </TabList>
         <TabPanels>
           <TabPanel value="0">
             <form @submit.prevent="searchEntity">
               <label for="placeSearch">
-                Recherche d'un point sur la carte <i v-if="!state.permissions?.can_list_without_query">(4 caractères minimum)</i>
+                {{ $t('cmp.viewer.navbar.searchPointOnMap') }} <i v-if="!state.permissions?.can_list_without_query">(4 caractères minimum)</i>
               </label>
               <InputGroup>
                 <InputText
                   v-model="entitySearch"
-                  placeholder="Tapez votre recherche ici"
+                  :placeholder="$t('cmp.viewer.navbar.searchPlaceholder')"
                 />
                 <Button type="submit">
                   <template #icon>
@@ -294,7 +304,7 @@
                         v-if="result.locations.length == 0"
                         class="italic text-sm"
                       >
-                        Aucune adresse connue
+                        {{ $t('cmp.viewer.navbar.noKnownAddress') }}
                       </div>
                       <span
                         v-for="(parent, i) in result.parents"
@@ -317,13 +327,13 @@
           <TabPanel value="1">
             <form @submit.prevent="searchLocation">
               <label for="placeSearch">
-                Recherche d'une ville, d'un lieu, d'une adresse
+                {{ $t('cmp.viewer.navbar.searchPlaceOrAddress') }}
               </label>
 
               <InputGroup>
                 <InputText
                   v-model="placeSearch"
-                  placeholder="Tours, France"
+                  :placeholder="$t('cmp.viewer.navbar.placeSearchPlaceholder')"
                 />
                 <Button type="submit">
                   <template #icon>
@@ -353,14 +363,14 @@
               class="my-2"
             >
               <Message severity="error">
-                Aucun résultat trouvé
+                {{ $t('cmp.viewer.navbar.noResults') }}
               </Message>
             </div>
 
             <Divider type="dotted" />
 
             <div class="text-xs">
-              Recherche avec Nominatim © OpenStreetMap Contributor
+              {{ $t('cmp.viewer.navbar.searchWithNominatim') }}
             </div>
           </TabPanel>
         </TabPanels>
@@ -373,7 +383,7 @@
     maximizable
     :style="{ width: '50rem' }"
     :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-    header="Informations"
+    :header="$t('cmp.viewer.navbar.information')"
     modal
   >
     <ViewerInformation />
@@ -403,6 +413,7 @@ import type { ViewerEntityAddForm } from '#build/components'
 
 const toast = useToast()
 const darkMode = useDarkMode()
+const { t } = useI18n()
 
 export interface Props {
   showCategorySwitcher?: boolean
@@ -467,8 +478,8 @@ async function searchLocation() {
   catch {
     toast.add({
       severity: 'error',
-      summary: 'Erreur',
-      detail: 'Impossible de charger les résultats',
+      summary: t('cmp.viewer.navbar.error'),
+      detail: t('cmp.viewer.navbar.resultsLoadError'),
       life: 3000,
     })
   }
@@ -495,8 +506,8 @@ async function refreshResult() {
   catch {
     toast.add({
       severity: 'error',
-      summary: 'Erreur',
-      detail: 'Impossible de charger les résultats',
+      summary: t('cmp.viewer.navbar.error'),
+      detail: t('cmp.viewer.navbar.resultsLoadError'),
       life: 3000,
     })
   }

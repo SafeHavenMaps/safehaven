@@ -28,7 +28,7 @@
 
     <div class="flex flex-col h-full w-full items-center ">
       <div class="text-xl font-bold mt-8">
-        Activités des 30 derniers jours
+        {{ $t('page.admin.home.activities30Days') }}
       </div>
 
       <Chart
@@ -51,13 +51,15 @@ definePageMeta({
   layout: 'admin-ui',
 })
 
+const { t } = useI18n()
+
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  'Accueil',
+  t('page.admin.home.pageTitle'),
   'home',
   [],
   [
-    { label: 'Accueil', url: '/admin/home' },
+    { label: t('page.admin.home.pageTitle'), url: '/admin/home' },
   ],
 )
 
@@ -83,7 +85,7 @@ const chartData = {
   labels: Object.keys(stats.value!.visits_30_days).map(date => new Date(date)),
   datasets: [
     {
-      label: 'Visites',
+      label: t('page.admin.home.visits'),
       data: Object.values(stats.value!.visits_30_days),
       fill: true,
       borderColor: '#e86ba7',
@@ -151,37 +153,37 @@ const cards = [
   {
     class: 'card-green',
     iconName: 'entity',
-    title: 'Entités',
+    title: t('page.admin.home.entities'),
     stat: stats.value.total_entities,
   },
   {
     class: 'card-green',
     iconName: 'comment',
-    title: 'Commentaires',
+    title: t('page.admin.home.comments'),
     stat: stats.value.total_comments,
   },
   {
     class: 'card-orange',
     iconName: 'pendingEntity',
-    title: 'Entités',
+    title: t('page.admin.home.entities'),
     stat: stats.value.pending_entities,
   },
   {
     class: 'card-orange',
     iconName: 'pendingComment',
-    title: 'Commentaires',
+    title: t('page.admin.home.comments'),
     stat: stats.value.pending_comments,
   },
   {
     class: 'card-blue',
     iconName: 'clock',
-    title: 'Visites (30j)',
+    title: t('page.admin.home.visits30Days'),
     stat: stats.value.total_visits_30_days,
   },
   {
     class: 'card-blue',
     iconName: 'clock',
-    title: 'Visites (7j)',
+    title: t('page.admin.home.visits7Days'),
     stat: stats.value.total_visits_7_days,
   },
 ]

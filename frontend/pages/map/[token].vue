@@ -72,6 +72,7 @@ import state from '~/lib/viewer-state'
 import ViewerMap from '~/components/viewer/Map.vue'
 
 const toast = useToast()
+const { t } = useI18n()
 
 // Init state with url token
 const route = useRoute()
@@ -84,8 +85,8 @@ try {
 catch {
   toast.add({
     severity: 'error',
-    summary: 'Erreur',
-    detail: 'Impossible de charger la carte',
+    summary: t('page.map.error'),
+    detail: t('page.map.couldNotLoadMap'),
     life: 3000,
   })
   if (state.redirectUrl) {
@@ -128,8 +129,8 @@ async function displayEntityId(entityId: string) {
   catch {
     toast.add({
       severity: 'error',
-      summary: 'Erreur',
-      detail: `Impossible de charger l'entité sélectionnée`,
+      summary: t('page.map.token.error'),
+      detail: t('page.map.token.couldNotLoadEntity'),
       life: 3000,
     })
   }

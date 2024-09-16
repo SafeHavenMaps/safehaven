@@ -20,7 +20,7 @@
             v-else
             class="no-geo"
           >
-            Aucune position géographique
+            {{ $t('cmp.viewer.fullResult.noGeo') }}
           </div>
         </div>
 
@@ -55,7 +55,7 @@
             <div class="flex flex-row-reverse md:flex-row gap-2">
               <Button
                 v-if="state.permissions?.can_access_entity"
-                label="Voir en détail"
+                :label="$t('cmp.viewer.fullResult.viewDetails')"
                 class="flex-auto md:flex-initial whitespace-nowrap"
                 @click="changeActiveEntity(props.entity)"
               >

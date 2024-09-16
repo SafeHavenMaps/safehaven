@@ -1,0 +1,445 @@
+{
+  "cmp": {
+    "viewer": {
+      "common": {
+        "entityDisplayer": {
+          "attached": "Rattachés",
+          "information": "Informations",
+          "attachments": "Rattachements",
+          "comments": "Commentaires",
+          "view": "Voir",
+          "addresses": "Adresses",
+          "address": "Adresse",
+          "notes": "Notes"
+        },
+        "formFields": {
+          "yes": "✅ Oui",
+          "no": "❌ Non",
+          "date": "Date",
+          "comment": "Commentaire"
+        }
+      },
+      "commentAddForm": {
+        "newComment": "Nouveau commentaire",
+        "addComment": "Ajouter un commentaire",
+        "author": "Auteur",
+        "commentText": "Texte du commentaire",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "save": "Sauvegarder",
+        "captchaCheck": "Une petite seconde, on doit vérifier que vous n'êtes pas un robot...",
+        "captchaExpired": "Le captcha a expiré",
+        "captchaValidationError": "Erreur de validation du captcha",
+        "success": "Succès",
+        "commentSuccess": "Commentaire modifié avec succès",
+        "error": "Erreur",
+        "commentError": "Erreur de modification du commentaire",
+        "page": "Page"
+      },
+      "entityAddForm": {
+        "displayName": "Nom d'affichage",
+        "includeComment": "Inclure un commentaire",
+        "author": "Auteur",
+        "commentText": "Texte du commentaire",
+        "captchaCheck": "Une petite seconde, on doit vérifier que vous n'êtes pas un robot...",
+        "captchaExpired": "Le captcha a expiré",
+        "captchaValidationError": "Erreur de validation du captcha",
+        "success": "Succès",
+        "entitySuccess": "Entité ajoutée avec succès",
+        "entityAndCommentSuccess": "Entité et commentaire ajoutés avec succès",
+        "error": "Erreur",
+        "entityError": "Erreur lors de l'ajout de l'entité",
+        "entityAndCommentError": "Erreur lors de l'ajout de l'entité ou du commentaire",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "save": "Sauvegarder"
+      },
+      "filterConfig": {
+        "general": "Général",
+        "tags": "Tags",
+        "constraints": "Contraintes",
+        "categories": "Catégories",
+        "invert": "Inverser",
+        "selectAll": "Tout sélectionner",
+        "reset": "Réinitialiser",
+        "filters": "Filtres",
+        "hidden": "Caché",
+        "displayed": "Affiché",
+        "required": "Requis",
+        "searchTag": "Rechercher un tag",
+        "clearSearch": "Retirer la recherche",
+        "clearFilters": "Retirer tous les filtres"
+      },
+      "fullResult": {
+        "noGeo": "Aucune position géographique",
+        "viewDetails": "Voir en détail"
+      },
+      "information": {
+        "safeHaven": "SafeHaven",
+        "safeHavenDescription": "SafeHaven est une solution opensource de création de carte collaborative.<br>Vous pouvez facilement créer votre carte !",
+        "discoverOnGitHub": "Découvrir sur GitHub"
+      },
+      "map": {
+        "error": "Erreur",
+        "refreshError": "Impossible de rafraîchir la carte",
+        "entityLoadError": "Impossible de charger l'entité sélectionnée"
+      },
+      "navbar": {
+        "add": "Ajouter",
+        "filters": "Filtres",
+        "mapMode": "Passage en mode carte",
+        "listMode": "Passage en mode liste",
+        "info": "Info",
+        "search": "Recherche",
+        "darkMode": "Mode sombre/clair",
+        "searchPoint": "Chercher un point",
+        "searchPlace": "Chercher un lieu",
+        "searchPlaceholder": "Tapez votre recherche ici",
+        "searchPointOnMap": "Recherche d'un point sur la carte",
+        "minChars": "4 caractères minimum",
+        "placeSearchPlaceholder": "Tours, France",
+        "searchPlaceOrAddress": "Recherche d'une ville, d'un lieu, d'une adresse",
+        "noResults": "Aucun résultat trouvé",
+        "information": "Informations",
+        "error": "Erreur",
+        "resultsLoadError": "Impossible de charger les résultats",
+        "noKnownAddress": "Aucune adresse connue",
+        "searchWithNominatim": "Recherche avec Nominatim © OpenStreetMap Contributor"
+      },
+      "richTextEditor": {
+        "bold": "Gras",
+        "italic": "Italique",
+        "underline": "Souligner",
+        "strike": "Barrer",
+        "subscript": "Indice",
+        "superscript": "Exposant"
+      }
+    },
+    "admin": {
+      "families": {
+        "editform": {
+          "newPage": "Nouvelle page",
+          "page": "Page {page}",
+          "fieldTitle": "Titre",
+          "fieldTitlePlaceholder": "Titre du champ",
+          "editKey": "Modifier la clé",
+          "fieldType": "Type",
+          "options": "Options",
+          "events": "Évènements",
+          "fieldChangeWarning": "Modifier le type, le sous-type ou le format peut causer de l'incohérence.",
+          "helpText": "Texte d'aide",
+          "helpTextPlaceholder": "Texte d'aide",
+          "displayOrder": "Ordre d'affichage",
+          "notDisplayed": "Non-affiché",
+          "required": "Requis",
+          "searchable": "Recherchable",
+          "filterable": "Filtrable",
+          "adminFilterOnly": "Filtrage admin uniquement",
+          "restrictedByCategories": "Restriction par catégories",
+          "selectedCategories": "{0} catégories sélectionnées",
+          "newField": "Nouveau champ",
+          "cancel": "Annuler",
+          "save": "Sauvegarder",
+          "confirmDeleteField": "Confirmer la suppression du champ",
+          "acceptDelete": "Confirmer",
+          "rejectDelete": "Annuler",
+          "fieldDeleteTooltip": "Ce champ ne sera plus visible sur les {kindName}s le comportant déjà tant que la clé n'est pas réutilisée, mais les informations resteront en base de donnée.",
+          "editFieldOptions": "Édition des options du champ {display_name}",
+          "editFieldEvents": "Édition des évènements du champ {display_name}",
+          "editFieldKey": "Édition de la clé du champ {display_name}",
+          "optionLabel": "Label",
+          "optionLabelPlaceholder": "Nom de l'option",
+          "optionKey": "Clé",
+          "optionKeyPlaceholder": "Clé unique",
+          "optionKeyWarning": "Modifier la clé ou supprimer l'option peut entraîner des incohérences dans les {kindName}s utilisant cette option.",
+          "optionHiddenTooltip": "Si activé, ce champ ne sera pas affiché dans les résultats lorsque cette option est sélectionnée",
+          "optionDeleteTooltip": "Cette option ne sera plus visible sur les {kindName}s le comportant déjà tant que la clé n'est pas réutilisée, mais les informations resteront en base de donnée.",
+          "addOption": "Ajouter une option",
+          "eventLabel": "Label",
+          "eventLabelPlaceholder": "Nom de l'évènement",
+          "eventColor": "Couleur",
+          "eventKey": "Clé",
+          "eventKeyPlaceholder": "Clé unique",
+          "eventKeyWarning": "Modifier la clé ou supprimer l'évènement peut entraîner des incohérences dans les {kindName}s utilisant cet évènement.",
+          "eventDeleteTooltip": "Cet évènement ne sera plus visible sur les {kindName}s le comportant déjà tant que la clé n'est pas réutilisée, mais les informations resteront en base de donnée.",
+          "addEvent": "Ajouter un évènement",
+          "addNewField": "Ajouter un nouveau champ",
+          "fieldKey": "Clé",
+          "fieldKeyPlaceholder": "Clé unique",
+          "keyWarning": "Si modifiée, les {kindName}s en base de donnée comportant l'ancienne clé ne pourront plus afficher ce champ, sauf si un champ du formulaire avec un type compatible vient à porter de nouveau l'ancienne clé.",
+          "error": "Erreur",
+          "keyAlreadyInUse": "Clé déjà actuellement utilisée par un autre champ",
+          "success": "Succès",
+          "familyUpdatedSuccess": "Famille modifiée avec succès",
+          "familyUpdateError": "Erreur de modification de la famille",
+          "fieldTypeSingleLineText": "Texte court",
+          "fieldTypeMultiLineText": "Texte long",
+          "fieldTypeRichText": "Éditeur riche",
+          "fieldTypeBoolean": "Vrai / Faux",
+          "fieldTypeNumber": "Nombre",
+          "fieldTypeDiscreteScore": "Score discret",
+          "fieldTypeDate": "Date",
+          "fieldTypeSingleOption": "Choix unique",
+          "fieldTypeMultiOption": "Choix multiples",
+          "fieldTypeEventList": "Liste d'événements",
+          "stringTypeNone": "Aucun",
+          "stringTypeUrl": "URL",
+          "stringTypePhone": "Téléphone",
+          "stringTypeEmail": "E-mail"
+        },
+        "editformjson": {
+          "description": "Édition directe du formulaire en .json, utile pour l'import/export. Ne réalisez d'autres changements par ce biais que si vous comprenez précisément la structure du formulaire. Pour sauvegarder, utilisez le bouton de prévisualisation, qui vous permettra d'abord de vérifier vos changements dans l'éditeur visuel. Tout changement non sauvegardé dans l'éditeur visuel sera écrasé.",
+          "import": "Importer",
+          "export": "Exporter",
+          "syncAndPreview": "Synchroniser et prévisualiser",
+          "importSuccess": "Le fichier a été importé avec succès. Les changements ne sont pas encore sauvegardés.",
+          "importError": "Le fichier n'a pas pu être importé.",
+          "syncSuccess": "Synchronisation réussie, veuillez vérifier vos changements puis sauvegarder.",
+          "syncError": "Erreur de synchronisation. Votre JSON est-il syntaxiquement correct ?",
+          "invalidJson": "Le fichier importé ne possède pas une structure .json correcte."
+        }
+      },
+      "input": {
+        "iconUpload": {
+          "downloadFailed": "Échec du téléchargement de l'image.",
+          "error": "Erreur",
+          "success": "Succès",
+          "uploadSuccess": "Image téléchargée avec succès!",
+          "uploadFailedWithStatus": "Échec du téléchargement de l'image, statut {status}.",
+          "uploadFailedWithMessage": "Échec du téléchargement de l'image: {message}",
+          "changeIcon": "Modifier l'icône",
+          "upload": "Télecharger",
+          "localFile": "Télecharger depuis vos fichiers locaux",
+          "or": "OU",
+          "urlPlaceholder": "http://url.com/icon.svg",
+          "save": "Sauvegarder",
+          "downloadFromUrl": "Télécharger depuis une URL"
+        },
+        "policyPermissionField": {
+          "accessAll": "Accès à toutes les {label} par défaut",
+          "selectExclude": "Sélectionner les {label} à exclure (le cas échéant)",
+          "selectInclude": "Sélectionner les {label} à inclure"
+        }
+      },
+      "editDeleteButtons": {
+        "deleteHeader": "Suppression {modelName} {name}",
+        "deleteWarning": "La suppression de {modelName} {name} entraînera la suppression définitive de {count} entités.",
+        "confirmPrompt": "Cette action ne pourra pas être annulée. Pour confirmer, veuillez entrer le nom {modelName} ci-dessous :",
+        "confirmDelete": "Confirmer la suppression {modelName}",
+        "cancel": "Annuler",
+        "confirm": "Confirmer"
+      },
+      "entityKinshipTable": {
+        "addParent": "Ajouter un parent",
+        "addChild": "Ajouter un enfant",
+        "childrenList": "Liste des enfants",
+        "parentsList": "Liste des parents",
+        "noKinship": "Aucun parent ni enfant pour le moment",
+        "entityName": "Nom de l'entité",
+        "category": "Catégorie",
+        "parentRelationship": "de la relation avec le parent",
+        "childRelationship": "de la relation avec l'enfant",
+        "success": "Succès",
+        "error": "Erreur",
+        "childAddedSuccess": "Relation avec l'enfant {name} ajoutée avec succès",
+        "childAddError": "Erreur d'ajout de la relation avec l'enfant {name}",
+        "parentAddedSuccess": "Relation avec le parent {name} ajoutée avec succès",
+        "parentAddError": "Erreur d'ajout de la relation avec le parent {name}",
+        "parentRemovedSuccess": "Relation avec le parent {name} supprimée avec succès",
+        "parentRemoveError": "Erreur de suppression de la relation avec le parent {name}",
+        "childRemovedSuccess": "Relation avec l'enfant {name} supprimée avec succès",
+        "childRemoveError": "Erreur de suppression de la relation avec l'enfant {name}"
+      },
+      "navbar": {
+        "versionInfo": "Information de version",
+        "updateAvailable": "Une mise à jour est disponible.",
+        "githubLink": "Rendez-vous sur GitHub pour voir et mettre à jour vers la dernière version.",
+        "currentVersion": "Version actuelle",
+        "gitHash": "Git hash",
+        "latestVersion": "Dernière version",
+        "unknown": "Inconnu",
+        "myAccount": "Mon compte",
+        "logout": "Me déconnecter"
+      },
+      "sidebar": {
+        "management": "Gestion",
+        "categories": "Catégories",
+        "entities": "Entités",
+        "pendingEntities": "Entités en attente",
+        "pendingComments": "Commentaires en attente",
+        "home": "Accueil",
+        "config": "Configuration",
+        "users": "Utilisateur⋅ices",
+        "accessTokens": "Jetons d'accès",
+        "families": "Familles",
+        "tags": "Tags"
+      }
+    },
+    "form": {
+      "adresses": {
+        "addAddress": "Ajouter une adresse",
+        "addresses": "Adresses",
+        "selectAddress": "Sélectionner une adresse",
+        "cancel": "Annuler",
+        "select": "Sélectionner",
+        "error": "Erreur",
+        "addressAlreadyExists": "Adresse déjà présente"
+      },
+      "categorySelect": {
+        "category": "Catégorie",
+        "selectCategory": "Sélectionner une catégorie"
+      },
+      "dynamicField": {
+        "discreteScore": {
+          "bad": "Mauvais",
+          "ratherBad": "Plutôt mauvais",
+          "ratherGood": "Plutôt bon",
+          "good": "Bon"
+        },
+        "dateFormat": "dd/mm/yy",
+        "datePlaceholder": "jj/mm/aaaa",
+        "optionalDetails": "Détails (optionnels)",
+        "newEvent": "Nouvel évènement",
+        "eventTypePlaceholder": "Type d'évènement",
+        "urlTooltip": "URL valide attendue",
+        "emailTooltip": "Email valide attendu",
+        "phoneTooltip": "Numéro de téléphone attendu"
+      },
+      "tagSelect": {
+        "tags": "Tags",
+        "emptyFilterMessage": "Aucun résultat trouvé",
+        "placeholder": "Sélectionner des tags"
+      }
+    },
+    "commentDisplayer": {
+      "toModerate": "À modérer",
+      "commentModelName": "du commentaire"
+    },
+    "nominatimPicker": {
+      "searchAddress": "Rechercher une adresse",
+      "startSearch": "Lancer la recherche",
+      "noResults": "Aucun résultat trouvé",
+      "address": "Adresse"
+    },
+    "polygonDrawer": {
+      "header": "Délimitez une zone géographique",
+      "polygon": "polygone",
+      "polygons": "polygones",
+      "max": "au plus",
+      "clear": "Effacer",
+      "cancel": "Annuler",
+      "save": "Sauvegarder"
+    },
+    "requiredIndicator": {
+      "requiredField": "Champ requis"
+    },
+    "startPopup": {
+      "information": "Informations",
+      "validate": "Valider"
+    }
+  },
+  "page": {
+    "search": {
+      "token": {
+        "resultsSingular": "résultat",
+        "resultsPlural": "résultats",
+        "search": "Recherche",
+        "addCommentHint": "Pour ajouter un commentaire, veuillez d'abord rechercher l'entité à laquelle vous désirez l'ajouter",
+        "searchPlaceholder": "Tapez votre recherche ici",
+        "minChars": "(4 caractères minimum)",
+        "filters": "Filtres",
+        "error": "Erreur",
+        "loadDataError": "Impossible de charger les données",
+        "loadResultsError": "Impossible de charger les résultats"
+      }
+    },
+    "map": {
+      "token": {
+        "error": "Erreur",
+        "couldNotLoadEntity": "Impossible de charger l'entité sélectionnée",
+        "couldNotLoadMap": "Impossible de charger la carte"
+      }
+    },
+    "add": {
+      "token": {
+        "add": "Ajouter",
+        "error": "Erreur",
+        "couldNotLoadMap": "Impossible de charger la carte"
+      }
+    },
+    "admin": {
+      "login": {
+        "adminSpace": "Espace d'administration",
+        "invalidCredentials": "Nom d'utilisateur⋅ice ou mot de passe incorrect",
+        "username": "Nom d'utilisateur⋅ice",
+        "password": "Mot de passe",
+        "rememberMe": "Se souvenir de moi",
+        "login": "Se connecter"
+      },
+      "home": {
+        "pageTitle": "Accueil",
+        "activities30Days": "Activités des 30 derniers jours",
+        "entities": "Entités",
+        "comments": "Commentaires",
+        "pendingEntities": "Entités en attente",
+        "pendingComments": "Commentaires en attente",
+        "visits30Days": "Visites (30 jours)",
+        "visits7Days": "Visites (7 jours)",
+        "visits": "Visites"
+      },
+      "config": {
+        "add": "Ajouter",
+        "general": "Général",
+        "popup": "Popup",
+        "mapInitialization": "Carte - Initialisation",
+        "mapSource": "Carte - Source",
+        "mapCluster": "Carte - Cluster",
+        "safeMode": "Mode Sécurisé",
+        "title": "Titre",
+        "subtitle": "Sous-titre",
+        "information": "Information",
+        "logoUrl": "URL du logo",
+        "redirectUrlEnabled": "Rediriger les tokens invalides vers une URL personnalisée",
+        "redirectUrl": "URL de redirection",
+        "cancel": "Annuler",
+        "reset": "Réinitialiser",
+        "save": "Sauvegarder",
+        "showPopup": "Afficher un popup au lancement de l'application",
+        "popupText": "Popup d'accueil",
+        "popupCheckbox": "Ajouter une case à cocher dans le popup d'accueil",
+        "popupCheckboxText": "Texte accompagnant la case à cocher du popup d'accueil",
+        "centerLat": "Latitude du Centre",
+        "centerLng": "Longitude du Centre",
+        "zoom": "Niveau de Zoom",
+        "lightMapUrl": "URL des tuiles de carte, thème clair",
+        "lightMapAttributions": "Attributions pour les tuiles de carte, thème clair",
+        "darkMapUrl": "URL des tuiles de carte, thème sombre",
+        "darkMapAttributions": "Attributions pour les tuiles de carte, thème sombre",
+        "characteristicDistance": "Distance caractéristique",
+        "declusteringSpeed": "Vitesse de dégroupement",
+        "minimalClusterSize": "Taille minimale du cluster",
+        "enableSafeMode": "Activer le mode sécurisé",
+        "hcaptchaSitekey": "Clé de Site hCaptcha",
+        "hcaptchaSecret": "Clé Secrète hCaptcha",
+        "error": "Erreur",
+        "resetError": "Erreur de réinitialisation du groupe d'options",
+        "resetSuccess": "Groupe d'options réinitialisé avec succès",
+        "saveError": "Erreur de sauvegarde du groupe d'options",
+        "saveSuccess": "Groupe d'options sauvegardé avec succès",
+        "success": "Succès"
+      }
+    }
+  },
+  "layout": {
+    "admin": {
+      "navigation": "Navigation"
+    }
+  },
+  "app": {
+    "apiUnavailable": "L'API n'est pas disponible",
+    "tryAgainLater": "Veuillez réessayer plus tard"
+  },
+  "error": {
+    "somethingWentWrong": "Oups ! Quelque chose s'est mal passé."
+  }
+}

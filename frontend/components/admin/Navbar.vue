@@ -116,7 +116,7 @@
 
   <Dialog
     v-model:visible="versionModalVisible"
-    header="Information de version"
+    :header="$t('cmp.admin.navbar.versionInfo')"
     modal
     dismissable-mask
   >
@@ -125,20 +125,20 @@
       severity="warn"
       class="m-1"
     >
-      Une mise à jour est disponible.<br>
-      <a href="https://github.com/SafeHavenMaps/safehaven/releases">Rendez-vous sur GitHub</a> pour voir et mettre à jour vers la dernière version.
+      {{ $t('cmp.admin.navbar.updateAvailable') }}<br>
+      <a href="https://github.com/SafeHavenMaps/safehaven/releases">{{ $t('cmp.admin.navbar.githubLink') }}</a>
     </Message>
     <div class="m-1">
-      Version actuelle: <pre>{{ state.versionInformation?.version ?? 'Inconnu' }}</pre>
+      {{ $t('cmp.admin.navbar.currentVersion') }}: <pre>{{ state.versionInformation?.version ?? $t('cmp.admin.navbar.unknown') }}</pre>
     </div>
     <div class="m-1">
-      Git hash: <pre>{{ state.versionInformation?.git_hash ?? 'Inconnu' }}</pre>
+      {{ $t('cmp.admin.navbar.gitHash') }}: <pre>{{ state.versionInformation?.git_hash ?? $t('cmp.admin.navbar.unknown') }}</pre>
     </div>
     <div
       v-if="state.versionInformation?.github_latest_version"
       class="m-1"
     >
-      Dernière version: <pre>{{ state.versionInformation?.github_latest_version }}</pre>
+      {{ $t('cmp.admin.navbar.latestVersion') }}: <pre>{{ state.versionInformation?.github_latest_version }}</pre>
     </div>
   </Dialog>
 </template>
@@ -150,6 +150,7 @@ import safehaven_logo from '~/assets/logo_square_white.svg'
 
 const emit = defineEmits(['toggleSidebar'])
 const darkMode = useDarkMode()
+const { t } = useI18n()
 
 const accountMenu = ref<typeof Menu | null>(null)
 const versionModalVisible = ref(false)
@@ -158,7 +159,7 @@ const navbarRef: Ref<HTMLElement | null> = ref(null)
 try {
   await state.check_login()
   await state.fetchConfig()
-  await state.fetchVersionInformaton()
+  await state.fetchVersionInformation()
 }
 catch {
   // Do nothing
@@ -174,13 +175,13 @@ const items = [
     label: state.username!,
     items: [
       {
-        label: 'Mon compte',
+        label: t('cmp.admin.navbar.myAccount'),
         command: () => {
           navigateTo('/admin/users/self')
         },
       },
       {
-        label: 'Me déconnecter',
+        label: t('cmp.admin.navbar.logout'),
         command: () => {
           state.logout()
         },

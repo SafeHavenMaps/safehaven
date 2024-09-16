@@ -6,13 +6,13 @@
         :input-id="`${props.label}.allow_all`"
         @update:model-value="(value:boolean) => emit('update:model-value', { ...props.modelValue, allow_all: value })"
       />
-      <label :for="`${props.label}.allow_all`">Accès à toutes les {{ props.label }} par défaut</label>
+      <label :for="`${props.label}.allow_all`">{{ $t('cmp.admin.input.policyPermissionField.accessAll', { label: props.label }) }}</label>
     </span>
     <div
       v-if="props.modelValue.allow_all"
       class="flex flex-col gap-2"
     >
-      <label :for="`${props.label}.force_exclude`">Sélectionner les {{ props.label }} à exclure (le cas échéant)</label>
+      <label :for="`${props.label}.force_exclude`">{{ $t('cmp.admin.input.policyPermissionField.selectExclude', { label: props.label }) }}</label>
       <MultiSelect
         :model-value="props.modelValue.force_exclude"
         :options="props.options"
@@ -26,7 +26,7 @@
       v-if="!props.modelValue.allow_all"
       class="flex flex-col gap-2"
     >
-      <label :for="`${props.label}.allow_list`">Sélectionner les {{ props.label }} à inclure</label>
+      <label :for="`${props.label}.allow_list`">{{ $t('cmp.admin.input.policyPermissionField.selectInclude', { label: props.label }) }}</label>
       <MultiSelect
         :model-value="props.modelValue.allow_list"
         :options="props.options"

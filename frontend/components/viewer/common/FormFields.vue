@@ -44,7 +44,7 @@
 
     <div v-else-if="field.field_type == 'Boolean'">
       <p>
-        {{ getKeyValue(field.key) ? '✅ Oui' : '❌ Non' }}
+        {{ getKeyValue(field.key) ? $t('cmp.viewer.common.formFields.yes') : $t('cmp.viewer.common.formFields.no') }}
       </p>
     </div>
 
@@ -85,11 +85,11 @@
 
           <AccordionContent>
             <p>
-              <strong>Date :</strong> {{ event.date.toLocaleDateString() }}
+              <strong>{{ $t('cmp.viewer.common.formFields.date') }} :</strong> {{ event.date.toLocaleDateString() }}
             </p>
 
             <p v-if="event.comment && event.comment.length > 0">
-              <strong>Commentaire :</strong>
+              <strong>{{ $t('cmp.viewer.common.formFields.comment') }} :</strong>
               <br>
               {{ event.comment }}
             </p>

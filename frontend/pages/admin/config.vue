@@ -2,22 +2,22 @@
   <Tabs value="0">
     <TabList>
       <Tab value="0">
-        Général
+        {{ $t('page.admin.config.general') }}
       </Tab>
       <Tab value="1">
-        Popup
+        {{ $t('page.admin.config.popup') }}
       </Tab>
       <Tab value="2">
-        Carte - Initialisation
+        {{ $t('page.admin.config.mapInitialization') }}
       </Tab>
       <Tab value="3">
-        Carte - Source
+        {{ $t('page.admin.config.mapSource') }}
       </Tab>
       <Tab value="4">
-        Carte - Cluster
+        {{ $t('page.admin.config.mapCluster') }}
       </Tab>
       <Tab value="5">
-        Mode Sécurisé
+        {{ $t('page.admin.config.safeMode') }}
       </Tab>
     </TabList>
     <TabPanels>
@@ -29,21 +29,21 @@
           <AdminInputTextField
             id="title"
             v-model="editedConfig.general.title"
-            label="Titre"
+            :label="$t('page.admin.config.title')"
             :variant="hasBeenEdited('general', 'title')"
           />
 
           <AdminInputTextField
             id="subtitle"
             v-model="editedConfig.general.subtitle"
-            label="Sous-titre"
+            :label="$t('page.admin.config.subtitle')"
             :variant="hasBeenEdited('general', 'subtitle')"
           />
 
           <AdminInputTextField
             id="information"
             v-model="editedConfig.general.information"
-            label="Information"
+            :label="$t('page.admin.config.information')"
             :variant="hasBeenEdited('general', 'information')"
             text-length="editor"
           />
@@ -52,7 +52,7 @@
             id="logo_url"
             v-model="editedConfig.general.logo_url"
             optional
-            label="URL du logo"
+            :label="$t('page.admin.config.logoUrl')"
             :variant="hasBeenEdited('general', 'logo_url')"
             :invalid="!isOptionValid({ group: 'general', name: 'logo_url' })"
           />
@@ -60,34 +60,34 @@
           <AdminInputSwitchField
             id="redirect_url_enabled"
             v-model="customRedirection"
-            label="Rediriger les tokens invalides vers une URL personnalisée"
+            :label="$t('page.admin.config.redirectUrlEnabled')"
           />
 
           <AdminInputTextField
             v-if="customRedirection"
             id="redirect_url"
             v-model="editedConfig.general.redirect_url"
-            label="URL de redirection"
+            :label="$t('page.admin.config.redirectUrl')"
             :variant="hasBeenEdited('general', 'redirect_url')"
             :invalid="!editedConfig.general.redirect_url || !validator.isURL(editedConfig.general.redirect_url)"
           />
 
           <span class="flex gap-1 justify-end">
             <Button
-              label="Annuler"
+              :label="$t('page.admin.config.cancel')"
               severity="secondary"
               :disabled="processingRequest"
               @click="onCancel('general')"
             />
             <Button
               v-if="state.is_admin"
-              label="Réinitialiser"
+              :label="$t('page.admin.config.reset')"
               :disabled="processingRequest"
               @click="onDelete('general')"
             />
             <Button
               v-if="state.is_admin"
-              label="Sauvegarder"
+              :label="$t('page.admin.config.save')"
               type="submit"
               :disabled="processingRequest || !isOptionGroupValid('general')"
             />
@@ -103,14 +103,14 @@
           <AdminInputSwitchField
             id="popup_enabled"
             v-model="popupEnabled"
-            label="Afficher un popup au lancement de l'application"
+            :label="$t('page.admin.config.showPopup')"
           />
 
           <AdminInputTextField
             v-if="popupEnabled"
             id="popup"
             v-model="editedConfig.init_popup.popup"
-            label="Popup d'accueil"
+            :label="$t('page.admin.config.popupText')"
             :variant="hasBeenEdited('init_popup', 'popup')"
             text-length="editor"
           />
@@ -119,14 +119,14 @@
             v-if="popupEnabled"
             id="popup_check_enabled"
             v-model="popupCheckboxEnabled"
-            label="Mettre une case à cocher dans le popup d'accueil"
+            :label="$t('page.admin.config.popupCheckbox')"
           />
 
           <AdminInputTextField
             v-if="popupEnabled && popupCheckboxEnabled"
             id="popup"
             v-model="editedConfig.init_popup.popup_check_text"
-            label="Texte accompagnant la case à cocher de la popup d'accueil"
+            :label="$t('page.admin.config.popupCheckboxText')"
             :variant="hasBeenEdited('init_popup', 'popup_check_text')"
           />
 
@@ -161,21 +161,21 @@
           <AdminInputNumberField
             id="center_lat"
             v-model="editedConfig.cartography_init.center_lat"
-            label="Latitude du Centre"
+            :label="$t('page.admin.config.centerLat')"
             :variant="hasBeenEdited('cartography_init', 'center_lat')"
           />
 
           <AdminInputNumberField
             id="center_lng"
             v-model="editedConfig.cartography_init.center_lng"
-            label="Longitude du Centre"
+            :label="$t('page.admin.config.centerLng')"
             :variant="hasBeenEdited('cartography_init', 'center_lng')"
           />
 
           <AdminInputNumberField
             id="zoom"
             v-model="editedConfig.cartography_init.zoom"
-            label="Niveau de Zoom"
+            :label="$t('page.admin.config.zoom')"
             :variant="hasBeenEdited('cartography_init', 'zoom')"
           />
 
@@ -210,28 +210,28 @@
           <AdminInputTextField
             id="light_map_url"
             v-model="editedConfig.cartography_source.light_map_url"
-            label="URL des tuiles de carte, thème clair"
+            :label="$t('page.admin.config.lightMapUrl')"
             :variant="hasBeenEdited('cartography_source', 'light_map_url')"
           />
 
           <AdminInputTextField
             id="light_map_attributions"
             v-model="editedConfig.cartography_source.light_map_attributions"
-            label="Attributions pour les tuiles de carte, thème clair"
+            :label="$t('page.admin.config.lightMapAttributions')"
             :variant="hasBeenEdited('cartography_source', 'light_map_attributions')"
           />
 
           <AdminInputTextField
             id="dark_map_url"
             v-model="editedConfig.cartography_source.dark_map_url"
-            label="URL des tuiles de carte, thème sombre"
+            :label="$t('page.admin.config.darkMapUrl')"
             :variant="hasBeenEdited('cartography_source', 'dark_map_url')"
           />
 
           <AdminInputTextField
             id="dark_map_attributions"
             v-model="editedConfig.cartography_source.dark_map_attributions"
-            label="Attributions pour les tuiles de carte, thème sombre"
+            :label="$t('page.admin.config.darkMapAttributions')"
             :variant="hasBeenEdited('cartography_source', 'dark_map_attributions')"
           />
 
@@ -266,21 +266,21 @@
           <AdminInputNumberField
             id="characteristic_distance"
             v-model="editedConfig.cartography_cluster.characteristic_distance"
-            label="Distance caractéristique"
+            :label="$t('page.admin.config.characteristicDistance')"
             :variant="hasBeenEdited('cartography_cluster', 'characteristic_distance')"
           />
 
           <AdminInputNumberField
             id="declustering_speed"
             v-model="editedConfig.cartography_cluster.declustering_speed"
-            label="Vitesse de dégroupement"
+            :label="$t('page.admin.config.declusteringSpeed')"
             :variant="hasBeenEdited('cartography_cluster', 'declustering_speed')"
           />
 
           <AdminInputNumberField
             id="minimal_cluster_size"
             v-model="editedConfig.cartography_cluster.minimal_cluster_size"
-            label="Taille minimale du cluster"
+            :label="$t('page.admin.config.minimalClusterSize')"
             :variant="hasBeenEdited('cartography_cluster', 'minimal_cluster_size')"
           />
 
@@ -314,15 +314,15 @@
         >
           <AdminInputSwitchField
             id="safe_mode_enabled"
-            v-model="editedConfig.safe_mode.enabled as boolean"
-            label="Activer le mode sécurisé"
+            v-model="(editedConfig.safe_mode.enabled as boolean)"
+            :label="$t('page.admin.config.enableSafeMode')"
           />
 
           <AdminInputTextField
             v-if="editedConfig.safe_mode.enabled"
             id="hcaptcha_sitekey"
             v-model="editedConfig.safe_mode.hcaptcha_sitekey"
-            label="Clé de Site hCaptcha"
+            :label="$t('page.admin.config.hcaptchaSitekey')"
             :variant="hasBeenEdited('safe_mode', 'hcaptcha_sitekey')"
           />
 
@@ -330,7 +330,7 @@
             v-if="editedConfig.safe_mode.enabled"
             id="hcaptcha_secret"
             v-model="editedConfig.safe_mode.hcaptcha_secret"
-            label="Clé Secrète hCaptcha"
+            :label="$t('page.admin.config.hcaptchaSecret')"
             :variant="hasBeenEdited('safe_mode', 'hcaptcha_secret')"
           />
 

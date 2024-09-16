@@ -33,13 +33,12 @@
     modal
     dismissable-mask
     :closable="false"
-    :header="`Suppression ${props.modelName} ${props.name}`"
+    :header="$t('cmp.admin.editDeleteButtons.deleteHeader', { modelName: props.modelName, name: props.name })"
     :style="{ width: '25rem' }"
   >
     <span class="p-text-secondary block mb-4 -mt-2">
-      <p>La suppression {{ props.modelName }} {{ props.name }}
-        entraînera <b>la suppression définitive de {{ props.secureDeleteEntityCount }} entités</b>.</p>
-      <p>Cette action ne pourra pas être annulée. Pour confirmer, veuillez entrer le nom {{ props.modelName }} ci-dessous :</p>
+      <p>{{ $t('cmp.admin.editDeleteButtons.deleteWarning', { modelName: props.modelName, name: props.name, count: props.secureDeleteEntityCount }) }}</p>
+      <p>{{ $t('cmp.admin.editDeleteButtons.confirmPrompt', { modelName: props.modelName }) }}</p>
     </span>
     <InputText
       id="repeatName"
@@ -50,14 +49,14 @@
     <div class="flex justify-end gap-2">
       <Button
         type="button"
-        label="Annuler"
+        :label="$t('cmp.admin.editDeleteButtons.cancel')"
         severity="secondary"
         @click="secureDeleteDialogVisible = false"
       />
       <Button
         :disabled="repeatName.toUpperCase() != props.name.toUpperCase()"
         type="button"
-        label="Confirmer"
+        :label="$t('cmp.admin.editDeleteButtons.confirm')"
         @click="() => {
           secureDeleteDialogVisible = false,
           loading = true,
@@ -87,6 +86,7 @@ const emit = defineEmits<{
   (e: 'delete', id: string, name: string, onDeleteDone: () => void): void
 }>()
 
+const { t } = useI18n()
 const confirm = useConfirm()
 interface ExtendedConfirmationOptions extends ConfirmationOptions {
   objectId?: string
@@ -104,13 +104,13 @@ function onDelete(event: Event) {
     const options: ExtendedConfirmationOptions = {
       target: event.currentTarget as HTMLElement,
       group: 'delete',
-      message: `Confirmer la suppression ${props.modelName}`,
+      message: t('cmp.admin.editDeleteButtons.confirmDelete', { modelName: props.modelName }),
       objectId: props.name,
       icon: 'warning',
       rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
       acceptClass: 'p-button-sm',
-      rejectLabel: 'Annuler',
-      acceptLabel: 'Confirmer',
+      rejectLabel: t('cmp.admin.editDeleteButtons.cancel'),
+      acceptLabel: t('cmp.admin.editDeleteButtons.confirm'),
       reject: () => {},
       accept: () => {
         loading.value = true
