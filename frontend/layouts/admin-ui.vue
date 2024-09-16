@@ -14,7 +14,7 @@
         :class="{ collapsed: sidebarCollapsed }"
       >
         <div class="sidebar-title mb-1">
-          Navigation
+          {{ $t('layout.admin.navigation') }}
         </div>
         <AdminSidebar />
       </div>

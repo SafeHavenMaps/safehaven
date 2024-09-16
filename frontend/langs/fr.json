@@ -338,10 +338,108 @@
       "validate": "Valider"
     }
   },
-  "pages": {
-    "errors": {
-      "Error": "Erreur",
-      "CouldNotLoadMap": "Impossible de charger la carte"
+  "page": {
+    "search": {
+      "token": {
+        "resultsSingular": "résultat",
+        "resultsPlural": "résultats",
+        "search": "Recherche",
+        "addCommentHint": "Pour ajouter un commentaire, veuillez d'abord rechercher l'entité à laquelle vous désirez l'ajouter",
+        "searchPlaceholder": "Tapez votre recherche ici",
+        "minChars": "(4 caractères minimum)",
+        "filters": "Filtres",
+        "error": "Erreur",
+        "loadDataError": "Impossible de charger les données",
+        "loadResultsError": "Impossible de charger les résultats"
+      }
+    },
+    "map": {
+      "token": {
+        "error": "Erreur",
+        "couldNotLoadEntity": "Impossible de charger l'entité sélectionnée",
+        "couldNotLoadMap": "Impossible de charger la carte"
+      }
+    },
+    "add": {
+      "token": {
+        "add": "Ajouter",
+        "error": "Erreur",
+        "couldNotLoadMap": "Impossible de charger la carte"
+      }
+    },
+    "admin": {
+      "login": {
+        "adminSpace": "Espace d'administration",
+        "invalidCredentials": "Nom d'utilisateur⋅ice ou mot de passe incorrect",
+        "username": "Nom d'utilisateur⋅ice",
+        "password": "Mot de passe",
+        "rememberMe": "Se souvenir de moi",
+        "login": "Se connecter"
+      },
+      "home": {
+        "pageTitle": "Accueil",
+        "activities30Days": "Activités des 30 derniers jours",
+        "entities": "Entités",
+        "comments": "Commentaires",
+        "pendingEntities": "Entités en attente",
+        "pendingComments": "Commentaires en attente",
+        "visits30Days": "Visites (30 jours)",
+        "visits7Days": "Visites (7 jours)",
+        "visits": "Visites"
+      },
+      "config": {
+        "add": "Ajouter",
+        "general": "Général",
+        "popup": "Popup",
+        "mapInitialization": "Carte - Initialisation",
+        "mapSource": "Carte - Source",
+        "mapCluster": "Carte - Cluster",
+        "safeMode": "Mode Sécurisé",
+        "title": "Titre",
+        "subtitle": "Sous-titre",
+        "information": "Information",
+        "logoUrl": "URL du logo",
+        "redirectUrlEnabled": "Rediriger les tokens invalides vers une URL personnalisée",
+        "redirectUrl": "URL de redirection",
+        "cancel": "Annuler",
+        "reset": "Réinitialiser",
+        "save": "Sauvegarder",
+        "showPopup": "Afficher un popup au lancement de l'application",
+        "popupText": "Popup d'accueil",
+        "popupCheckbox": "Ajouter une case à cocher dans le popup d'accueil",
+        "popupCheckboxText": "Texte accompagnant la case à cocher du popup d'accueil",
+        "centerLat": "Latitude du Centre",
+        "centerLng": "Longitude du Centre",
+        "zoom": "Niveau de Zoom",
+        "lightMapUrl": "URL des tuiles de carte, thème clair",
+        "lightMapAttributions": "Attributions pour les tuiles de carte, thème clair",
+        "darkMapUrl": "URL des tuiles de carte, thème sombre",
+        "darkMapAttributions": "Attributions pour les tuiles de carte, thème sombre",
+        "characteristicDistance": "Distance caractéristique",
+        "declusteringSpeed": "Vitesse de dégroupement",
+        "minimalClusterSize": "Taille minimale du cluster",
+        "enableSafeMode": "Activer le mode sécurisé",
+        "hcaptchaSitekey": "Clé de Site hCaptcha",
+        "hcaptchaSecret": "Clé Secrète hCaptcha",
+        "error": "Erreur",
+        "resetError": "Erreur de réinitialisation du groupe d'options",
+        "resetSuccess": "Groupe d'options réinitialisé avec succès",
+        "saveError": "Erreur de sauvegarde du groupe d'options",
+        "saveSuccess": "Groupe d'options sauvegardé avec succès",
+        "success": "Succès"
+      }
     }
+  },
+  "layout": {
+    "admin": {
+      "navigation": "Navigation"
+    }
+  },
+  "app": {
+    "apiUnavailable": "L'API n'est pas disponible",
+    "tryAgainLater": "Veuillez réessayer plus tard"
+  },
+  "error": {
+    "somethingWentWrong": "Oups ! Quelque chose s'est mal passé."
   }
 }

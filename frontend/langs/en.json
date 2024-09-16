@@ -37,10 +37,10 @@
         "page": "Page"
       },
       "entityAddForm": {
-        "displayName": "Display Name",
+        "displayName": "Display name",
         "includeComment": "Include a comment",
         "author": "Author",
-        "commentText": "Comment Text",
+        "commentText": "Comment text",
         "captchaCheck": "Hold on a second, we need to verify you're not a robot...",
         "captchaExpired": "The captcha has expired",
         "captchaValidationError": "Captcha validation error",
@@ -338,10 +338,106 @@
       "validate": "Validate"
     }
   },
-  "pages": {
-    "errors": {
-      "Error": "Error",
-      "CouldNotLoadMap": "Could not load the map"
+  "page": {
+    "search": {
+      "token": {
+        "resultsSingular": "result",
+        "resultsPlural": "results",
+        "search": "Search",
+        "addCommentHint": "To add a comment, please first search for the entity you wish to comment on",
+        "searchPlaceholder": "Type your search here",
+        "minChars": "(4 characters minimum)",
+        "filters": "Filters",
+        "error": "Error",
+        "loadDataError": "Unable to load data",
+        "loadResultsError": "Unable to load results"
+      }
+    },
+    "map": {
+      "token": {
+        "error": "Error",
+        "couldNotLoadEntity": "Unable to load the selected entity",
+        "couldNotLoadMap": "Unable to load the map"
+      }
+    },
+    "add": {
+      "token": {
+        "add": "Add",
+        "error": "Error",
+        "couldNotLoadMap": "Unable to load the map"
+      }
+    },
+    "admin": {
+      "login": {
+        "adminSpace": "Administration Space",
+        "invalidCredentials": "Invalid username or password",
+        "username": "Username",
+        "password": "Password",
+        "rememberMe": "Remember me",
+        "login": "Login"
+      },
+      "home": {
+        "pageTitle": "Dashboard",
+        "activities30Days": "Activities in the last 30 days",
+        "entities": "Entities",
+        "comments": "Comments",
+        "visits30Days": "Visits (30d)",
+        "visits7Days": "Visits (7d)",
+        "visits": "Visits"
+      },
+      "config": {
+        "add": "Add",
+        "general": "General",
+        "popup": "Popup",
+        "mapInitialization": "Map - Initialization",
+        "mapSource": "Map - Source",
+        "mapCluster": "Map - Cluster",
+        "safeMode": "Safe Mode",
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "information": "Information",
+        "logoUrl": "Logo URL",
+        "redirectUrlEnabled": "Redirect invalid tokens to a custom URL",
+        "redirectUrl": "Redirect URL",
+        "cancel": "Cancel",
+        "reset": "Reset",
+        "save": "Save",
+        "showPopup": "Show a popup on application launch",
+        "popupText": "Welcome popup",
+        "popupCheckbox": "Add a checkbox in the welcome popup",
+        "popupCheckboxText": "Text accompanying the checkbox in the welcome popup",
+        "centerLat": "Center Latitude",
+        "centerLng": "Center Longitude",
+        "zoom": "Zoom Level",
+        "lightMapUrl": "Tile URL, light theme",
+        "lightMapAttributions": "Tile attributions, light theme",
+        "darkMapUrl": "Tile URL, dark theme",
+        "darkMapAttributions": "Tile attributions, dark theme",
+        "characteristicDistance": "Characteristic Distance",
+        "declusteringSpeed": "Declustering Speed",
+        "minimalClusterSize": "Minimal Cluster Size",
+        "enableSafeMode": "Enable Safe Mode",
+        "hcaptchaSitekey": "hCaptcha Site Key",
+        "hcaptchaSecret": "hCaptcha Secret Key",
+        "error": "Error",
+        "resetError": "Error resetting the option group",
+        "resetSuccess": "Option group successfully reset",
+        "saveError": "Error saving the option group",
+        "saveSuccess": "Option group successfully saved",
+        "success": "Success"
+      }
     }
+  },
+  "layout": {
+    "admin": {
+      "navigation": "Navigation"
+    }
+  },
+  "app": {
+    "apiUnavailable": "API is not available",
+    "tryAgainLater": "Please try again later"
+  },
+  "error": {
+    "somethingWentWrong": "Oops! Something went wrong."
   }
 }

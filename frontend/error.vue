@@ -8,7 +8,7 @@
         >
       </div>
       <div class="text-5xl font-bold text-center">
-        Oops! Something went wrong.
+        {{ $t('error.somethingWentWrong') }}
       </div>
       <div>
         {{ error.message }}

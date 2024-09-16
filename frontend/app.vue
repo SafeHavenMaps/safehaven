@@ -5,9 +5,9 @@
     <NuxtPage v-if="state.loaded" />
     <NuxtPage v-else>
       <h1 class="text-xl">
-        API is not available
+        {{ $t('app.apiUnavailable') }}
       </h1>
-      <p>Please try again later</p>
+      <p>{{ $t('app.tryAgainLater') }}</p>
     </NuxtPage>
   </NuxtLayout>
 

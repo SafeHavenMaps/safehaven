@@ -27,7 +27,7 @@
           <ViewerFamilySwitcher />
 
           <Button
-            label="Ajouter"
+            :label="$t('page.add.token.add')"
             @click="entityAddForm!.open()"
           >
             <template #icon>
@@ -57,6 +57,7 @@ import defaultLogo from '~/assets/logo_square.svg'
 import type { ViewerEntityAddForm } from '#build/components'
 
 const toast = useToast()
+const { t } = useI18n()
 
 // Init state with url token
 const route = useRoute()
@@ -69,8 +70,8 @@ try {
 catch {
   toast.add({
     severity: 'error',
-    summary: 'Erreur',
-    detail: 'Impossible de charger la carte',
+    summary: t('page.add.token.error'),
+    detail: t('page.add.token.couldNotLoadMap'),
     life: 3000,
   })
   if (state.redirectUrl) {

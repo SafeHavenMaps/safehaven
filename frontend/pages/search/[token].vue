@@ -15,13 +15,13 @@
       <template #header>
         <div class="flex flex-col gap-1">
           <span class="text-2xl font-bold">
-            Recherche
+            {{ $t('page.search.token.search') }}
           </span>
           <span
             v-if="state.permissions?.can_add_comment && !state.permissions?.can_access_entity"
             class="text-muted-color"
           >
-            Pour ajouter un commentaire, veuillez d'abord rechercher l'entité à laquelle vous désirez l'ajouter
+            {{ $t('page.search.token.addCommentHint') }}
           </span>
         </div>
       </template>
@@ -32,7 +32,8 @@
             <InputGroup>
               <InputText
                 v-model="query"
-                :placeholder="'Tapez votre recherche ici' + (state.permissions?.can_list_without_query ? '' : '(4 caractères minimum)')"
+                :placeholder="$t('page.search.token.searchPlaceholder')
+                  + (state.permissions?.can_list_without_query ? '' : $t('page.search.token.minChars'))"
               />
 
               <Button
@@ -54,7 +55,7 @@
               <Button
                 type="button"
                 severity="warn"
-                label="Filtres"
+                :label="$t('page.search.token.filters')"
                 @click="showCriteriasModal()"
               >
                 <template #icon>
@@ -76,7 +77,8 @@
             <InputGroup>
               <InputText
                 v-model="query"
-                :placeholder="'Tapez votre recherche ici' + (state.permissions?.can_list_without_query ? '' : '(4 caractères minimum)')"
+                :placeholder="$t('page.search.token.searchPlaceholder')
+                  + (state.permissions?.can_list_without_query ? '' : $t('page.search.token.minChars'))"
               />
               <Button type="submit">
                 <template #icon>
@@ -194,7 +196,7 @@
     <Dialog
       v-model:visible="showCriterias"
       maximizable
-      header="Filtres"
+      :header="$t('page.search.token.filters')"
       :style="{ width: '50rem' }"
       :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
       modal
@@ -217,6 +219,7 @@ import type { ViewerPaginatedCachedEntities } from '~/lib'
 import state from '~/lib/viewer-state'
 
 const toast = useToast()
+const { t } = useI18n()
 
 // Init state with url token
 const route = useRoute()
@@ -229,8 +232,8 @@ try {
 catch {
   toast.add({
     severity: 'error',
-    summary: 'Erreur',
-    detail: 'Impossible de charger les données',
+    summary: t('page.search.token.error'),
+    detail: t('page.search.token.loadDataError'),
     life: 3000,
   })
   if (state.redirectUrl) {
@@ -259,7 +262,7 @@ const familySwitcher = ref<typeof Popover>()
 
 function resultLabel() {
   const result = currentEntitiesResults!.value?.total_results ?? 0
-  return result > 1 ? 'résultats' : 'résultat'
+  return result > 1 ? t('page.search.token.resultsPlural') : t('page.search.token.resultsSingular')
 }
 
 async function submitSearch() {
@@ -289,8 +292,8 @@ async function refreshResult() {
   catch {
     toast.add({
       severity: 'error',
-      summary: 'Erreur',
-      detail: 'Impossible de charger les résultats',
+      summary: t('page.search.token.error'),
+      detail: t('page.search.token.loadResultsError'),
       life: 3000,
     })
   }
