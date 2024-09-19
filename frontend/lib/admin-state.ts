@@ -18,6 +18,8 @@ import type {
   SafeHavenVersion,
 } from '~/lib'
 
+const { t } = useI18n()
+
 interface Identifiable {
   id: string | number
 }
@@ -264,6 +266,25 @@ export class AppState {
 
   get countsByCategory() {
     return this.countsByCategoryData ?? {}
+  }
+
+  // Tables local storage
+  registerTable(tableKey: string, selectedColumKeys: string[]) {
+    if (!(tableKey in state.tablesSelectedColumns)) {
+      this.tablesSelectedColumns[tableKey] = selectedColumKeys
+    }
+    if (!(tableKey in state.tablesFilters)) {
+      this.tablesFilters[tableKey] = {
+        global: { value: null, matchMode: 'contains' },
+      }
+    }
+  }
+
+  toSelectableColumns(optionalColumnsKeys: string[]): { key: string, label: string }[] {
+    const optionalColumns = optionalColumnsKeys.map(
+      column_key => ({ key: column_key, label: t('page.admin.familyId.categories.index.column_' + column_key) }),
+    )
+    return optionalColumns
   }
 }
 

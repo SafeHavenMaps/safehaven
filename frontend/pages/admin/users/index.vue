@@ -9,28 +9,29 @@
           class="-mt-1"
         /></InputIcon>
         <InputText
-          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
+          v-model="(state.tablesFilters[tableKey]['global'] as DataTableFilterMetaData).value"
           placeholder="Recherche"
         />
       </IconField>
       <MultiSelect
-        v-model="state.tablesSelectedColumns[table_key]"
+        v-model="state.tablesSelectedColumns[tableKey]"
         :options="optionalColumns"
-
+        option-label="label"
+        option-value="key"
         display="chip"
         placeholder="Sélectionner des colonnes"
         class="w-full md:w-80"
       />
     </span>
     <DataTable
-      v-model:filters="state.tablesFilters[table_key]"
+      v-model:filters="state.tablesFilters[tableKey]"
       paginator
       paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       current-page-report-template="&nbsp&nbsp&nbsp({totalPages} page·s, {totalRecords} utilisateur·ice·s)"
       :value="users"
       striped-rows
       state-storage="session"
-      :state-key="table_key"
+      :state-key="tableKey"
       data-key="id"
       :rows="10"
       :rows-per-page-options="[10, 20, 50]"
@@ -52,7 +53,7 @@
         </template>
       </Column>
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Droits')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('Droits')"
         header="Droits"
         field="is_admin"
         sortable
@@ -66,7 +67,7 @@
       </Column>
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Connection')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('Connection')"
         field="last_login"
         header="Dernière connection"
       >
@@ -97,17 +98,14 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { User } from '~/lib'
 import state from '~/lib/admin-state'
 
+// 'Droits', 'Connection'
+const optionalColumnsKeys = ['is_admin', 'last_login']
+const optionalColumns = state.toSelectableColumns(optionalColumnsKeys)
+
+const tableKey = `dt-users`
 const isSmallScreen = useMediaQuery('(max-width: 768px)')
-const optionalColumns = ref(['Droits', 'Connection'])
-const table_key = `dt-users`
-if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Droits', 'Connection']
-}
-if (!(table_key in state.tablesFilters)) {
-  state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: 'contains' },
-  }
-}
+const selectedColumKeys = isSmallScreen.value ? [] : ['is_admin', 'last_login']
+state.registerTable(tableKey, selectedColumKeys)
 
 definePageMeta({
   layout: 'admin-ui',

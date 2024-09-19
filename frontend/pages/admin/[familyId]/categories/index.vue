@@ -9,25 +9,27 @@
           />
         </InputIcon>
         <InputText
-          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
-          placeholder="Recherche"
+          v-model="(state.tablesFilters[tableKey]['global'] as DataTableFilterMetaData).value"
+          :placeholder="$t('page.admin.familyId.categories.index.search')"
         />
       </IconField>
       <MultiSelect
-        v-model="state.tablesSelectedColumns[table_key]"
+        v-model="state.tablesSelectedColumns[tableKey]"
         :options="optionalColumns"
+        option-label="label"
+        option-value="key"
         display="chip"
-        placeholder="Sélectionner des colonnes"
+        :placeholder="$t('page.admin.familyId.categories.index.selectColumns')"
         class="w-full md:w-80"
       />
     </span>
     <DataTable
-      v-model:filters="state.tablesFilters[table_key]"
+      v-model:filters="state.tablesFilters[tableKey]"
       paginator
       paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-      current-page-report-template="&nbsp&nbsp&nbsp({totalPages} page·s, {totalRecords} catégorie·s)"
+      :current-page-report-template="$t('page.admin.familyId.categories.index.currentPageReport')"
       state-storage="session"
-      :state-key="table_key"
+      :state-key="tableKey"
       data-key="id"
       :value="categories"
       striped-rows
@@ -39,26 +41,26 @@
     >
       <Column
         field="title"
-        header="Titre"
+        :header="$t('page.admin.familyId.categories.index.title')"
         sortable
       />
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Affichage par défaut')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('default_status')"
         field="default_status"
-        header="Affichage par défaut"
+        :header="$t('page.admin.familyId.categories.index.defaultDisplay')"
         sortable
       >
         <template #body="slotProps">
           <Tag
-            :value="slotProps.data.default_status ? 'Inclus' : 'Exclus'"
+            :value="slotProps.data.default_status ? $t('page.admin.familyId.categories.index.included') : $t('page.admin.familyId.categories.index.excluded')"
             :severity="slotProps.data.default_status ? 'success' : 'danger'"
           />
         </template>
       </Column>
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Entités')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('entity_count')"
         field="entity_count"
-        header="Entités"
+        :header="$t('page.admin.familyId.categories.index.entities')"
         sortable
       />
       <Column>
@@ -84,6 +86,9 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Category } from '~/lib'
 import state from '~/lib/admin-state'
 
+// const { t } = useI18n()
+const toast = useToast()
+
 const familyId = useRoute().params.familyId as string
 if (state.families == null)
   await state.fetchFamilies()
@@ -105,17 +110,14 @@ async function refreshTable() {
 }
 refreshTable()
 
+// const optionalColumns = ref(['Affichage par défaut', 'Entités'])
+const optionalColumnsKeys = ['default_status', 'entity_count']
+const optionalColumns = state.toSelectableColumns(optionalColumnsKeys)
+
+const tableKey = `dt-state-categories-${familyId}`
 const isSmallScreen = useMediaQuery('(max-width: 768px)')
-const optionalColumns = ref(['Affichage par défaut', 'Entités'])
-const table_key = `dt-state-categories-${familyId}`
-if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Affichage par défaut']
-}
-if (!(table_key in state.tablesFilters)) {
-  state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: 'contains' },
-  }
-}
+const selectedColumKeys = isSmallScreen.value ? [] : ['default_status']
+state.registerTable(tableKey, selectedColumKeys)
 
 definePageMeta({
   layout: 'admin-ui',
@@ -138,8 +140,6 @@ initAdminLayout(
     { label: 'Catégories', url: `/admin/${familyId}/categories` },
   ],
 )
-
-const toast = useToast()
 
 async function onDelete(category_id: string, category_name: string, onDeleteDone: () => void) {
   try {

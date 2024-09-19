@@ -6,28 +6,28 @@
     <AdminInputTextField
       id="title"
       v-model="editedCategory.title"
-      label="Titre"
+      :label="$t('page.admin.familyId.categories.id.title')"
       :variant="hasBeenEdited('title')"
     />
 
     <AdminInputSwitchField
       id="default_status"
       v-model="editedCategory.default_status"
-      label="Inclus par défaut"
-      helper-text="(si décoché, toutes les entités appartenant à cette catégorie seront exclues des résultats par défaut)"
+      :label="$t('page.admin.familyId.categories.id.defaultStatus')"
+      :helper-text="$t('page.admin.familyId.categories.id.defaultStatusHelper')"
     />
 
     <AdminInputColorField
       id="border_color"
       v-model="editedCategory.border_color"
-      label="Couleur de bordure"
+      :label="$t('page.admin.familyId.categories.id.borderColor')"
       :variant="hasBeenEdited('border_color')"
     />
 
     <AdminInputColorField
       id="fill_color"
       v-model="editedCategory.fill_color"
-      label="Couleur de remplissage"
+      :label="$t('page.admin.familyId.categories.id.fillColor')"
       :variant="hasBeenEdited('fill_color')"
     />
 
@@ -38,14 +38,14 @@
     <span class="flex gap-1 justify-end">
       <NuxtLink :to="`/admin/${familyId}/categories`">
         <Button
-          label="Annuler"
+          :label="$t('page.admin.familyId.categories.id.cancel')"
           severity="secondary"
           :disabled="processingRequest"
           :loading="processingRequest"
         />
       </NuxtLink>
       <Button
-        label="Sauvegarder"
+        :label="$t('page.admin.familyId.categories.id.save')"
         type="submit"
         :loading="processingRequest"
         :disabled="isDisabled()"
@@ -87,6 +87,7 @@ const editedCategory: Ref<NewOrUpdateCategory> = ref(isNew
 
 const processingRequest = ref(false)
 const toast = useToast()
+const { t } = useI18n()
 
 function isDisabled() {
   return processingRequest.value
@@ -97,16 +98,16 @@ function isDisabled() {
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  isNew ? 'Nouvelle catégorie' : `Édition de la catégorie ${fetchedCategory!.title}`,
+  isNew ? t('page.admin.familyId.categories.id.newCategory') : t('page.admin.familyId.categories.id.editCategory', { title: fetchedCategory!.title }),
   'category',
   [],
   [
     { label: `${familyTitle}`, url: '/admin/families' },
-    { label: 'Catégories', url: `/admin/${familyId}/categories` },
+    { label: t('page.admin.familyId.categories.id.categories'), url: `/admin/${familyId}/categories` },
     (
       isNew
-        ? { label: `Édition d'une nouvelle catégorie`, url: `/admin/${familyId}/categories/new` }
-        : { label: `Édition de la catégorie ${fetchedCategory!.title}`, url: `/admin/${familyId}/categories/${categoryId}` }
+        ? { label: t('page.admin.familyId.categories.id.editNewCategory'), url: `/admin/${familyId}/categories/new` }
+        : { label: t('page.admin.familyId.categories.id.editCategory', { title: fetchedCategory!.title }), url: `/admin/${familyId}/categories/${categoryId}` }
     ),
   ],
 )

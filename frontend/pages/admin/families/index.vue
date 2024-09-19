@@ -9,22 +9,24 @@
           class="-mt-1"
         /></InputIcon>
         <InputText
-          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
+          v-model="(state.tablesFilters[tableKey]['global'] as DataTableFilterMetaData).value"
           placeholder="Recherche"
         />
       </IconField>
       <MultiSelect
-        v-model="state.tablesSelectedColumns[table_key]"
+        v-model="state.tablesSelectedColumns[tableKey]"
         :options="optionalColumns"
+        option-label="label"
+        option-value="key"
         display="chip"
         placeholder="Sélectionner des colonnes"
         class="w-full md:w-80"
       />
     </span>
     <DataTable
-      v-model:filters="state.tablesFilters[table_key]"
+      v-model:filters="state.tablesFilters[tableKey]"
       state-storage="session"
-      :state-key="table_key"
+      :state-key="tableKey"
       data-key="id"
       paginator
       paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
@@ -43,7 +45,7 @@
         sortable
       />
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Entités')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('entity_count')"
         field="entity_count"
         header="Entités"
         sortable
@@ -104,18 +106,14 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { Family } from '~/lib'
 import state from '~/lib/admin-state'
 
-const optionalColumns = ref(['Entités'])
+// 'Entités'
+const optionalColumnsKeys = ['entity_count']
+const optionalColumns = state.toSelectableColumns(optionalColumnsKeys)
 
-const table_key = `dt-state-families`
+const tableKey = `dt-state-families`
 const isSmallScreen = useMediaQuery('(max-width: 768px)')
-if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Entités']
-}
-if (!(table_key in state.tablesFilters)) {
-  state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: 'contains' },
-  }
-}
+const selectedColumKeys = isSmallScreen.value ? [] : ['entity_count']
+state.registerTable(tableKey, selectedColumKeys)
 
 definePageMeta({
   layout: 'admin-ui',

@@ -76,7 +76,8 @@
       },
       "information": {
         "safeHaven": "SafeHaven",
-        "safeHavenDescription": "SafeHaven is an open-source solution for creating collaborative maps.<br>You can easily create your own map!",
+        "safeHavenDescription": "SafeHaven is an open-source solution for creating collaborative maps.",
+        "safeHavenDescriptionPart2": "You can easily create your own map!",
         "discoverOnGitHub": "Discover on GitHub"
       },
       "map": {
@@ -424,7 +425,45 @@
         "resetSuccess": "Option group successfully reset",
         "saveError": "Error saving the option group",
         "saveSuccess": "Option group successfully saved",
-        "success": "Success"
+        "success": "Success",
+        "pageTitle": "Configuration editing",
+        "pageBreadcrumb": "Configuration"
+      },
+      "familyId": {
+        "categories": {
+          "id": {
+            "title": "Title",
+            "defaultStatus": "Included by default",
+            "defaultStatusHelper": "(if unchecked, all entities belonging to this category will be excluded from the default results)",
+            "borderColor": "Border Color",
+            "fillColor": "Fill Color",
+            "cancel": "Cancel",
+            "save": "Save",
+            "newCategory": "New Category",
+            "editCategory": "Editing Category {title}",
+            "categories": "Categories",
+            "editNewCategory": "Editing a New Category"
+          },
+          "index": {
+            "search": "Search",
+            "selectColumns": "Select Columns",
+            "currentPageReport": "&nbsp&nbsp&nbsp({totalPages} page(s), {totalRecords} category(ies))",
+            "title": "Title",
+            "defaultDisplay": "Default Display",
+            "included": "Included",
+            "excluded": "Excluded",
+            "entities": "Entities",
+            "modelName": "of the category",
+            "categories": "Categories",
+            "newCategory": "New Category",
+            "success": "Success",
+            "error": "Error",
+            "deleteSuccess": "Category {category_name} successfully deleted",
+            "deleteError": "Error deleting category {category_name}",
+            "column_default_status": "Affichage par défaut",
+            "column_entity_count": "Entities"
+          }
+        }
       }
     }
   },

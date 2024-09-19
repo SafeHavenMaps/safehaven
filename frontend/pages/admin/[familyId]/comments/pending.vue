@@ -9,25 +9,27 @@
           />
         </InputIcon>
         <InputText
-          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
+          v-model="(state.tablesFilters[tableKey]['global'] as DataTableFilterMetaData).value"
           placeholder="Recherche"
         />
       </IconField>
       <MultiSelect
-        v-model="state.tablesSelectedColumns[table_key]"
+        v-model="state.tablesSelectedColumns[tableKey]"
         :options="optionalColumns"
+        option-label="label"
+        option-value="key"
         display="chip"
         placeholder="Sélectionner des colonnes"
         class="w-full md:w-80"
       />
     </span>
     <DataTable
-      v-model:filters="state.tablesFilters[table_key]"
+      v-model:filters="state.tablesFilters[tableKey]"
       paginator
       paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       current-page-report-template="&nbsp&nbsp&nbsp({totalPages} page·s, {totalRecords} commentaire·s)"
       state-storage="session"
-      :state-key="table_key"
+      :state-key="tableKey"
       data-key="id"
       :value="comments"
       striped-rows
@@ -51,7 +53,7 @@
       />
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Catégorie')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('entity_category_id')"
         field="entity_category_id"
         header="Catégorie"
         sortable
@@ -62,7 +64,7 @@
       </Column>
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Créé le')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('created_at')"
         field="created_at"
         header="Créé le"
         sortable
@@ -72,7 +74,7 @@
         </template>
       </Column>
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Mis à jour le')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('updated_at')"
         field="updated_at"
         header="Mis à jour le"
         sortable
@@ -119,17 +121,14 @@ async function refreshTable() {
 }
 refreshTable()
 
+// 'Catégorie', 'Créé le', 'Mis à jour le'
+const optionalColumnsKeys = ['entity_category_id', 'created_at', 'updated_at']
+const optionalColumns = state.toSelectableColumns(optionalColumnsKeys)
+
+const tableKey = `dt-state-comments-${familyId}`
 const isSmallScreen = useMediaQuery('(max-width: 768px)')
-const optionalColumns = ref(['Catégorie', 'Créé le', 'Mis à jour le'])
-const table_key = `dt-state-comments-${familyId}`
-if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Créé le', 'Catégorie']
-}
-if (!(table_key in state.tablesFilters)) {
-  state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: 'contains' },
-  }
-}
+const selectedColumKeys = isSmallScreen.value ? [] : ['entity_category_id', 'created_at']
+state.registerTable(tableKey, selectedColumKeys)
 
 definePageMeta({
   layout: 'admin-ui',

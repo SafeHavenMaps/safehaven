@@ -76,7 +76,8 @@
       },
       "information": {
         "safeHaven": "SafeHaven",
-        "safeHavenDescription": "SafeHaven est une solution opensource de création de carte collaborative.<br>Vous pouvez facilement créer votre carte !",
+        "safeHavenDescription": "SafeHaven est une solution opensource de création de carte collaborative.",
+        "safeHavenDescriptionPart2": "Vous pouvez facilement créer votre carte !",
         "discoverOnGitHub": "Découvrir sur GitHub"
       },
       "map": {
@@ -426,7 +427,26 @@
         "resetSuccess": "Groupe d'options réinitialisé avec succès",
         "saveError": "Erreur de sauvegarde du groupe d'options",
         "saveSuccess": "Groupe d'options sauvegardé avec succès",
-        "success": "Succès"
+        "success": "Succès",
+        "pageTitle": "Édition de la configuration",
+        "pageBreadcrumb": "Configuration"
+      },
+      "familyId": {
+        "categories": {
+          "id": {
+            "title": "Titre",
+            "defaultStatus": "Inclus par défaut",
+            "defaultStatusHelper": "(si décoché, toutes les entités appartenant à cette catégorie seront exclues des résultats par défaut)",
+            "borderColor": "Couleur de bordure",
+            "fillColor": "Couleur de remplissage",
+            "cancel": "Annuler",
+            "save": "Sauvegarder",
+            "newCategory": "Nouvelle catégorie",
+            "editCategory": "Édition de la catégorie {title}",
+            "categories": "Catégories",
+            "editNewCategory": "Édition d'une nouvelle catégorie"
+          }
+        }
       }
     }
   },

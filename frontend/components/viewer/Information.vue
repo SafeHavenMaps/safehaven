@@ -31,6 +31,8 @@
 
         <p class="text-center !m-4">
           {{ $t('cmp.viewer.information.safeHavenDescription') }}
+          <br>
+          {{ $t('cmp.viewer.information.safeHavenDescriptionPart2') }}
         </p>
 
         <p class="text-center !m-4">

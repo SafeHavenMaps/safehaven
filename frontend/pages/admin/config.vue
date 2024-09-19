@@ -132,20 +132,20 @@
 
           <span class="flex gap-1 justify-end">
             <Button
-              label="Annuler"
+              :label="$t('page.admin.config.cancel')"
               severity="secondary"
               :disabled="processingRequest"
               @click="onCancel('init_popup')"
             />
             <Button
               v-if="state.is_admin"
-              label="Réinitialiser"
+              :label="$t('page.admin.config.reset')"
               :disabled="processingRequest"
               @click="onDelete('init_popup')"
             />
             <Button
               v-if="state.is_admin"
-              label="Sauvegarder"
+              :label="$t('page.admin.config.save')"
               type="submit"
               :disabled="processingRequest || !isOptionGroupValid('init_popup')"
             />
@@ -181,20 +181,20 @@
 
           <span class="flex gap-1 justify-end">
             <Button
-              label="Annuler"
+              :label="$t('page.admin.config.cancel')"
               severity="secondary"
               :disabled="processingRequest"
               @click="onCancel('cartography_init')"
             />
             <Button
               v-if="state.is_admin"
-              label="Réinitialiser"
+              :label="$t('page.admin.config.reset')"
               :disabled="processingRequest"
               @click="onDelete('cartography_init')"
             />
             <Button
               v-if="state.is_admin"
-              label="Sauvegarder"
+              :label="$t('page.admin.config.save')"
               type="submit"
               :disabled="processingRequest || !isOptionGroupValid('cartography_init')"
             />
@@ -237,20 +237,20 @@
 
           <span class="flex gap-1 justify-end">
             <Button
-              label="Annuler"
+              :label="$t('page.admin.config.cancel')"
               severity="secondary"
               :disabled="processingRequest"
               @click="onCancel('cartography_source')"
             />
             <Button
               v-if="state.is_admin"
-              label="Réinitialiser"
+              :label="$t('page.admin.config.reset')"
               :disabled="processingRequest"
               @click="onDelete('cartography_source')"
             />
             <Button
               v-if="state.is_admin"
-              label="Sauvegarder"
+              :label="$t('page.admin.config.save')"
               type="submit"
               :disabled="processingRequest || !isOptionGroupValid('cartography_source')"
             />
@@ -286,20 +286,20 @@
 
           <span class="flex gap-1 justify-end">
             <Button
-              label="Annuler"
+              :label="$t('page.admin.config.cancel')"
               severity="secondary"
               :disabled="processingRequest"
               @click="onCancel('cartography_cluster')"
             />
             <Button
               v-if="state.is_admin"
-              label="Réinitialiser"
+              :label="$t('page.admin.config.reset')"
               :disabled="processingRequest"
               @click="onDelete('cartography_cluster')"
             />
             <Button
               v-if="state.is_admin"
-              label="Sauvegarder"
+              :label="$t('page.admin.config.save')"
               type="submit"
               :disabled="processingRequest || !isOptionGroupValid('cartography_cluster')"
             />
@@ -336,20 +336,20 @@
 
           <span class="flex gap-1 justify-end">
             <Button
-              label="Annuler"
+              :label="$t('page.admin.config.cancel')"
               severity="secondary"
               :disabled="processingRequest"
               @click="onCancel('safe_mode')"
             />
             <Button
               v-if="state.is_admin"
-              label="Réinitialiser"
+              :label="$t('page.admin.config.reset')"
               :disabled="processingRequest"
               @click="onDelete('safe_mode')"
             />
             <Button
               v-if="state.is_admin"
-              label="Sauvegarder"
+              :label="$t('page.admin.config.save')"
               type="submit"
               :disabled="processingRequest || !isOptionGroupValid('safe_mode')"
             />
@@ -373,6 +373,7 @@ const editedConfig: Ref<SafeHavenOptions> = ref(JSON.parse(JSON.stringify(fetche
 
 const processingRequest = ref(false)
 const toast = useToast()
+const { t } = useI18n()
 
 const popupEnabled = ref(!!editedConfig.value.init_popup.popup)
 const popupCheckboxEnabled = ref(!!editedConfig.value.init_popup.popup_check_text)
@@ -419,11 +420,11 @@ definePageMeta({
 
 const initAdminLayout = inject<InitAdminLayout>('initAdminLayout')!
 initAdminLayout(
-  'Édition de la configuration',
+  t('page.admin.config.pageTitle'),
   'user',
   [],
   [
-    { label: 'Configuration', url: '/admin/config' },
+    { label: t('page.admin.config.pageBreadcrumb'), url: '/admin/config' },
   ],
 )
 
@@ -541,10 +542,10 @@ async function onSave(name: keyof SafeHavenOptions, config: ConfigurationOption)
   try {
     await state.client.updateConfig(name, config)
     fetchedConfig = state.options
-    toast.add({ severity: 'success', summary: 'Succès', detail: 'Groupe d\'options sauvegardé avec succès', life: 3000 })
+    toast.add({ severity: 'success', summary: t('page.admin.config.success'), detail: t('page.admin.config.saveSuccess'), life: 3000 })
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de sauvegarde du groupe d\'options', life: 3000 })
+    toast.add({ severity: 'error', summary: t('page.admin.config.error'), detail: t('page.admin.config.saveError'), life: 3000 })
   }
   processingRequest.value = false
 }
@@ -555,10 +556,10 @@ async function onDelete(name: keyof SafeHavenOptions) {
     await state.client.deleteConfig(name)
     fetchedConfig = state.options
     editedConfig.value[name] = JSON.parse(JSON.stringify(fetchedConfig))[name]
-    toast.add({ severity: 'success', summary: 'Succès', detail: 'Groupe d\'options réinitialisé avec succès', life: 3000 })
+    toast.add({ severity: 'success', summary: t('page.admin.config.success'), detail: t('page.admin.config.resetSuccess'), life: 3000 })
   }
   catch {
-    toast.add({ severity: 'error', summary: 'Erreur', detail: 'Erreur de réinitialisation du groupe d\'options', life: 3000 })
+    toast.add({ severity: 'error', summary: t('page.admin.config.error'), detail: t('page.admin.config.resetError'), life: 3000 })
   }
   processingRequest.value = false
 }

@@ -36,7 +36,7 @@
       v-if="hasParents || hasChildren"
       paginator
       state-storage="session"
-      :state-key="table_key"
+      :state-key="tableKey"
       data-key="id"
       :value="hasChildren ? props.mainEntity.children : props.mainEntity.parents"
       striped-rows
@@ -98,7 +98,7 @@ const parentSelectVisible = ref(false)
 const hasParents = computed(() => !!props.mainEntity.parents.length)
 const hasChildren = computed(() => !!props.mainEntity.children.length)
 
-const table_key = `dt-state-entities-kinship-${props.mainEntity.id}`
+const tableKey = `dt-state-entities-kinship-${props.mainEntity.id}`
 
 const toast = useToast()
 const { t } = useI18n()

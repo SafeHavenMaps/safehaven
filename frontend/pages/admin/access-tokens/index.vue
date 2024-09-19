@@ -9,22 +9,24 @@
           class="-mt-1"
         /></InputIcon>
         <InputText
-          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
+          v-model="(state.tablesFilters[tableKey]['global'] as DataTableFilterMetaData).value"
           placeholder="Recherche"
         />
       </IconField>
       <MultiSelect
-        v-model="state.tablesSelectedColumns[table_key]"
+        v-model="state.tablesSelectedColumns[tableKey]"
         :options="optionalColumns"
+        option-label="label"
+        option-value="key"
         display="chip"
         placeholder="Sélectionner des colonnes"
         class="w-full md:w-80"
       />
     </span>
     <DataTable
-      v-model:filters="state.tablesFilters[table_key]"
+      v-model:filters="state.tablesFilters[tableKey]"
       state-storage="session"
-      :state-key="table_key"
+      :state-key="tableKey"
       data-key="id"
       paginator
       paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
@@ -43,7 +45,7 @@
         sortable
       />
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Jeton')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('token')"
         field="token"
         header="Jeton"
       />
@@ -61,7 +63,7 @@
       </Column>
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Visites')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('last_week_visits')"
         field="last_week_visits"
         header="Visites (7 derniers jours)"
         class="max-w-32 "
@@ -69,7 +71,7 @@
       />
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Familles')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('permissions_families_policy')"
         header="Familles"
         :field="(data: any) => all_included(data.permissions.families_policy).toString()"
         sortable
@@ -83,7 +85,7 @@
       </Column>
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Catégories')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('permissions_categories_policy')"
         header="Catégories"
         :field="(data: any) => all_included(data.permissions.categories_policy).toString()"
         sortable
@@ -97,9 +99,9 @@
       </Column>
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Tags')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('permissions_tags_policy')"
         header="Tags"
-        field="data => all_included(data.permissions.tags_policy).toString()"
+        :field="data => all_included(data.permissions.tags_policy).toString()"
         sortable
       >
         <template #body="slotProps">
@@ -111,7 +113,7 @@
       </Column>
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Commentaires')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('permissions_can_access_comments')"
         header="Commentaires"
         field="permissions.can_access_comments"
         sortable
@@ -157,18 +159,15 @@ import type { InitAdminLayout } from '~/layouts/admin-ui.vue'
 import type { AccessToken, PermissionPolicy } from '~/lib'
 import state from '~/lib/admin-state'
 
-const optionalColumns = ref(['Jeton', 'Visites', 'Familles', 'Catégories', 'Tags', 'Commentaires'])
+// 'Jeton', 'Visites', 'Familles', 'Catégories', 'Tags', 'Commentaires'
+const optionalColumnsKeys = ['token', 'last_week_visits', 'permissions_family_policy',
+  'permissions_categories_policy', 'permissions_tags_policy', 'permissions_can_access_comments']
+const optionalColumns = state.toSelectableColumns(optionalColumnsKeys)
 
+const tableKey = `dt-state-access-tokens`
 const isSmallScreen = useMediaQuery('(max-width: 768px)')
-const table_key = `dt-state-access-tokens`
-if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Visites']
-}
-if (!(table_key in state.tablesFilters)) {
-  state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: 'contains' },
-  }
-}
+const selectedColumKeys = isSmallScreen.value ? [] : ['last_week_visits']
+state.registerTable(tableKey, selectedColumKeys)
 
 function all_included(permissionPolicy: PermissionPolicy) {
   return permissionPolicy.allow_all && !permissionPolicy.force_exclude.length

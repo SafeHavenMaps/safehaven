@@ -11,25 +11,27 @@
           />
         </InputIcon>
         <InputText
-          v-model="(state.tablesFilters[table_key]['global'] as DataTableFilterMetaData).value"
+          v-model="(state.tablesFilters[tableKey]['global'] as DataTableFilterMetaData).value"
           placeholder="Recherche"
         />
       </IconField>
       <MultiSelect
-        v-model="state.tablesSelectedColumns[table_key]"
+        v-model="state.tablesSelectedColumns[tableKey]"
         :options="optionalColumns"
+        option-label="label"
+        option-value="key"
         display="chip"
         placeholder="Sélectionner des colonnes"
         class="w-full md:w-80"
       />
     </span>
     <DataTable
-      v-model:filters="state.tablesFilters[table_key]"
+      v-model:filters="state.tablesFilters[tableKey]"
       paginator
       paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       current-page-report-template="&nbsp&nbsp&nbsp({totalPages} page·s, {totalRecords} entité·s)"
       state-storage="session"
-      :state-key="table_key"
+      :state-key="tableKey"
       data-key="id"
       :value="entities"
       striped-rows
@@ -47,7 +49,7 @@
       />
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Catégorie')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('category_id')"
         field="category_id"
         header="Catégorie"
         sortable
@@ -58,7 +60,7 @@
       </Column>
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Créée le')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('created_at')"
         field="created_at"
         header="Créée le"
         sortable
@@ -68,7 +70,7 @@
         </template>
       </Column>
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Mise à jour le')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('updated_at')"
         field="updated_at"
         header="Mise à jour le"
         sortable
@@ -79,7 +81,7 @@
       </Column>
 
       <Column
-        v-if="state.tablesSelectedColumns[table_key].includes('Visibilité')"
+        v-if="state.tablesSelectedColumns[tableKey].includes('hidden')"
         field="hidden"
         header="Visibilité"
       >
@@ -128,17 +130,14 @@ async function refreshTable() {
 }
 refreshTable()
 
+// 'Catégorie', 'Créée le', 'Mise à jour le', 'Visibilité'
+const optionalColumnsKeys = ['category_id', 'created_at', 'updated_at', 'hidden']
+const optionalColumns = state.toSelectableColumns(optionalColumnsKeys)
+
+const tableKey = `dt-state-pending-entities-${familyId}`
 const isSmallScreen = useMediaQuery('(max-width: 768px)')
-const optionalColumns = ref(['Catégorie', 'Créée le', 'Mise à jour le', 'Visibilité'])
-const table_key = `dt-state-entities-${familyId}`
-if (!(table_key in state.tablesSelectedColumns)) {
-  state.tablesSelectedColumns[table_key] = isSmallScreen.value ? [] : ['Catégorie', 'Créée le']
-}
-if (!(table_key in state.tablesFilters)) {
-  state.tablesFilters[table_key] = {
-    global: { value: null, matchMode: 'contains' },
-  }
-}
+const selectedColumKeys = isSmallScreen.value ? [] : ['category_id', 'created_at']
+state.registerTable(tableKey, selectedColumKeys)
 
 definePageMeta({
   layout: 'admin-ui',
