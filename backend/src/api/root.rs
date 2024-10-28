@@ -119,6 +119,7 @@ pub struct BootstrapResponse {
 #[derive(Deserialize)]
 pub struct BootstrapQueryParams {
     #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
     pub referrer: Option<String>,
 }
 
