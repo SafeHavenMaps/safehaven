@@ -172,6 +172,9 @@ async fn bootstrap(
 ) -> Result<AppJson<BootstrapResponse>, AppError> {
     tracing::trace!("Bootstrapping");
     let access_token = AccessToken::get(token, &mut conn).await?;
+    if !access_token.active {
+        return Err(AppError::NotFound);
+    }
 
     // Process the token request
     let perms: crate::models::access_token::Permissions = access_token.permissions.0;

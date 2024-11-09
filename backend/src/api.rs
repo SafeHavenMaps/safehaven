@@ -198,6 +198,7 @@ pub enum AppError {
     Database(sqlx::Error),
     InvalidPagination,
     Internal(Option<String>),
+    NotFound,
 }
 
 #[derive(FromRequest)]
@@ -226,6 +227,7 @@ impl IntoResponse for AppError {
             AppError::BadUsernameOrPassword => (StatusCode::NOT_FOUND, "user_not_found", None),
             AppError::TokenValidation => (StatusCode::UNAUTHORIZED, "token_validation_error", None),
             AppError::Validation(ve) => (StatusCode::BAD_REQUEST, "validation_error", Some(ve)),
+            AppError::NotFound => (StatusCode::NOT_FOUND, "not_found", None),
             AppError::Database(de) => match de {
                 sqlx::Error::RowNotFound => (StatusCode::NOT_FOUND, "not_found", None),
                 _ => {
