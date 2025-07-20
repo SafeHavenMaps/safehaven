@@ -40,7 +40,7 @@
             rel="noopener noreferrer"
           >
             <Button
-              label="Découvrir sur GitHub"
+              label="Découvrir sur Codeberg"
             >
               <template #icon>
                 <AppIcon icon-name="github" />
@@ -57,7 +57,7 @@
 import state from '~/lib/viewer-state'
 
 const siteInfo = await state.getSanitizedInformation()
-const safeHavenRepoUrl = 'https://github.com/SafeHavenMaps/safehaven'
+const safeHavenRepoUrl = 'https://codeberg.org/SafeHaven/safehaven'
 </script>
 
 <style scoped>

@@ -126,7 +126,7 @@
       class="m-1"
     >
       Une mise à jour est disponible.<br>
-      <a href="https://github.com/SafeHavenMaps/safehaven/releases">Rendez-vous sur GitHub</a> pour voir et mettre à jour vers la dernière version.
+      <a href="https://codeberg.org/SafeHaven/safehaven/releases">Rendez-vous sur Codeberg</a> pour voir et mettre à jour vers la dernière version.
     </Message>
     <div class="m-1">
       Version actuelle: <pre>{{ state.versionInformation?.version ?? 'Inconnu' }}</pre>
