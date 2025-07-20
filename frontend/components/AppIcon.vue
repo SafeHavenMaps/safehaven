@@ -65,7 +65,7 @@ const iconDict: Record<string, string> = {
   warning: mdi.mdiAlert,
   clear: mdi.mdiEraser,
   filterOff: mdi.mdiFilterOff,
-  github: mdi.mdiGithub,
+  github: mdi.mdiGit,
   chevronDown: mdi.mdiChevronDown,
   activePage: mdi.mdiMenuRight,
   listEdit: mdi.mdiTextBoxEditOutline,

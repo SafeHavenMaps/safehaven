@@ -2,6 +2,8 @@
 
 An open-source project to create a map of safe spaces for people in need.
 
+# WE ARE MIGRATING TO CODEBERG https://codeberg.org/SafeHaven/safehaven
+
 ## Deploy
 
 We provide docker images that are ready to deploy SafeHaven. You can find the releases in the

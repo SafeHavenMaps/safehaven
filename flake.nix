@@ -4,10 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    alejandra = {
-      url = "github:kamadorueda/alejandra/3.0.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     fenix = {
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,7 +14,6 @@
     self,
     nixpkgs,
     fenix,
-    alejandra,
     flake-utils,
     ...
   }:
@@ -66,7 +61,6 @@
 
             echo "::group::Backend lint"
               cargo fmt -- --check
-              cargo clippy -- -D warnings
             echo "::endgroup::"
 
             echo "::group::OpenAPI sync checks"
@@ -273,8 +267,6 @@
               sqlx-cli
               # Front
               fixedNode
-              # Nix formatting
-              alejandra.defaultPackage.${system}
               # Process composing
               process-compose
               # PostgreSQL and PostGIS

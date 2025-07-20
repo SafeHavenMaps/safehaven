@@ -133,7 +133,7 @@ pub struct SafeHavenVersionResponse {
 async fn get_github_last_version() -> Option<String> {
     let client = reqwest::Client::new();
     let response = client
-        .get("https://api.github.com/repos/SafeHavenMaps/safehaven/releases/latest")
+        .get("https://codeberg.org/api/v1/repos/SafeHaven/safehaven/releases/latest")
         .header("User-Agent", "SafeHaven")
         .send()
         .await
